@@ -6,10 +6,11 @@ program selplt
   use constants
   implicit none   
   integer, parameter :: nn=2000,nff=1000,nvar=210,ndim=2,ncond=17               !ndim is the number of dimensions of the conditions array (differen variables, for AND), ncond is the number of conditions (for OR)
-  real*8 :: dat(nvar,nn),dato(nvar,nn),r,l,t,x(ndim),y(ndim,ncond),dy(ndim,ncond),sumsq,zsurf
-  integer :: i,j,m,n,nc,f,nf,fl,bl,sel,dsel,cd,d,indx(ndim),ver,dpdt
+  real*8 :: dat(nvar,nn),dato(nvar,nn),x(ndim),y(ndim,ncond),dy(ndim,ncond),sumsq!,zsurf
+  integer :: i,j,n,f,nf,sel,cd,d,indx(ndim),ver,dpdt!,dsel
   character :: fnames(nff)*99,fname*99,labels(nvar)*99
   
+  call setconstants()
   
   indx = (/10,9/) !Teff, L
   

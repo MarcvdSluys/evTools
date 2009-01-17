@@ -8,7 +8,7 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
   use constants
   implicit none
   real :: x,xmin,xmax,y,ymin,ymax,logr,dlogr,cst
-  real :: r1,r2,dr
+  real :: r1,r2,dr,x2(2),y2(2)
   character :: str*99
   
   call pgsls(4)
@@ -32,7 +32,10 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
      else
         write(str,'(I5,A)')nint(10**logr),'R\d\(2281)\u'
      end if
-     call pgline(2,(/2.,6./),cst+2*logr+4*(/2.,6./))
+     !call pgline(2,(/2.,6./),cst+2*logr+4*(/2.,6./))
+     x2 = (/2.,6./)
+     y2 = cst+2*logr+4*(/2.,6./)
+     call pgline(2,x2,y2)
      x = xmin - (xmax-xmin)*0.015
      y = cst+2*logr+4*xmin
      if(y.gt.ymax) then
@@ -75,7 +78,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   integer :: nn,nvar,n,nl, nhp,hp(1000),  i,j
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
   real*8 :: dat(nvar,nn)
-  real :: xx(nn),yy(nl,nn),zonex(4),zoney(3,4),ymin,ymax
+  real :: xx(nn),xx2(2),yy(nl,nn),y(nn),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),ymin,ymax,dat1(nn)
   character :: hlbls*5,hlp,hlbl
   
   plconv = 1  !Plot convection
@@ -84,7 +87,9 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   plcb   = 1  !Plot core boundaries
   
   call pgslw(3)
-  call pgline(n,xx(1:n),yy(1,1:n))
+  !call pgline(n,xx(1:n),yy(1,1:n))
+  y(1:n) = yy(1,1:n)
+  call pgline(n,xx(1:n),y(1:n))
   
   ch = 1 !Plot hatches
   if(ch.eq.1) then
@@ -97,6 +102,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
      if(plconv.eq.1) then
         call pgslw(3)
         call pgsci(14)
+        ibold = 0
         do i=2,n
            !cycle
            ib = 68
@@ -170,7 +176,9 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            
            
            do j=1,nz
-              if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
+              !if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
+              zoney1(1:4) = zoney(j,1:4)
+              if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
            ibold = ib
         end do !do i=2,n
@@ -265,7 +273,9 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            !if(xx(i).gt.1180) write(6,'(I5,I6,2(2x,6F8.4))')i,nint(xx(i)),real(dat(63:74,i))
            
            do j=1,nz
-              if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
+              !if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
+              zoney1(1:4) = zoney(j,1:4)
+              if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
            ibold = ib
         end do   !do i=2,n
@@ -281,6 +291,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
         call pgslw(3)
         call pgsls(1)
         call pgsci(2)
+        ibold = 0
         do i=2,n
            do j=80,76,-1
               if(dabs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are equal, remove them
@@ -348,10 +359,17 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            end do
            
            do j=1,nz
-              call pgpoly(4,zonex,zoney(j,1:4))
+              !call pgpoly(4,zonex,zoney(j,1:4))
+              zoney1(1:4) = zoney(j,1:4)
+              call pgpoly(4,zonex,zoney1(1:4))
               !if(mod(dib,2).eq.0.or.i.eq.2) then !Even dib
-              call pgline(2,zonex(2:3),zoney(j,(/1,4/))) !Outline the region.  Dangerous?
-              call pgline(2,zonex(2:3),zoney(j,2:3))
+              !call pgline(2,zonex(2:3),zoney(j,(/1,4/))) !Outline the region.  Dangerous?
+              !call pgline(2,zonex(2:3),zoney(j,2:3))
+              !call pgline(2,zonex(2:3),zoney1((/1,4/))) !Outline the region.  Dangerous?
+              !call pgline(2,zonex(2:3),(/zoney1(1),zoney1(4)/)) !Outline the region.  Dangerous?
+              zoney2 = zoney1((/1,4/))
+              call pgline(2,zonex(2:3),zoney2(1:2)) !Outline the region.  Dangerous?
+              call pgline(2,zonex(2:3),zoney1(2:3))
               !end if
            end do
            ibold = ib
@@ -361,7 +379,10 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
         if(hlp.eq.'y') then
            call pgsch(0.7)
            do i=1,nhp
-              call pgline(2,(/xx(hp(i)),xx(hp(i))/),(/ymin,ymax/))
+              !call pgline(2,(/xx(hp(i)),xx(hp(i))/),(/ymin,ymax/))
+              xx2 = (/xx(hp(i)),xx(hp(i))/)
+              yy2 = (/ymin,ymax/)
+              call pgline(2,xx2,yy2)
               write(hlbls,'(I5)')nint(dat(1,hp(i)))
               if(hlbl.eq.'y') call pgtext(xx(hp(i)),yy(1,hp(i)),hlbls)
            end do
@@ -398,13 +419,18 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
      call pgsls(1)
      do j=5,7 !core masses
         call pgsci(j-1)
-        call pgline(n,xx(1:n),real(dat(j,1:n)))
+        !call pgline(n,xx(1:n),real(dat(j,1:n)))
+        dat1(1:n) = real(dat(j,1:n))
+        call pgline(n,xx(1:n),dat1(1:n))
      end do !j
      
      call pgslw(4)
      call pgsls(1)
      call pgsci(0)
-     call pgline(2,xx((/1,n/)),(/0.,0./))
+     !call pgline(2,xx((/1,n/)),(/0.,0./))
+     xx2 = xx((/1,n/))
+     yy2 = (/0.,0./)
+     call pgline(2,xx2,yy2)
   end if
   
   call pgsci(1)

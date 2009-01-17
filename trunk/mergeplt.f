@@ -7,7 +7,6 @@ program mergeplt
   integer :: nn,nnn
   parameter (nn=30000,nnn=100)
   real*8 :: dat1(nnn,nn),dat2(nnn,nn)
-  real :: x
   integer :: model1(nn),model2(nn)
   integer :: narg,iargc,l1,l2,lo
 

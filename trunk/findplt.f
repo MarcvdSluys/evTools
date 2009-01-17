@@ -7,8 +7,8 @@ program findplt
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nnn=100,ny=18
-  real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mi
-  integer :: i,j,ncols,y(ny),prmdl,succ,narg,iargc,iin,iout,glt
+  real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b
+  integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt
   character :: findfile*20,fname*99,arg*99
   
   !Read atmosphere-model data

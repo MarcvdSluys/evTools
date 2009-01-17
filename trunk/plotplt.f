@@ -12,7 +12,7 @@ program plotplt
   integer,parameter :: nn=30000,nvar=210,nc=81,nl=10
   real*8 :: dat(nvar,nn),d(nvar)
   !real*8 :: c92(nn),c85a,c85b
-  real :: xx(nn),yy(nl,nn),minx,miny(nl),dist,mindist
+  real :: xx(nn),yy(nl,nn),yy1(nn),minx,miny(nl),dist,mindist
   real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   !real :: tsc(6,nn),zonex(4),zoney(3,4)
@@ -127,6 +127,9 @@ program plotplt
      yy(1,1:n) = real(dlog10(abs(dat(9,1:nn))))
      lx = 'log '//labels(10)
      ly = 'log '//labels(9)
+     vy = 0
+     lgx = 1
+     lgy = 1
      goto 50
   end if
   
@@ -598,9 +601,13 @@ program plotplt
   
   do i=1,ny
      call pgsci(i)
-     if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy(i,1:n),1)
-     if(drawlines.ge.1) call pgline(n,xx(1:n),yy(i,1:n))
-     if(drawlines.eq.2) call pgpoint(n,xx(1:n),yy(i,1:n),20)
+     !if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy(i,1:n),1)
+     !if(drawlines.ge.1) call pgline(n,xx(1:n),yy(i,1:n))
+     !if(drawlines.eq.2) call pgpoint(n,xx(1:n),yy(i,1:n),20)
+     yy1(1:n) = yy(i,1:n)
+     if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy1(1:n),1)
+     if(drawlines.ge.1) call pgline(n,xx(1:n),yy1(1:n))
+     if(drawlines.eq.2) call pgpoint(n,xx(1:n),yy1(1:n),20)
   end do
   call pgsci(1)
   

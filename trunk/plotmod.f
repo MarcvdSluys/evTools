@@ -9,22 +9,22 @@ program plotmod
   implicit none
   integer, parameter :: nc=25,nm=1000
   real*8 :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real*8 :: lnf,lnt,x16,m,lnm,x1,lnr,l,x4,x12,x20
-  real*8 :: mi,pr,phi,phis,e,f
-  real*8 :: m2,q1,q2,a,a1,a2,rl1,rl2,x
-  real*8 :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
+  real*8 :: lnf,lnt,x16,lnm,x1,lnr,l,x4,x12,x20
+  real*8 :: mi,pr,phi,phis,e,f,x
+  real*8 :: r1,l1,ts,tc,hc,hec,zc
   real*8 :: mhe,mco
   integer :: i,j,kh,kp,jmod,jb,jin,n
   integer :: narg,iargc,blk
   character :: fname*99,findfile*99
-
+  
   real :: dat(nc,nm),dat1(nc,nm)
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
   integer :: vx,vy,hmp,plotagain
   character :: log,ans
   character :: labels(nc)*60,lx*60,ly*60,title*100
-
-
+  
+  call setconstants()
+  
   plotagain = 0
   x=system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')

@@ -7,7 +7,7 @@ program plt2obs
   real*8 :: tm,m,mc,z,zmod,mv,umb,bmv,vmr,rmi
   real*8 :: logt,logl,logr,dat(nc,nn)
   integer :: i,j,n,ncols,fnl,nf,f
-  character :: findfile*99,fname*99,fnames(nff)*99,oname*55,ans
+  character :: fname*99,fnames(nff)*99,oname*55,ans
   
   
   !Read atmosphere-model data

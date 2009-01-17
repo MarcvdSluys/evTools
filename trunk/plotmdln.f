@@ -20,9 +20,11 @@ program plotmdln
   integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax
   character findfile*99,fname*99,rng,log,mdlnr*5
   character :: labels(nq)*60,lx*50,ly*50,title*100
-
+  
   plotagain = 0
-
+  
+  call setconstants()
+  
   !Axis labels
   labels(1)='\u\(2263) centre\d    Mesh point    \usurface \(2261)'
   labels(2) = 'M (M\d\(2281)\u)'

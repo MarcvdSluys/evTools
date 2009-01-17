@@ -4,7 +4,7 @@ program plt2ce
   implicit none   
   integer, parameter :: nff=200, n=100000,nc=89
   real*8 :: dat(nc),r,l,t,m0,r0
-  integer :: i,nc1,f,nf,fl,bl
+  integer :: i,nc1,f,nf,fl
   character :: fnames(nff)*99,fname*99
   
   m0 = 1.9891d33

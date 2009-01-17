@@ -23,6 +23,8 @@ program plotpltn
   character :: rng,log,labels(100)*45,lx*40,ly*40,title*100!,str*99
   logical :: ex
   
+  call setconstants()
+  
   !os = getos() !1-Linux, 2-MacOS
   os = 1        !Don't use Mac OS's silly AquaTerm
   whitebg = 1   !0: black background on screen, 1: white
