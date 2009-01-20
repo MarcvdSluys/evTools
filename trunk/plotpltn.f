@@ -11,16 +11,15 @@ program plotpltn
   use ubvdata
   implicit none
   integer, parameter :: nn=10000,nc=100,nff=120  !10000x100x120 takes ~1Gb!
-  !real*8 :: dat(nff,nc,nn)  !Using real in stead of real*8 reduces the memory usage with 50%
   real*8, allocatable :: dat(:,:,:)
-  real :: xx(nff,nn),yy(nff,nn),minx(nff),miny(nff)
-  real :: x,system,xmin,xmax,dx,ymin,ymax,dy
+  real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
+  real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn)!,getos
+  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle
   character :: fnames(nff)*99,fname*99,psname*99
-  character :: rng,log,labels(100)*45,lx*40,ly*40,title*100!,str*99
+  character :: rng,log,labels(100)*45,lx*40,ly*40,title*100
   logical :: ex
   
   call setconstants()
@@ -33,11 +32,12 @@ program plotpltn
   prtitle   = 0 !Print dir as title: 0-no, 1-yes
   
   !Read atmosphere-model data
-  open(unit=10, file='~/bin/lib/UBVRI.Kur',status='old')
+  open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read')
   read(unit=10, fmt=*)ubv
   close(10)
   
-  
+  lgx = 0
+  lgy = 0
   
   labels(1) = 'Model'
   labels(2) = 't (yr)'
@@ -118,12 +118,12 @@ program plotpltn
   
   labels(88) = 'k\u2\dR\u2\d'
 
-  x=system('pwd > tmppwd.txt')
+  i = system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  x=system('rm tmppwd.txt')
+  i = system('rm tmppwd.txt')
 
   plot = 0
 5 nf = iargc()
@@ -156,11 +156,8 @@ program plotpltn
      open(unit=10,form='formatted',status='old',file=fnames(f))
      rewind 10
      read(10,*)ncols
-     !write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
      do j=1,nn
-        !read(10,10,err=12,end=11) (dat(f,i,j),i=1,ncols)
         read(10,*,err=12,end=11) (dat(f,i,j),i=1,ncols)
-!10      format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)
         dat(f,1,j) = j
      end do
      write(6,'(A)')'  End of file reached, arrays too small!'
@@ -187,9 +184,7 @@ program plotpltn
      open (unit=20,form='formatted',status='old',file=fnames(f))
      rewind 20
      read(20,*)ncols
-     !write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
      do j=1,nn
-        !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,ncols)
         if(ncols.eq.81) read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
         if(ncols.gt.81) then
            read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
@@ -225,26 +220,13 @@ program plotpltn
      dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3) 	!Average Rho
      dat(f,74,1:n(f)) = dat(f,81,1:n(f))						!Move Qconv from 81 to 74
      dat(f,75,1:n(f)) = 1.d0 - dat(f,42,1:n(f)) - dat(f,43,1:n(f))			!Z_surf = 1 - X - Y
-     !dat(f,76,1:n(f)) = max(dat(f,2,n(f))-dat(f,2,1:n(f)), dat(f,2,2))                  !t_f - t
      dat(f,76,1:n(f)) = dat(f,2,n(f))-min(dat(f,2,1:n(f)),dat(f,2,n(f))-1.d4)                  !t_f - t
      
      !Colours
      do i=1,n(f)
         call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),dat(f,81,i),dat(f,82,i),dat(f,83,i),dat(f,84,i),dat(f,85,i))
-        !logt = dlog10(dat(f,9,i))
-        !logl = dlog10(dat(f,10,i))
-        !m    = dat(f,4,i)
-        !z    = dat(f,75,i)
-        !call lt2ubv(logt,logl,m,dlog10(z/2.d-2),mv,umb,bmv,vmr,rmi)
-        !dat(f,81,i) = mv
-        !dat(f,82,i) = umb
-        !dat(f,83,i) = bmv
-        !dat(f,84,i) = vmr
-        !dat(f,85,i) = rmi
-
         dat(f,86,i) = dat(f,82,i)+dat(f,83,i)  !(U-V) = (U-B) + (B-V)
         dat(f,87,i) = dat(f,84,i)+dat(f,85,i)  !(V-I) = (V-R) + (R-I)
-        !write(6,'(9F10.3)')dat(f,81,i),dat(f,82,i),dat(f,83,i),dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2)
      end do
      
      dat(f,88,1:n(f)) = dat(f,8,1:n(f))**2*dat(f,22,1:n(f))  !k^2*R^2
@@ -330,7 +312,7 @@ program plotpltn
   lgy = 0
   if(log.eq.'x'.or.log.eq.'b') lgx = 1
   if(log.eq.'y'.or.log.eq.'b') lgy = 1
-
+  
   
   lx = labels(vx)
   ly = labels(vy)
@@ -394,7 +376,6 @@ program plotpltn
   
   
   !Limit ranges for logged axes like Mdot
-  !if(vy.eq.15.and.ymin.lt.40.) ymin = 40.  !Ubind is always logged
   if(lgx.eq.1) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
   end if
@@ -437,28 +418,24 @@ program plotpltn
         write(6,'(A,$)')'  Give the new range for the X-axis (Xmin, Xmax): '
         read*,xmin,xmax
         if(xmin.gt.xmax) then
-           x = xmin
-           xmin = xmax
-           xmax = x
+           call rswap(xmin,xmax)
            write(6,'(A)')'  I swapped Xmin and Xmax'
         end if !if(xmin.gt.xmax)
      end if !if(rng.eq.'x'.or.rng.eq.'b')
      
      
-80   if(rng.eq.'y'.or.rng.eq.'b') then
+     if(rng.eq.'y'.or.rng.eq.'b') then
         write(6,'(A51,$)')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
-           x = ymin
-           ymin = ymax
-           ymax = x
+           call rswap(ymin,ymax)
            write(6,'(A)')'  I swapped Ymin and Ymax'
         end if !if(ymin.gt.ymax)
      end if !if(rng.eq.'y'.or.rng.eq.'b')
   end if  !if(plot.ne.6) then   
   
   
-90 write(6,*)'' 
+  write(6,*)'' 
   !Limit ranges for logged axes like Mdot, again!
   if(lgx.eq.1) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
@@ -473,16 +450,15 @@ program plotpltn
 100 continue
   if(plot.eq.3.and.rng.eq.'n') goto 129
   if(plot.eq.3.and.rng.eq.'y') goto 125
-120 x = 0.02*abs(xmax-xmin)
-  if(x.eq.0.) x = 0.05*xmax
-  xmin = xmin - x
-  xmax = xmax + x
+  dx = 0.02*abs(xmax-xmin)
+  if(dx.eq.0.) dx = 0.05*xmax
+  xmin = xmin - dx
+  xmax = xmax + dx
 125 if(plot.eq.3.and.rng.eq.'x') goto 129
-  x = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) x = 0.05*ymax
-  !if(vy.eq.81) x = -x  !V-mag
-  ymin = ymin - x
-  ymax = ymax + x
+  dy = 0.02*abs(ymax-ymin)
+  if(dy.eq.0.) dy = 0.05*ymax
+  ymin = ymin - dy
+  ymax = ymax + dy
 129 continue
   
   
@@ -495,16 +471,8 @@ program plotpltn
   
 501 continue
   
-  if(hrd.eq.1.or.vx.eq.76.or.vx.eq.81) then
-     x = min(xmin,xmax)
-     xmin = max(xmin,xmax)
-     xmax = x
-  end if
-  if(vy.eq.76.or.vy.eq.81) then
-     x = ymin
-     ymin = ymax
-     ymax = x
-  end if
+  if((hrd.eq.1.or.vx.eq.76.or.vx.eq.81) .and. (xmin.lt.xmax)) call rswap(xmin,xmax)
+  if((vy.eq.76.or.vy.eq.81) .and. (ymin.lt.ymax)) call rswap(ymin,ymax)
   write(6,*)''    
   write(6,*)'  X-range:',xmin,'-',xmax
   write(6,*)'  Y-range:',ymin,'-',ymax
@@ -514,7 +482,6 @@ program plotpltn
   
   if(plot.eq.8) then
      call pgbegin(1,'plot_pltn_000.eps/cps',1,1)
-     !call pgpap(12.0,0.70)
      call pgpap(11.0,0.70) !Make it fit on letter
   else
      if(os.eq.1) call pgbegin(1,'/xserve',1,1)
@@ -567,11 +534,12 @@ program plotpltn
   call pgsch(0.6)
   do f=1,nf
      col = mod(f,13)+1
-     !if(col.gt.14) col = col-13
      call pgsci(col)
-     if(drawlines.eq.0) call pgpoint(n(f),xx(f,1:n(f)),yy(f,1:n(f)),1)
-     if(drawlines.ge.1) call pgline(n(f),xx(f,1:n(f)),yy(f,1:n(f)))
-     if(drawlines.eq.2) call pgpoint(n(f),xx(f,1:n(f)),yy(f,1:n(f)),20)
+     xx1(1:n(f)) = xx(f,1:n(f))
+     yy1(1:n(f)) = yy(f,1:n(f)) 
+     if(drawlines.eq.0) call pgpoint(n(f),xx1(1:n(f)),yy1(1:n(f)),1)
+     if(drawlines.ge.1) call pgline(n(f),xx1(1:n(f)),yy1(1:n(f)))
+     if(drawlines.eq.2) call pgpoint(n(f),xx1(1:n(f)),yy1(1:n(f)),20)
      fname = fnames(f)
      l = len_trim(fname)
      if(fname(l:l).eq.'1'.or.fname(l:l).eq.'2') l = l-1
@@ -612,9 +580,6 @@ program plotpltn
      end if
   end if
   
-  !if(plt.eq.1) call pgend
-  !end do !plt
-  
   if(plot.eq.8) then
      call pgend
      ex = .true.
@@ -626,7 +591,6 @@ program plotpltn
         i = i+1
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
-     !write(6,'(A)')'  Plot saved to plot_pltn.eps'
   end if
   !End of the plotting
   
@@ -704,11 +668,7 @@ program plotpltn
      xmax = (xmin+xmax)/2. + 2*abs((xmin+xmax)/2.-xmin)
      ymin = (ymin+ymax)/2. - 2*abs((ymin+ymax)/2.-ymin)
      ymax = (ymin+ymax)/2. + 2*abs((ymin+ymax)/2.-ymin)
-     if(hrd.eq.1) then
-        x = xmin
-        xmin = xmax
-        xmax = x
-     end if
+     if(hrd.eq.1) call rswap(xmin,xmax)
      goto 501
   end if
   

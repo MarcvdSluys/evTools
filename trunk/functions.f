@@ -25,6 +25,7 @@ module constants
   save
   real :: scrsz,scrrat
   real*8 :: pi,sigma,l0,r0,m0,g,c,day,yr,amu
+  character :: homedir*99
 end module constants
 !************************************************************************
 
@@ -47,6 +48,8 @@ subroutine setconstants
   day      =  8.64d4
   yr	   =  3.15569d7
   amu      =  1.6605402d-24
+  
+  homedir = '/home/user'
 end subroutine setconstants
 !************************************************************************
 
@@ -88,8 +91,7 @@ end subroutine locate
 
 !************************************************************************      
 subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
-  !Computes values of Mv, U-B, B-V and V-I for given log L, log T,
-  !mass and log(Z/0.02)
+  !Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
 
   use ubvdata
   implicit none
@@ -100,7 +102,6 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   real*8 :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
   external indx
 
-  ! write(6,*)logl,logt,mass,logz
   logm = dlog10(mass)
   logg = logm + 4*logt - logl + gconst
   ltgr = dlog10(tgr*100)
@@ -111,7 +112,6 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   it = indx(logt,ltgr,ntgr)
   iz = indx(logz,zgr,nzgr)
 
-  ! write(6,*)ig,it,iz,ggr(ig),10.**ltgr(it),10.**zgr(iz)
   dg1 = (logg - ggr(ig-1))/(ggr(ig) - ggr(ig-1))
   dg1 = max(0.0d0, min(1.0d0, dg1))
   dg2 = 1.0d0 - dg1
@@ -121,7 +121,6 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   dz1 = max(0.0d0, min(1.0d0, dz1))
   dz2 = 1.0d0 - dz1
 
-  ! write(6,*)ig,dg1,dg2,it,dt1,dt2,iz,dz1,dz2
   do k = 4, 8
      cm(k-3) = ((ubv(k,ig,it,iz)*dg1 + ubv(k,ig-1,it,iz)*dg2)*dt1  &
           + (ubv(k,ig,it-1,iz)*dg1 +  &
@@ -132,7 +131,6 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
           ubv(k,ig-1,it-1,iz-1)*dg2)*dt2)*dz2
   end do
   
-  ! write(6,*)ig,it,iz,ggr(ig),tgr(it),zgr(iz)
   ! mbol = 4.75 - 2.5*logl
   mbol = 4.741 - 2.5*logl  !AF: 4.74 = -2.5*dlog10(l0) + 2.5*dlog10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
   bolc = cm(1)
@@ -179,14 +177,14 @@ end function indx
 
 !***********************************************************************
 function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
+  use constants
   implicit none
   integer :: i,system,getos
   character :: ostype*25
-  i=system('uname > ~/uname.tmp') !This gives Linux or Darwin
-  open(16,file='~/uname.tmp', status='old', form='formatted')
+  i=system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
+  open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
   read(16,'(A)')ostype
   close(16, status = 'delete')
-  !write(6,*)ostype
   getos = 1 !Linux
   if(ostype(1:5).eq.'Darwi') getos = 2 !MacOSX
   return
@@ -196,16 +194,18 @@ end function getos
 
 !***********************************************************************
 function findfile(match,len)
+  use constants
   implicit none
   integer, parameter :: maxfile=1000
   integer :: i,k,len,fnum,system
-  character :: match*99,names(maxfile)*99,findfile*99,fname*99
+  character :: match*99,names(maxfile)*99,findfile*99,fname*99,tempfile*99
   
-  i = system('ls '//match(1:len)//' > ~/.findfile.tmp')  !Shell command to list all the files with the search string and pipe them to a temporary file
+  tempfile = trim(homedir)//'/.findfile.tmp'
+  i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
   
   k=0
   names = ''
-  open(10,file='~/.findfile.tmp', status='old', form='formatted') !Read the temp file and delete it when closing
+  open(10,file=trim(tempfile), status='old', form='formatted') !Read the temp file and delete it when closing
   rewind(10)
   do i=1,maxfile 
      read(10,'(A99)',end=100) names(i)
@@ -255,18 +255,20 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   !  fnames:  array that contains the files found; make sure it has the same length as the array in the calling programme
   !  nf:      the actual number of files returned in fnames ( = min(number found, nff))
   
+  use constants
   implicit none
   integer :: i,j,k,len,fnum,nf,nff,system,all
-  character :: match*99,names(nff)*99,fnames(nff)*99
+  character :: match*99,names(nff)*99,fnames(nff)*99,tempfile*99
   
-  i = system('ls '//match(1:len)//' > ~/.findfiles.tmp')  !Shell command to list all the files with the search string and pipe them to a temporary file
+  tempfile = trim(homedir)//'/.findfile.tmp'
+  i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
   
   do i=1,nff
      names(i)='                                                                                                   '
   end do
   
   k=0
-  open(10,file='~/.findfiles.tmp', status='old', form='formatted') !Read the temp file and delete it when closing
+  open(10,file=trim(tempfile), status='old', form='formatted') !Read the temp file and delete it when closing
   rewind(10)
   do i=1,nff
      read(10,'(A99)',end=100) names(i)
@@ -420,7 +422,6 @@ subroutine getpltlabels(nvar,labels)
   labels(81) = 'Q\dconv\u'
   labels(82) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
   labels(83) = 'M\denv\u (M\d\(2281)\u)'
-  !labels(83) = 'Q\dconv,env\u'
   labels(84) = 'M\dconv\u (M\d\(2281)\u)'
   labels(85) = 'R/(dR/dt) (yr)'
   labels(86) = 'Rossby number'
@@ -529,11 +530,11 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   close(u)
   goto 15
   
-11 if(verbose.eq.1) write(6,'(A,I,A)')'  End of the file reached,',j-1,' lines read.'
+11 if(verbose.eq.1) write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(u)
   goto 15
   
-12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I)')'  Error reading file, line ',j
+12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading file, line',j
   close(u)
   if(j.lt.3) goto 19
   if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
@@ -568,11 +569,11 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   close(u)
   goto 25
   
-21 if(verbose.eq.1) write(6,'(A,I,A)')'  End of the file reached,',j-1,' lines read.'
+21 if(verbose.eq.1) write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(u)
   goto 25
   
-22 write(6,'(A,I)')'  Error reading file, aborting at line ',j
+22 write(6,'(A,I6)')'  Error reading file, aborting at line',j
   if(j.lt.3) then
      write(6,'(/,A,/)')' Program finished.'
      stop
@@ -613,12 +614,6 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dat(i,1:n) = 10.d0**dat(i,1:n)
   end do
   
-  !do i=1,n
-  !   dat(82,i) = dat(5,i)-dat(6,i) !Intershell mass
-  !end do
-  !dat(15,:) = dat(15,:)*m0*1.d-40  !Ubind in 10^40 ergs
-  
-  
   !'Clean' the convection data
   do j0 = 63,69,6
      do i=1,n
@@ -640,11 +635,6 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      end do !i
   end do !j0
   
-  !do i=1,n
-  !!if(dat(1,i).gt.1180.) 
-  !write(6,'(I5,I6,2(2x,6F8.4))')i,nint(dat(1,i)),real(dat(63:74,i))
-  !end do
-  
   !************************************************************************      
   !***   CREATE EXTRA PLOT VARIABLES
   !************************************************************************      
@@ -655,7 +645,6 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dat(82,i) = dat(5,i)-dat(6,i)                              !Intershell mass
   end do
   dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                         !H-envelope mass
-  !dat(83,1:n) = dat(81,1:n)/(dat(82,1:n)+1.d-30)               !Mass fraction of convective envelope to total envelope, NOT TRUE
   do i=1,n
      dat(84,i) = 0.d0
      if(dat(64,i).lt.0.d0) dat(84,i) = dabs(dat(64,i))          !Convective core boundary
@@ -709,7 +698,6 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
   dat(97,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y
-  !dat(99,1:n) = max(dat(2,n)-dat(2,1:n), dat(2,2))                          !t - t_final, avoid by setting dat(,1) = dat(,2)
   dat(99,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                          !t - t_final, avoid by setting dat(,1) = dat(,2)
   
   !dat(100,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
@@ -754,6 +742,17 @@ end subroutine changepltvars
 !***********************************************************************
 
 
+!***********************************************************************
+subroutine rswap(x,y) !Swap two real numbers
+  implicit none
+  real :: x,y,z
+  z = x
+  x = y
+  y = z
+end subroutine rswap
+!***********************************************************************
 
-  
-  
+
+
+
+

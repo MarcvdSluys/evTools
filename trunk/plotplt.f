@@ -11,11 +11,9 @@ program plotplt
   implicit none
   integer,parameter :: nn=30000,nvar=210,nc=81,nl=10
   real*8 :: dat(nvar,nn),d(nvar)
-  !real*8 :: c92(nn),c85a,c85b
   real :: xx(nn),yy(nl,nn),yy1(nn),minx,miny(nl),dist,mindist
   real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
-  !real :: tsc(6,nn),zonex(4),zoney(3,4)
   
   integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
   integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
@@ -27,16 +25,16 @@ program plotplt
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
   logical :: ex
   
+  !Set constants:
+  call setconstants()
+  
   os = getos() !1-Linux, 2-MacOS
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
   whitebg = 1  !0: black background on screen, 1: white
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
   
-  !Set constants:
-  call setconstants()
-  
   !Read atmosphere-model data
-  open(unit=10, file='~/bin/lib/UBVRI.Kur',status='old',iostat=io)
+  open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)ubv
      close(10)
@@ -51,12 +49,12 @@ program plotplt
   call getpltlabels(nvar,labels)                                                                  !Get the labels for the plot axes
   
   !Read current path and use it as plot title
-  x=system('pwd > ~/tmppwd.txt')
-  open (unit=10,form='formatted',status='old',file='~/tmppwd.txt')
+  x=system('pwd > '//trim(homedir)//'/tmppwd.txt')
+  open (unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
-  x=system('rm ~/tmppwd.txt')
+  x=system('rm '//trim(homedir)//'/tmppwd.txt')
   do i=10,99
      if(title(i:i).ne.' ') nt = i
   end do
@@ -106,7 +104,6 @@ program plotplt
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
      if(vx.gt.62.and.vx.lt.81) goto 35
-     !if(vx.gt.99.and.vx.lt.101) goto 35
      if(vx.gt.107.and.vx.lt.201) goto 35
      
      hrd   = 0
@@ -139,7 +136,6 @@ program plotplt
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.209) goto 36
      if(vy.gt.62.and.vy.lt.81) goto 36
-     !if(vy.gt.99.and.vy.lt.101) goto 36
      if(vy.gt.107.and.vy.lt.202) goto 36
   end if   !if(plot.lt.2) then   
   
@@ -255,7 +251,7 @@ program plotplt
   xmin = minval(xx(1:n))
   xmax = maxval(xx(1:n))
   
-60 ymin = 1.e33
+  ymin = 1.e33
   ymax = -1.e33
   do i=1,ny
      if(excly(i).eq.1) cycle
@@ -283,8 +279,6 @@ program plotplt
   
   
   !Limit ranges for logged axes like Mdot
-  !if((vy.eq.15.or.vy.eq.82).and.ymin.lt.40.) ymin = 40.  !Ubind is always logged
-  !if(vy.eq.15.and.ymin.lt.40.) ymin = 40.  !Ubind is always logged
   if(lgx.eq.1) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
   end if
@@ -300,11 +294,6 @@ program plotplt
   if(vy.eq.205.and.lgy.eq.1.and.ymin.lt.4.) ymin = 4.
   if(vy.eq.205.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.88.and.ymin.lt.-20.) ymin = -20.
-  
-  !if(vx.eq.101)  xmin = maxval(xx(1:n))
-  !if(vx.eq.101)  xmax = minval(xx(1:n))
-  !if(vy.eq.101)  ymin = maxval(yy(1,1:n))
-  !if(vy.eq.101)  ymax = minval(yy(1,1:n))
   
   
   
@@ -350,7 +339,7 @@ program plotplt
      end if !if(rng.eq.'x'.or.rng.eq.'b')
      
      
-80   if(rng.eq.'y'.or.rng.eq.'b') then
+     if(rng.eq.'y'.or.rng.eq.'b') then
         write(6,'(A51,$)')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
@@ -363,7 +352,7 @@ program plotplt
   end if  !if(plot.ne.6.and.plot.ne.7) then   
   
   
-90 if(plot.ne.7) write(6,*)''  
+  if(plot.ne.7) write(6,*)''  
   !Limit ranges for logged axes like Mdot
   if(lgx.eq.1) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin= -12.
@@ -377,8 +366,6 @@ program plotplt
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
-  !if(vy.eq.205.and.lgy.eq.1.and.ymin.lt.7.) ymin = 7.
-  !if(vy.eq.205.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.88.and.ymin.gt.-20.) ymin = -20.
   
   
@@ -400,7 +387,6 @@ program plotplt
      write(6,'(A)')'  Red         : gravitational radiation AM loss'
      write(6,'(A)')'  Green       : Sills MB AM loss (was: wind AM loss)'
      write(6,'(A)')'  Dark blue   : Rappaport MB AML (was: SO coupling AML)'
-     !write(6,'(A)')'  Light blue  : Negative AML that expands orbit due to Mtr'
      write(6,'(A)')'  Light blue  : Non-conservative MT AM loss'
      write(6,*)''
   end if
@@ -411,18 +397,10 @@ program plotplt
      write(6,'(A)')' Red          : nuclear evolution timescale'
      write(6,'(A)')' Green        : mass loss timescale'
      write(6,'(A)')' Dark Blue    : gravitational radiation timescale'
-     !write(6,'(A)')' Light Blue   : magnetic braking timescale'
      write(6,'(A)')' Light Blue   : dynamical timescale'
      write(6,*)''
   end if
-  !write(6,'(A)')'  --------- : Kelvin-Helmholz timescale'
-  !write(6,'(A)')'  - - - - - : gravitational radiation timescale'
-  !write(6,'(A)')'  -.-.-.-.- : magnetic braking timescale'
-  !write(6,'(A)')'  ......... : mass loss timescale'
-  !write(6,'(A)')'  -...-...- : nuclear evolution timescale'
-  !!write(6,'(A)')'  -...-...- : orbital angular momentum timescale'
-  !!write(6,'(A)')'  --------- : OA due to system mass loss timescale'
-
+  
   if(conv.eq.1) then
      ch = 0
      !write(6,'(A42,$)')' Do you want to plot hatches (Y)es/(N)o: '
@@ -435,16 +413,13 @@ program plotplt
   
   if(plot.eq.3.and.rng.eq.'n') goto 129
   if(plot.eq.3.and.rng.eq.'y') goto 125
-120 x = 0.02*abs(xmax-xmin)
-  !if(hrd.eq.1) x = -x  !HRD
-  !if(vx.eq.101) x = -x  !V-mag
+  x = 0.02*abs(xmax-xmin)
   if(x.eq.0.) x = 0.05*xmax
   xmin = xmin - x
   xmax = xmax + x
 125 if(plot.eq.3.and.rng.eq.'x') goto 129
   x = 0.02*abs(ymax-ymin)
   if(x.eq.0.) x = 0.05*ymax
-  !if(vy.eq.101) x = -x  !V-mag
   ymin = ymin - x
   ymax = ymax + x
 129 continue
@@ -601,9 +576,6 @@ program plotplt
   
   do i=1,ny
      call pgsci(i)
-     !if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy(i,1:n),1)
-     !if(drawlines.ge.1) call pgline(n,xx(1:n),yy(i,1:n))
-     !if(drawlines.eq.2) call pgpoint(n,xx(1:n),yy(i,1:n),20)
      yy1(1:n) = yy(i,1:n)
      if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy1(1:n),1)
      if(drawlines.ge.1) call pgline(n,xx(1:n),yy1(1:n))
@@ -798,7 +770,6 @@ program plotplt
            end if
         end do
      end do
-     !write(6,'(3I6,10ES13.5)')j0,i0,nint(dat(1,i0)),mindist,xsel(1),xx(i0),ysel(1),yy(j0,i0)
      write(6,*)''
      write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
      write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(i0),',  y =',yy(j0,i0),'    line =',i0+1,',  model =',nint(dat(1,i0))

@@ -18,7 +18,6 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
   r1 = (ymin - cst - 4*xmin)/2.  !logR in lower-left  corner
   r2 = (ymax - cst - 4*xmax)/2.  !logR in upper-right corner
   dr = r2-r1
-  !print*,r1,r2,floor(dr)
   if(floor(dr).lt.4) dlogr = dlogr/2.
   
   do logr=-10.,10.,dlogr  !0=1Ro, 1=10Ro, etc
@@ -32,7 +31,6 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
      else
         write(str,'(I5,A)')nint(10**logr),'R\d\(2281)\u'
      end if
-     !call pgline(2,(/2.,6./),cst+2*logr+4*(/2.,6./))
      x2 = (/2.,6./)
      y2 = cst+2*logr+4*(/2.,6./)
      call pgline(2,x2,y2)
@@ -43,7 +41,6 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
         y = ymax + (ymax-ymin)*0.01
      end if
      if(logr.ge.-3.and.logr.lt.4. .and. logr.gt.r1+0.5*dlogr.and.logr.lt.r2-0.5*dlogr) call pgptxt(x,y,0.,0.,trim(str))
-     !write(*,'(10F10.3)')logr,10**logr,x,y
   end do
   call pgsls(1)
 end subroutine plotlinesofconstantradius
@@ -87,7 +84,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   plcb   = 1  !Plot core boundaries
   
   call pgslw(3)
-  !call pgline(n,xx(1:n),yy(1,1:n))
   y(1:n) = yy(1,1:n)
   call pgline(n,xx(1:n),y(1:n))
   
@@ -104,7 +100,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
         call pgsci(14)
         ibold = 0
         do i=2,n
-           !cycle
            ib = 68
            do j=68,62,-1
               ib = j
@@ -148,7 +143,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            
            do j=1,nz
               if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then  !Zeroes or change in the number of zones can mean trouble
-                 !if(dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
                     zoney(j,2) = (zoney(j,3)+zoney(j,4))/2.
@@ -176,7 +170,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            
            
            do j=1,nz
-              !if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
               zoney1(1:4) = zoney(j,1:4)
               if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
@@ -184,11 +177,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
         end do !do i=2,n
      end if !If plconv.eq.1
      
-     !write(6,*)''
-     !do i=160,175
-     !write(6,'(2I5,6F8.4)')i,nint(xx(i)),real(dat(63:68,i))
-     !end do
-     !goto 899
+     
      
      
      !*** Semiconvection ***  NOTICE that dat(69:74) was 'cleaned' after reading the file
@@ -243,7 +232,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            
            do j=1,nz
               if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then  !Zeroes or change in the number of zones can mean trouble
-                 !if(dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
                     zoney(j,2) = (zoney(j,3)+zoney(j,4))/2.
@@ -270,19 +258,13 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            !end if
            
            
-           !if(xx(i).gt.1180) write(6,'(I5,I6,2(2x,6F8.4))')i,nint(xx(i)),real(dat(63:74,i))
-           
            do j=1,nz
-              !if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney(j,1:4))
               zoney1(1:4) = zoney(j,1:4)
               if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
            ibold = ib
         end do   !do i=2,n
      end if !If plsmcnv.eq.1
-     
-     !goto 899
-     
      
      
      !*** Nuclear burning ***
@@ -301,12 +283,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
               if(dat(j,i).eq.0.d0) ib = j-1
            end do
            dib = ib-ibold
-           
-           !if(dib.ne.0) then  !Skip the jumps, works relatively well for Nuclear burning
-           !ibold = ib
-           !cycle
-           !write(6,*),i,nint(xx(i)),ib,ibold,dib
-           !end if
            
            zonex = 0.
            zoney = 0.
@@ -359,7 +335,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
            end do
            
            do j=1,nz
-              !call pgpoly(4,zonex,zoney(j,1:4))
               zoney1(1:4) = zoney(j,1:4)
               call pgpoly(4,zonex,zoney1(1:4))
               !if(mod(dib,2).eq.0.or.i.eq.2) then !Even dib
@@ -379,7 +354,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
         if(hlp.eq.'y') then
            call pgsch(0.7)
            do i=1,nhp
-              !call pgline(2,(/xx(hp(i)),xx(hp(i))/),(/ymin,ymax/))
               xx2 = (/xx(hp(i)),xx(hp(i))/)
               yy2 = (/ymin,ymax/)
               call pgline(2,xx2,yy2)
@@ -393,18 +367,18 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   
   
   !Plot outlines
-  call pgsci(14)
-  do j=63,68
-     do i=1,n
-        !if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !semiconvection bounds
-     end do
-  end do !j
-  call pgsci(15)
-  do j=69,74
-     do i=1,n
-        !if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !convection bounds
-     end do
-  end do !j
+  !call pgsci(14)
+  !do j=63,68
+  !   do i=1,n
+  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !semiconvection bounds
+  !   end do
+  !end do !j
+  !call pgsci(15)
+  !do j=69,74
+  !   do i=1,n
+  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !convection bounds
+  !   end do
+  !end do !j
   call pgsci(2)
   if(plnuc.eq.1) then
      do j=75,80
@@ -419,7 +393,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
      call pgsls(1)
      do j=5,7 !core masses
         call pgsci(j-1)
-        !call pgline(n,xx(1:n),real(dat(j,1:n)))
         dat1(1:n) = real(dat(j,1:n))
         call pgline(n,xx(1:n),dat1(1:n))
      end do !j
@@ -427,7 +400,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
      call pgslw(4)
      call pgsls(1)
      call pgsci(0)
-     !call pgline(2,xx((/1,n/)),(/0.,0./))
      xx2 = xx((/1,n/))
      yy2 = (/0.,0./)
      call pgline(2,xx2,yy2)
@@ -438,7 +410,6 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   call pgsch(1.)
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   
-899 continue
 end subroutine pltconvection
 !***********************************************************************
 
