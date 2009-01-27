@@ -1,6 +1,7 @@
-  ! Reads, optinally changes and (over!)writes an init.run (fort.23) input file
-  ! AF January 21, 2004
-  
+! Reads, optinally changes and (over!)writes an init.run (fort.23) input file
+! AF January 21, 2004
+
+program makerun  
   implicit none
   real*8 :: ct1(7),ct2(7),ct3(7)
   real*8 :: ml1,dml,ql1,dql,xl1,dxl
@@ -9,15 +10,15 @@
   real*8 :: m2
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
-  integer :: i,narg,iargc
+  integer :: io,narg,iargc
   character :: file*8,arg*10
   
   write(6,*)''
   file = 'init.run'
   
   
-  open(unit=10,form='formatted',status='old',file=file,iostat=i)
-  if(i.ne.0) goto 90
+  open(unit=10,form='formatted',status='old',file=file,iostat=io)
+  if(io.ne.0) goto 90
   rewind 10
   read(10,*,err=91) isb,ktw,ip1,im1,ip2,im2,kpt,kp
   read(10,*,err=92) ml1,dml,kml
@@ -30,6 +31,7 @@
   read(10,*,err=99) ct3
   close(10)
   
+  kml = 1  !Only one iteration in mass
   m2 = 0.5d0*sm
   if(bms.gt.0) m2 = bms-sm
   
@@ -56,7 +58,7 @@
      read*,m2
      write(6,'(A33,$)')'  Give the orbital period (d):   '
      read*,per
-  endif
+  end if
   
   if(bms.gt.0.d0.or.narg.eq.3) bms = sm + m2
   !dty = 1.d5
@@ -77,7 +79,6 @@
   write(20,'(A)')'last five lines:'
   write(20,'(A)')'    ROT     KR   EX   : KR=1 -> P1 = Pcrit1*10**ROT;  KR=2 -> P1 = Porb*10**ROT'
   write(20,'(A)')'alternative initial conditions if JMX >= 0, and if any item is non-negative:'
-  !write(20,'(A)')'alternative initial conditions if JMX >= 0:'
   write(20,'(A)')'    SM       DTY          AGE       PER       BMS       ECC       P1        ENC       JMX'
   write(20,'(A)')'conditions for termination:'
   write(20,'(A)')'    rlf1     age      LCarb     rlf2      LHe        rho      MCO '
@@ -89,30 +90,28 @@
   
   
   
-  goto 9999
-90 write(6,'(A)')'Error opening file: '//trim(file)
-  goto 9999
-91 write(6,'(A)')'Error reading file: '//trim(file)//', line 1'
-  goto 9999
-92 write(6,'(A)')'Error reading file: '//trim(file)//', line 2'
-  goto 9999
-93 write(6,'(A)')'Error reading file: '//trim(file)//', line 3'
-  goto 9999
-94 write(6,'(A)')'Error reading file: '//trim(file)//', line 4'
-  goto 9999
-95 write(6,'(A)')'Error reading file: '//trim(file)//', line 5'
-  goto 9999
-96 write(6,'(A)')'Error reading file: '//trim(file)//', line 6'
-  goto 9999
-97 write(6,'(A)')'Error reading file: '//trim(file)//', line 7'
-  goto 9999
-98 write(6,'(A)')'Error reading file: '//trim(file)//', line 8'
-  goto 9999
-99 write(6,'(A)')'Error reading file: '//trim(file)//', line 9'
-  goto 9999
+  write(6,'(A,/)')'Program done'
+  stop
   
+90 write(6,'(A,/)')'Error opening file: '//trim(file)
+  stop
+91 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 1'
+  stop
+92 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 2'
+  stop
+93 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 3'
+  stop
+94 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 4'
+  stop
+95 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 5'
+  stop
+96 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 6'
+  stop
+97 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 7'
+  stop
+98 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 8'
+  stop
+99 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 9'
+  stop
   
-  
-9999 write(6,'(A)')'Program done'
-  write(6,*)''
-end program
+end program makerun
