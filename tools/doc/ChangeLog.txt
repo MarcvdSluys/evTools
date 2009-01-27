@@ -1,0 +1,8 @@
+
+  ChangeLog for the eggleton-tools tools repository.  
+  Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
+     
+     1: AstroFloyd, 27/01/2009
+       Initial import
+       
+     
