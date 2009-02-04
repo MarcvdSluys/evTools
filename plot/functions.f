@@ -60,35 +60,6 @@ end subroutine setconstants
 
 
 
-!***********************************************************************
-subroutine locate(xx,n,x,j)
-  integer :: j,n,jl,jm,ju
-  real*8 x,xx(n)
-  jl=0
-  ju=n+1
-10 if(ju-jl.gt.1)then
-     jm=(ju+jl)/2
-     if((xx(n).ge.xx(1)).eqv.(x.ge.xx(jm)))then
-        jl=jm
-     else
-        ju=jm
-     end if
-     goto 10
-  end if
-  if(x.eq.xx(1))then
-     j=1
-  else if(x.eq.xx(n))then
-     j=n-1
-  else
-     j=jl
-  end if
-  return
-end subroutine locate
-!***********************************************************************
-
-
-
-
 !************************************************************************      
 subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   !Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
@@ -147,34 +118,6 @@ end subroutine lt2ubv
 
 
 
-!************************************************************************      
-function indx(ax,xx,nx)
-  !Finds index of ax in monotonously increasing or decreasing array xx
-  implicit none
-  integer :: indx,nx,j,jl,jh
-  real*8 :: ax,xx(nx),sx
-  
-  sx = xx(nx) - xx(1)
-  jl = 1
-  jh = nx
-1 if (jh-jl.gt.1) then
-     j = (jh + jl)/2
-     if ((ax-xx(j))*sx .gt. 0.0) then
-        jl = j
-     else
-        jh = j
-     end if
-     goto 1
-  end if
-  indx = jh
-  
-  return
-end function indx
-!************************************************************************      
-
-
-
-
 !***********************************************************************
 function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
   use constants
@@ -199,6 +142,11 @@ function findfile(match,len)
   integer, parameter :: maxfile=1000
   integer :: i,k,len,fnum,system
   character :: match*99,names(maxfile)*99,findfile*99,fname*99,tempfile*99
+  
+  if(len_trim(homedir).eq.99) then
+     write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
+     stop
+  end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
   i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
@@ -259,6 +207,11 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   implicit none
   integer :: i,j,k,len,fnum,nf,nff,system,all
   character :: match*99,names(nff)*99,fnames(nff)*99,tempfile*99
+  
+  if(len_trim(homedir).eq.99) then
+     write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
+     stop
+  end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
   i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
@@ -751,6 +704,176 @@ subroutine rswap(x,y) !Swap two real numbers
   y = z
 end subroutine rswap
 !***********************************************************************
+
+
+
+
+
+!************************************************************************      
+function indx(ax,xx,nx)  !Double precision
+  !Finds index of ax in monotonously increasing or decreasing array xx
+  implicit none
+  integer :: indx,nx,j,jl,jh
+  real*8 :: ax,xx(nx),sx
+  
+  sx = xx(nx) - xx(1)
+  jl = 1
+  jh = nx
+1 if (jh-jl.gt.1) then
+     j = (jh + jl)/2
+     if ((ax-xx(j))*sx .gt. 0.0) then
+        jl = j
+     else
+        jh = j
+     end if
+     goto 1
+  end if
+  indx = jh
+  
+  return
+end function indx
+!************************************************************************      
+
+
+
+
+!***********************************************************************
+subroutine locate(xx,n,x,j)  !Double precision
+  !Input: 
+  !  xx: monotonic array
+  !  n:  length of xx
+  !  x:  value to look for
+  !  Output:
+  !  j:  returned value, such that x is between xx(j) and xx(j+1).  If j=0 or jn, x is out of range
+  
+  implicit none
+  integer :: j,n,jl,jm,ju
+  real*8 :: x,xx(n)
+  jl=0
+  ju=n+1
+10 if(ju-jl.gt.1)then
+     jm=(ju+jl)/2
+     if((xx(n).ge.xx(1)).eqv.(x.ge.xx(jm)))then
+        jl=jm
+     else
+        ju=jm
+     end if
+     goto 10
+  end if
+  if(x.eq.xx(1))then
+     j=1
+  else if(x.eq.xx(n))then
+     j=n-1
+  else
+     j=jl
+  end if
+end subroutine locate
+!***********************************************************************
+
+
+!***********************************************************************
+subroutine locater(xxr,n,xr,j)  !Single precision
+  !Input: 
+  !  xx: monotonic array
+  !  n:  length of xx
+  !  x:  value to look for
+  !  Output:
+  !  j:  returned value, such that x is between xx(j) and xx(j+1).  If j=0 or jn, x is out of range
+  
+  implicit none
+  integer :: j,n
+  real :: xr,xxr(n)
+  real*8 :: xd,xxd(n)
+  xxd = dble(xxr)
+  xd  = dble(xr)
+  call locate(xxd,n,xd,j)  !j will be returned to the calling routine
+end subroutine locater
+!************************************************************************      
+
+
+!***********************************************************************
+subroutine polint(xa,ya,n,x,y,dy)
+  implicit none
+  integer, parameter :: nmax=10
+  integer :: n
+  real :: dy,x,y,xa(n),ya(n)
+  integer :: i,m,ns
+  real :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
+  
+  ns=1
+  dif=abs(x-xa(1))
+  do i=1,n
+     dift=abs(x-xa(i))
+     if (dift.lt.dif) then
+        ns=i
+        dif=dift
+     end if
+     c(i)=ya(i)
+     d(i)=ya(i)
+  end do
+  y=ya(ns)
+  ns=ns-1
+  do m=1,n-1
+     do i=1,n-m
+        ho=xa(i)-x
+        hp=xa(i+m)-x
+        w=c(i+1)-d(i)
+        den=ho-hp
+        !          if(den.eq.0.) pause 'failure in polint'
+        den=w/den
+        d(i)=hp*den
+        c(i)=ho*den
+     end do
+     if (2*ns.lt.n-m)then
+        dy=c(ns+1)
+     else
+        dy=d(ns)
+        ns=ns-1
+     end if
+     y=y+dy
+  end do
+  return
+end subroutine polint
+!***********************************************************************
+
+
+
+
+!***********************************************************************
+function ran1(idum)
+  implicit none
+  integer :: idum,IA,IM,IQ,IR,NTAB,NDIV
+  real :: ran1,AM,EPS,RNMX
+  PARAMETER (IA=16807,IM=2147483647,AM=1./IM,IQ=127773,IR=2836,NTAB=32,NDIV=1+(IM-1)/NTAB,EPS=1.2e-7,RNMX=1.-EPS)
+  INTEGER j,k,iv(NTAB),iy
+  SAVE iv,iy
+  DATA iv /NTAB*0/, iy /0/
+  
+  if (idum.le.0.or.iy.eq.0) then
+     idum=max(-idum,1)
+     do j=NTAB+8,1,-1
+        k=idum/IQ
+        idum=IA*(idum-k*IQ)-IR*k
+        if (idum.lt.0) idum=idum+IM
+        if (j.le.NTAB) iv(j)=idum
+     end do
+     iy=iv(1)
+  end if
+  k=idum/IQ
+  idum=IA*(idum-k*IQ)-IR*k
+  if (idum.lt.0) idum=idum+IM
+  j=1+iy/NDIV
+  iy=iv(j)
+  iv(j)=idum
+  ran1=min(AM*iy,RNMX)
+  return
+end function ran1
+!***********************************************************************
+
+
+
+
+
 
 
 
