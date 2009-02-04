@@ -189,7 +189,7 @@ program listmod
   !83 format ('  Primary:      M  =',f9.5,' Mo,  R  =',f9.5,' Ro,   L  =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K,   Mhe =',f9.5,',   Mco =',f9.5)
 83 format ('  Primary:      M   =',f9.5,' Mo,  R   =',f9.5,' Ro,   L   =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K')
 84 format ('                Mhe =',f9.5,' Mo,  Mco =',f9.5,' Mo,   Menv=',f9.5,' Mo')
-85 format ('  Binary:       M1  =',f9.5,' Mo,  M2  =',f9.5,' Mo,   Mb  =',f9.5' Mo,     q1 =',f9.5,',        q2   =',f9.5)
+85 format ('  Binary:       M1  =',f9.5,' Mo,  M2  =',f9.5,' Mo,   Mb  =',f9.4' Mo,     q1 =',f9.5,',        q2   =',f9.5)
   !86 format ('  Orbit:        P  =',f9.5,' d,   a  =',f9.5,' Ro,   a1 =',f9.5,' Ro,    a2 =',f9.5,' Ro,   Rrl1 =',f9.5' Ro,   Rrl2 = ',f9.5,' Ro')
 86 format ('  Orbit:        P  =',ES12.5,' d,   a  =',ES12.5,' Ro,   a1 =',ES12.5,' Ro,    a2 =',ES12.5,' Ro,   Rrl1 =',ES12.5' Ro,   Rrl2 = ',ES12.5,' Ro')
 !87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',f9.5,' days')

@@ -5,7 +5,7 @@ COMP = ifort
 
 #To develop code  (don't mix -check bounds with -O>0!):
 CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
-CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all 
+CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all -check noarg_temp_created
 
 
 #To debug code:
@@ -48,6 +48,9 @@ PLTOBJ = plotfunctions.o
 exit:
 
 all: findplt listmdl listmod listplt makerun mergeplt plt2ce plt2obs selplt
+
+dat2plt: $(STDOBJ) dat2plt.o
+	$(COMP) $(LFLAGS) -o ~/bin/dat2plt $(STDOBJ) dat2plt.o
 
 findplt: $(STDOBJ) findplt.o
 	$(COMP) $(LFLAGS) -o ~/bin/findplt $(STDOBJ) findplt.o

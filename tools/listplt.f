@@ -1,30 +1,22 @@
 ! Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
 
 program listplt  
+  use constants
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81
   real*8 :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
   real*8 :: c82(nn),c85a,c85b,c92(nn)
-  real :: pi,l0,m0,r0,g,day,yr,c
 
   integer :: i,j,n,ans,ncols,narg,iargc
   character :: findfile*99, fname*99,labels(nnn)*13
-
+  
+  call setconstants()
+  
   !Read atmosphere-model data
-  open(unit=10, file='~/bin/lib/UBVRI.Kur',status='old')
+  open(unit=10, action='read', file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old')
   read(10,*)ubv
   close(10)
-
-  pi   =  4*datan(1.d0)
-  l0   =  3.83d33
-  r0   =  6.9599d10
-  m0   =  1.9891d33
-  g    =  6.67259d-8
-  c    =  2.99792458d10
-  day  =  8.64d4
-  yr   =  3.15569d7
-
 
   labels = ''
   labels(1)  = 'Model'

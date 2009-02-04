@@ -48,16 +48,23 @@ program makerun
      read(arg,*)m2
      call getarg(3,arg)
      read(arg,*)per
+     write(6,'(A)')'  Synchronising binary...'
+     p1 = per
+  else if(narg.eq.4) then
+     call getarg(1,arg)
+     read(arg,*)sm
+     call getarg(2,arg)
+     read(arg,*)m2
+     call getarg(3,arg)
+     read(arg,*)per
+     call getarg(4,arg)
+     read(arg,*)p1
   else
-     write(6,'(A)')'  Syntax:  makerun <M1> <M2> <Porb>'
-     write(6,'(A)')'      or:  makerun <M1> <Porb>'
-     write(6,'(A)')''
-     write(6,'(A33,$)')'  Give the mass of star 1 (Mo):  '
-     read*,sm
-     write(6,'(A33,$)')'  Give the mass of star 2 (Mo):  '
-     read*,m2
-     write(6,'(A33,$)')'  Give the orbital period (d):   '
-     read*,per
+     write(6,'(A)')'  Syntax: '
+     write(6,'(A)')'    makerun <M1> <Porb>'
+     write(6,'(A)')'    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
+     write(6,'(A,/)')'    makerun <M1> <M2> <Porb> <Prot>'
+     stop
   end if
   
   if(bms.gt.0.d0.or.narg.eq.3) bms = sm + m2
@@ -89,29 +96,29 @@ program makerun
 50 format (8I6,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
   
-  
-  write(6,'(A,/)')'Program done'
+  write(6,'(4(A,ES10.3))')'  M1:',sm,',  M2:',m2,',  Porb:',per,',  Prot,1:',p1
+  write(6,'(A,/)')'  Program done'
   stop
   
-90 write(6,'(A,/)')'Error opening file: '//trim(file)
+90 write(6,'(A,/)')'  Error opening file: '//trim(file)
   stop
-91 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 1'
+91 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 1'
   stop
-92 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 2'
+92 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 2'
   stop
-93 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 3'
+93 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 3'
   stop
-94 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 4'
+94 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 4'
   stop
-95 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 5'
+95 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 5'
   stop
-96 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 6'
+96 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 6'
   stop
-97 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 7'
+97 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 7'
   stop
-98 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 8'
+98 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 8'
   stop
-99 write(6,'(A,/)')'Error reading file: '//trim(file)//', line 9'
+99 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 9'
   stop
   
 end program makerun
