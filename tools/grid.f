@@ -2,14 +2,34 @@
 
 program grid      
   implicit none
-  double precision :: xi,dx,x10
+  real*8 :: xi,dx
+  integer :: n,iargc
+  character :: bla*99
+  
+  if(iargc().ne.3) then
+     write(*,'(/,A)')'  This program shows what values are used in a grid of models for the Eggleton code with specified grid settings'
+     write(6,'(A,/)')'  syntax:  grid <Xi, dX, n> '
+     stop
+     !read*,xi,dx,n
+  end if
+  
+  call getarg(1,bla)
+  read(bla,*)xi
+  call getarg(2,bla)
+  read(bla,*)dx
+  call getarg(3,bla)
+  read(bla,*)n
+  
+  call printgrid(xi,dx,n)
+  write(*,*)
+end program grid
+
+
+!Shared with getgrid.f
+subroutine printgrid(xi,dx,n)
+  implicit none
+  real*8 :: xi,dx
   integer :: i,n
-  character :: ans
-  
-  write(*,'(/,A)')'  This program shows what values are used in a grid of models for Eggletons code.'
-  write(6,'(A,$)')'   Xi, dX, n: '      
-  read*,xi,dx,n
-  
   
   write(6,'(A5,2A10)')'i','x','log x'
   do i=1,n
@@ -17,5 +37,4 @@ program grid
      xi = xi + dx
   end do
   
-  write(*,*)
-end program grid
+end subroutine printgrid
