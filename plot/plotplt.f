@@ -18,10 +18,10 @@ program plotplt
   integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
   integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,getos,whitebg,strmdls(nn)
-  integer :: ansi
+  integer :: ansi,xwini,pgopen
   character :: findfile*99,fname*99,psname*99
   character :: rng,log,hlp,hlp1,hlbl,hlbls*5,lstr(6)*11
-  character :: abstr(7)*2
+  character :: abstr(7)*2,xwin*19
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
   logical :: ex
   
@@ -62,6 +62,7 @@ program plotplt
   
   !Search for input file in current dir
   plot = 0
+  xwini = 1  !Number of X window to try first
 5 continue
   if(iargc().eq.1.and.plot.eq.0) then
      call getarg(1,fname)
@@ -104,7 +105,7 @@ program plotplt
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
      if(vx.gt.62.and.vx.lt.81) goto 35
-     if(vx.gt.107.and.vx.lt.201) goto 35
+     if(vx.gt.111.and.vx.lt.201) goto 35
      
      hrd   = 0
      dhdt  = 0
@@ -131,12 +132,12 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-107, 202-209): '
+36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-111, 202-209): '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.209) goto 36
      if(vy.gt.62.and.vy.lt.81) goto 36
-     if(vy.gt.107.and.vy.lt.202) goto 36
+     if(vy.gt.111.and.vy.lt.202) goto 36
   end if   !if(plot.lt.2) then   
   
   
@@ -531,9 +532,24 @@ program plotplt
   
   
   if(plot.eq.9) then
-     call pgbegin(1,'plot_plt_000.eps/cps',1,1)
+     !call pgbegin(1,'plot_plt_000.eps/cps',1,1)
+     io = pgopen('plot_plt_000.eps/cps')
+     if(io.le.0) then
+        write(0,'(A,/)')'  Error opening postscript file, aborting'
+        stop
+     end if
   else
-     if(os.eq.1) call pgbegin(1,'1/xserve',1,1)
+     !if(os.eq.1) call pgbegin(1,'1/xserve',1,1)
+     io = 0
+     do while(io.le.0)
+        write(xwin,'(I3.3,A7)')xwini,'/xserve'
+        io = pgopen(trim(xwin))
+        if(io.le.0) then
+           write(6,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
+           xwini = xwini + 1
+        end if
+     end do
+     
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)          !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
      if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)

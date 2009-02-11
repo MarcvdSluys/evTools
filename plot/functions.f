@@ -26,6 +26,7 @@ module constants
   real :: scrsz,scrrat
   real*8 :: pi,sigma,l0,r0,m0,g,c,day,yr,amu
   character :: homedir*99
+  character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
 end module constants
 !************************************************************************
 
@@ -50,6 +51,12 @@ subroutine setconstants
   amu      =  1.6605402d-24
   
   homedir = '/home/user'
+  
+  cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
+  cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
+  cursorright = char(27)//'[1C' !Makes the cursor move right one space
+  cursorleft = char(27)//'[1D' !Makes the cursor move left one space
+  
 end subroutine setconstants
 !************************************************************************
 
@@ -401,6 +408,8 @@ subroutine getpltlabels(nvar,labels)
   labels(106) = 'U-V'
   labels(107) = 'V-I'
   
+  labels(111) = '\(2137)\denv\u'  !lambda_env
+  
   labels(202) = 'dH\dorb\u/dt'
   labels(204) = 'dM/dt (M\d\(2281)\u/yr)'
   labels(205) = '\gt (yr)'
@@ -419,39 +428,42 @@ subroutine printpltvarlist
   implicit none
   
   write(6,*)''
-  write(6,'(A)'),' Variables:                                          0: Quit                           '
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'   1: model        16: Lh           28: Porb        34: Horb                           '
-  write(6,'(A)'),'   2: t            17: Lhe          29: FLR         35: dHorb/dt                       '
-  write(6,'(A)'),'   3: dt           18: Lc           30: F1          36: dHgw/dt                        '
-  write(6,'(A)'),'   4: M            19: Lnu          31: dM          37: dHwml/dt                       '
-  write(6,'(A)'),'   5: Mhe          20: Lth          32: dMwind      38: dHmb/dt                        '
-  write(6,'(A)'),'   6: Mco          21: Prot         33: dMmt        39: dHmtr/dt                       '
-  write(6,'(A)'),'   7: Mone         22: VK2                          40: Mcomp                          '
-  write(6,'(A)'),'   8: R            23: Rcz                          41: e                              '
-  write(6,'(A)'),'   9: L            24: dRcz                                                            '
-  write(6,'(A)'),'  10: Teff         25: Tet                                                             '
-  write(6,'(A)'),'  11: Tc           26: Ralv                                                            '
-  write(6,'(A)'),'  12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
-  write(6,'(A)'),'  13: Rhoc                        Surf:  42  43  44  45  46  47  48   207              '
-  write(6,'(A)'),'  14: RhoTm                       Tmax:  49  50  51  52  53  54  55   208              '
-  write(6,'(A)'),'  15: Ub,env                      Core:  56  57  58  59  60  61  62   209              '
-  write(6,'(A)'),'                                                                                       ' 
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'  81: Qconv                86: Rossby nr            91: Ne/O change   96: Jspin        '  
-  write(6,'(A)'),'  82: Mhe-Mco              87: Pcr (MB)             92: Pgw,max       97: Rho_avg      '  
-  write(6,'(A)'),'  83: Menv                 88: Sills MB             93: Rrl           98: Zsurf        '
-  write(6,'(A)'),'  84: Mconv                89: Tet: int/anal        94: Xf            99: t_f-t        '
-  write(6,'(A)'),'  85: R/(dR/dt)            90: t-to                 95: M.I.         100: P_rot/crit   '
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'  101: V   102: U-B   103: B-V   104: V-R   105: R-I   106: U-V   107: V-I             '
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'  201: HR Diagram         204: Mdots                                                   '
-  write(6,'(A)'),"  202: dH/dt's            205: Timescales                                              "
-  write(6,'(A)'),'  203: Convection plot    206: Luminosities                                            '
-  write(6,'(A)'),'                                                                                       '
-  write(6,'(A)'),'                                                                                       '
+  write(6,'(A)'),'  Primary variables:                                  0: Quit                           '
+  write(6,'(A)'),'                                                                                        '
+  write(6,'(A)'),'    1: model        16: Lh           28: Porb        34: Horb                           '
+  write(6,'(A)'),'    2: t            17: Lhe          29: FLR         35: dHorb/dt                       '
+  write(6,'(A)'),'    3: dt           18: Lc           30: F1          36: dHgw/dt                        '
+  write(6,'(A)'),'    4: M            19: Lnu          31: dM          37: dHwml/dt                       '
+  write(6,'(A)'),'    5: Mhe          20: Lth          32: dMwind      38: dHmb/dt                        '
+  write(6,'(A)'),'    6: Mco          21: Prot         33: dMmt        39: dHmtr/dt                       '
+  write(6,'(A)'),'    7: Mone         22: VK2                          40: Mcomp                          '
+  write(6,'(A)'),'    8: R            23: Rcz                          41: e                              '
+  write(6,'(A)'),'    9: L            24: dRcz                                                            '
+  write(6,'(A)'),'   10: Teff         25: Tet                                                             '
+  write(6,'(A)'),'   11: Tc           26: Ralv       Abundances:                                          '
+  write(6,'(A)'),'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
+  write(6,'(A)'),'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   207              '
+  write(6,'(A)'),'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   208              '
+  write(6,'(A)'),'   15: Ub,env                      Core:  56  57  58  59  60  61  62   209              '
+  write(6,'(A)'),'                                                                                        ' 
+  write(6,'(A)'),'  Derived variables:                                                                    '
+  write(6,'(A)'),'   81: Qconv                91: Ne/O change     101: V        111: lambda_env           '  
+  write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B                                '  
+  write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V                                '
+  write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R                                '
+  write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I                                '
+  write(6,'(A)'),'   86: Rossby nr            96: Jspin           106: U-V                                '
+  write(6,'(A)'),'   87: Pcr (MB)             97: Rho_avg         107: V-I                                '
+  write(6,'(A)'),'   88: Sills MB             98: Zsurf                                                   '
+  write(6,'(A)'),'   89: Tet: int/anal        99: t_f-t                                                   '
+  write(6,'(A)'),'   90: t-to                100: P_rot/crit                                              '
+  write(6,'(A)'),'                                                                                        '
+  write(6,'(A)'),'  Special plots:                                                                        '
+  write(6,'(A)'),'   201: HR Diagram         204: Mdots           207: Surface abundances                 '
+  write(6,'(A)'),"   202: dH/dt's            205: Timescales      208: Tmax abundances                    "
+  write(6,'(A)'),'   203: Convection plot    206: Luminosities    209: Core abundances                    '
+  write(6,'(A)'),'                                                                                        '
+  write(6,'(A)'),'                                                                                        '
   
 end subroutine printpltvarlist
 !***********************************************************************
@@ -461,6 +473,7 @@ end subroutine printpltvarlist
 !***********************************************************************
 !Read the *.plt? file fname from unit u and return it's length and the contents
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
+  use constants
   implicit none
   real*8 :: dat(nvar,nn)
   integer :: nvar,nn,ncols,nc,verbose,i,j,n,ver,u
@@ -500,7 +513,14 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   
   
   !*** New output format (2005)
-19 if(verbose.eq.1) write(6,'(A)')'  I will try the new output format...'
+19 continue
+  !Erase the output from trying the first format
+  do i=1,3
+     write(6,'(A)')cursorup
+     write(6,'(A150)')''
+     write(6,'(A)')cursorup
+  end do
+  if(verbose.eq.1) write(6,'(A)')'  I will try the new output format...'
   dat = 0.d0
   ver = 2005
   open (unit=u,form='formatted',status='old',file=trim(fname))
@@ -664,6 +684,11 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
   end do
   
+  dat(111,1:n) = g*dat(4,1:n)*dat(83,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+  do i=1,n
+     if(dabs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
+     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(83,i),dat(15,i),dat(8,i),dat(111,i)
+  end do
   
   !Timescales
   dat(201,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale

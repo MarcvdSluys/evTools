@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
      
+    14: AstroFloyd, 11/02/2009
+       plotplt:
+        - add lambda_ce
+	- open next xwin if first is in use
+	    
      2: AstroFloyd, 16/01/2009
        Cleaning of files for compilation with -warn all and -check all:
        - stick things into arrays before calling pgline/pgpoly
