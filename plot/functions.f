@@ -685,6 +685,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   end do
   
   dat(111,1:n) = g*dat(4,1:n)*dat(83,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+  !dat(111,1:n) = dabs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
+  dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
      if(dabs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
      !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(83,i),dat(15,i),dat(8,i),dat(111,i)

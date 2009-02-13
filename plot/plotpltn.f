@@ -117,6 +117,8 @@ program plotpltn
   labels(87) = 'V-I'
   
   labels(88) = 'k\u2\dR\u2\d'
+  labels(89) = 'M\denv\u'        !M_env
+  labels(90) = '\(2137)\denv\u'  !lambda_env
 
   i = system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
@@ -217,7 +219,7 @@ program plotpltn
      dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40  					!Ubind in 10^40 erg
      dat(f,71,1:n(f)) = dat(f,5,1:n(f)) - dat(f,6,1:n(f))  				!Mhe-CO: intershell mass
      dat(f,72,1:n(f)) = dat(f,22,1:n(f))*dat(f,4,1:n(f))*dat(f,8,1:n(f))**2 		!Moment of inertia
-     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3) 	!Average Rho
+     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3) 	        !Average Rho
      dat(f,74,1:n(f)) = dat(f,81,1:n(f))						!Move Qconv from 81 to 74
      dat(f,75,1:n(f)) = 1.d0 - dat(f,42,1:n(f)) - dat(f,43,1:n(f))			!Z_surf = 1 - X - Y
      dat(f,76,1:n(f)) = dat(f,2,n(f))-min(dat(f,2,1:n(f)),dat(f,2,n(f))-1.d4)                  !t_f - t
@@ -230,6 +232,15 @@ program plotpltn
      end do
      
      dat(f,88,1:n(f)) = dat(f,8,1:n(f))**2*dat(f,22,1:n(f))  !k^2*R^2
+     
+     dat(f,89,1:n(f)) = dat(f,4,1:n(f)) - dat(f,5,1:n(f))                         !H-envelope mass
+     dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+     !dat(f,90,1:n(f)) = dabs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ubind changes sign
+     dat(f,90,1:n(f)) = max(dat(f,90,1:n(f)),0.d0)
+     do i=1,n(f)
+        if(dabs(dat(f,5,i)).lt.1.d-29) dat(f,90,i) = 0.d0  !If there's no He core mass, there's no lambda
+        !write(*,'(I6,9ES20.5)')i,dat(f,4:5,i),dat(f,83,i),dat(f,15,i),dat(f,8,i),dat(f,90,i)
+     end do
   end do !f, file
   
   
@@ -263,8 +274,8 @@ program plotpltn
      write(6,'(A70)')' 71: Mhe-MCO                   81: V     86: U-V             101: HRD '
      write(6,'(A70)')' 72: M.I.                      82: U-B   87: V-R                      '
      write(6,'(A70)')' 73: Rho_avg                   83: B-V   88: (kR)^2                   '
-     write(6,'(A70)')' 74: Qconv                     84: V-I                                '
-     write(6,'(A70)')' 75: Zsurf                     85: I-R                                '
+     write(6,'(A70)')' 74: Qconv                     84: V-I   89: M_env                    '
+     write(6,'(A70)')' 75: Zsurf                     85: I-R   90: lambda_env               '
      write(6,'(A70)')' 76: t_f-t                                                            '
      write(6,'(A70)')'                                                                      '
 35   write(6,'(A,$)')'  Choose the X-axis variable (1-101): '
@@ -272,7 +283,7 @@ program plotpltn
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.101) goto 35
      if(vx.gt.76.and.vx.lt.81) goto 35
-     if(vx.gt.88.and.vx.lt.101) goto 35
+     if(vx.gt.90.and.vx.lt.101) goto 35
   end if   !if(plot.ne.6) then   
   
   
@@ -281,10 +292,10 @@ program plotpltn
   if(hrd.eq.1) goto 50
   
   if(plot.lt.2) then      
-36   write(6,'(A,$)')'  Choose the Y-axis variable (1-76): '
+36   write(6,'(A,$)')'  Choose the Y-axis variable (1-90): '
      read*,vy
      if(vy.eq.0) goto 9999
-     if(vy.lt.0.or.vy.gt.88) goto 36
+     if(vy.lt.0.or.vy.gt.90) goto 36
      if(vy.gt.76.and.vy.lt.81) goto 36
   end if   !if(plot.lt.2) then   
   
