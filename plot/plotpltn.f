@@ -143,7 +143,7 @@ program plotpltn
   allocate(dat(nf,nc,nn))
   
   
-  plot = 0
+  plot = 1
   
   !************************************************************************      
   !***   READ THE INPUT FILE
@@ -417,7 +417,7 @@ program plotpltn
      write(6,*)''
      write(6,*)'  X-range:',xmin,'-',xmax
      write(6,*)'  Y-range:',ymin,'-',ymax
-     write(6,'(A73,$)')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A,$)')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'N') rng='n'

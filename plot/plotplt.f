@@ -207,7 +207,7 @@ program plotplt
   !***   LIN/LOG AXES
   !************************************************************************      
   if(plot.ne.6.and.plot.ne.7) then      
-     write(6,'(A69,$)')' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A,$)')' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,log
      if(log.eq.'X') log='x'
      if(log.eq.'Y') log='y'
@@ -318,7 +318,7 @@ program plotplt
      write(6,*)''
      write(6,*)' X-range:',xmin,'-',xmax
      write(6,*)' Y-range:',ymin,'-',ymax
-     write(6,'(A73,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'N') rng='n'
