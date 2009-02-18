@@ -70,7 +70,7 @@ program plotplt
      fname=findfile('*.plt*',6) !Match string and its length
      if(fname(1:10).eq.'          ') goto 9999
   end if
-  plot = 0
+  plot = 1
   
   
   !************************************************************************      
@@ -523,7 +523,7 @@ program plotplt
      ymax = x
   end if
   
-  if(plot.ne.7) then
+  if(plot.ne.0.and.plot.ne.7.and.plot.ne.9) then
      write(6,*)''     
      write(6,*)' X-range:',xmin,'-',xmax
      write(6,*)' Y-range:',ymin,'-',ymax
@@ -539,17 +539,18 @@ program plotplt
         stop
      end if
   else
-     !if(os.eq.1) call pgbegin(1,'1/xserve',1,1)
-     io = 0
-     do while(io.le.0)
-        write(xwin,'(I3.3,A7)')xwini,'/xserve'
-        io = pgopen(trim(xwin))
-        if(io.le.0) then
-           write(6,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
-           xwini = xwini + 1
-        end if
-     end do
-     
+     if(plot.eq.7) call pgend  !Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
+     if(os.eq.1) then
+        io = 0
+        do while(io.le.0)
+           write(xwin,'(I3.3,A7)')xwini,'/xserve'
+           io = pgopen(trim(xwin))
+           if(io.le.0) then
+              write(6,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
+              xwini = xwini + 1
+           end if
+        end do
+     end if
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)          !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
      if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
@@ -677,6 +678,8 @@ program plotplt
         i = i+1
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
+     plot = 0
+     goto 501 !Redo the plot on the screen, in case you select '4' next
   end if
   !End of the plotting
   
@@ -699,7 +702,7 @@ program plotplt
   !***   POST-PLOT MENU   ***
   !************************************************************************      
   
-900 if(plot.ne.9) then
+900 if(plot.ne.0.and.plot.ne.9) then
      write(6,*)''
      write(6,'(A)')' You can:'
      write(6,'(A)')'  0) quit'

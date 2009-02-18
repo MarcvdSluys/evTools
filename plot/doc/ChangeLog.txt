@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
      
+    19: AstroFloyd, 17/02/2009
+      - fixed autoupdate function in plotplt now that pgopen is used
+      - fixed chosing 'zoom in' after eps file was written in plotplt(n)
+      
     17: AstroFloyd, 13/02/2009
       added lambda_env to plotplt(n)
 	

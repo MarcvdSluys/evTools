@@ -160,7 +160,7 @@ program plotpltn
      read(10,*)ncols
      do j=1,nn
         read(10,*,err=12,end=11) (dat(f,i,j),i=1,ncols)
-        dat(f,1,j) = j
+        !dat(f,1,j) = j
      end do
      write(6,'(A)')'  End of file reached, arrays too small!'
      close(10)
@@ -368,32 +368,34 @@ program plotpltn
   end if
   
   
-  xmin = 1.e33
-  xmax = -1.e33
-  do f=1,nf
-     if(exclx(f).eq.1) cycle
-     xmin = min(minval(xx(f,1:n(f))),xmin)
-     xmax = max(maxval(xx(f,1:n(f))),xmax)
-  end do
-  ymin = 1.e33
-  ymax = -1.e33
-  do f=1,nf
-     if(excly(f).eq.1) cycle
-     ymin = min(minval(yy(f,1:n(f))),ymin)
-     ymax = max(maxval(yy(f,1:n(f))),ymax)
-  end do
-  
-  
-  
-  
-  !Limit ranges for logged axes like Mdot
-  if(lgx.eq.1) then
-     if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
-  end if
-  if(lgy.eq.1) then
-     if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
-     if(vy.ge.35.and.vy.le.39.and.ymin.lt.-18.) ymin = -18.
-     if(vy.ge.35.and.vy.le.39.and.ymax.gt.-12.) ymax = -12.
+  !Find plot range
+  if(plot.ne.6) then
+     xmin = 1.e33
+     xmax = -1.e33
+     do f=1,nf
+        if(exclx(f).eq.1) cycle
+        xmin = min(minval(xx(f,1:n(f))),xmin)
+        xmax = max(maxval(xx(f,1:n(f))),xmax)
+     end do
+     ymin = 1.e33
+     ymax = -1.e33
+     do f=1,nf
+        if(excly(f).eq.1) cycle
+        ymin = min(minval(yy(f,1:n(f))),ymin)
+        ymax = max(maxval(yy(f,1:n(f))),ymax)
+     end do
+     
+     
+     
+     !Limit ranges for logged axes like Mdot
+     if(lgx.eq.1) then
+        if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
+     end if
+     if(lgy.eq.1) then
+        if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
+        if(vy.ge.35.and.vy.le.39.and.ymin.lt.-18.) ymin = -18.
+        if(vy.ge.35.and.vy.le.39.and.ymax.gt.-12.) ymax = -12.
+     end if
   end if
   
   
@@ -484,10 +486,12 @@ program plotpltn
   
   if((hrd.eq.1.or.vx.eq.76.or.vx.eq.81) .and. (xmin.lt.xmax)) call rswap(xmin,xmax)
   if((vy.eq.76.or.vy.eq.81) .and. (ymin.lt.ymax)) call rswap(ymin,ymax)
-  write(6,*)''    
-  write(6,*)'  X-range:',xmin,'-',xmax
-  write(6,*)'  Y-range:',ymin,'-',ymax
-  write(6,*)''    
+  if(plot.ne.0.and.plot.ne.8) then
+     write(6,*)''    
+     write(6,*)'  X-range:',xmin,'-',xmax
+     write(6,*)'  Y-range:',ymin,'-',ymax
+     write(6,*)''    
+  end if
   
   
   
@@ -602,6 +606,8 @@ program plotpltn
         i = i+1
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
+     plot = 0
+     goto 501  !Redo the screen plot, in case option 4 gets selected
   end if
   !End of the plotting
   
@@ -621,7 +627,7 @@ program plotpltn
   !***   POST-PLOT MENU   ***
   !************************************************************************      
   
-900 if(plot.ne.8) then
+900 if(plot.ne.0.and.plot.ne.8) then
      write(6,*)''
      write(6,'(A)')'  You can:'
      write(6,'(A)')'   0) quit'
@@ -630,7 +636,7 @@ program plotpltn
      write(6,'(A)')'   3) change axis ranges'
      write(6,'(A)')'   4) select zoom region'
      write(6,'(A)')'   5) zoom out'
-     write(6,'(A)')'   6) reread file and make same plot'
+     write(6,'(A)')'   6) reread files and make same plot'
      write(6,'(A)')'   7) change input file'
      write(6,'(A)')'   8) save plot to postscript'
      write(6,'(A)')'   9) toggle drawing line/points'

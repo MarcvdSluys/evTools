@@ -51,6 +51,7 @@ subroutine setconstants
   amu      =  1.6605402d-24
   
   homedir = '/home/user'
+  !homedir = '/Network/Servers/taku.astro.northwestern.edu/Users/ajl501'
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
@@ -487,7 +488,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
-  if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
+  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
   do j=1,nn
      read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
   end do
@@ -515,19 +516,21 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   !*** New output format (2005)
 19 continue
   !Erase the output from trying the first format
-  do i=1,3
-     write(6,'(A)')cursorup
-     write(6,'(A150)')''
-     write(6,'(A)')cursorup
-  end do
-  if(verbose.eq.1) write(6,'(A)')'  I will try the new output format...'
+  if(verbose.eq.1) then
+     do i=1,2
+        write(6,'(A)')cursorup
+        write(6,'(A150)')''
+        write(6,'(A)')cursorup
+     end do
+     write(6,'(A)')'  I will try the new output format...'
+  end if
   dat = 0.d0
   ver = 2005
   open (unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
-  if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
+  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
   if(ncols.eq.81) then
      do j=1,nn
         read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,81)  !81 Columns
