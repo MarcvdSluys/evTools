@@ -10,14 +10,15 @@ program makerun
   real*8 :: m2
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
-  integer :: io,narg,iargc
-  character :: file*8,arg*10,bla*500
+  integer :: io,narg,iargc,i,system
+  character :: filei*99,fileo*99,arg*10,bla*500
   
   write(6,*)''
-  file = 'init.run'
+  filei = 'init.run'
+  fileo = 'init.run.temp'
   
   
-  open(unit=10,form='formatted',status='old',file=file,iostat=io)
+  open(unit=10,form='formatted',status='old',file=trim(filei),iostat=io)
   if(io.ne.0) goto 90
   rewind 10
   read(10,*,err=91) isb,ktw,ip1,im1,ip2,im2,kpt,kp
@@ -81,7 +82,7 @@ program makerun
   if(narg.eq.3) ql1 = log10(sm/m2)
   if(per.gt.0.d0) xl1 = log10(per)
   
-  open(unit=20,form='formatted',file=file)
+  open(unit=20,form='formatted',file=trim(fileo))
   write(20,50) isb,ktw,ip1,im1,ip2,im2,kpt,kp,  &
        ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
        rot,kr,ex,  &
@@ -100,6 +101,8 @@ program makerun
   close(10)
   close(20)
   
+  i = system('mv -f '//trim(fileo)//' '//trim(filei))
+  
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
   
@@ -107,25 +110,25 @@ program makerun
   write(6,'(A,/)')'  Program done'
   stop
   
-90 write(6,'(A,/)')'  Error opening file: '//trim(file)
+90 write(6,'(A,/)')'  Error opening file: '//trim(filei)
   stop
-91 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 1'
+91 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 1'
   stop
-92 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 2'
+92 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 2'
   stop
-93 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 3'
+93 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 3'
   stop
-94 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 4'
+94 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 4'
   stop
-95 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 5'
+95 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 5'
   stop
-96 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 6'
+96 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 6'
   stop
-97 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 7'
+97 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 7'
   stop
-98 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 8'
+98 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 8'
   stop
-99 write(6,'(A,/)')'  Error reading file: '//trim(file)//', line 9'
+99 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 9'
   stop
   
 end program makerun
