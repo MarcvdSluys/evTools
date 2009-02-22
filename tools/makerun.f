@@ -11,7 +11,7 @@ program makerun
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
   integer :: io,narg,iargc
-  character :: file*8,arg*10
+  character :: file*8,arg*10,bla*500
   
   write(6,*)''
   file = 'init.run'
@@ -29,14 +29,18 @@ program makerun
   read(10,*,err=97) ct1
   read(10,*,err=98) ct2
   read(10,*,err=99) ct3
-  close(10)
+  !close(10)
+  
   
   kml = 1  !Only one iteration in mass
   m2 = 0.5d0*sm
   if(bms.gt.0) m2 = bms-sm
   
   narg = iargc()
-  if(narg.eq.2) then
+  if(narg.eq.1) then
+     call getarg(1,arg)
+     read(arg,*)sm
+  else if(narg.eq.2) then
      call getarg(1,arg)
      read(arg,*)sm
      call getarg(2,arg)
@@ -61,6 +65,7 @@ program makerun
      read(arg,*)p1
   else
      write(6,'(A)')'  Syntax: '
+     write(6,'(A)')'    makerun <M1>'
      write(6,'(A)')'    makerun <M1> <Porb>'
      write(6,'(A)')'    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
      write(6,'(A,/)')'    makerun <M1> <M2> <Porb> <Prot>'
@@ -74,26 +79,28 @@ program makerun
   
   ml1 = log10(sm)
   if(narg.eq.3) ql1 = log10(sm/m2)
-  xl1 = log10(per)
+  if(per.gt.0.d0) xl1 = log10(per)
   
   open(unit=20,form='formatted',file=file)
   write(20,50) isb,ktw,ip1,im1,ip2,im2,kpt,kp,  &
-    ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
-    rot,kr,ex,  &
-    sm,dty,age,per,bms,ecc,p1,enc,jmx,  &
-    ct1,ct2,ct3
-  write(20,*)''
-  write(20,'(A)')'last five lines:'
-  write(20,'(A)')'    ROT     KR   EX   : KR=1 -> P1 = Pcrit1*10**ROT;  KR=2 -> P1 = Porb*10**ROT'
-  write(20,'(A)')'alternative initial conditions if JMX >= 0, and if any item is non-negative:'
-  write(20,'(A)')'    SM       DTY          AGE       PER       BMS       ECC       P1        ENC       JMX'
-  write(20,'(A)')'conditions for termination:'
-  write(20,'(A)')'    rlf1     age      LCarb     rlf2      LHe        rho      MCO '
-  write(20,'(A)')'    rho      mdot     XHe       eps       dtmin      sm8      vmh8'
-  write(20,'(A)')'    last     line     not       yet       used       ...      ... '
+       ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
+       rot,kr,ex,  &
+       sm,dty,age,per,bms,ecc,p1,enc,jmx,  &
+       ct1,ct2,ct3
+  read(10,*)bla
+  write(20,'(/,A)')'last five lines:'
+  
+  io = 0
+  do while(io.eq.0)
+     read(10,'(A500)',iostat=io)bla
+     if(io.ne.0.or.len_trim(bla).eq.0.or.len_trim(bla).eq.500) exit
+     write(20,'(A)')trim(bla)
+  end do
+  
+  close(10)
   close(20)
   
-50 format (8I6,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
+50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
   
   write(6,'(4(A,ES10.3))')'  M1:',sm,',  M2:',m2,',  Porb:',per,',  Prot,1:',p1
