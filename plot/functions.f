@@ -477,9 +477,10 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   use constants
   implicit none
   real*8 :: dat(nvar,nn)
-  integer :: nvar,nn,ncols,nc,verbose,i,j,n,ver,u
+  integer :: nvar,nn,ncols,nc,nc1,verbose,i,j,n,ver,u
   character :: fname*99
   
+  nc1 = nc !Get rid of 'unused' message
   
   !*** Old output format (2003)
   dat = 0.d0
@@ -640,6 +641,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dat(88,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(87,i))**2* dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(21,i).gt.dat(87,i)) dat(88,i) = 2.7e-3* (2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(81,i).lt.0.02)  dat(88,i) = dat(88,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
+     if(dat(81,i).lt.1.d-9)  dat(88,i) = 0.d0
+     if(dat(81,i).gt.1.d0-1.d-9)  dat(88,i) = 0.d0  !No MB for fully convective star
   end do !i
   dat(88,1:n) = dat(88,1:n)/day**3
   
@@ -647,6 +650,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50  !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983
   do i=1,n
      if(dat(81,i).lt.0.02)  dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
+     if(dat(81,i).lt.1.d-9)  dat(38,i) = 0.d0
+     if(dat(81,i).gt.1.d0-1.d-9)  dat(38,i) = 0.d0  !No MB for fully convective star
   end do !i
   
   dat(37,1:n) = dat(88,1:n)                                     !Take Sills MB in stead of Wind AML

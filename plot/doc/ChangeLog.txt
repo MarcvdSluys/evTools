@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
      
+    25: AstroFloyd, 24/02/2009
+      - take into account fully convective state when computing MB
+      - added hardcoded parameter ncolours to plotpln.f
+      
     19: AstroFloyd, 17/02/2009
       - fixed autoupdate function in plotplt now that pgopen is used
       - fixed chosing 'zoom in' after eps file was written in plotplt(n)

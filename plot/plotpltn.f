@@ -15,7 +15,7 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system
+  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,ncolours
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle
   character :: fnames(nff)*99,fname*99,psname*99
@@ -30,6 +30,7 @@ program plotpltn
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
   plhrdrad  = 1 !Draw lines of constant radius in HRD
   prtitle   = 0 !Print dir as title: 0-no, 1-yes
+  ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read')
@@ -548,7 +549,8 @@ program plotpltn
   
   call pgsch(0.6)
   do f=1,nf
-     col = mod(f,13)+1
+     col = mod(f,ncolours) + 1
+     if(ncolours.lt.10) col = col + 1  !Avoid black
      call pgsci(col)
      xx1(1:n(f)) = xx(f,1:n(f))
      yy1(1:n(f)) = yy(f,1:n(f)) 
