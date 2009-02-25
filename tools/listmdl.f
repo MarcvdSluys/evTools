@@ -3,9 +3,9 @@
 ! AF
 
 program listmdl
+  use constants
   implicit none
   real :: age,dov,x,vk,mm1,be,be1
-  real :: pi,sigma,l0,m0,r0,g,day
   integer :: nmsh,nv,nmdl
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
@@ -17,16 +17,9 @@ program listmdl
   integer i,ii,j,nblk,blk,ans,svblk
   character findfile*99,fname*99
   
+  call setconstants()
+  
   svblk = 0
-  
-  pi	=	4.d0*datan(1.d0)
-  sigma	=	5.67051d-5
-  l0	=	3.83d33
-  r0	=	6.9599d10
-  m0	=	1.9891d33
-  g		=	6.67259d-8
-  day 	=	8.64d4
-  
   
   !Search for input file in current dir
   fname = findfile('*.mdl*',6)
@@ -228,8 +221,8 @@ program listmdl
      write(6,*)''
      write(6,85)mhe,mco,mhenv
      write(6,*)''
-     !        write(6,88)hs,hes,cs,ns,os,nes,mgs,zs
-     !        write(6,89)hc,hec,cc,ns,oc,nec,mgs,zc
+     !write(6,88)hs,hes,cs,ns,os,nes,mgs,zs
+     !write(6,89)hc,hec,cc,ns,oc,nec,mgs,zc
      write(6,90)hs,hes,cs,ns,os,nes,mgs,zs
      write(6,91)hc,hec,cc,ns,oc,nec,mgs,zc
      write(6,*)''
@@ -240,8 +233,8 @@ program listmdl
 84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3')
 85 format('  Cores:        Mhe = ',f9.5,' Mo,  Mco =',f9.5,' Mo,     Menv =',f9.5,' Mo')
   
-88 format('  Composition:  Surface:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
-89 format('  Composition:     Core:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
+!88 format('  Composition:  Surface:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
+!89 format('  Composition:     Core:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
   
 90 format('  Composition:  Surface:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4,',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
 91 format('  Composition:     Core:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4,',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)

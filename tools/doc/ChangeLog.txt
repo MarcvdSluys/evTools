@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    26: AstroFloyd, 25/02/2009
+     - updated listmdl, listmod, listplt for use with module constants and gfortran
+    
     14: AstroFloyd, 04/02/2009
      - some updates
      - added dat2plt, to convert output from a different evolution code to plt format

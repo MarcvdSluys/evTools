@@ -21,7 +21,7 @@ program getgrid
   
   dlgx = dlog10(x2/x1)/real(n-1)
   
-  write(6,'(/,2x,2ES11.3,I5,/)')dlog10(x1),dlgx,n
+  write(6,'(/,2ES11.3,I5,/)')dlog10(x1),dlgx,n
   
   write(*,*)
   call printgrid(dlog10(x1),dlgx,n)

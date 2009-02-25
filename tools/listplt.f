@@ -135,29 +135,28 @@ program listplt
 
 
 
-7 write(6,*)''
+  write(6,*)''
   write(6,'(A)')'Reading file '//trim(fname)
 
   dat = 0.d0
   open(unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
   read(10,*)ncols
-  write(6,'(A,I,A)')'  Reading',ncols,' columns of data'
-  if(ncols.ne.nc) write(6,'(A,I)')'WARNING: Number of colums in this file does not match that of the program: ',nc
+  write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
+  if(ncols.ne.nc) write(6,'(A,I4)')'WARNING: Number of colums in this file does not match that of the program:',nc
   do j=1,nn
-     !read(10,10,err=12,end=11) (dat(i,j),i=1,nc)
+     !read(10,'(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)',err=12,end=11) (dat(i,j),i=1,nc)
      read(10,*,err=12,end=11) (dat(i,j),i=1,nc)
-10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)
   end do
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(10)
   goto 15
 
-11 write(6,'(A,I,A)')'  End of the file reached,',j-1,' lines read.'
+11 write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(10)
   goto 15
 
-12 write(6,'(A,I)')'  Error reading file, line ',j
+12 write(6,'(A,I6)')'  Error reading file, line ',j
   close(10)
   if(j.lt.3) goto 19
   print*,"  I'll skip the rest of the file and use the first part."
@@ -174,22 +173,21 @@ program listplt
   open(unit=20,form='formatted',status='old',file=trim(fname))
   rewind 20
   read(20,*)ncols
-  write(6,'(A,I,A)')'  Reading',ncols,' columns of data'
-  if(ncols.ne.nc) write(6,'(A,I)')'WARNING: Number of colums in this file does not match that of the program: ',nc
+  write(6,'(A,I6,A)')'  Reading',ncols,' columns of data'
+  if(ncols.ne.nc) write(6,'(A,I4)')'WARNING: Number of colums in this file does not match that of the program:',nc
   do j=1,nn
-     !read(20,20,err=22,end=21) (dat(i,j),i=1,nc)
+     !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,nc)
      read(20,*,err=22,end=21) (dat(i,j),i=1,nc)
-20   format(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)
   end do
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(20)
   goto 25
 
-21 write(6,'(A,I,A)')'  End of the file reached,',j-1,' lines read.'
+21 write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(20)
   goto 25
 
-22 write(6,'(A,I)')'  Error reading file, aborting at line ',j
+22 write(6,'(A,I6)')'  Error reading file, aborting at line ',j
   print*,dat(1,1:10)
   if(j.lt.3) goto 9999
   write(6,'(A)')"  I'll skip the rest of the file and use the first part."

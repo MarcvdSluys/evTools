@@ -5,10 +5,10 @@
 ! Write an extra 0 at the end of the first line to make the output with the V.2005 code.
 
 program listmod
+  use constants
   implicit none
-  real*8 :: pi,l0,r0,m0,g,day,horb
-  real*8 :: m1,dt,t,p,bms,ecc,p1,enc
-  real*8 :: lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20
+  real*8 :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real*8 :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
   real*8 :: mi,pr,phi,phis,e,f
   real*8 :: m2,q1,q2,a,a1,a2,rl1,rl2,x
   real*8 :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
@@ -18,13 +18,7 @@ program listmod
   integer :: narg,iargc,blk,ans,iout
   character :: fname*99,findfile*99,outname*7
   
-  pi   =  4*datan(1.d0)
-  l0   =  3.83d33
-  r0   =  6.9599d10
-  m0   =  1.9891d33
-  g    =  6.67259d-8
-  day  =  8.64d4
-  
+  call setconstants()
   
   
   !***   READ COMMAND LINE VARIABLES
@@ -56,7 +50,7 @@ program listmod
      mhe = 0.d0
      mco = 0.d0
      do j=1,kh
-        read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         if(j.eq.1) then
            r1  = exp(lnr)*1.e11/r0
            l1  = l*1.d33/l0
@@ -102,11 +96,11 @@ program listmod
   
   
   !Read file, upto chosen model (blk-1)
-25 rewind 10
+  rewind 10
   do i=1,blk-1
      read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      do j=1,kh
-        read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
      end do !j
   end do !i
   
@@ -116,7 +110,7 @@ program listmod
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   
   read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin   !jin = # columns
-  read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
   
   m1  = lnm*1.d33/m0
   r1  = exp(lnr)*1.e11/r0
@@ -132,7 +126,7 @@ program listmod
   mhe = 0.d0
   mco = 0.d0
   do i=1,kh-1 !Number of Mesh points
-     read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+     read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
      if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
      if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
   end do
@@ -231,7 +225,7 @@ program listmod
   do i=1,blk-1
      read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      do j=1,kh
-        read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
      end do !j
   end do !i
   
