@@ -1,7 +1,10 @@
 
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
-     
+    
+    28: AstroFloyd, 03/03/2009
+      - added q_qrit and m_2,crit (for dynamical MT) to plotplt
+      
     25: AstroFloyd, 24/02/2009
       - take into account fully convective state when computing MB
       - added hardcoded parameter ncolours to plotpln.f

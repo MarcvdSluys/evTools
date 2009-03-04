@@ -7,7 +7,7 @@ module ubvdata
   save
   integer, parameter :: nzgr=9,ntgr=61,nggr=11
   real*8 :: zgr(nzgr),tgr(ntgr),ggr(nggr),ubv(8,nggr,ntgr,nzgr)
-
+  
   data zgr /-1.d0,-0.5d0,-0.3d0,-0.2d0,-0.1d0,0.d0,0.1d0,0.2d0,0.3d0/
   data ggr /0.d0,0.5d0,1.d0,1.5d0,2.d0,2.5d0,3.d0,3.5d0,4.d0,4.5d0,5.d0/
   data tgr /35.d0,37.5d0,40.d0,42.5d0,45.d0,47.5d0,50.d0,52.5d0,55.d0,57.5d0,60.d0,62.5d0,  &
@@ -24,7 +24,7 @@ module constants
   implicit none
   save
   real :: scrsz,scrrat
-  real*8 :: pi,sigma,l0,r0,m0,g,c,day,yr,amu
+  real*8 :: pi,sigma,l0,r0,m0,g,c,day,yr,amu,c3rd
   character :: homedir*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
 end module constants
@@ -35,11 +35,10 @@ end module constants
 subroutine setconstants
   use constants
   implicit none
-  !scrsz=11.5  !Screen dimensions: MacBook, MacOS
-  !scrrat=0.75
   scrsz=10.8  !Screen dimensions: MacBook, Gentoo
   scrrat=0.57
   pi	   =  4*datan(1.d0)
+  c3rd     =  1.d0/3.d0
   sigma    =  5.67051d-5
   l0	   =  3.83d33
   r0	   =  6.9599d10
@@ -50,8 +49,10 @@ subroutine setconstants
   yr	   =  3.15569d7
   amu      =  1.6605402d-24
   
-  homedir = '/home/user'
-  !homedir = '/Network/Servers/taku.astro.northwestern.edu/Users/ajl501'
+  
+  homedir = '~'  
+  !homedir = '/home/user'  !gfortran doesn't like '~'
+  !homedir = '/Network/Servers/taku.astro.northwestern.edu/Users/ajl501'  !gfortran doesn't like '~'
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
@@ -151,7 +152,7 @@ function findfile(match,len)
   integer :: i,k,len,fnum,system
   character :: match*99,names(maxfile)*99,findfile*99,fname*99,tempfile*99
   
-  if(len_trim(homedir).eq.99) then
+  if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
      stop
   end if
@@ -410,6 +411,8 @@ subroutine getpltlabels(nvar,labels)
   labels(107) = 'V-I'
   
   labels(111) = '\(2137)\denv\u'  !lambda_env
+  labels(112) = 'q\dcrit\u'       !q_crit; q_1 > q_crit gives dynamical MT (Hurley et al., 2002, Eq.57)
+  labels(113) = 'M\dcomp,crit\u'  !M2 < M2,crit gives dynamical MT (Hurley et al., 2002, Eq.57)
   
   labels(202) = 'dH\dorb\u/dt'
   labels(204) = 'dM/dt (M\d\(2281)\u/yr)'
@@ -449,8 +452,8 @@ subroutine printpltvarlist
   write(6,'(A)'),'                                                                                        ' 
   write(6,'(A)'),'  Derived variables:                                                                    '
   write(6,'(A)'),'   81: Qconv                91: Ne/O change     101: V        111: lambda_env           '  
-  write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B                                '  
-  write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V                                '
+  write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B      112: q_crit               '  
+  write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V      113: M2,crit              '
   write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R                                '
   write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I                                '
   write(6,'(A)'),'   86: Rossby nr            96: Jspin           106: U-V                                '
@@ -576,7 +579,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real*8 :: dat(nvar,nn),var(nn),dpdj(nn)
-  real*8 :: c92(nn),c85a,c85b
+  real*8 :: c92(nn),c85a,c85b,x,z
   character :: labels(nvar)*99
   
   !de-log some variables
@@ -678,8 +681,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                 !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
   dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
   dat(97,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
-  dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y
-  dat(99,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                          !t - t_final, avoid by setting dat(,1) = dat(,2)
+  dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
+  dat(99,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
   
   !dat(100,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
   dat(100,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day         !Critical (Keplerian) rotation period
@@ -700,6 +703,20 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(83,i),dat(15,i),dat(8,i),dat(111,i)
   end do
   
+  z = log10(dat(98,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
+  x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
+  print*,dat(98,1),z,x
+  dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
+  dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
+  do i=1,n
+     if(dat(5,i).lt.1.e-6) then
+        dat(112,i) = 0.
+        dat(113,i) = 0.
+     end if
+     !write(6,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
+  end do
+  
+  
   !Timescales
   dat(201,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
   dat(202,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
@@ -710,21 +727,34 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dpdt  = 0
   
   !Replace dH/dt by dP/dt
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
-  do i=35,39
-     dat(i,1:n) = dat(i,1:n)*dpdj(1:n)*1.d50+1.d-30
-  end do
-  labels(35) = 'dP\dorb\u/dt'
-  labels(202) = 'dP\dorb\u/dt'
-  dpdt = 1
+  !35 = H_orb,  36 = H_gw, 37 = H_wml, 38 = H_s-o, 39 = H_mtr
+  if(1.eq.2) then
+     dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
+     do i=35,39
+        dat(i,1:n) = dat(i,1:n)*dpdj(1:n)*1.d50+1.d-30
+     end do
+     labels(35) = 'dP\dorb\u/dt'
+     labels(36) = 'dP\dgw\u/dt'
+     labels(37) = 'dP\dwml\u/dt'
+     labels(38) = 'dP\ds-o\u/dt'
+     labels(39) = 'dP\dmtr\u/dt'
+     labels(202) = 'dP\dorb\u/dt'
+     dpdt = 1
+  end if
   
   !Replace dP/dt by timescales 
-  do i=35,39
-     dat(i,1:n) = dat(28,1:n)*day/dat(i,1:n)/yr
-  end do
-  labels(35) = '\gt\dP\dorb\u\u (yr)'
-  labels(202) = '\gt\dP\dorb\u\u (yr)'
-  dpdt = 2
+  if(1.eq.2) then
+     do i=35,39
+        dat(i,1:n) = dat(28,1:n)*day/dat(i,1:n)/yr
+     end do
+     labels(35) = '\gt\dP\dorb\u\u (yr)'
+     labels(36) = '\gt\dP\dgw\u\u (yr)'
+     labels(37) = '\gt\dP\dwml\u\u (yr)'
+     labels(38) = '\gt\dP\ds-o\u\u (yr)'
+     labels(39) = '\gt\dP\dmtr\u\u (yr)'
+     labels(202) = '\gt\dP\dorb\u\u (yr)'
+     dpdt = 2
+  end if
   
 end subroutine changepltvars
 !***********************************************************************
@@ -786,18 +816,18 @@ subroutine locate(xx,n,x,j)  !Double precision
   real*8 :: x,xx(n)
   jl=0
   ju=n+1
-10 if(ju-jl.gt.1)then
+10 if(ju-jl.gt.1) then
      jm=(ju+jl)/2
-     if((xx(n).ge.xx(1)).eqv.(x.ge.xx(jm)))then
+     if((xx(n).ge.xx(1)).eqv.(x.ge.xx(jm))) then
         jl=jm
      else
         ju=jm
      end if
      goto 10
   end if
-  if(x.eq.xx(1))then
+  if(x.eq.xx(1)) then
      j=1
-  else if(x.eq.xx(n))then
+  else if(x.eq.xx(n)) then
      j=n-1
   else
      j=jl
@@ -907,10 +937,199 @@ end function ran1
 
 
 
+!***********************************************************************
+subroutine spline(x,y,n,yp1,ypn,y2)
+  implicit none
+  !integer, parameter :: nmax=1000
+  integer :: n,i,k
+  real*8 :: yp1,ypn,x(n),y(n),y2(n)
+  real*8 :: p,qn,sig,un,u(n)
+  
+  !if(n.gt.nmax) then
+  !   write(0,'(/,A)')'  ERROR: spline():  n > nmax'
+  !   write(0,'(A,/)')'  Aborting...'
+  !   stop
+  !end if
+  
+  if(yp1.gt..99d30) then
+     y2(1) = 0.
+     u(1) = 0.
+  else
+     y2(1) = -0.5
+     u(1) = (3./(x(2)-x(1)))*((y(2)-y(1))/(x(2)-x(1))-yp1)
+  end if
+  
+  do i=2,n-1
+     sig = (x(i)-x(i-1))/(x(i+1)-x(i-1))
+     p = sig*y2(i-1)+2.
+     y2(i) = (sig-1.)/p
+     u(i) = (6 * ( (y(i+1)-y(i)) / (x(i+1)-x(i)) - (y(i)-y(i-1)) / (x(i)-x(i-1)) ) / (x(i+1)-x(i-1)) - sig*u(i-1)) / p
+  end do
+  
+  if(ypn.gt..99e30) then
+     qn = 0.
+     un = 0.
+  else
+     qn = 0.5
+     un = (3./(x(n)-x(n-1)))*(ypn-(y(n)-y(n-1))/(x(n)-x(n-1)))
+  end if
+  
+  y2(n) = (un-qn*u(n-1))/(qn*y2(n-1)+1.)
+  do k=n-1,1,-1
+     y2(k) = y2(k)*y2(k+1)+u(k)
+  end do
+  
+end subroutine spline
+!***********************************************************************
+
+
+!***********************************************************************
+subroutine splint(xa,ya,y2a,n,x,y)
+  implicit none
+  integer :: n,k,khi,klo
+  real*8 :: x,y,xa(n),y2a(n),ya(n),a,b,h
+  
+  klo = 1
+  khi = n
+1 if(khi-klo.gt.1) then
+     k = (khi+klo)/2
+     if(xa(k).gt.x) then
+        khi = k
+     else
+        klo = k
+     end if
+     goto 1
+  end if
+  
+  h = xa(khi)-xa(klo)
+  if(h.eq.0.) pause 'bad xa input in splint'
+  a = (xa(khi)-x)/h
+  b = (x-xa(klo))/h
+  y = a*ya(klo)+b*ya(khi)+((a**3-a)*y2a(klo)+(b**3-b)*y2a(khi))*(h**2)/6.
+  return
+end subroutine splint
+!***********************************************************************
 
 
 
 
 
 
+!********************************************************************************      
+function a2j(m1,m2,a)  !a to Orbital angular momentum
+  use constants
+  implicit none
+  real*8 :: a2j,m1,m2,a
+  a2j = m1*m2*dsqrt(g*a*r0/(m1+m2)*m0**3)!*m0**1.5d0
+end function a2j
+!***********************************************************************
+
+!********************************************************************************      
+function j2a(m1,m2,j)  !Orbital angular momentum to a
+  use constants
+  implicit none
+  real*8 :: j2a,m1,m2,j
+  j2a = (j/(m1*m2))**2 * (m1+m2)/(g*m0**3)/r0
+end function j2a
+!***********************************************************************
+
+
+
+!********************************************************************************      
+function p2j(m1,m2,p)  !P to Orbital angular momentum, all in cgs units
+  use constants
+  implicit none
+  real*8 :: p2j,m1,m2,p,a,p2a
+  a = p2a(m1+m2,p)
+  p2j = m1*m2*sqrt(g*a/(m1+m2))
+end function p2j
+!***********************************************************************
+
+!********************************************************************************      
+function j2p(m1,m2,j)  !Orbital angular momentum to P, all in cgs units
+  use constants
+  implicit none
+  real*8 :: j2p,m1,m2,j,a,a2p
+  a = (j/(m1*m2))**2 * (m1+m2)/g
+  j2p = a2p(m1+m2,a)
+end function j2p
+!***********************************************************************
+
+
+
+!********************************************************************************      
+function p2a(mtot,p)  !P, a, mtot in cgs units
+  use constants
+  implicit none
+  real*8 :: p2a,mtot,p
+  p2a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
+end function p2a
+!***********************************************************************
+
+!********************************************************************************      
+function a2p(mtot,a)  !P, a, mtot in cgs units
+  use constants
+  implicit none
+  real*8 :: a2p,mtot,a
+  a2p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
+end function a2p
+!***********************************************************************
+
+
+!************************************************************************
+function a2rl(m1,m2,a)  !m1 and m2 in the same units, Rl and a in the same units
+  use constants
+  implicit none
+  real*8 :: a2rl,q,m1,m2,a
+  q = m1/m2
+  a2rl = a / (0.6d0*q**(2*c3rd) + dlog(1.d0 + q**c3rd)) * (0.49d0*q**(2*c3rd))
+end function a2rl
+!***********************************************************************
+
+
+
+!************************************************************************
+function rl2a(m1,m2,rl1)  !m1 and m2 in the same units, Rl and a in the same units
+  use constants
+  implicit none
+  real*8 :: rl2a,q,m1,m2,rl1
+  q = m1/m2
+  rl2a = rl1/(0.49d0*q**(2*c3rd)/(0.6d0*q**(2*c3rd) + dlog(1.d0+q**c3rd)))
+end function rl2a
+!***********************************************************************
+
+
+!************************************************************************
+function p2rl(m1,m2,p)  !P, rl, mtot in cgs units
+  implicit none
+  real*8 :: p2rl,m1,m2,p,a,p2a,a2rl
+  a = p2a(m1+m2,p)
+  p2rl = a2rl(m1,m2,a)
+end function p2rl
+!************************************************************************
+
+
+!************************************************************************
+function rl2p(m1,m2,rl1)  !P, rl, mtot in cgs units
+  implicit none
+  real*8 :: rl2p,m1,m2,rl1,a,a2p,rl2a
+  a = rl2a(m1,m2,rl1)
+  rl2p = a2p(m1+m2,a)
+end function rl2p
+!************************************************************************
+
+
+
+
+!************************************************************************
+subroutine quit_program(message,len)  !Print a message and quit
+  implicit none
+  character :: message*199
+  integer :: len
+  
+  if(len.ge.1.and.len.le.199) write(0,'(/,A)')'  '//trim(message(1:len))
+  write(0,'(A,/)')'  Aborting...'
+  stop
+end subroutine quit_program
+!************************************************************************
 

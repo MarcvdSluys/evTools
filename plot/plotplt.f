@@ -105,7 +105,7 @@ program plotplt
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
      if(vx.gt.62.and.vx.lt.81) goto 35
-     if(vx.gt.111.and.vx.lt.201) goto 35
+     if(vx.gt.113.and.vx.lt.201) goto 35
      
      hrd   = 0
      dhdt  = 0
@@ -132,12 +132,12 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-111, 202-209): '
+36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-113, 202-209): '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.209) goto 36
      if(vy.gt.62.and.vy.lt.81) goto 36
-     if(vy.gt.111.and.vy.lt.202) goto 36
+     if(vy.gt.113.and.vy.lt.202) goto 36
   end if   !if(plot.lt.2) then   
   
   
@@ -774,8 +774,8 @@ program plotplt
      nsel=0
      call pgsci(1)
      call pgolin(1,nsel,xsel,ysel,2)
-     write(6,'(10ES10.2)')xsel,xmin,xmax
-     write(6,'(10ES10.2)')ysel,ymin,ymax
+     !write(6,'(10ES10.2)')xsel,xmin,xmax
+     !write(6,'(10ES10.2)')ysel,ymin,ymax
      dx = abs(xmax-xmin)
      dy = abs(ymax-ymin)
      mindist = 1.e30
@@ -792,6 +792,22 @@ program plotplt
      write(6,*)''
      write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
      write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(i0),',  y =',yy(j0,i0),'    line =',i0+1,',  model =',nint(dat(1,i0))
+     
+     dx = 0
+     dy = 0
+     if(i0.gt.1.and.i0.lt.n) then
+        dx = xx(i0+1)-xx(i0-1)
+        dy = yy(j0,i0+1)-yy(j0,i0-1)
+     else if(i0.gt.1) then
+        dx = xx(i0)-xx(i0-1)
+        dy = yy(j0,i0)-yy(j0,i0-1)
+     else if(i0.lt.n) then
+        dx = xx(i0+1)-xx(i0)
+        dy = yy(j0,i0+1)-yy(j0,i0)
+     end if
+     
+     write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+     
      d = dat(:,i0)
      write(6,*)''
      !From listplt
