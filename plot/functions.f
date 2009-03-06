@@ -24,7 +24,9 @@ module constants
   implicit none
   save
   real :: scrsz,scrrat
-  real*8 :: pi,sigma,l0,r0,m0,g,c,day,yr,amu,c3rd
+  real*8 :: pi,tpi,pi2,c3rd
+  real*8 :: l0,r0,m0,g,c,day,yr
+  real*8 :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
 end module constants
@@ -37,18 +39,29 @@ subroutine setconstants
   implicit none
   scrsz=10.8  !Screen dimensions: MacBook, Gentoo
   scrrat=0.57
-  pi	   =  4*datan(1.d0)
-  c3rd     =  1.d0/3.d0
-  sigma    =  5.67051d-5
-  l0	   =  3.83d33
-  r0	   =  6.9599d10
-  m0	   =  1.9891d33
-  g	   =  6.67259d-8
-  c        =  2.99792458d10
-  day      =  8.64d4
-  yr	   =  3.15569d7
-  amu      =  1.6605402d-24
   
+  pi	   =  4*datan(1.d0)                         !Pi, area of circle/r^2
+  tpi      =  2*pi
+  pi2      =  0.5d0*pi
+  c3rd     =  1.d0/3.d0
+  
+  l0	   =  3.83d33                               !Solar luminosity, erg s^-1
+  r0	   =  6.9599d10                             !Solar radius, cm
+  m0	   =  1.9891d33                             !Solar mass, g
+  
+  g	   =  6.67259d-8                            !Newton's constant, cm^3 g^-1 s^-2
+  c        =  2.99792458d10                         !Speed of light in vacuo, cm s^-1
+  
+  day      =  8.64d4                                !Day, s
+  yr	   =  3.15569d7                             !Year, s
+  
+  amu      =  1.6605402d-24                         !Atomic mass unit; (mass of C12 atom)/12, g
+  m_h      =  1.007825*amu                          !Mass of a hydrogen atom
+  k_b      =  1.380658d-16                          !Boltzmann constant, erg/K
+  h_p      =  6.6260755d-27                         !Planck's constant, erg s
+  h_bar    =  h_p/tpi                               !Reduced Planck constant, erg s
+  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
+  sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
   homedir = '~'  
   !homedir = '/home/user'  !gfortran doesn't like '~'

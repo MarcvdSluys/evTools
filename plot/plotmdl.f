@@ -16,7 +16,7 @@ program plotmdl
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
   real :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
-
+  
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab,ttlen
   character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,mdlnr*5,bla*3
   character :: labels(nq)*60,lx*60,ly*60,title*100,pxns(0:nq)*99,psname*99
@@ -47,6 +47,7 @@ program plotmdl
   pxns(51:60) = (/'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2'/)
 
   pxns(201:210) = (/'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g'/)
+  pxns(211:215) = (/'mu','n','Prad','Pgas','Pr/Pg'/)
   pxns(251:252) = (/'Abundances','Nablas'/)
   
   !Axis labels
@@ -135,10 +136,16 @@ program plotmdl
   labels(205) = 'C/O'
   labels(206) = 'Ne/O'
   labels(207) = 'U\dgr\u - U\dint\u'
-  labels(208) = 'm.f.p. (cm)'
+  labels(208) = 'mean free path (cm)'
   labels(209) = 'n (cm\u-3\d)'
   labels(210) = 'g (cm s\u-2\d)'
-
+  labels(211) = '\(2138)'  !\mu - mean molecular weight
+  labels(212) = 'n (cm\u-3\d)'
+  labels(213) = 'P\drad\u (dyn cm\u-2\d)'
+  labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
+  labels(215) = '\(2128) = P\drad\u/P\dgas\u'  !\beta - Prad/Pgas
+  
+  
   labels(251) = 'Abundances'
   labels(252) = "\(2266)'s"
   
@@ -342,18 +349,27 @@ program plotmdl
      dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                      	   !Ne/O
      dat(207,1:nm) = g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0)-dat(pxin(27),1:nm)     !Ugr - Uint
      dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))				   !Mean free path = 1/(rho * kappa)
-     pxnr(201:208) = (/201,202,203,204,205,206,207,208/)
      if(pxin(31).ne.0) then
         dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
         pxnr(209) = 209
      end if
-     pxnr(251:252) = (/251,252/) !Abundances, Nablas
+     dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
+     pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
+     
+     dat(211,1:nm) = 2. / (1 + 3*dat(9,1:nm) + 0.5*dat(10,1:nm))                           !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62)
+     dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       !Particle density       n = rho/(mu*m_H)
+     dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             !                   P_rad = aT^4/3
+     dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         !                   P_gas = nkT
+     dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.e-30)                                  !                    beta = Prad/Pgas
+     pxnr(211:215) = (/211,212,213,214,215/)
+     
+     
+     
      if(pxin(60).ne.0) then !Brint-Vailasakatralala frequency
         dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
      end if
-     dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
-     pxnr(210) = 210
      
+     pxnr(251:252) = (/251,252/) !Abundances, Nablas
   end if !if(plot.eq.0) then
   
   
@@ -370,7 +386,7 @@ program plotmdl
         if(pxnr(i+j*ii).eq.0) then
            write(6,'(A19,$)')''
         else
-           write(6,'(I4,A10,5x,$)')i+j*ii,': '//pxns(pxnr(i+j*ii))
+           write(6,'(I9,A10,5x,$)')i+j*ii,': '//pxns(pxnr(i+j*ii))
         end if
      end do
      write(6,*)''
@@ -379,18 +395,32 @@ program plotmdl
   !Print derived variables, from number 201 on:
   write(6,'(A)')'                                                              '
   write(6,'(A)')'  Derived variables:                                          '
-  nr = 3 !Number of variable columns
-  j = 0
-  do i=201,nq
-     if(j.eq.nr) then
-        write(6,*)''
-        j = 0
-     end if
-     if(pxnr(i).gt.0) then
-        write(6,'(I5,A15,5x,$)')i,': '//pxns(i)
-        j = j+1
-     end if
+  !nr = 3 !Number of variable columns
+  !j = 0
+  !do i=201,nq
+  !   if(j.eq.nr) then
+  !      write(6,*)''
+  !      j = 0
+  !   end if
+  !   if(pxnr(i).gt.0) then
+  !      write(6,'(I5,A15,5x,$)')i,': '//pxns(i)
+  !      j = j+1
+  !   end if
+  !end do
+
+  nr = 4 !Number of variable columns
+  ii = ceiling(real(nc)/real(nr)) !Number of rows
+  do i=1,ii
+     do j=0,nr-1
+        if(pxnr(200+i+j*ii).eq.0) then
+           write(6,'(A19,$)')''
+        else
+           write(6,'(I9,A10,5x,$)')200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
+        end if
+     end do
+     write(6,*)''
   end do
+  
   write(6,*)''
   write(6,*)''
   

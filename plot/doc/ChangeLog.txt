@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    29: AstroFloyd, 05/03/2009
+      - plotmdl: 
+        - added secondary variables mu, n, P_rad, P_gas, beta=P_rad/P_gas
+	      
     28: AstroFloyd, 03/03/2009
       - added q_qrit and m_2,crit (for dynamical MT) to plotplt
       
