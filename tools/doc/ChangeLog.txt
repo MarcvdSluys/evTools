@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    33: AstroFloyd, 09/03/2009
+     - listmod and mergeplt should now be able to handle v.2005 output
+     
     26: AstroFloyd, 25/02/2009
      - updated listmdl, listmod, listplt for use with module constants and gfortran
     

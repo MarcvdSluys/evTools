@@ -13,7 +13,7 @@ program listmod
   real*8 :: m2,q1,q2,a,a1,a2,rl1,rl2,x
   real*8 :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
   real*8 :: mhe,mco,mhenv
-  real*8 :: dat1(8),dat2(24)
+  real*8 :: dat1(8),dat2(24),dat(99)
   integer :: i,j,kh,kp,jmod,jb,jin,n
   integer :: narg,iargc,blk,ans,iout
   character :: fname*99,findfile*99,outname*7
@@ -44,17 +44,40 @@ program listmod
   open (unit=10,form='formatted',status='old',file=trim(fname))
 3 rewind 10
   
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1   Mhe   Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   do i=1,999
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     !print*,kh,kp,jmod,jb,jin
      mhe = 0.d0
      mco = 0.d0
      do j=1,kh
-        read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        !read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        read(10,*,err=6,end=10)dat(1:jin)
+        lnf = dat(1)
+        lnt = dat(2)
+        x16 = dat(3)
+        lnm = dat(4)
+        x1 = dat(5)
+        dqdk = dat(6)
+        lnr = dat(7)
+        l = dat(8)
+        x4 = dat(9)
+        x12 = dat(10)
+        x20 = dat(11)
+        mi = dat(12)
+        pr = dat(13)
+        phi = dat(14)
+        phis = dat(15)
+        !x = dat(16)
+        horb = dat(17)
+        e = dat(18)
+        f = dat(19)
+        
         if(j.eq.1) then
            r1  = exp(lnr)*1.e11/r0
            l1  = l*1.d33/l0
            ts  = exp(lnt)
+           m1 = lnm*1.d33/m0
         end if
         if(j.eq.kh) then
            tc  = exp(lnt)
@@ -65,7 +88,7 @@ program listmod
         if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
      end do !j
-     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1   Mhe   Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
      write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,hc,hec,zc,bms,p,p1
   end do !i
   write(6,'(A)')'  EOF not reached, array too small!'
@@ -74,9 +97,9 @@ program listmod
 5 write(6,'(A35,I3)')'  Error reading first line of block',i
   goto 10
 6 write(6,'(A36,I3)')'  Error reading second line of block',i
-9 format (I4,I7,I5,ES13.5,ES9.2,f10.4,2f6.3,ES9.2,1x,3ES9.2,ES9.2,1x,3f7.4,1x,3ES9.2)
+9 format (I4,I7,I5,ES13.5,ES9.2,f10.4,2f7.3,ES9.2,1x,3ES9.2,ES9.2,1x,3f7.4,1x,3ES9.2)
 10 n=i-1
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1   Mhe   Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   
   write(6,'(I5,A)')n,' blocks read.'

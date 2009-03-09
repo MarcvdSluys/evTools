@@ -4,36 +4,32 @@
 
 program mergeplt      
   implicit none
-  integer :: nn,nnn
-  parameter (nn=30000,nnn=100)
+  integer, parameter :: nn=30000,nnn=100
   real*8 :: dat1(nnn,nn),dat2(nnn,nn)
-  integer :: model1(nn),model2(nn)
-  integer :: narg,iargc,l1,l2,lo
-
-  integer :: i,j,n1,n2,ncols1,ncols2
+  !integer :: model1(nn),model2(nn)
+  integer :: narg,iargc
+  
+  integer :: i,j,n1,n2,ncols,ncols1,ncols2,ncolsmax
   character :: fin1*99,fin2*99,fout*99
-
-
+  
+  
+  ncolsmax = 89  !Program is not designed to handle more columns
+  
+  
   narg = iargc()
   if(narg.eq.3) then
      call getarg(1,fin1)
      call getarg(2,fin2)
      call getarg(3,fout)
-     do i=1,50
-        if(fin1(i:i).ne.' ') l1 = i !Use trim instead
-        if(fin2(i:i).ne.' ') l2 = i
-        if(fout(i:i).ne.' ') lo = i
-     end do
-  end if
-  if(narg.ne.3) then
-     write(*,'(A)')'mergeplt: merges the contents of two plot files to a third file'
-     write(*,'(A)')'          syntax:  mergeplt <infile1> <infile2> <outfile>'
+  else
+     write(*,'(A)')'  mergeplt: merges the contents of two plot files to a third file'
+     write(*,'(A)')'            syntax:  mergeplt <infile1> <infile2> <outfile>'
      goto 9999
   end if
-
+  
   write(*,*)''
   write(*,'(A)')'  Reading file '//trim(fin1)
-  open (unit=10,form='formatted',status='old',file=fin1(1:l1)) !Use trim instead
+  open (unit=10,form='formatted',status='old',file=trim(fin1))
   rewind 10
   read(10,*)ncols1
   if(ncols1.gt.nnn+1) then
@@ -42,97 +38,96 @@ program mergeplt
      goto 9999
   end if
   do j=1,nn
-     read(10,*,err=12,end=11) model1(j), (dat1(i,j),i=1,ncols1-1)
+     read(10,*,err=12,end=11) (dat1(i,j),i=1,ncols1)
   end do
   write(*,'(A)')'  End of file reached, arrays too small!'
   close(10)
   goto 15
-
-11 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',model1(1),' - ',model1(j-1)
+  
+11 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
   write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat1(1,1),' - ',dat1(1,j-1)
   close(10)
   goto 15
-
+  
 12 write(*,*)'  File unreadable after line ',j-1
   write(*,'(A)')'  Make sure files overlap !!!'
   write(*,*)''
-  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', model1(1),' - ',model1(j-1)
+  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
   write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat1(1,1),' - ',dat1(1,j-1)
   close(10)
-  !goto 9999
-
+  
+  
 15 n1=j-1
-
-
+  
+  
   write(*,*)''
-
-
+  
+  
   write(*,'(A)')'  Reading file '//trim(fin2)
-  open (unit=20,form='formatted',status='old',file=fin2(1:l2)) !Use trim instead
+  open (unit=20,form='formatted',status='old',file=trim(fin2))
   rewind 20
   read(20,*)ncols2
+  ncols = ncols1
   if(ncols2.ne.ncols1) then
-     write(*,'(A)')'  The two files have different numbers of columns!!!'  !This can happen because I write 81 cols max.
-     !write(*,'(A)')'  Aborting...'
-     !goto 9999
+     write(*,'(A,I4,A,I4)')'  The two files have different numbers of columns:',ncols1,' vs.',ncols2    
+     ncols = min(ncols1,ncols2)
+     write(*,'(A,I4)')'  Continuing with the minimum of the two:',ncols  !This can happen because I write 81 cols max.
   end if
   do j=1,nn
-     read(20,*,err=22,end=21) model2(j), (dat2(i,j),i=1,ncols1-1)
+     read(20,*,err=22,end=21) (dat2(i,j),i=1,ncols2)
   end do
   write(*,'(A)')'  End of file reached, arrays too small!'
   close(20)
   goto 25
-
-21 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',model2(1),' - ',model2(j-1)
+  
+21 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
   write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat2(1,1),' - ',dat2(1,j-1)
   close(10)
   goto 25
-
+  
 22 write(*,*)'  File unreadable after line ',j-1
   write(*,'(A)')'  Continuing process, check the result !!!'
   write(*,*)''
-  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', model2(1),' - ',model2(j-1)
+  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
   write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat2(1,1),' - ',dat2(1,j-1)
   close(20)
-  !goto 9999
-
+  
 25 n2=j-1
-
+  
   write(*,*)''
   
-  if(ncols1.gt.81) then
-     write(*,'(A)')'  The number of columns is larger that 81, I can only save the first 81!!!'
-     ncols1 = 81
+  if(ncols.gt.ncolsmax) then
+     write(*,'(A,I4,A,I4,A)')'  The number of columns is larger than', ncolsmax,', I can only save the first', ncolsmax,' !!!'
+     ncols = ncolsmax
   end if
   
-  open(unit=30,form='formatted',status='new',file=fout(1:lo),iostat=i) !Use trim instead
+  open(unit=30,form='formatted',status='new',file=trim(fout),iostat=i)
   if(i.ne.0) then
-     write(*,'(A)')'  File already exists: '//fout(1:lo) !Use trim instead
+     write(*,'(A)')'  File already exists: '//trim(fout)
      write(*,'(A)')'  Aborting...'
      goto 9999
   end if
-  write(*,'(A)')'  Creating output file: '//fout(1:lo) !Use trim instead
-  write(30,'(I4)')ncols1
+  write(*,'(A)')'  Creating output file: '//trim(fout)
+  write(30,'(I4)')ncols
   do j=1,n1
-     !if(model1(j).ge.model2(1)) goto 28
      if(dat1(1,j).ge.dat2(1,1)) goto 28 !Use time rather than model number
-     if(ncols1.le.81) write(30,30) model1(j), (dat1(i,j),i=1,ncols1-1)
-     !if(ncols1.gt.81) write(30,40) model1(j), (dat1(i,j),i=1,ncols1-1)
+     if(ncols.le.81) write(30,2003) nint(dat1(1,j)), (dat1(i,j),i=2,ncols)  !v.2003
+     if(ncols.gt.81) write(30,2005) nint(dat1(1,j)), (dat1(i,j),i=2,ncols)  !v.2005
   end do
-
+  
 28 do j=1,n2
-     if(ncols1.le.81) write(30,30) model2(j), (dat2(i,j),i=1,ncols1-1)
-     !if(ncols1.gt.81) write(30,40) model2(j), (dat2(i,j),i=1,ncols1-1)
+     if(ncols.le.81) write(30,2003) nint(dat2(1,j)), (dat2(i,j),i=2,ncols)  !v.2003
+     if(ncols.gt.81) write(30,2005) nint(dat2(1,j)), (dat2(i,j),i=2,ncols)  !v.2005
   end do
   close(30)
-
-30 format(I6,ES17.9,ES14.6,11F9.5,7ES12.4,3F9.5,16ES12.4,F8.4,21ES13.5,12F9.5,6F9.5,ES14.6)
-!40 format()
-
-
-
-
-
+  
+2003 format(I6,ES17.9,ES14.6,11F9.5,7ES12.4,3F9.5,16ES12.4,F8.4,21ES13.5,12F9.5,6F9.5,ES14.6) !v.2003, 81 colums
+2005 format(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4, 39ES13.5,ES14.6,ES13.5,F5.1,6ES13.5) !v.2005, 89 colums
+  
+  
+  
+  
+  
   write(*,'(A)')'  Program finished'
 9999 write(*,*)''
 end program mergeplt
