@@ -21,10 +21,16 @@ program getgrid
   
   dlgx = dlog10(x2/x1)/real(n-1)
   
-  write(6,'(/,2ES11.3,I5,/)')dlog10(x1),dlgx,n
+  write(6,'(/,A,2ES11.3,I5)')'  Start at first value:  ',dlog10(x1),dlgx,n
+  write(6,'(A,2ES11.3,I5,/)')'  Start at second value: ',dlog10(x1)+dlgx,dlgx,n-1
   
   write(*,*)
   call printgrid(dlog10(x1),dlgx,n)
+  write(*,*)
+  
+  write(6,'(/,A,2ES11.3,I5)')'  Intermediate grid:     ',dlog10(x1)+dlgx/2.,dlgx,n-1
+  write(*,*)
+  call printgrid(dlog10(x1)+dlgx/2.,dlgx,n-1)
   write(*,*)
   
 end program getgrid
@@ -32,11 +38,12 @@ end program getgrid
 
 
 !Shared with grid.f
-subroutine printgrid(xi,dx,n)
+subroutine printgrid(xi1,dx,n)
   implicit none
-  real*8 :: xi,dx
+  real*8 :: xi1,xi,dx
   integer :: i,n
   
+  xi = xi1
   write(6,'(A5,2A10)')'i','x','log x'
   do i=1,n
      write(6,'(I5,F10.5,ES12.3)')i,10.d0**xi,xi
