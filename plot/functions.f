@@ -543,7 +543,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   end if
   dat = 0.d0
   ver = 2005
-  open (unit=u,form='formatted',status='old',file=trim(fname))
+  open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
@@ -718,7 +718,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   z = log10(dat(98,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
   x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
-  print*,dat(98,1),z,x
+  
   dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
   dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
   do i=1,n
@@ -756,7 +756,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   end if
   
   !Replace dP/dt by timescales 
-  if(1.eq.2) then
+  if(1.eq.1) then
      do i=35,39
         dat(i,1:n) = dat(28,1:n)*day/dat(i,1:n)/yr
      end do
@@ -869,8 +869,109 @@ end subroutine locater
 !************************************************************************      
 
 
+!************************************************************************************************************************************
+subroutine rindexx(n,rarr,indx)  !Return a sorted index indx of array arr of length n - single precision
+  integer :: n,indx(n)
+  real :: rarr(n)
+  real*8 :: darr(n)
+  
+  darr = dble(rarr)
+  call dindexx(n,darr,indx)  !Call the double-precision routine
+  
+end subroutine rindexx
+!************************************************************************************************************************************
+
+!************************************************************************************************************************************
+subroutine dindexx(n,arr,indx)  !Return a sorted index indx of array arr of length n - double precision
+  integer, parameter :: m=7,nstack=50
+  integer :: n,indx(n)
+  real*8 :: arr(n),a
+  integer :: i,indxt,ir,itemp,j,jstack,k,l,istack(nstack)
+  
+  do j=1,n
+     indx(j)=j
+  end do
+  
+  jstack=0
+  l=1
+  ir=n
+  
+1 if(ir-l.lt.m) then
+     do j=l+1,ir
+        indxt=indx(j)
+        a=arr(indxt)
+        do i=j-1,l,-1
+           if(arr(indx(i)).le.a) goto 2
+           indx(i+1)=indx(i)
+        end do
+        i=l-1
+2       indx(i+1)=indxt
+     end do
+     if(jstack.eq.0)return
+     ir=istack(jstack)
+     l=istack(jstack-1)
+     jstack=jstack-2
+     
+  else
+     
+     k=(l+ir)/2
+     itemp=indx(k)
+     indx(k)=indx(l+1)
+     indx(l+1)=itemp
+     if(arr(indx(l)).gt.arr(indx(ir))) then
+        itemp=indx(l)
+        indx(l)=indx(ir)
+        indx(ir)=itemp
+     end if
+     if(arr(indx(l+1)).gt.arr(indx(ir))) then
+        itemp=indx(l+1)
+        indx(l+1)=indx(ir)
+        indx(ir)=itemp
+     end if
+     if(arr(indx(l)).gt.arr(indx(l+1))) then
+        itemp=indx(l)
+        indx(l)=indx(l+1)
+        indx(l+1)=itemp
+     end if
+     i=l+1
+     j=ir
+     indxt=indx(l+1)
+     a=arr(indxt)
+3    continue
+     i=i+1
+     if(arr(indx(i)).lt.a) goto 3
+4    continue
+     j=j-1
+     if(arr(indx(j)).gt.a) goto 4
+     if(j.lt.i) goto 5
+     itemp=indx(i)
+     indx(i)=indx(j)
+     indx(j)=itemp
+     goto 3
+5    indx(l+1)=indx(j)
+     indx(j)=indxt
+     jstack=jstack+2
+     !if(jstack.gt.nstack)pause 'nstack too small in indexx'
+     if(jstack.gt.nstack) write(*,'(A)')' nstack too small in dindexx'
+     if(ir-i+1.ge.j-l) then
+        istack(jstack)=ir
+        istack(jstack-1)=i
+        ir=j-1
+     else
+        istack(jstack)=j-1
+        istack(jstack-1)=l
+        l=i
+     end if
+  end if
+  
+  goto 1
+end subroutine dindexx
+!************************************************************************************************************************************
+
+
+
 !***********************************************************************
-subroutine polint(xa,ya,n,x,y,dy)
+subroutine polint(xa,ya,n,x,y,dy)  !Single precision
   implicit none
   integer, parameter :: nmax=10
   integer :: n
@@ -902,7 +1003,7 @@ subroutine polint(xa,ya,n,x,y,dy)
         d(i)=hp*den
         c(i)=ho*den
      end do
-     if (2*ns.lt.n-m)then
+     if (2*ns.lt.n-m) then
         dy=c(ns+1)
      else
         dy=d(ns)
@@ -912,6 +1013,54 @@ subroutine polint(xa,ya,n,x,y,dy)
   end do
   return
 end subroutine polint
+!***********************************************************************
+
+
+
+
+!***********************************************************************
+subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
+  implicit none
+  integer, parameter :: nmax=10
+  integer :: n
+  real*8 :: dy,x,y,xa(n),ya(n)
+  integer :: i,m,ns
+  real*8 :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
+  
+  ns=1
+  dif=abs(x-xa(1))
+  do i=1,n
+     dift=abs(x-xa(i))
+     if (dift.lt.dif) then
+        ns=i
+        dif=dift
+     end if
+     c(i)=ya(i)
+     d(i)=ya(i)
+  end do
+  y=ya(ns)
+  ns=ns-1
+  do m=1,n-1
+     do i=1,n-m
+        ho=xa(i)-x
+        hp=xa(i+m)-x
+        w=c(i+1)-d(i)
+        den=ho-hp
+        !if(den.eq.0.d0) pause 'failure in polint'
+        den=w/den
+        d(i)=hp*den
+        c(i)=ho*den
+     end do
+     if (2*ns.lt.n-m) then
+        dy=c(ns+1)
+     else
+        dy=d(ns)
+        ns=ns-1
+     end if
+     y=y+dy
+  end do
+  return
+end subroutine polintd
 !***********************************************************************
 
 
@@ -1113,7 +1262,7 @@ end function rl2a
 
 
 !************************************************************************
-function p2rl(m1,m2,p)  !P, rl, mtot in cgs units
+function p2rl(m1,m2,p)  !All in cgs units
   implicit none
   real*8 :: p2rl,m1,m2,p,a,p2a,a2rl
   a = p2a(m1+m2,p)
@@ -1123,7 +1272,7 @@ end function p2rl
 
 
 !************************************************************************
-function rl2p(m1,m2,rl1)  !P, rl, mtot in cgs units
+function rl2p(m1,m2,rl1)  !All in cgs units
   implicit none
   real*8 :: rl2p,m1,m2,rl1,a,a2p,rl2a
   a = rl2a(m1,m2,rl1)
@@ -1145,4 +1294,75 @@ subroutine quit_program(message,len)  !Print a message and quit
   stop
 end subroutine quit_program
 !************************************************************************
+
+
+
+!************************************************************************************************************************************
+subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)  !Count the number of points in each bin (1D), taken from analyse_mcmc
+  ! x - input: data, n points
+  ! norm - input: normalise (1) or not (0)
+  ! nbin - input: number of bins
+  ! xmin, xmax - in/output: set xmin=xmax to auto-determine
+  ! xbin, ybin - output: binned data (x, y).  The x values are the left side of the bin!
+  
+  implicit none
+  integer :: i,k,n,nbin,norm
+  real :: x(n),xbin(nbin+1),ybin(nbin+1),xmin,xmax,dx,xmin1,xmax1
+  
+  xmin = xmin1
+  xmax = xmax1
+  
+  if(abs((xmin-xmax)/(xmax+1.e-30)).lt.1.e-20) then  !Autodetermine
+     xmin = minval(x(1:n))
+     xmax = maxval(x(1:n))
+     xmin1 = xmin                                    !And return new values
+     xmax1 = xmax
+  end if
+  dx = abs(xmax - xmin)/real(nbin)
+  
+  do k=1,nbin+1
+     !xbin(k) = xmin + (real(k)-0.5)*dx  !x is the centre of the bin
+     xbin(k) = xmin + (k-1)*dx          !x is the left of the bin
+  end do
+  !ybintot=0.
+  ybin = 0.
+  do i=1,n
+     do k=1,nbin
+        if(x(i).ge.xbin(k)) then
+           if(x(i).lt.xbin(k+1)) then
+              ybin(k) = ybin(k) + 1.
+              exit !If point i fits in this bin, don't try the others
+           end if
+        end if
+     end do !k (bin)
+     !ybintot = ybintot + ybin(k)
+  end do
+  !if(norm.eq.1) ybin = ybin/(ybintot+1.e-30)
+  if(norm.eq.1) ybin = ybin/(sum(ybin)+1.e-30)
+  
+end subroutine bin_data_1d
+!************************************************************************************************************************************
+
+
+!************************************************************************
+function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+  implicit none
+  real*8 :: time_stamp
+  integer :: os,i,system
+  character :: fname*99
+  
+  fname = './.analysemcmc_time_stamp'  !gfortran doesn't want to read from ~ for some reason
+  if(os.eq.2) then !MacOS
+     i = system('date +%s >& '//trim(fname)) !%N for fractional seconds doesn't work on MacOS!!! (But it does with GNU date)
+  else !GNU/Linux, default
+     i = system('date +%s.%N >& '//trim(fname))
+  end if
+  open(unit=9,status='old',file=trim(fname))
+  read(9,*)time_stamp
+  close(9)
+  i = system('rm -f '//trim(fname))
+end function time_stamp
+!************************************************************************
+
+
 

@@ -50,7 +50,7 @@ program plotplt
   
   !Read current path and use it as plot title
   x=system('pwd > '//trim(homedir)//'/tmppwd.txt')
-  open (unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
+  open(unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
@@ -444,8 +444,8 @@ program plotplt
         hlp1 = 'm'
         write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
         read*,hlp1
-        if(hlp.eq.'S') hlp1='s'
-        if(hlp.eq.'M') hlp1='m'
+        if(hlp1.eq.'S') hlp1='s'
+        if(hlp1.eq.'M') hlp1='m'
         
         !Use saved structure models, store them in hp()
         if(hlp1.eq.'s') then
@@ -495,7 +495,23 @@ program plotplt
      end if !if(hlp.eq.'y') then
   end if !if(plot.lt.2.or.plot.eq.8) then
   
-  
+
+  !Redetermine which structure models were saved after rereading file:
+  if(plot.eq.6.or.plot.eq.7.and.hlp.eq.'y'.and.hlp1.eq.'s') then
+     !Use saved structure models, store them in hp()
+     !write(6,'(/,A)')'      Nr    Line   Model'
+     i = 0
+     do j=1,n
+        if(strmdls(j).eq.1) then
+           i = i+1
+           hp(i) = j
+           !write(6,'(3I8)')i,hp(i),nint(dat(1,j))
+        end if
+     end do
+     nhp = i
+     !write(6,'(I5,A)')nhp,' points selected.'
+  end if
+        
   
   
   
@@ -583,7 +599,7 @@ program plotplt
   call pgswin(xmin,xmax,ymin,ymax)
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   if(plot.eq.7) then
-     write(title1,'(A5,ES12.4,3(A,F6.2))')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n)
+     write(title1,'(A5,ES12.4,3(A,F6.2),A,F7.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else
      call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
@@ -826,12 +842,12 @@ program plotplt
   if(plot.eq.11) then !Toggle between drawing points, lines or both
      ansi=-1
      do while(ansi.lt.0.or.ansi.gt.3)
-        write(*,'(A)')'  You can plot:'
-        write(*,'(A)')'  0: keep the current choice'
-        write(*,'(A)')'  1: dots'
-        write(*,'(A)')'  2: lines'
-        write(*,'(A)')'  3: both'
-        write(*,'(A,$)')'  What would you like to plot?  '
+        write(6,'(A)')'  You can plot:'
+        write(6,'(A)')'  0: keep the current choice'
+        write(6,'(A)')'  1: dots'
+        write(6,'(A)')'  2: lines'
+        write(6,'(A)')'  3: both'
+        write(6,'(A,$)')'  What would you like to plot?  '
         read*,ansi
      end do
      if(ansi.gt.0) drawlines = ansi-1 !0-2

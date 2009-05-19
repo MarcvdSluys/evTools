@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    46: AstroFloyd, 19/05/2009	
+      - plotmdl: started implementation of Ubind
+      - plotplt: fixed bug in plotting which structure models were saved
+      - functions: added indexx (real/dble), bin_data_1d and time_stamp (for phist)
+		   added polint (d) for gw_evolve
+    
     29: AstroFloyd, 05/03/2009
       - plotmdl: 
         - added secondary variables mu, n, P_rad, P_gas, beta=P_rad/P_gas

@@ -47,7 +47,7 @@ program plotmdl
   pxns(51:60) = (/'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2'/)
 
   pxns(201:210) = (/'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g'/)
-  pxns(211:215) = (/'mu','n','Prad','Pgas','Pr/Pg'/)
+  pxns(211:216) = (/'mu','n','Prad','Pgas','Pr/Pg','Ubind'/)
   pxns(251:252) = (/'Abundances','Nablas'/)
   
   !Axis labels
@@ -144,6 +144,7 @@ program plotmdl
   labels(213) = 'P\drad\u (dyn cm\u-2\d)'
   labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
   labels(215) = '\(2128) = P\drad\u/P\dgas\u'  !\beta - Prad/Pgas
+  labels(216) = 'U\dbind\u ()'  !Binding energy
   
   
   labels(251) = 'Abundances'
@@ -347,7 +348,7 @@ program plotmdl
      dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                        	   !R/R*
      dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                      	   !C/O
      dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                      	   !Ne/O
-     dat(207,1:nm) = g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0)-dat(pxin(27),1:nm)     !Ugr - Uint
+     dat(207,1:nm) = g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) - dat(pxin(27),1:nm)   !Ugr - Uint
      dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))				   !Mean free path = 1/(rho * kappa)
      if(pxin(31).ne.0) then
         dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
@@ -361,8 +362,16 @@ program plotmdl
      dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             !                   P_rad = aT^4/3
      dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         !                   P_gas = nkT
      dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.e-30)                                  !                    beta = Prad/Pgas
-     pxnr(211:215) = (/211,212,213,214,215/)
      
+     !216-217: binding energy:
+     dat(216,1) = 0.
+     dat(217,1) = 0.
+     do i=2,nm
+        dat(216,i) = dat(216,i-1) + dat(207,i)
+        if(dat(pxin(10),i).lt.0.1) dat(217,i) = dat(217,i-1) + dat(207,i)                     !Start at core-envelope boundary
+     end do
+     
+     pxnr(211:217) = (/211,212,213,214,215,216,217/)
      
      
      if(pxin(60).ne.0) then !Brint-Vailasakatralala frequency
