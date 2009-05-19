@@ -21,6 +21,11 @@ program mergeplt
      call getarg(1,fin1)
      call getarg(2,fin2)
      call getarg(3,fout)
+  else if(narg.eq.2) then
+     call getarg(1,fin1)
+     call getarg(2,fin2)
+     fout = 'merged.plt1'
+     write(6,'(A)')'  No output file name specified, using merged.plt1'
   else
      write(*,'(A)')'  mergeplt: merges the contents of two plot files to a third file'
      write(*,'(A)')'            syntax:  mergeplt <infile1> <infile2> <outfile>'

@@ -76,6 +76,7 @@ program listmod
         if(j.eq.1) then
            r1  = exp(lnr)*1.e11/r0
            l1  = l*1.d33/l0
+           !l1  = l/3.844d0  !Peter's CLSN
            ts  = exp(lnt)
            m1 = lnm*1.d33/m0
         end if
@@ -138,6 +139,7 @@ program listmod
   m1  = lnm*1.d33/m0
   r1  = exp(lnr)*1.e11/r0
   l1  = l*1.d33/l0
+  !l1  = l/3.844d0  !Peter's CLSN
   ts  = exp(lnt)
   hs  = x1
   hes = x4
