@@ -507,7 +507,8 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
   !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
   do j=1,nn
-     read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
+     !read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
+     read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
   end do
 10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
   write(6,'(A)')'  End of file reached, arrays too small!'

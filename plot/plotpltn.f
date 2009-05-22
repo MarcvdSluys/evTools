@@ -15,14 +15,18 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,ncolours
+  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
   
-  integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle
+  integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*99,fname*99,psname*99
   character :: rng,log,labels(100)*45,lx*40,ly*40,title*100
   logical :: ex
   
   call setconstants()
+  
+  
+  !****************************************************************************************************
+  !Settings:
   
   !os = getos() !1-Linux, 2-MacOS
   os = 1        !Don't use Mac OS's silly AquaTerm
@@ -30,7 +34,31 @@ program plotpltn
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
   plhrdrad  = 1 !Draw lines of constant radius in HRD
   prtitle   = 0 !Print dir as title: 0-no, 1-yes
+  prlegend  = 1 !Print input file names to right of plot as legend: 0-no, 1-yes
+  
   ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
+  colours(1:ncolours) = (/2,3,4,5,6,7,8,9,10,11,12,13,1/)  !Use black as last resort
+  !ncolours = 4
+  !colours(1:ncolours) = (/15,2,15,4/) !Grey-red-grey-blue
+  
+  
+  !Predefined colours in PGPlot:
+  ! 0: background 
+  ! 1: foreground 
+  ! 2: red                       9: light green
+  ! 3: dark green               10: light blue-green?
+  ! 4: dark blue                11: light blue
+  ! 5: very light blue          12: dark purple
+  ! 6: light purple             13: red-purple
+  ! 7: yellow                   14: dark grey
+  ! 8: orange                   15: light grey
+  
+  !****************************************************************************************************
+  
+  
+  
+  
+  
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read')
@@ -122,7 +150,7 @@ program plotpltn
   labels(90) = '\(2137)\denv\u'  !lambda_env
 
   i = system('pwd > tmppwd.txt')
-  open (unit=10,form='formatted',status='old',file='tmppwd.txt')
+  open(unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
@@ -184,13 +212,15 @@ program plotpltn
      !*** New output format (2005)
 19   if(nf.eq.1) write(6,'(A)')'  I will try the new output format...'
      dat(f,:,:) = 0.d0
-     open (unit=20,form='formatted',status='old',file=fnames(f))
+     open(unit=20,form='formatted',status='old',file=fnames(f))
      rewind 20
      read(20,*)ncols
      do j=1,nn
-        if(ncols.eq.81) read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
+        !if(ncols.eq.81) read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
+        if(ncols.eq.81) read(20,*,err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
         if(ncols.gt.81) then
-           read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+           !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+           read(20,*,err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
            strmdls(j) = nint(dat(f,83,j)) !Structure model was saved (1) or not (0)
         end if
      end do
@@ -529,7 +559,11 @@ program plotpltn
   
   call pgscf(1)
   if(os.eq.2.or.plot.eq.8) call pgscf(2)
-  call pgsvp(0.06,0.90,0.07,0.96)
+  if(prlegend.eq.0) then
+     call pgsvp(0.06,0.96,0.07,0.96)
+  else  !Make room for 'legend'
+     call pgsvp(0.06,0.90,0.07,0.96)
+  end if
   if(hrd.eq.1.and.plhrdrad.eq.1) then  !Make room for Radius labels
      dx = (xmax - xmin)*0.02
      dy = (ymax - ymin)*0.05
@@ -549,19 +583,20 @@ program plotpltn
   
   call pgsch(0.6)
   do f=1,nf
-     col = mod(f,ncolours) + 1
-     if(ncolours.lt.10) col = col + 1  !Avoid black
+     col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
      call pgsci(col)
      xx1(1:n(f)) = xx(f,1:n(f))
      yy1(1:n(f)) = yy(f,1:n(f)) 
      if(drawlines.eq.0) call pgpoint(n(f),xx1(1:n(f)),yy1(1:n(f)),1)
      if(drawlines.ge.1) call pgline(n(f),xx1(1:n(f)),yy1(1:n(f)))
      if(drawlines.eq.2) call pgpoint(n(f),xx1(1:n(f)),yy1(1:n(f)),20)
-     fname = fnames(f)
-     l = len_trim(fname)
-     if(fname(l:l).eq.'1'.or.fname(l:l).eq.'2') l = l-1
-     l = l-4 !get rid of '.plt'
-     call pgmtext('RV',0.5,real(46.-f)/45.,0.,fname(1:l))
+     if(prlegend.ge.1) then !Print legend
+        fname = fnames(f)
+        l = len_trim(fname)
+        if(fname(l:l).eq.'1'.or.fname(l:l).eq.'2') l = l-1
+        l = l-4 !get rid of '.plt'
+        call pgmtext('RV',0.5,real(46.-f)/45.,0.,fname(1:l))
+     end if
   end do
   
   call pgsls(2)

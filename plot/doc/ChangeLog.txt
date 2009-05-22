@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    48: AstroFloyd, 22/05/2009	
+      - plotplt(n): read input files unformatted
+      - plotpltn (hardcoded in plotpltn.f):
+        - use custom colours (ncolours/colours() array)
+	- switch 'legend' on/off (prlegend)
+      
     46: AstroFloyd, 19/05/2009	
       - plotmdl: started implementation of Ubind
       - plotplt: fixed bug in plotting which structure models were saved
