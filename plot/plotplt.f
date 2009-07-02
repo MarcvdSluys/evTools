@@ -1,7 +1,7 @@
 !Plots the data contained in a plt* file, highlight selected points
 !Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
 !Uses code in functions.f
-!Requires the file ~/bin/lib/UBVRI.Kur to calculate colours
+!Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
 !Uses PGPLOT window 1 to plot to
 !AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
 
@@ -34,12 +34,12 @@ program plotplt
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file ~/bin/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   

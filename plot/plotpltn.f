@@ -2,7 +2,7 @@
   !This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
   !This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
   !Uses code in functions.f
-  !Requires the file ~/bin/lib/UBVRI.Kur to calculate colours
+  !Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
   !AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
   
 
@@ -15,7 +15,7 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
+  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*99,fname*99,psname*99
@@ -61,9 +61,13 @@ program plotpltn
   
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old',action='read')
-  read(unit=10, fmt=*)ubv
-  close(10)
+  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  if(io.eq.0) then
+     read(10,*)ubv
+     close(10)
+  else
+     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+  end if
   
   lgx = 0
   lgy = 0
