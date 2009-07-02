@@ -1,19 +1,25 @@
 !plt2obs.f:  Convert code output in plt-file to observables (V, U-B, B-V, V-R, R-I)
 !            Based on Kurucz' atmosphere models, needs UBVRI.Kur
 program plt2obs
+  use constants
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nc=81,nff=100
   real*8 :: tm,m,mc,z,zmod,mv,umb,bmv,vmr,rmi
   real*8 :: logt,logl,logr,dat(nc,nn)
-  integer :: i,j,n,ncols,fnl,nf,f
+  integer :: i,j,n,ncols,fnl,nf,f,io
   character :: fname*99,fnames(nff)*99,oname*55,ans
   
+  call setconstants()
   
   !Read atmosphere-model data
-  open(unit=10, file='~/bin/lib/UBVRI.Kur',status='old')
-  read(unit=10, fmt=*)ubv
-  close(10)
+  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  if(io.eq.0) then
+     read(10,*)ubv
+     close(10)
+  else
+     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+  end if
   
   write(6,*)''
   

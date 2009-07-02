@@ -7,17 +7,21 @@ program listplt
   integer, parameter :: nn=30000,nnn=200,nc=81
   real*8 :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
   real*8 :: c82(nn),c85a,c85b,c92(nn)
-
-  integer :: i,j,n,ans,ncols,narg,iargc
+  
+  integer :: i,io,j,n,ans,ncols,narg,iargc
   character :: findfile*99, fname*99,labels(nnn)*13
   
   call setconstants()
   
   !Read atmosphere-model data
-  open(unit=10, action='read', file=trim(homedir)//'/bin/lib/UBVRI.Kur',status='old')
-  read(10,*)ubv
-  close(10)
-
+  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  if(io.eq.0) then
+     read(10,*)ubv
+     close(10)
+  else
+     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+  end if
+  
   labels = ''
   labels(1)  = 'Model'
   labels(2)  = 't (yr)'

@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    50: AstroFloyd, 01/07/2009
+     - ~/bin/lib/ -> ~/usr/lib/
+    
     33: AstroFloyd, 09/03/2009
      - listmod and mergeplt should now be able to handle v.2005 output
      

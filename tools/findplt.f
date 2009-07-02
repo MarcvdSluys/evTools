@@ -1,20 +1,27 @@
 !Findplt.f:  cloned from findp.f
 !Reads plt file and displays properties of the interpolated model with a certain value for a certain variable
 !Line width > 72 chars, so compile with --wide or -extend_source or whatever is needed
-!Needs the file ~/bin/lib/UBVRI.Kur to calculate magnitudes and colours (see line 15)
+!Needs the file ~/usr/lib/UBVRI.Kur to calculate magnitudes and colours (see line 15)
 
 program findplt
+  use constants
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nnn=100,ny=18
   real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b
-  integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt
+  integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt,io
   character :: findfile*20,fname*99,arg*99
   
+  call setconstants()
+  
   !Read atmosphere-model data
-  open(unit=10, file='~/bin/lib/UBVRI.Kur',status='old')
-  read(unit=10, fmt=*)ubv
-  close(10)
+  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  if(io.eq.0) then
+     read(10,*)ubv
+     close(10)
+  else
+     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+  end if
   
   !Read the filename from the command line if any, search the current directory otherwise
   narg = iargc()
