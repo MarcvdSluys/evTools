@@ -28,7 +28,7 @@ program plotplt
   !Set constants:
   call setconstants()
   
-  os = getos() !1-Linux, 2-MacOS
+  !os = getos() !1-Linux, 2-MacOS
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
   whitebg = 1  !0: black background on screen, 1: white
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both

@@ -2,16 +2,19 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
-    51: AstroFloyd, 01/07/2009	
+    52: AstroFloyd, 03/07/2009
+      - Read homedir from environment variable $HOME using getenv()
+    
+    51: AstroFloyd, 01/07/2009
       - ~/bin/lib/ -> ~/usr/lib/
     
-    48: AstroFloyd, 22/05/2009	
+    48: AstroFloyd, 22/05/2009
       - plotplt(n): read input files unformatted
       - plotpltn (hardcoded in plotpltn.f):
         - use custom colours (ncolours/colours() array)
 	- switch 'legend' on/off (prlegend)
       
-    46: AstroFloyd, 19/05/2009	
+    46: AstroFloyd, 19/05/2009
       - plotmdl: started implementation of Ubind
       - plotplt: fixed bug in plotting which structure models were saved
       - functions: added indexx (real/dble), bin_data_1d and time_stamp (for phist)

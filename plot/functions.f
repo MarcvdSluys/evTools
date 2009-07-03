@@ -63,9 +63,10 @@ subroutine setconstants
   a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
   sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
-  homedir = '~'  
+  !homedir = '~'  
   !homedir = '/home/user'  !gfortran doesn't like '~'
-  !homedir = '/Network/Servers/taku.astro.northwestern.edu/Users/ajl501'  !gfortran doesn't like '~'
+  !homedir = '/Network/Servers/chikuwa.astro.northwestern.edu/Volumes/MyBook/Users/ajl501'  !gfortran doesn't like '~'
+  call getenv('HOME',homedir) !Set homedir = $HOME (the environment variable)
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
@@ -146,7 +147,7 @@ function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
   implicit none
   integer :: i,system,getos
   character :: ostype*25
-  i=system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
+  i = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
   read(16,'(A)')ostype
   close(16, status = 'delete')
