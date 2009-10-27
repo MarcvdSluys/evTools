@@ -25,7 +25,7 @@ module constants
   save
   real :: scrsz,scrrat
   real*8 :: pi,tpi,pi2,c3rd
-  real*8 :: l0,r0,m0,g,c,day,yr
+  real*8 :: l0,r0,m0,g,c,day,yr,km
   real*8 :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
@@ -40,20 +40,21 @@ subroutine setconstants
   scrsz=10.8  !Screen dimensions: MacBook, Gentoo
   scrrat=0.57
   
-  pi	   =  4*datan(1.d0)                         !Pi, area of circle/r^2
+  pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
   tpi      =  2*pi
   pi2      =  0.5d0*pi
   c3rd     =  1.d0/3.d0
   
-  l0	   =  3.83d33                               !Solar luminosity, erg s^-1
-  r0	   =  6.9599d10                             !Solar radius, cm
-  m0	   =  1.9891d33                             !Solar mass, g
+  l0       =  3.83d33                               !Solar luminosity, erg s^-1
+  r0       =  6.9599d10                             !Solar radius, cm
+  m0       =  1.9891d33                             !Solar mass, g
   
-  g	   =  6.67259d-8                            !Newton's constant, cm^3 g^-1 s^-2
+  g        =  6.67259d-8                            !Newton's constant, cm^3 g^-1 s^-2
   c        =  2.99792458d10                         !Speed of light in vacuo, cm s^-1
   
   day      =  8.64d4                                !Day, s
-  yr	   =  3.15569d7                             !Year, s
+  yr       =  3.15569d7                             !Year, s
+  km       =  1.d5                                  !Kilometer, cm
   
   amu      =  1.6605402d-24                         !Atomic mass unit; (mass of C12 atom)/12, g
   m_h      =  1.007825*amu                          !Mass of a hydrogen atom
@@ -63,9 +64,6 @@ subroutine setconstants
   a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
   sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
-  !homedir = '~'  
-  !homedir = '/home/user'  !gfortran doesn't like '~'
-  !homedir = '/Network/Servers/chikuwa.astro.northwestern.edu/Volumes/MyBook/Users/ajl501'  !gfortran doesn't like '~'
   call getenv('HOME',homedir) !Set homedir = $HOME (the environment variable)
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
@@ -84,9 +82,12 @@ end subroutine setconstants
 
 
 !************************************************************************      
-subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
+subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   !Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
-
+  !  See: http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
+  !  UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
+  !  UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
+  
   use ubvdata
   implicit none
   real*8, parameter :: gconst=-10.6071d0
@@ -95,17 +96,17 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   real*8 :: logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini
   real*8 :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
   external indx
-
-  logm = dlog10(mass)
+  
+  logm = log10(mass)
   logg = logm + 4*logt - logl + gconst
-  ltgr = dlog10(tgr*100)
-
+  ltgr = log10(tgr*100)
+  
   !Find indices of log Z, log g and log T to interpolate between.
   !don't allow extrapolation outside log Z and log g grid.
   ig = indx(logg,ggr,nggr)
   it = indx(logt,ltgr,ntgr)
   iz = indx(logz,zgr,nzgr)
-
+  
   dg1 = (logg - ggr(ig-1))/(ggr(ig) - ggr(ig-1))
   dg1 = max(0.0d0, min(1.0d0, dg1))
   dg2 = 1.0d0 - dg1
@@ -114,8 +115,8 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
   dz1 = (logz - zgr(iz-1))/(zgr(iz) - zgr(iz-1))
   dz1 = max(0.0d0, min(1.0d0, dz1))
   dz2 = 1.0d0 - dz1
-
-  do k = 4, 8
+  
+  do k = 4,8
      cm(k-3) = ((ubv(k,ig,it,iz)*dg1 + ubv(k,ig-1,it,iz)*dg2)*dt1  &
           + (ubv(k,ig,it-1,iz)*dg1 +  &
           ubv(k,ig-1,it-1,iz)*dg2)*dt2)*dz1 +  &
@@ -125,16 +126,15 @@ subroutine lt2ubv(logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini)
           ubv(k,ig-1,it-1,iz-1)*dg2)*dt2)*dz2
   end do
   
-  ! mbol = 4.75 - 2.5*logl
-  mbol = 4.741 - 2.5*logl  !AF: 4.74 = -2.5*dlog10(l0) + 2.5*dlog10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
+  !mbol = 4.75 - 2.5*logl
+  mbol = 4.741 - 2.5*logl  !AF: 4.74 = -2.5*log10(l0) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
   bolc = cm(1)
   mv = mbol - bolc
   uminb = cm(2)
   bminv = cm(3)
   vminr = cm(4)
   rmini = cm(5)
-
-  return
+  
 end subroutine lt2ubv
 !************************************************************************      
 
@@ -164,7 +164,7 @@ function findfile(match,len)
   implicit none
   integer, parameter :: maxfile=1000
   integer :: i,k,len,fnum,system
-  character :: match*99,names(maxfile)*99,findfile*99,fname*99,tempfile*99
+  character :: match*(len),names(maxfile)*99,findfile*99,fname*99,tempfile*99
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -229,7 +229,7 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   use constants
   implicit none
   integer :: i,j,k,len,fnum,nf,nff,system,all
-  character :: match*99,names(nff)*99,fnames(nff)*99,tempfile*99
+  character :: match*(len),names(nff)*99,fnames(nff)*99,tempfile*99
   
   if(len_trim(homedir).eq.99) then
      write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -427,6 +427,7 @@ subroutine getpltlabels(nvar,labels)
   labels(111) = '\(2137)\denv\u'  !lambda_env
   labels(112) = 'q\dcrit\u'       !q_crit; q_1 > q_crit gives dynamical MT (Hurley et al., 2002, Eq.57)
   labels(113) = 'M\dcomp,crit\u'  !M2 < M2,crit gives dynamical MT (Hurley et al., 2002, Eq.57)
+  labels(114) = 'v\drot\u (km/s)' !Rotational velocity
   
   labels(202) = 'dH\dorb\u/dt'
   labels(204) = 'dM/dt (M\d\(2281)\u/yr)'
@@ -468,7 +469,7 @@ subroutine printpltvarlist
   write(6,'(A)'),'   81: Qconv                91: Ne/O change     101: V        111: lambda_env           '  
   write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B      112: q_crit               '  
   write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V      113: M2,crit              '
-  write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R                                '
+  write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R      114: Vrot                 '
   write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I                                '
   write(6,'(A)'),'   86: Rossby nr            96: Jspin           106: U-V                                '
   write(6,'(A)'),'   87: Pcr (MB)             97: Rho_avg         107: V-I                                '
@@ -511,7 +512,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
      !read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
      read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
   end do
-10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
+!10 format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(u)
   goto 15
@@ -594,7 +595,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real*8 :: dat(nvar,nn),var(nn),dpdj(nn)
-  real*8 :: c92(nn),c85a,c85b,x,z
+  real*8 :: c92(nn),c85a,c85b,x,z,mbol,bc
   character :: labels(nvar)*99
   
   !de-log some variables
@@ -619,9 +620,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
            if(dat(j,i).lt.0.d0) exit
         end do !j
         do j=ib,j0+1,-2
-           if(dabs((dat(j-1,i)+dat(j,i))/dat(4,i)).lt.1.d-4) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are close enough, remove them
+           if(abs((dat(j-1,i)+dat(j,i))/dat(4,i)).lt.1.d-4) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are close enough, remove them
         end do !j
-        do while(dabs(dat(j0,i))/dat(4,i).lt.1.d-4.and.sum(dabs(dat(j0:j0+5,i))).gt.1.e-7)  !Remove all the leading zeroes
+        do while(abs(dat(j0,i))/dat(4,i).lt.1.d-4.and.sum(abs(dat(j0:j0+5,i))).gt.1.e-7)  !Remove all the leading zeroes
            do j=j0,j0+4
               dat(j,i) = dat(j+1,i)
            end do
@@ -642,13 +643,13 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                         !H-envelope mass
   do i=1,n
      dat(84,i) = 0.d0
-     if(dat(64,i).lt.0.d0) dat(84,i) = dabs(dat(64,i))          !Convective core boundary
+     if(dat(64,i).lt.0.d0) dat(84,i) = abs(dat(64,i))          !Convective core boundary
   end do
   
   dat(85,1) = 0.d0
   do i=2,n
-     c85a = dabs(dat(8,i)-dat(8,i-1))+1.d-30                    !dR
-     c85b = dabs(dat(2,i)-dat(2,i-1))+1.d-30                    !dt
+     c85a = abs(dat(8,i)-dat(8,i-1))+1.d-30                    !dR
+     c85b = abs(dat(2,i)-dat(2,i-1))+1.d-30                    !dt
      dat(85,i) = dat(8,i)/(c85a/c85b)                           !R/(dR/dt)
   end do
   
@@ -705,16 +706,16 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   !Colours
   do i=1,n
-     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
   end do
   
   dat(111,1:n) = g*dat(4,1:n)*dat(83,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
-  !dat(111,1:n) = dabs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
+  !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
   dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
-     if(dabs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
+     if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
      !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(83,i),dat(15,i),dat(8,i),dat(111,i)
   end do
   
@@ -730,6 +731,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      end if
      !write(6,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
   end do
+  
+  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
   
   
   !Timescales
@@ -953,8 +956,7 @@ subroutine dindexx(n,arr,indx)  !Return a sorted index indx of array arr of leng
 5    indx(l+1)=indx(j)
      indx(j)=indxt
      jstack=jstack+2
-     !if(jstack.gt.nstack)pause 'nstack too small in indexx'
-     if(jstack.gt.nstack) write(*,'(A)')' nstack too small in dindexx'
+     if(jstack.gt.nstack) write(0,'(A)')'  *** Warning:  nstack too small in dindexx  ***'
      if(ir-i+1.ge.j-l) then
         istack(jstack)=ir
         istack(jstack-1)=i
@@ -1000,7 +1002,7 @@ subroutine polint(xa,ya,n,x,y,dy)  !Single precision
         hp=xa(i+m)-x
         w=c(i+1)-d(i)
         den=ho-hp
-        !          if(den.eq.0.) pause 'failure in polint'
+        if(den.eq.0.) write(0,'(A)')'  *** Warning:  Failure in polint  ***'
         den=w/den
         d(i)=hp*den
         c(i)=ho*den
@@ -1048,7 +1050,7 @@ subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
         hp=xa(i+m)-x
         w=c(i+1)-d(i)
         den=ho-hp
-        !if(den.eq.0.d0) pause 'failure in polint'
+        if(den.eq.0.d0) write(0,'(A)')'  *** Warning:  Failure in polint  ***'
         den=w/den
         d(i)=hp*den
         c(i)=ho*den
@@ -1166,7 +1168,7 @@ subroutine splint(xa,ya,y2a,n,x,y)
   end if
   
   h = xa(khi)-xa(klo)
-  if(h.eq.0.) pause 'bad xa input in splint'
+  if(h.eq.0.) write(0,'(A)')'  *** Warning:  Bad xa input in splint  ***'
   a = (xa(khi)-x)/h
   b = (x-xa(klo))/h
   y = a*ya(klo)+b*ya(khi)+((a**3-a)*y2a(klo)+(b**3-b)*y2a(khi))*(h**2)/6.
@@ -1246,7 +1248,7 @@ function a2rl(m1,m2,a)  !m1 and m2 in the same units, Rl and a in the same units
   implicit none
   real*8 :: a2rl,q,m1,m2,a
   q = m1/m2
-  a2rl = a / (0.6d0*q**(2*c3rd) + dlog(1.d0 + q**c3rd)) * (0.49d0*q**(2*c3rd))
+  a2rl = a / (0.6d0*q**(2*c3rd) + log(1.d0 + q**c3rd)) * (0.49d0*q**(2*c3rd))
 end function a2rl
 !***********************************************************************
 
@@ -1258,7 +1260,7 @@ function rl2a(m1,m2,rl1)  !m1 and m2 in the same units, Rl and a in the same uni
   implicit none
   real*8 :: rl2a,q,m1,m2,rl1
   q = m1/m2
-  rl2a = rl1/(0.49d0*q**(2*c3rd)/(0.6d0*q**(2*c3rd) + dlog(1.d0+q**c3rd)))
+  rl2a = rl1/(0.49d0*q**(2*c3rd)/(0.6d0*q**(2*c3rd) + log(1.d0+q**c3rd)))
 end function rl2a
 !***********************************************************************
 

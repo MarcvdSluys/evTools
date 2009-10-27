@@ -1,8 +1,8 @@
-  ! Plotmod.f
-  ! Reads an input or output structure model file for Eggeltons TWIN code v.2003 and lists the properties of each model it contains.
-  ! One can then select a model to plot its contents. Adapted from Listmod.f
-  ! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-  ! AF 2004-08-05
+! Plotmod.f
+! Reads an input or output structure model file for Eggeltons TWIN code v.2003 and lists the properties of each model it contains.
+! One can then select a model to plot its contents. Adapted from Listmod.f
+! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
+! AF 2004-08-05
 
 program plotmod  
   use constants
@@ -53,7 +53,7 @@ program plotmod
 2 write(6,*)''
   write(6,'(A)')' Reading file '//trim(fname)
   open (unit=10,form='formatted',status='old',file=trim(fname))
-3 rewind 10
+  rewind 10
 
   write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc     Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
@@ -121,7 +121,7 @@ program plotmod
 
   ! READ AND PLOT SELECTED MODEL
 
-25 rewind 10
+  rewind 10
   do i=1,blk-1
      read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      do j=1,kh
@@ -201,12 +201,12 @@ program plotmod
   if(log.eq.'x'.or.log.eq.'X'.or.log.eq.'b'.or.log.eq.'B') then
      if(dat(vx,1).eq.0.) dat(vx,1)=dat(vx,2)
      dat(vx,1:kh) = log10(abs(dat(vx,1:kh))+1.e-20)
-     lx = 'log '//lx
+     lx = trim('log '//lx)
   end if
   if(log.eq.'y'.or.log.eq.'Y'.or.log.eq.'b'.or.log.eq.'B') then
      if(dat(vy,1).eq.0.) dat(vy,1)=dat(vy,2)
      dat(vy,1:kh) = log10(abs(dat(vy,1:kh))+1.e-20)
-     ly = 'log '//ly
+     ly = trim('log '//ly)
   end if
 
   xmin = minval(dat(vx,1:kh))
@@ -240,7 +240,7 @@ program plotmod
         if(dat(vx,i).ge.xmin.and.dat(vx,i).le.xmax) then
            if(dat(vy,i).lt.ymin) ymin = dat(vy,i)
            if(dat(vy,i).gt.ymax) ymax = dat(vy,i)
-	end if
+        end if
      end do !i
   end if
 
@@ -255,7 +255,7 @@ program plotmod
         if(dat(vy,i).ge.ymin.and.dat(vy,i).le.ymax) then
            if(dat(vx,i).lt.xmin) xmin = dat(vx,i)
            if(dat(vx,i).gt.xmax) xmax = dat(vx,i)
-	end if
+        end if
      end do !i
   end if
 

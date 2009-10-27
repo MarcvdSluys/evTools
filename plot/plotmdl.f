@@ -342,14 +342,14 @@ program plotmdl
      do i=1,nm
         dat(201,i) = real(i)
      end do
-     dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                      	   !Nabla_rad
+     dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
      dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))                              !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad
-     dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                          	   !M/M*
-     dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                        	   !R/R*
-     dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                      	   !C/O
-     dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                      	   !Ne/O
+     dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     !M/M*
+     dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
+     dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
+     dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
      dat(207,1:nm) = g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) - dat(pxin(27),1:nm)   !Ugr - Uint
-     dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))				   !Mean free path = 1/(rho * kappa)
+     dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                             !Mean free path = 1/(rho * kappa)
      if(pxin(31).ne.0) then
         dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
         pxnr(209) = 209

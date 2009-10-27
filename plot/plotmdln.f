@@ -252,8 +252,9 @@ program plotmdln
   if(vy.lt.1.or.vy.gt.28) goto 36
 
 
-41 lx = labels(vx)
-  ly = labels(vy)
+41 continue
+  lx = trim(labels(vx))
+  ly = trim(labels(vy))
 
   xx(1:nb,1:nm) = dat(blk(1:nb),vx,1:nm)
   yy(1:nb,1:nm) = dat(blk(1:nb),vy,1:nm)
@@ -278,14 +279,14 @@ program plotmdln
         if(xx(b,1).eq.0.) xx(b,1) = xx(b,2)
      end do
      xx(1:nb,1:nm) = log10(abs(xx(1:nb,1:nm))+1.e-30)
-     lx = 'log '//lx
+     lx = trim('log '//lx)
   end if
   if(log.eq.'y'.or.log.eq.'b') then
      do b=1,nb
         if(yy(b,1).eq.0.) yy(b,1) = yy(b,2)
      end do
      yy(1:nb,1:nm) = log10(abs(yy(1:nb,1:nm))+1.e-30)
-     ly = 'log '//ly
+     ly = trim('log '//ly)
   end if
 
   xmin = minval(xx(1:nb,1:nm))

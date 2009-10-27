@@ -1,10 +1,10 @@
-  !Plots the data contained in different star.plt*-files into one graph
-  !This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
-  !This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
-  !Uses code in functions.f
-  !Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-  !AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
-  
+!Plots the data contained in different star.plt*-files into one graph
+!This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
+!This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
+!Uses code in functions.f
+!Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
+
 
 program plotpltn  
   use constants
@@ -12,14 +12,15 @@ program plotpltn
   implicit none
   integer, parameter :: nn=10000,nc=100,nff=120  !10000x100x120 takes ~1Gb!
   real*8, allocatable :: dat(:,:,:)
+  real*8 :: mbol,bc
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
   integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
-  character :: fnames(nff)*99,fname*99,psname*99
-  character :: rng,log,labels(100)*45,lx*40,ly*40,title*100
+  character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10
+  character :: rng,log,labels(100)*45,lx*45,ly*45,title*100
   logical :: ex
   
   call setconstants()
@@ -63,6 +64,8 @@ program plotpltn
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
+     read(10,*)tmpstr
+     read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
@@ -140,6 +143,8 @@ program plotpltn
   labels(74) = 'Q\dconv\u'
   labels(75) = 'Z\dsurf\u'
   labels(76) = '(t\df\u - t)  (yr)'
+  labels(77) = 't/t\df\u'
+  labels(78) = 'L\dHe\u/L\dH\u'
 
   labels(81) = 'V'
   labels(82) = 'U-B'
@@ -251,17 +256,19 @@ program plotpltn
      do i=8,14
         dat(f,i,1:n(f)) = 10**dat(f,i,1:n(f))
      end do
-     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40  					!Ubind in 10^40 erg
-     dat(f,71,1:n(f)) = dat(f,5,1:n(f)) - dat(f,6,1:n(f))  				!Mhe-CO: intershell mass
-     dat(f,72,1:n(f)) = dat(f,22,1:n(f))*dat(f,4,1:n(f))*dat(f,8,1:n(f))**2 		!Moment of inertia
-     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3) 	        !Average Rho
-     dat(f,74,1:n(f)) = dat(f,81,1:n(f))						!Move Qconv from 81 to 74
-     dat(f,75,1:n(f)) = 1.d0 - dat(f,42,1:n(f)) - dat(f,43,1:n(f))			!Z_surf = 1 - X - Y
-     dat(f,76,1:n(f)) = dat(f,2,n(f))-min(dat(f,2,1:n(f)),dat(f,2,n(f))-1.d4)                  !t_f - t
+     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40                                         !Ubind in 10^40 erg
+     dat(f,71,1:n(f)) = dat(f,5,1:n(f)) - dat(f,6,1:n(f))                                  !Mhe-CO: intershell mass
+     dat(f,72,1:n(f)) = dat(f,22,1:n(f))*dat(f,4,1:n(f))*dat(f,8,1:n(f))**2                !Moment of inertia
+     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3)             !Average Rho
+     dat(f,74,1:n(f)) = dat(f,81,1:n(f))                                                   !Move Qconv from 81 to 74
+     dat(f,75,1:n(f)) = 1.d0 - dat(f,42,1:n(f)) - dat(f,43,1:n(f))                         !Z_surf = 1 - X - Y
+     dat(f,76,1:n(f)) = dat(f,2,n(f))-min(dat(f,2,1:n(f)),dat(f,2,n(f))-1.d4)              !t_f - t
+     dat(f,77,1:n(f)) = dat(f,2,1:n(f))/(dat(f,2,n(f))+1.e-30)                             !t/t_f
+     dat(f,78,1:n(f)) = dat(f,17,1:n(f))/(dat(f,16,1:n(f))+1.e-30)                         !L_He/L_H
      
      !Colours
      do i=1,n(f)
-        call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),dat(f,81,i),dat(f,82,i),dat(f,83,i),dat(f,84,i),dat(f,85,i))
+        call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),mbol,bc,dat(f,81,i),dat(f,82,i),dat(f,83,i),dat(f,84,i),dat(f,85,i))
         dat(f,86,i) = dat(f,82,i)+dat(f,83,i)  !(U-V) = (U-B) + (B-V)
         dat(f,87,i) = dat(f,84,i)+dat(f,85,i)  !(V-I) = (V-R) + (R-I)
      end do
@@ -312,12 +319,14 @@ program plotpltn
      write(6,'(A70)')' 74: Qconv                     84: V-I   89: M_env                    '
      write(6,'(A70)')' 75: Zsurf                     85: I-R   90: lambda_env               '
      write(6,'(A70)')' 76: t_f-t                                                            '
+     write(6,'(A70)')' 77: t/t_f                                                            '
+     write(6,'(A70)')' 78: Lhe/Lh                                                           '
      write(6,'(A70)')'                                                                      '
 35   write(6,'(A,$)')'  Choose the X-axis variable (1-101): '
      read*,vx
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.101) goto 35
-     if(vx.gt.76.and.vx.lt.81) goto 35
+     if(vx.gt.78.and.vx.lt.81) goto 35
      if(vx.gt.90.and.vx.lt.101) goto 35
   end if   !if(plot.ne.6) then   
   
@@ -331,7 +340,7 @@ program plotpltn
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.90) goto 36
-     if(vy.gt.76.and.vy.lt.81) goto 36
+     if(vy.gt.78.and.vy.lt.81) goto 36
   end if   !if(plot.lt.2) then   
   
   do f=1,nf
@@ -374,7 +383,7 @@ program plotpltn
         xx(f,1:n(f)) = log10(abs(xx(f,1:n(f)))+minx(f)*1.e-3)
         if(abs(minx(f)-1.e33).lt.1e32) exclx(f) = 1  !Exclude it in determining ranges
      end do
-     lx = 'log '//lx
+     lx = trim('log '//lx)
   end if
   excly = 0
   if(lgy.eq.1) then
@@ -387,14 +396,14 @@ program plotpltn
         yy(f,1:n(f)) = log10(abs(yy(f,1:n(f)))+miny(f)*1.e-3)
         if(abs(miny(f)-1.e33).lt.1e32) excly(f) = 1  !Exclude it in determining ranges
      end do
-     ly = 'log '//ly
+     ly = trim('log '//ly)
   end if
   
 50 if(hrd.eq.1) then
      vx = 10
      vy = 9
-     lx = 'log '//labels(vx)
-     ly = 'log '//labels(vy)
+     lx = trim('log '//labels(vx))
+     ly = trim('log '//labels(vy))
 
      do f=1,nf
         xx(f,1:n(f)) = real(dlog10(abs(dat(f,vx,1:n(f)))))
@@ -535,7 +544,7 @@ program plotpltn
      call pgpap(11.0,0.70) !Make it fit on letter
   else
      if(os.eq.1) call pgbegin(1,'/xserve',1,1)
-     if(os.eq.2) call pgbegin(1,'/aqt',1,1)		!Use Aquaterm on MacOSX
+     if(os.eq.2) call pgbegin(1,'/aqt',1,1)                !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
      if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below

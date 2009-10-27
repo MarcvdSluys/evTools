@@ -17,16 +17,19 @@ program plotplt
   
   integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
   integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
-  integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,getos,whitebg,strmdls(nn)
+  integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,whitebg,strmdls(nn)
   integer :: ansi,xwini,pgopen
+  real :: sch
   character :: findfile*99,fname*99,psname*99
   character :: rng,log,hlp,hlp1,hlbl,hlbls*5,lstr(6)*11
-  character :: abstr(7)*2,xwin*19
+  character :: abstr(7)*2,xwin*19,tmpstr
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
   logical :: ex
   
   !Set constants:
   call setconstants()
+  
+  sch = 1.0
   
   !os = getos() !1-Linux, 2-MacOS
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
@@ -36,6 +39,8 @@ program plotplt
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
+     read(10,*)tmpstr
+     read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
@@ -105,7 +110,7 @@ program plotplt
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
      if(vx.gt.62.and.vx.lt.81) goto 35
-     if(vx.gt.113.and.vx.lt.201) goto 35
+     if(vx.gt.114.and.vx.lt.201) goto 35
      
      hrd   = 0
      dhdt  = 0
@@ -123,8 +128,8 @@ program plotplt
      hrd = 1
      xx = real(dlog10(abs(dat(10,1:nn))))
      yy(1,1:n) = real(dlog10(abs(dat(9,1:nn))))
-     lx = 'log '//labels(10)
-     ly = 'log '//labels(9)
+     lx = trim('log '//labels(10))
+     ly = trim('log '//labels(9))
      vy = 0
      lgx = 1
      lgy = 1
@@ -132,12 +137,12 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-113, 202-209): '
+36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-114, 202-209): '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.209) goto 36
      if(vy.gt.62.and.vy.lt.81) goto 36
-     if(vy.gt.113.and.vy.lt.202) goto 36
+     if(vy.gt.114.and.vy.lt.202) goto 36
   end if   !if(plot.lt.2) then   
   
   
@@ -231,7 +236,7 @@ program plotplt
         if(abs(xx(j)).lt.minx.and.abs(xx(j)).ne.0.) minx = abs(xx(j))
      end do
      xx(1:n) = log10(abs(xx(1:n))+minx*1.e-3)
-     lx = 'log '//lx
+     lx = trim('log '//lx)
   end if
   if(dhdt.eq.1) lgy = 1
   excly = 0
@@ -245,7 +250,7 @@ program plotplt
         yy(i,1:n) = log10(abs(yy(i,1:n))+miny(i)*1.e-3)
         if(abs(miny(i)-1.e33).lt.1e32) excly(i) = 1  !Exclude it in determining ranges
      end do
-     ly = 'log '//ly
+     ly = trim('log '//ly)
   end if
   
 50 continue !HRD   
@@ -554,6 +559,9 @@ program plotplt
         write(0,'(A,/)')'  Error opening postscript file, aborting'
         stop
      end if
+     call pgpap(10.,1.)
+     call pgslw(5)
+     sch = 1.5
   else
      if(plot.eq.7) call pgend  !Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
@@ -569,6 +577,8 @@ program plotplt
      end if
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)          !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
+     call pgslw(1)
+     sch = 1.0
      if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
@@ -594,21 +604,25 @@ program plotplt
   
   
   call pgscf(1)
-  if(os.eq.2.or.plot.eq.9) call pgscf(2)
+  !if(os.eq.2.or.plot.eq.9) call pgscf(2)
+  call pgsch(sch)
   call pgsvp(0.06,0.95,0.07,0.96)
+  if(plot.eq.9) call pgsvp(0.10,0.95,0.12,0.95)
   call pgswin(xmin,xmax,ymin,ymax)
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   if(plot.eq.7) then
      write(title1,'(A5,ES12.4,3(A,F6.2),A,F7.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else
-     call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
+     if(plot.ne.9) call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
   end if
   call pgmtxt('B',2.4,0.5,0.5,trim(lx))
   call pgmtxt('L',2.0,0.5,0.5,trim(ly))
   
+  call pgsci(2)
   do i=1,ny
-     call pgsci(i)
+     call pgsci(i+1)
+     !if(ny.eq.1) call pgsci(2)
      yy1(1:n) = yy(i,1:n)
      if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy1(1:n),1)
      if(drawlines.ge.1) call pgline(n,xx(1:n),yy1(1:n))
@@ -617,20 +631,20 @@ program plotplt
   call pgsci(1)
   
   !Highlight points
-  call pgsch(1.5)
+  call pgsch(1.5*sch)
   call pgsci(2)
   if(hlp.eq.'y') call pgpoint(nhp,xx(hp(1:nhp)),yy(1,hp(1:nhp)),2)
   if(hlbl.eq.'y') then
-     call pgsch(0.7)
+     call pgsch(0.7*sch)
      do i=1,nhp
         write(hlbls,'(I5)')nint(dat(1,hp(i)))
         call pgtext(xx(hp(i)),yy(1,hp(i)),hlbls)
      end do
-     call pgsch(1.)
+     call pgsch(sch)
      call pgsci(1)
   end if !if(hlbl.eq.'y') then
   
-  call pgsch(1.0)
+  call pgsch(sch)
   if(lums.eq.1) then  !Luminosity legenda
      do j=1,6
         call pgsci(j)
@@ -645,14 +659,17 @@ program plotplt
      end do !j
      call pgsci(1)
   end if !if(sabs+tabs+cabs.gt.1)
-  call pgsch(1.0)
+  call pgsch(sch)
   
   
   
   
   
-  if(conv.eq.1)   call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot
-  
+  if(conv.eq.1) then
+     call pgsci(1)
+     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot
+     call pgsci(2)
+  end if
   
   
   
@@ -681,8 +698,9 @@ program plotplt
      call pgline(n,xx(1:n),log10(real(dat(38,1:n))))
      call pgsls(1)
   end if
-  
-  
+   
+  call pgsci(1)
+     
   if(plot.eq.9) then
      call pgend
      ex = .true.

@@ -7,20 +7,22 @@
 subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
   use constants
   implicit none
+  integer :: logri
   real :: x,xmin,xmax,y,ymin,ymax,logr,dlogr,cst
   real :: r1,r2,dr,x2(2),y2(2)
   character :: str*99
   
   call pgsls(4)
   cst = log10(real(4*pi*sigma * r0**2/l0))
-  dlogr = 1. - 1.e-10
+  dlogr = 1.
   
   r1 = (ymin - cst - 4*xmin)/2.  !logR in lower-left  corner
   r2 = (ymax - cst - 4*xmax)/2.  !logR in upper-right corner
   dr = r2-r1
   if(floor(dr).lt.4) dlogr = dlogr/2.
   
-  do logr=-10.,10.,dlogr  !0=1Ro, 1=10Ro, etc
+  do logri=nint(-10./dlogr),nint(10./dlogr)  !0=1Ro, 1=10Ro, etc
+     logr = real(logri)*dlogr
      if(logr.lt.r1.or.logr.gt.r2) cycle
      if(logr.lt.0.0001) then
         if(logr.lt.-2.001) then
