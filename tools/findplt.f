@@ -8,15 +8,17 @@ program findplt
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nnn=100,ny=18
-  real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b
+  real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
   integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt,io
-  character :: findfile*20,fname*99,arg*99
+  character :: findfile*20,fname*99,arg*99,tmpstr*10
   
   call setconstants()
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
+     read(10,*)tmpstr
+     read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
@@ -80,7 +82,7 @@ program findplt
   !print*,ncols,'columns'
   
   succ = 0
-  glt = 1  		!glt determines whether we search the first model where:  x(iin) < xfind (glt=1),   or  x(iin) > xfind (glt=2)
+  glt = 1               !glt determines whether we search the first model where:  x(iin) < xfind (glt=1),   or  x(iin) > xfind (glt=2)
   
   do j=1,nn
      read(10,10,err=11,end=15) x(1:ncols)
@@ -88,8 +90,8 @@ program findplt
 10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)
      
      !Calculate colours/magnitude
-     x(99) = 1.d0 - x(42) - x(43)			!Z_surf = 1 - X - Y
-     call lt2ubv(x(9),x(10),x(4),dlog10(x(99)/2.d-2),x(91),x(92),x(93),x(94),x(95))
+     x(99) = 1.d0 - x(42) - x(43)                       !Z_surf = 1 - X - Y
+     call lt2ubv(x(9),x(10),x(4),dlog10(x(99)/2.d-2),mbol,bc,x(91),x(92),x(93),x(94),x(95))
      x(96) = x(92)+x(93)  ! (U-V) = (U-B) + (B-V)
      x(97) = x(94)+x(95)  ! (V-I) = (V-R) + (R-I)
      
@@ -113,7 +115,7 @@ program findplt
      end if !if(j.gt.1) then
      
      prmdl = nint(x(1))
-     x1 = x		!For the next loop: the previous value for x
+     x1 = x             !For the next loop: the previous value for x
   end do !j=1,nn
   goto 15
   
@@ -131,7 +133,6 @@ program findplt
      call printmodel(nnn,x,iin,iout)
      goto 9999
   end if
-21 format(A18,A33,A1,A9,2x,6(A6,F6.3),A8,ES10.2,A8,I5)
   
   
   if(1.eq.2) write(6,'(ES12.5)')x(2)
@@ -164,7 +165,7 @@ subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
      write(6,'(15x,5es10.3,3f8.4)')x((/56,57,58,59,60,11,13,5/))
      write(6,*)''
   else
-     write(6,'(70x,2G)')x(iin),x(iout)
+     write(6,'(70x,2G12.3)')x(iin),x(iout)
   end if
   
   

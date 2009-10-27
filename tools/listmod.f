@@ -44,7 +44,7 @@ program listmod
   open (unit=10,form='formatted',status='old',file=trim(fname))
 3 rewind 10
   
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   do i=1,999
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      !print*,kh,kp,jmod,jb,jin
@@ -79,6 +79,9 @@ program listmod
            !l1  = l/3.844d0  !Peter's CLSN
            ts  = exp(lnt)
            m1 = lnm*1.d33/m0
+           hs  = x1
+           hes = x4
+           zs  = 1.d0 - x1 - x4
         end if
         if(j.eq.kh) then
            tc  = exp(lnt)
@@ -89,8 +92,8 @@ program listmod
         if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
      end do !j
-     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
-     write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,hc,hec,zc,bms,p,p1
+     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+     write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
   end do !i
   write(6,'(A)')'  EOF not reached, array too small!'
   n=999
@@ -98,9 +101,9 @@ program listmod
 5 write(6,'(A35,I3)')'  Error reading first line of block',i
   goto 10
 6 write(6,'(A36,I3)')'  Error reading second line of block',i
-9 format (I4,I7,I5,ES13.5,ES9.2,f10.4,2f7.3,ES9.2,1x,3ES9.2,ES9.2,1x,3f7.4,1x,3ES9.2)
+9 format (I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)
 10 n=i-1
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff       Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   
   write(6,'(I5,A)')n,' blocks read.'

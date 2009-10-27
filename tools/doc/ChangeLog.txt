@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    53: AstroFloyd, 27/10/2009
+     - made code compatible with gfortran and ifort v.11
+     - listmod: more screen output
+     - updated doc/Makefile
+         
     50: AstroFloyd, 01/07/2009
      - ~/bin/lib/ -> ~/usr/lib/
     

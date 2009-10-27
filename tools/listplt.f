@@ -6,16 +6,18 @@ program listplt
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81
   real*8 :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
-  real*8 :: c82(nn),c85a,c85b,c92(nn)
+  real*8 :: c82(nn),c85a,c85b,c92(nn),mbol,bc
   
   integer :: i,io,j,n,ans,ncols,narg,iargc
-  character :: findfile*99, fname*99,labels(nnn)*13
+  character :: findfile*99, fname*99,labels(nnn)*99,tmpstr*10
   
   call setconstants()
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
+     read(10,*)tmpstr
+     read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
@@ -87,7 +89,7 @@ program listplt
   labels(62) = 'Mg,centr'
   labels(63) = 'Menv (Mo)'
   labels(64) = 'Xf'
-
+  
   labels(81) = 'Qconv'
   labels(82) = 'PGW,max (d)'
   labels(83) = 'Menv (Mo)'
@@ -106,7 +108,7 @@ program listplt
   labels(96) = 'J_spin (10^50 g cm^2 s^-1)'
   labels(97) = '\gr_avg (g cm^-3)'
   labels(98) = 'Z_surf'
-
+  
   labels(101) = 'V'
   labels(102) = 'U-B'
   labels(103) = 'B-V'
@@ -114,16 +116,16 @@ program listplt
   labels(105) = 'R-I'
   labels(106) = 'U-V'
   labels(107) = 'V-I'
-
-
-
-
+  
+  
+  
+  
   !      fname=findfile('*.plt*')
-
+  
   !************************************************************************
   !***   READ COMMAND LINE VARIABLES
   !************************************************************************
-
+  
   narg = iargc()
   if(narg.eq.1) then
      call getarg(1,fname)
@@ -134,14 +136,14 @@ program listplt
      write(6,'(A)')"I'll look in the current directory for a *.plt file..."
      fname=findfile('*.plt*',6)
   end if
-
-
-
-
-
+  
+  
+  
+  
+  
   write(6,*)''
   write(6,'(A)')'Reading file '//trim(fname)
-
+  
   dat = 0.d0
   open(unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
@@ -155,22 +157,22 @@ program listplt
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(10)
   goto 15
-
+  
 11 write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(10)
   goto 15
-
+  
 12 write(6,'(A,I6)')'  Error reading file, line ',j
   close(10)
   if(j.lt.3) goto 19
   print*,"  I'll skip the rest of the file and use the first part."
 15 continue
   write(6,*)''
-
+  
   n = j-1   !Number of models in the file
-
-
-
+  
+  
+  
   goto 29
 19 write(6,'(A)')'Trying for the new output format...'
   dat = 0.d0
@@ -186,11 +188,11 @@ program listplt
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(20)
   goto 25
-
+  
 21 write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
   close(20)
   goto 25
-
+  
 22 write(6,'(A,I6)')'  Error reading file, aborting at line ',j
   print*,dat(1,1:10)
   if(j.lt.3) goto 9999
@@ -198,20 +200,20 @@ program listplt
   close(20)
 25 continue
   write(6,*)''
-
+  
   n = j-1   !Number of models in the file
-
-
-
-
-
+  
+  
+  
+  
+  
   write(6,*)''
 29 continue
   !Log or de-log some variables
   do i=4,nnn !skip t,dt
      if(dat(i,1).eq.0.) dat(i,1) = dat(i,2)
   end do
-
+  
   dat(8,1:n)  = 10**dat(8,1:n)
   dat(9,1:n)  = 10**dat(9,1:n)
   dat(10,1:n) = 10**dat(10,1:n)
@@ -219,58 +221,58 @@ program listplt
   dat(12,1:n) = 10**dat(12,1:n)
   dat(13,1:n) = 10**dat(13,1:n)
   dat(14,1:n) = 10**dat(14,1:n)
-  dat(15,1:n) = dat(15,1:n)*m0 	!One would like to print Ubind in erg, not erg/m0
-
-
-
-
+  dat(15,1:n) = dat(15,1:n)*m0  !One would like to print Ubind in erg, not erg/m0
+  
+  
+  
+  
   !****** CALCULATE SOME VARIABLES THAT ARE NOT IN THE FILE ***************
-
+  
   !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983
   dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4 * (2*pi/(dat(21,1:n)*day))**3/1.d50
   do i=1,n
      if(dat(81,i).lt.0.02) dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
   end do !i
-
-
+  
+  
   !      dat(38,1:n) = dat(88,1:n)  !Take Sills in stead of Rappaport MB
   dat(37,1:n) = dat(88,1:n)  !Take Sills MB in stead of Wind AML
-
-
+  
+  
   dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (2.d0*pi*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
-
+  
   dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(2.d0*pi*(dat(4,1:n)+dat(40,1:n))*m0))**(1.d0/3.d0)/1.d50                     !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of dat(33)
-
-
+  
+  
   dat(63,1:n) = dat(4,1:n) - dat(5,1:n) 
-
-
-  dat(75,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr		!KH timescale
-  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)		!Gravitational waves
-  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)		!Magnetic braking (Actually SO-coupling!)
-  dat(78,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)		!Mass transfer
-  dat(79,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10		!Nuclear evolution timescale
+  
+  
+  dat(75,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr          !KH timescale
+  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)          !Gravitational waves
+  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)             !Magnetic braking (Actually SO-coupling!)
+  dat(78,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)         !Mass transfer
+  dat(79,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10              !Nuclear evolution timescale
   dat(80,1:n) = dat(79,1:n)
-
+  
   dat(5,1:n) = dat(5,1:n) + 1.d-30
   c82(1:n) = 2.d0*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) * (dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/(dat(5,1:n)+1.4)**(1.d0/8.d0)
   dat(82,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c82(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
-
-
-  dat(83,1:n) = dat(4,1:n) - dat(5,1:n) 				!H-envelope mass
-  dat(84,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.			!Xf := 2Xc + Yc + 1
-
+  
+  
+  dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                                 !H-envelope mass
+  dat(84,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                        !Xf := 2Xc + Yc + 1
+  
   dat(85,1) = 0.d0
   do i=2,n
-     c85a = dabs(dat(8,i)-dat(8,i-1))+1.d-30	!dR
-     c85b = dabs(dat(2,i)-dat(2,i-1))+1.d-30	!dt
-     dat(85,i) = dat(8,i)/(c85a/c85b)	!R/(dR/dt)
+     c85a = dabs(dat(8,i)-dat(8,i-1))+1.d-30    !dR
+     c85b = dabs(dat(2,i)-dat(2,i-1))+1.d-30    !dt
+     dat(85,i) = dat(8,i)/(c85a/c85b)   !R/(dR/dt)
   end do
-
+  
   dat(86,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)  !Rossby number = Prot/Tet
-
+  
   dat(87,1:n) = 2.5d0/13.8d0 * dat(25,1:n)  !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d
-
+  
   do i=1,n !Saturated MB - Sills et al, 2000ApJ.534.335
      dat(88,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(87,i))**2 * dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(21,i).gt.dat(87,i)) dat(88,i) = 2.7e-3*(2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
@@ -278,41 +280,41 @@ program listplt
   end do !i
   !      dat(88,1:n) = log10(dat(88,1:n)/day**3)
   dat(88,1:n) = dat(88,1:n)/day**3
-
+  
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 + 0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
   dat(89,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F)
-
-
+  
+  
   dat(90,1:n) = dat(2,1:n) - dat(2,1) !t-t0
-
+  
   dat(91,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
-
+  
   c92(1:n) = 2*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) *(dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/(dat(5,1:n)+1.4)**(1.d0/8.d0)
   dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c92(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
-
-  dat(93,1:n) = dat(8,1:n)/dexp(dat(29,1:n))	
-  dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.				!Xf := 2Xc + Yc + 1
-  dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2			!M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
-  dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day)	!Jspin = I*w in 10^50 g cm^2 s^-1
+  
+  dat(93,1:n) = dat(8,1:n)/dexp(dat(29,1:n))    
+  dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                                !Xf := 2Xc + Yc + 1
+  dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                     !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
+  dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day)     !Jspin = I*w in 10^50 g cm^2 s^-1
   dat(97,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y
-
-
+  
+  
   !Colours
   do i=1,n
-     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),dat(101,i),dat(102,i),dat(103,i),dat(104,i),dat(105,i))
+     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i),dat(103,i),dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)  ! (U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)  ! (V-I) = (V-R) + (R-I)
   enddo
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
   do i=1,n
      d(1:nnn) = dat(1:nnn,i)
      if(mod(i,25).eq.1) then
@@ -323,60 +325,60 @@ program listplt
      !write(6,'(I5,I6,ES14.6,2x,F8.3,2F7.3,F8.3,2x,2(2ES10.2,2x),2F7.3,2x,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(56),d(57),d(28),dabs(d(31)),d(40)
      write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
   end do
-
-
+  
+  
 61 write(6,*)''
   write(6,'(A,$)')'  Which line would you like to see (0 = quit):  '
   read*,ans
   if(ans.gt.n.or.ans.lt.0) goto 61
   if(ans.eq.0) goto 9999
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
   a = dat(:,ans)
   do i=1,2
      write(6,*)''
   end do
-
+  
   do i=1,16
-     write(6,'(2x,4(I3,1x,A9,1x,ES15.7,9x))')i,labels(i),a(i),i+16,labels(i+16),a(i+16),i+32,labels(i+32),a(i+32),i+48,labels(i+48),a(i+48)
+     write(6,'(2x,4(I3,1x,A9,1x,ES15.7,9x))')i,trim(labels(i)),a(i),i+16,trim(labels(i+16)),a(i+16),i+32,trim(labels(i+32)),a(i+32),i+48,trim(labels(i+48)),a(i+48)
   end do
-
+  
   do i=1,2
      write(6,*)''
   end do
-
+  
   do i=1,10
-     write(6,'(4(I5,1x,A13,2x,ES15.7,10x))')80+i,labels(80+i),a(80+i), 90+i,labels(90+i),a(90+i), 100+i,labels(100+i),a(100+i)
+     write(6,'(4(I5,1x,A13,2x,ES15.7,10x))')80+i,trim(labels(80+i)),a(80+i), 90+i,trim(labels(90+i)),a(90+i), 100+i,trim(labels(100+i)),a(100+i)
   end do
-
+  
   do i=1,2
      write(6,*)''
   end do
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   goto 9999
-
-
+  
+  
   !*************************************************************************************************************************************************
-
-
-
+  
+  
+  
   write(6,*)''
   write(6,'(A)')'Variables:                                    0: Quit    '
   write(6,*)''
@@ -403,8 +405,8 @@ program listplt
   write(6,'(A)')' 84: Xf             89: Tet: int/anal                    '
   write(6,'(A)')' 85: R/(dR/dt)                                           '
   write(6,'(A)')'                                                         '
-
-
+  
+  
 9999 write(6,*)''
   write(6,'(A)')'Program finished'
   write(6,*)''

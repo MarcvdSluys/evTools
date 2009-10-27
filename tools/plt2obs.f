@@ -5,16 +5,18 @@ program plt2obs
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nc=81,nff=100
-  real*8 :: tm,m,mc,z,zmod,mv,umb,bmv,vmr,rmi
+  real*8 :: tm,m,mc,z,zmod,mbol,bc,mv,umb,bmv,vmr,rmi
   real*8 :: logt,logl,logr,dat(nc,nn)
   integer :: i,j,n,ncols,fnl,nf,f,io
-  character :: fname*99,fnames(nff)*99,oname*55,ans
+  character :: fname*99,fnames(nff)*99,oname*55,ans,tmpstr*10
   
   call setconstants()
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
+     read(10,*)tmpstr
+     read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
@@ -44,7 +46,7 @@ program plt2obs
      fname = fnames(f)
      if(fname(1:5).eq.'     ') goto 9999
      
-7    write(6,'(A)')'Reading file '//fname
+     write(6,'(A)')'Reading file '//fname
      
      do i=99,1,-1
         fnl = i-1
@@ -93,7 +95,7 @@ program plt2obs
      do j=1,nn
         !read(20,20,err=22,end=21) (dat(i,j),i=1,nc)
         read(20,*,err=22,end=21) (dat(i,j),i=1,nc)
-20      format(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)
+!20      format(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)
      end do
      write(6,'(A)')'  End of file reached, arrays too small!'
      close(20)
@@ -119,7 +121,7 @@ program plt2obs
 
      !Is the model-Z 0.02?
      zmod = 1.d0 - dat(42,1) - dat(43,1)
-     if(dabs(dlog10(zmod/z)).gt.1.d-2) then
+     if(abs(log10(zmod/z)).gt.1.d-2) then
         write(6,'(A)')' There seems to be a difference between the metalicity of the model and the code.'
         write(6,'(A23,F8.5,A3,F8.5,A12,$)')' Should I change Z from',z,'to',zmod,'?  (y/n):  '
         read*,ans
@@ -136,7 +138,7 @@ program plt2obs
         logr = dat(8,i)
         logl = dat(9,i)
         logt = dat(10,i)
-        call lt2ubv(logl,logt,m,dlog10(z/2.d-2),mv,umb,bmv,vmr,rmi)
+        call lt2ubv(logl,logt,m,log10(z/2.d-2),mbol,bc,mv,umb,bmv,vmr,rmi)
         write(30,52)tm,m,mc,logr,logl,logt,mv,umb,bmv,vmr,rmi
 52      format(ES17.9,5F9.5,2x,5F9.5)
      end do

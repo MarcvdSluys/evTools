@@ -90,7 +90,7 @@ program listmdl
         mm1 = mm !Remember the previous value
      end do !do j=1,nmsh
      
-     vk = vk/((m1-mhe)*r1**2)	
+     vk = vk/((m1-mhe)*r1**2)   
      write(6,9)ii,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk!,be,be1!,bms,p,p1
      write(20,'(4E11.4)')mhe,be,be1,be/be1
      

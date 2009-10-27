@@ -85,7 +85,7 @@ program selplt
         !read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=12,end=15) (dat(i,j),i=1,81)  !81 Columns
         !if(nc.gt.81) read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=12,end=15) (dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
         
-        !zsurf = 1.d0 - dat(42,j) - dat(43,j)			!Z_surf = 1 - X - Y
+        !zsurf = 1.d0 - dat(42,j) - dat(43,j)                   !Z_surf = 1 - X - Y
         !call lt2ubv(dat(9,j),dat(10,j),dat(4,j),dlog10(zsurf/2.d-2),dat(81,j),dat(82,j),dat(83,j),dat(84,j),dat(85,j))
         !dat(86,j) = dat(82,j)+dat(83,j)  ! (U-V) = (U-B) + (B-V)
         !dat(87,j) = dat(84,j)+dat(85,j)  ! (V-I) = (V-R) + (R-I)
@@ -129,9 +129,7 @@ program selplt
      
      
      goto 15
-     write(6,'(A)')'End of file not reached, arrays too small!'
-     goto 15
-12   write(6,'(A,I,A)')'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
+     write(6,'(A,I5,A)')'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
 15   continue
      close(10)
   end do  !f
