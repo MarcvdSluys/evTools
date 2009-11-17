@@ -2,6 +2,19 @@
 ! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
 ! Uses PGPLOT window 2 to plot to
 ! AF, 19-05-2005
+!
+!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 program plotmdl  
   use constants
@@ -33,22 +46,22 @@ program plotmdl
      pxin(i) = i
   end do
   
-  abds = (/'H ','He','C ','N ','O ','Ne','Mg'/)   !Line labels in abundances plot
-  nabs = (/'ad ','rad','tru'/)   !Line labels in nablas plot
+  abds = [character(len=2) :: 'H ','He','C ','N ','O ','Ne','Mg']   !Line labels in abundances plot
+  nabs = [character(len=3) :: 'ad ','rad','tru']   !Line labels in nablas plot
   nab = 0
-
+  
   !Names of the variables in px
   pxns(0) = ''
-  pxns(1:10)  = (/'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H'/)
-  pxns(11:20) = (/'He','C','N','O','Ne','Mg','R','L','Eth','Enuc'/)
-  pxns(21:30) = (/'Enu','dM','...','Thom','Uhom','Vhom','Uint','S','L/Ledd','wxl'/)
-  pxns(31:40) = (/'mu','wt?','Nel','NeO','w?','MI','phi','Fm','DGOS','...'/)
-  pxns(41:50) = (/'...','LDRK','Enth','V^2','FAC','','','','','Rpp'/)
-  pxns(51:60) = (/'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2'/)
-
-  pxns(201:210) = (/'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g'/)
-  pxns(211:216) = (/'mu','n','Prad','Pgas','Pr/Pg','Ubind'/)
-  pxns(251:252) = (/'Abundances','Nablas'/)
+  pxns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
+  pxns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
+  pxns(21:30) = [character(len=99) :: 'Enu','dM','...','Thom','Uhom','Vhom','Uint','S','L/Ledd','wxl']
+  pxns(31:40) = [character(len=99) :: 'mu','wt?','Nel','NeO','w?','MI','phi','Fm','DGOS','...']
+  pxns(41:50) = [character(len=99) :: '...','LDRK','Enth','V^2','FAC','','','','','Rpp']
+  pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
+  
+  pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
+  pxns(211:216) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','Ubind']
+  pxns(251:252) = [character(len=99) :: 'Abundances','Nablas']
   
   !Axis labels
   labels = ''
@@ -167,11 +180,11 @@ program plotmdl
   else
      fname=findfile('*.mdl*',6)  !Search for input file in current dir
   end if
-
-
-
+  
+  
+  
   !***   READ ALL STRUCTURE MODELS IN THE FILE AND DISPLAY MAIN PROPERTIES
-
+  
   write(6,*)''
 4 write(6,'(A)')' Reading file '//trim(fname)
   open (unit=10,form='formatted',status='old',action='read',file=fname,iostat=io)
@@ -189,7 +202,7 @@ program plotmdl
      close(10)
      stop
   end if
-     
+  
   write(6,'(A,I4,A,I3,A)')' Reading',nm,' meshpoints,',nc,' columns of data.'
   if(ver.gt.1.) then
      read(10,*)bla 
@@ -238,7 +251,7 @@ program plotmdl
         end if
         if(mhe.eq.0.0.and.hh.gt.0.1) mhe = mm
         if(mco.eq.0.0.and.hhe.gt.0.1) mco = mm
-
+        
      end do !do j=1,nm
      
      write(6,9)ii,mdl,nm,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs!,bms,p,p1
@@ -416,7 +429,7 @@ program plotmdl
   !      j = j+1
   !   end if
   !end do
-
+  
   nr = 4 !Number of variable columns
   ii = ceiling(real(nc)/real(nr)) !Number of rows
   do i=1,ii
@@ -441,7 +454,7 @@ program plotmdl
   read*,vx
   if(vx.eq.0) goto 9999
   if(pxnr(vx).eq.0) goto 35
-
+  
 36 write(6,'(A,$)')' Choose the Y-axis variable: '
   read*,vy
   if(vy.eq.0) goto 9999
@@ -505,21 +518,21 @@ program plotmdl
   
   if(ab.eq.1.and.(log.eq.'y'.or.log.eq.'b').and.ymin.lt.-6.) ymin = -6.
   
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
   !***   PLOT RANGE
-
+  
   xmin0 = xmin
   xmax0 = xmax
   ymin0 = ymin
   ymax0 = ymax
-
+  
 70 write(6,*)''
   write(6,*)' X-range:',xmin,'-',xmax
   write(6,*)' Y-range:',ymin,'-',ymax
@@ -622,9 +635,9 @@ program plotmdl
   call pgmtxt('T',0.7,0.5,0.5,title(14:ttlen))  !13 to remove /home/user/
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.0,0.5,0.5,ly)
-
+  
   if(plot.eq.8) call pgslw(2)
-
+  
   if(vx.ne.201.and.vy.ne.201) then
      do i=1,ny
         call pgsci(mod(i-1,6)+1)
@@ -640,7 +653,7 @@ program plotmdl
         if(ab.eq.1) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,abds(i))
      end do
   end if
-
+  
   call pgsch(1.5)
   call pgsci(8)
   if(hmp.ne.0) then
@@ -669,21 +682,21 @@ program plotmdl
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
   end if
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   !***   FINISH
-
+  
 900 if(plot.ne.8) then
      write(6,*)''
      write(6,'(A)')' You can:'
@@ -701,7 +714,7 @@ program plotmdl
   write(6,'(A27,$)')' What do you want to do ?  '
   read*,plot
   if(plot.lt.0.or.plot.gt.8) goto 900
-
+  
   if(plot.ne.4) call pgend
   if(plot.eq.1) goto 32
   if(plot.eq.2) goto 37
@@ -709,7 +722,7 @@ program plotmdl
   if(plot.eq.6) goto 4
   if(plot.eq.7) goto 3
   if(plot.eq.8) goto 501
-
+  
   if(plot.eq.4) then  !Select region
 941  call pgsci(1)
      xsel = 0.
@@ -732,7 +745,7 @@ program plotmdl
      call pgend
      goto 501
   end if
-
+  
   if(plot.eq.5) then  !Zoom out
      xmin = (xmin+xmax)/2. - 2*abs((xmin+xmax)/2.-xmin) !Central value - 2x the 'radius', 'radius' = central value - minimum
      xmax = (xmin+xmax)/2. + 2*abs((xmin+xmax)/2.-xmin)
@@ -744,7 +757,7 @@ program plotmdl
      write(6,*)''
      goto 501
   end if
-
+  
 9999 continue
   write(6,'(A,/)')' Program finished'
 end program plotmdl

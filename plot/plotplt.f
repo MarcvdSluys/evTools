@@ -4,6 +4,19 @@
 !Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
 !Uses PGPLOT window 1 to plot to
 !AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
+!
+!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 program plotplt
   use constants
@@ -647,14 +660,14 @@ program plotplt
   call pgsch(sch)
   if(lums.eq.1) then  !Luminosity legenda
      do j=1,6
-        call pgsci(j)
+        call pgsci(j+1)
         call pgmtext('RV',0.5,real(20-j)/20.,0.,lstr(j))
      end do !j
      call pgsci(1)
   end if !if(lums.eq.1)
   if(sabs+tabs+cabs.gt.0) then  !Abundances legenda
      do j=1,7
-        call pgsci(j)
+        call pgsci(j+1)
         call pgmtext('RV',0.5,real(20-j)/20.,0.,abstr(j))
      end do !j
      call pgsci(1)

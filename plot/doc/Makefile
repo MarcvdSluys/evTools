@@ -1,90 +1,83 @@
-#Compile the program and put the executable in ~/bin
+#Compile the program and put the executable in ~/usr/bin
 
-#FORT = lf95
-FORT = ifort
-
-#To develop code  (don't mix -check bounds with -O>0!):
-#CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
-CFLAGS = -free -O0  -vec-report0 -warn all -check all
-
-#To debug code:
-#CFLAGS = -free -O0  -vec-report0 -g
-
-#To optimise code by hand (memory):
-#CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -check format -check output_conversion -traceback -warn unused
-#CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -check format -traceback -warn unused
-
-#To use optimum run speed (~70s compile time):
-#CFLAGS = -free -O3  -vec-report0 -traceback
+#No text/space after statements below!
+COMP = gfortran#  Use GNU fortran compiler
+#COMP = ifort#     Use Intel fortran compiler
 
 
-#LFLAGS = -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
-LFLAGS = -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
+#ifort:
+ifeq ($(COMP),ifort)
+   #To develop code  (don't mix -check bounds with -O>0!):
+   #CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
+   CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all  -check noarg_temp_created
+
+   #To debug code:
+   #CFLAGS = -free -O0  -vec-report0 -g
+
+   #To use optimum run speed
+   #CFLAGS = -free -O3 -vec-report0 -traceback
+   #CFLAGS = -free -O3 -arch SSE2 -vec-report0 -traceback           #SSE2 needs -lsvml
+   ##CFLAGS = -free -O3 -arch SSE2 -ipo -vec-report0 -traceback
+
+   CFLAGS += -nogen-interfaces  #For ifort v.11
+
+   #LFLAGS = -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
+   #LFLAGS = -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
+   LFLAGS = -lpgplot
+   #LFLAGS = -ipo -vec-report0 -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
+endif
+
+
+#gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
+ifeq ($(COMP),gfortran)
+   #CFLAGS = -O0 -ffree-form -ffree-line-length-none
+   CFLAGS = -O0 -ffree-form -ffree-line-length-none   -Wall 
+   #CFLAGS = -O -ffree-form -ffree-line-length-none
+   #CFLAGS = -O3 -ffree-form -ffree-line-length-none
+   LFLAGS = -lpgplot
+endif
+
+
+
 
 STDOBJ = functions.o
 PLTOBJ = plotfunctions.o
 
-.f.o: 
-	$(FORT) $(CFLAGS) -c $?
+%.o: %.f Makefile
+	$(COMP) $(CFLAGS) -c $<
+
+
+all: plotmdl plotmdln plotmod plotplt plotpltn plotpltp
 
 exit:
-
-all: findplt listmdl listmod listplt makerun mergeplt plotmdl plotmdln plotmod plotplt plotpltn plt2ce plt2obs selplt
-
-findplt: $(STDOBJ) findplt.o
-	$(FORT) $(LFLAGS) -o ~/bin/findplt $(STDOBJ) findplt.o
-
-getgrid: $(STDOBJ) getgrid.o
-	$(FORT) $(LFLAGS) -o ~/bin/getgrid $(STDOBJ) getgrid.o
-
-grid: $(STDOBJ) grid.o
-	$(FORT) $(LFLAGS) -o ~/bin/grid $(STDOBJ) grid.o
-
-listmdl: $(STDOBJ) listmdl.o
-	$(FORT) $(LFLAGS) -o ~/bin/listmdl $(STDOBJ) listmdl.o
-
-listmod: $(STDOBJ) listmod.o
-	$(FORT) $(LFLAGS) -o ~/bin/listmod $(STDOBJ) listmod.o
-
-listplt: $(STDOBJ) listplt.o
-	$(FORT) $(LFLAGS) -o ~/bin/listplt $(STDOBJ) listplt.o
-
-makerun: $(STDOBJ) makerun.o
-	$(FORT) $(LFLAGS) -o ~/bin/makerun $(STDOBJ) makerun.o
-
-mergeplt: $(STDOBJ) mergeplt.o
-	$(FORT) $(LFLAGS) -o ~/bin/mergeplt $(STDOBJ) mergeplt.o
 
 
 
 plotmdl: $(STDOBJ) $(PLTOBJ) plotmdl.o
-	$(FORT) $(LFLAGS) -o ~/bin/plotmdl $(STDOBJ) $(PLTOBJ) plotmdl.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdl $(STDOBJ) $(PLTOBJ) plotmdl.o
 
 plotmdln: $(STDOBJ) $(PLTOBJ) plotmdln.o
-	$(FORT) $(LFLAGS) -o ~/bin/plotmdln $(STDOBJ) $(PLTOBJ) plotmdln.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdln $(STDOBJ) $(PLTOBJ) plotmdln.o
 
 plotmod: $(STDOBJ) $(PLTOBJ) plotmod.o
-	$(FORT) $(LFLAGS) -o ~/bin/plotmod $(STDOBJ) $(PLTOBJ) plotmod.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmod $(STDOBJ) $(PLTOBJ) plotmod.o
 
 plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
-	$(FORT) $(LFLAGS) -o ~/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
 
 plotpltn: $(STDOBJ) $(PLTOBJ) plotpltn.o
-	$(FORT) $(LFLAGS) -o ~/bin/plotpltn $(STDOBJ) $(PLTOBJ) plotpltn.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltn $(STDOBJ) $(PLTOBJ) plotpltn.o
+
+plotpltp: $(STDOBJ) $(PLTOBJ) plotpltp.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltp $(STDOBJ) $(PLTOBJ) plotpltp.o
 
 
-
-plt2ce: $(STDOBJ) plt2ce.o
-	$(FORT) $(LFLAGS) -o ~/bin/plt2ce $(STDOBJ) plt2ce.o
-
-plt2obs: $(STDOBJ) plt2obs.o
-	$(FORT) $(LFLAGS) -o ~/bin/plt2obs $(STDOBJ) plt2obs.o
-
-selplt: $(STDOBJ) selplt.o
-	$(FORT) $(LFLAGS) -o ~/bin/selplt $(STDOBJ) selplt.o
 
 
 
 
 clean:
 	rm -f *.o *.mod
+
+cleanwarnings:
+	rm -f *__genmod.f90 *__genmod.mod

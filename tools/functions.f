@@ -1,5 +1,18 @@
 !functions.f: Shared modules, functions and subroutines for the Eggleton plot package
 !For functions and routines that need pgplot, see plotfunctions.f
+!
+!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 !************************************************************************
 module ubvdata
@@ -91,11 +104,11 @@ subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   use ubvdata
   implicit none
   real*8, parameter :: gconst=-10.6071d0
-  integer :: k,ig,it,iz,indx
+  integer :: k,ig,it,iz,find_index
   real*8 :: cm(5),ltgr(ntgr)
   real*8 :: logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini
   real*8 :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
-  external indx
+  external find_index
   
   logm = log10(mass)
   logg = logm + 4*logt - logl + gconst
@@ -103,9 +116,9 @@ subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   
   !Find indices of log Z, log g and log T to interpolate between.
   !don't allow extrapolation outside log Z and log g grid.
-  ig = indx(logg,ggr,nggr)
-  it = indx(logt,ltgr,ntgr)
-  iz = indx(logz,zgr,nzgr)
+  ig = find_index(logg,ggr,nggr)
+  it = find_index(logt,ltgr,ntgr)
+  iz = find_index(logz,zgr,nzgr)
   
   dg1 = (logg - ggr(ig-1))/(ggr(ig) - ggr(ig-1))
   dg1 = max(0.0d0, min(1.0d0, dg1))
@@ -637,6 +650,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
   dat(15,:) = dat(15,:)*m0*1.d-40                               !Ubind in 10^40 ergs
+  
+  dat(42:62,:) = max(dat(42:62,:),1.e-10)                       !Abundances: limit them to >10^-10  -  isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  
   do i=1,n
      dat(82,i) = dat(5,i)-dat(6,i)                              !Intershell mass
   end do
@@ -793,183 +809,191 @@ end subroutine rswap
 
 
 !************************************************************************      
-function indx(ax,xx,nx)  !Double precision
-  !Finds index of ax in monotonously increasing or decreasing array xx
+function find_index(v,arr,narr)  !Double precision
+  !Finds index of value v in monotonously increasing or decreasing array arr of length narr
   implicit none
-  integer :: indx,nx,j,jl,jh
-  real*8 :: ax,xx(nx),sx
+  integer :: find_index,narr,i,iLow,iHigh
+  real*8 :: v,arr(narr),range
   
-  sx = xx(nx) - xx(1)
-  jl = 1
-  jh = nx
-1 if (jh-jl.gt.1) then
-     j = (jh + jl)/2
-     if ((ax-xx(j))*sx .gt. 0.0) then
-        jl = j
+  range = arr(narr) - arr(1)
+  iLow = 1
+  iHigh = narr
+  
+  do while(iHigh-iLow.gt.1)
+     i = (iHigh + iLow)/2
+     if ((v-arr(i))*range .gt. 0.0) then
+        iLow = i
      else
-        jh = j
+        iHigh = i
      end if
-     goto 1
-  end if
-  indx = jh
+  end do
   
-  return
-end function indx
+  find_index = iHigh
+end function find_index
 !************************************************************************      
 
 
 
 
 !***********************************************************************
-subroutine locate(xx,n,x,j)  !Double precision
+subroutine locate(arr,narr,v,i)  !Double precision
   !Input: 
-  !  xx: monotonic array
-  !  n:  length of xx
-  !  x:  value to look for
+  !  arr: monotonic array
+  !  narr:  length of arr
+  !  v:  value to look for
   !  Output:
-  !  j:  returned value, such that x is between xx(j) and xx(j+1).  If j=0 or jn, x is out of range
+  !  i:  returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
   implicit none
-  integer :: j,n,jl,jm,ju
-  real*8 :: x,xx(n)
-  jl=0
-  ju=n+1
-10 if(ju-jl.gt.1) then
-     jm=(ju+jl)/2
-     if((xx(n).ge.xx(1)).eqv.(x.ge.xx(jm))) then
-        jl=jm
+  integer :: i,narr,iLow,iMid,iHigh
+  real*8 :: v,arr(narr)
+  
+  iLow = 0
+  iHigh = narr+1
+  do while(iHigh-iLow.gt.1)
+     iMid = (iHigh+iLow)/2
+     if((arr(narr).ge.arr(1)) .eqv. (v.ge.arr(iMid))) then
+        iLow = iMid
      else
-        ju=jm
+        iHigh = iMid
      end if
-     goto 10
-  end if
-  if(x.eq.xx(1)) then
-     j=1
-  else if(x.eq.xx(n)) then
-     j=n-1
+  end do
+  
+  if(v.eq.arr(1)) then
+     i = 1
+  else if(v.eq.arr(narr)) then
+     i = narr-1
   else
-     j=jl
+     i = iLow
   end if
+  
 end subroutine locate
 !***********************************************************************
 
 
 !***********************************************************************
-subroutine locater(xxr,n,xr,j)  !Single precision
+subroutine locater(rarr,narr,rv,i)  !Single precision
   !Input: 
-  !  xx: monotonic array
-  !  n:  length of xx
-  !  x:  value to look for
+  !  rarr:  monotonic array
+  !  narr:  length of rarr
+  !  rv:    value to look for
   !  Output:
-  !  j:  returned value, such that x is between xx(j) and xx(j+1).  If j=0 or jn, x is out of range
+  !  i:     returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
   implicit none
-  integer :: j,n
-  real :: xr,xxr(n)
-  real*8 :: xd,xxd(n)
-  xxd = dble(xxr)
-  xd  = dble(xr)
-  call locate(xxd,n,xd,j)  !j will be returned to the calling routine
+  integer :: i,narr
+  real :: rv,rarr(narr)
+  real*8 :: dv,darr(narr)
+  
+  darr = dble(rarr)
+  dv  = dble(rv)
+  call locate(darr,narr,dv,i)  !i will be returned to the calling routine
+  
 end subroutine locater
 !************************************************************************      
 
 
 !************************************************************************************************************************************
-subroutine rindexx(n,rarr,indx)  !Return a sorted index indx of array arr of length n - single precision
-  integer :: n,indx(n)
-  real :: rarr(n)
-  real*8 :: darr(n)
+subroutine rindex(narr,rarr,indx)  !Return a sorted index indx of array rarr of length n - single precision
+  implicit none
+  integer :: narr,indx(narr)
+  real :: rarr(narr)
+  real*8 :: darr(narr)
   
   darr = dble(rarr)
-  call dindexx(n,darr,indx)  !Call the double-precision routine
+  call dindex(narr,darr,indx)  !Call the double-precision routine
   
-end subroutine rindexx
+end subroutine rindex
 !************************************************************************************************************************************
 
 !************************************************************************************************************************************
-subroutine dindexx(n,arr,indx)  !Return a sorted index indx of array arr of length n - double precision
+subroutine dindex(narr,arr,ind)  !Return a sorted index ind of array arr of length narr - double precision
+  implicit none
   integer, parameter :: m=7,nstack=50
-  integer :: n,indx(n)
-  real*8 :: arr(n),a
+  integer :: narr,ind(narr)
+  real*8 :: arr(narr),a
   integer :: i,indxt,ir,itemp,j,jstack,k,l,istack(nstack)
   
-  do j=1,n
-     indx(j)=j
+  do j=1,narr
+     ind(j) = j
   end do
   
-  jstack=0
-  l=1
-  ir=n
+  jstack = 0
+  l = 1
+  ir = narr
   
 1 if(ir-l.lt.m) then
-     do j=l+1,ir
-        indxt=indx(j)
-        a=arr(indxt)
-        do i=j-1,l,-1
-           if(arr(indx(i)).le.a) goto 2
-           indx(i+1)=indx(i)
+     do j = l+1,ir
+        indxt = ind(j)
+        a = arr(indxt)
+        do i = j-1,l,-1
+           if(arr(ind(i)).le.a) goto 2
+           ind(i+1) = ind(i)
         end do
-        i=l-1
-2       indx(i+1)=indxt
+        i = l-1
+2       ind(i+1) = indxt
      end do
-     if(jstack.eq.0)return
-     ir=istack(jstack)
-     l=istack(jstack-1)
-     jstack=jstack-2
+     if(jstack.eq.0) return
+     ir = istack(jstack)
+     l = istack(jstack-1)
+     jstack = jstack-2
      
   else
      
-     k=(l+ir)/2
-     itemp=indx(k)
-     indx(k)=indx(l+1)
-     indx(l+1)=itemp
-     if(arr(indx(l)).gt.arr(indx(ir))) then
-        itemp=indx(l)
-        indx(l)=indx(ir)
-        indx(ir)=itemp
+     k = (l+ir)/2
+     itemp = ind(k)
+     ind(k) = ind(l+1)
+     ind(l+1) = itemp
+     if(arr(ind(l)) .gt. arr(ind(ir))) then
+        itemp = ind(l)
+        ind(l) = ind(ir)
+        ind(ir) = itemp
      end if
-     if(arr(indx(l+1)).gt.arr(indx(ir))) then
-        itemp=indx(l+1)
-        indx(l+1)=indx(ir)
-        indx(ir)=itemp
+     if(arr(ind(l+1)) .gt. arr(ind(ir))) then
+        itemp = ind(l+1)
+        ind(l+1) = ind(ir)
+        ind(ir) = itemp
      end if
-     if(arr(indx(l)).gt.arr(indx(l+1))) then
-        itemp=indx(l)
-        indx(l)=indx(l+1)
-        indx(l+1)=itemp
+     if(arr(ind(l)) .gt. arr(ind(l+1))) then
+        itemp = ind(l)
+        ind(l) = ind(l+1)
+        ind(l+1) = itemp
      end if
-     i=l+1
-     j=ir
-     indxt=indx(l+1)
-     a=arr(indxt)
+     i = l+1
+     j = ir
+     indxt = ind(l+1)
+     a = arr(indxt)
+     
 3    continue
-     i=i+1
-     if(arr(indx(i)).lt.a) goto 3
+     i = i+1
+     if(arr(ind(i)).lt.a) goto 3
+     
 4    continue
-     j=j-1
-     if(arr(indx(j)).gt.a) goto 4
+     j = j-1
+     if(arr(ind(j)).gt.a) goto 4
      if(j.lt.i) goto 5
-     itemp=indx(i)
-     indx(i)=indx(j)
-     indx(j)=itemp
+     itemp = ind(i)
+     ind(i) = ind(j)
+     ind(j) = itemp
      goto 3
-5    indx(l+1)=indx(j)
-     indx(j)=indxt
-     jstack=jstack+2
-     if(jstack.gt.nstack) write(0,'(A)')'  *** Warning:  nstack too small in dindexx  ***'
+     
+5    ind(l+1) = ind(j)
+     ind(j) = indxt
+     jstack = jstack+2
+     if(jstack.gt.nstack) write(0,'(A)')'  *** Warning:  nstack too small in dindex  ***'
      if(ir-i+1.ge.j-l) then
-        istack(jstack)=ir
-        istack(jstack-1)=i
-        ir=j-1
+        istack(jstack) = ir
+        istack(jstack-1) = i
+        ir = j-1
      else
-        istack(jstack)=j-1
-        istack(jstack-1)=l
-        l=i
+        istack(jstack) = j-1
+        istack(jstack-1) = l
+        l = i
      end if
   end if
   
   goto 1
-end subroutine dindexx
+end subroutine dindex
 !************************************************************************************************************************************
 
 
@@ -983,37 +1007,37 @@ subroutine polint(xa,ya,n,x,y,dy)  !Single precision
   integer :: i,m,ns
   real :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
   
-  ns=1
-  dif=abs(x-xa(1))
+  ns = 1
+  dif = abs(x-xa(1))
   do i=1,n
-     dift=abs(x-xa(i))
+     dift = abs(x-xa(i))
      if (dift.lt.dif) then
-        ns=i
-        dif=dift
+        ns = i
+        dif = dift
      end if
-     c(i)=ya(i)
-     d(i)=ya(i)
+     c(i) = ya(i)
+     d(i) = ya(i)
   end do
-  y=ya(ns)
-  ns=ns-1
+  y = ya(ns)
+  ns = ns-1
   do m=1,n-1
      do i=1,n-m
-        ho=xa(i)-x
-        hp=xa(i+m)-x
-        w=c(i+1)-d(i)
-        den=ho-hp
+        ho = xa(i)-x
+        hp = xa(i+m)-x
+        w = c(i+1)-d(i)
+        den = ho-hp
         if(den.eq.0.) write(0,'(A)')'  *** Warning:  Failure in polint  ***'
-        den=w/den
-        d(i)=hp*den
-        c(i)=ho*den
+        den = w/den
+        d(i) = hp*den
+        c(i) = ho*den
      end do
      if (2*ns.lt.n-m) then
-        dy=c(ns+1)
+        dy = c(ns+1)
      else
-        dy=d(ns)
-        ns=ns-1
+        dy = d(ns)
+        ns = ns-1
      end if
-     y=y+dy
+     y = y+dy
   end do
   return
 end subroutine polint
@@ -1031,37 +1055,37 @@ subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
   integer :: i,m,ns
   real*8 :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
   
-  ns=1
-  dif=abs(x-xa(1))
+  ns = 1
+  dif = abs(x-xa(1))
   do i=1,n
-     dift=abs(x-xa(i))
+     dift = abs(x-xa(i))
      if (dift.lt.dif) then
-        ns=i
-        dif=dift
+        ns = i
+        dif = dift
      end if
-     c(i)=ya(i)
-     d(i)=ya(i)
+     c(i) = ya(i)
+     d(i) = ya(i)
   end do
-  y=ya(ns)
-  ns=ns-1
+  y = ya(ns)
+  ns = ns-1
   do m=1,n-1
      do i=1,n-m
-        ho=xa(i)-x
-        hp=xa(i+m)-x
-        w=c(i+1)-d(i)
-        den=ho-hp
+        ho = xa(i)-x
+        hp = xa(i+m)-x
+        w = c(i+1)-d(i)
+        den = ho-hp
         if(den.eq.0.d0) write(0,'(A)')'  *** Warning:  Failure in polint  ***'
-        den=w/den
-        d(i)=hp*den
-        c(i)=ho*den
+        den = w/den
+        d(i) = hp*den
+        c(i) = ho*den
      end do
      if (2*ns.lt.n-m) then
-        dy=c(ns+1)
+        dy = c(ns+1)
      else
-        dy=d(ns)
-        ns=ns-1
+        dy = d(ns)
+        ns = ns-1
      end if
-     y=y+dy
+     y = y+dy
   end do
   return
 end subroutine polintd
@@ -1071,33 +1095,36 @@ end subroutine polintd
 
 
 !***********************************************************************
-function ran1(idum)
+function ran1(seed)
   implicit none
-  integer :: idum,IA,IM,IQ,IR,NTAB,NDIV
-  real :: ran1,AM,EPS,RNMX
-  PARAMETER (IA=16807,IM=2147483647,AM=1./IM,IQ=127773,IR=2836,NTAB=32,NDIV=1+(IM-1)/NTAB,EPS=1.2e-7,RNMX=1.-EPS)
-  INTEGER j,k,iv(NTAB),iy
-  SAVE iv,iy
-  DATA iv /NTAB*0/, iy /0/
+  integer, parameter :: ia=16807,im=2147483647,iq=127773,ir=2836,ntab=32,ndiv=1+(im-1)/ntab
+  real, parameter :: am=1./im, eps=1.2e-7, rnmx=1.-eps
+  integer :: j,k,iv(ntab),iy,seed
+  real :: ran1
   
-  if (idum.le.0.or.iy.eq.0) then
-     idum=max(-idum,1)
-     do j=NTAB+8,1,-1
-        k=idum/IQ
-        idum=IA*(idum-k*IQ)-IR*k
-        if (idum.lt.0) idum=idum+IM
-        if (j.le.NTAB) iv(j)=idum
+  save iv,iy
+  iv = 0
+  iy = 0
+  
+  if (seed.le.0.or.iy.eq.0) then
+     seed = max(-seed,1)
+     do j=ntab+8,1,-1
+        k = seed/iq
+        seed = ia*(seed-k*iq)-ir*k
+        if (seed.lt.0) seed = seed+im
+        if (j.le.ntab) iv(j) = seed
      end do
-     iy=iv(1)
+     iy = iv(1)
   end if
-  k=idum/IQ
-  idum=IA*(idum-k*IQ)-IR*k
-  if (idum.lt.0) idum=idum+IM
-  j=1+iy/NDIV
-  iy=iv(j)
-  iv(j)=idum
-  ran1=min(AM*iy,RNMX)
-  return
+  
+  k = seed/iq
+  seed = ia*(seed-k*iq)-ir*k
+  if (seed.lt.0) seed = seed+im
+  j = 1+iy/ndiv
+  iy = iv(j)
+  iv(j) = seed
+  ran1 = min(am*iy,rnmx)
+  
 end function ran1
 !***********************************************************************
 
@@ -1117,7 +1144,7 @@ subroutine spline(x,y,n,yp1,ypn,y2)
   !   stop
   !end if
   
-  if(yp1.gt..99d30) then
+  if(yp1.gt.0.99d30) then
      y2(1) = 0.
      u(1) = 0.
   else
@@ -1172,7 +1199,7 @@ subroutine splint(xa,ya,y2a,n,x,y)
   a = (xa(khi)-x)/h
   b = (x-xa(klo))/h
   y = a*ya(klo)+b*ya(khi)+((a**3-a)*y2a(klo)+(b**3-b)*y2a(khi))*(h**2)/6.
-  return
+  
 end subroutine splint
 !***********************************************************************
 
@@ -1290,7 +1317,7 @@ end function rl2p
 !************************************************************************
 subroutine quit_program(message,len)  !Print a message and quit
   implicit none
-  character :: message*199
+  character :: message*(len)
   integer :: len
   
   if(len.ge.1.and.len.le.199) write(0,'(/,A)')'  '//trim(message(1:len))

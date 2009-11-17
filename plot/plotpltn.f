@@ -4,6 +4,19 @@
 !Uses code in functions.f
 !Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
 !AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
+!
+!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 
 program plotpltn  
@@ -189,13 +202,14 @@ program plotpltn
   
 7 write(6,*)''
   do f=1,nf
-     write(6,'(A,$)')'  Reading file '//trim(fnames(f))
+     write(6,'(A,$)')'  Reading file '//trim(fnames(f))//','
      if(nf.eq.1) write(*,*)
 
      dat(f,:,:) = 0.d0
      open(unit=10,form='formatted',status='old',file=fnames(f))
      rewind 10
      read(10,*)ncols
+     write(6,'(I4,A,$)')ncols,' columns.'
      do j=1,nn
         read(10,*,err=12,end=11) (dat(f,i,j),i=1,ncols)
         !dat(f,1,j) = j

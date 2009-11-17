@@ -1,6 +1,19 @@
 !From a .plt? file, or a series of plot files, select the models that fulfill certain conditions and write them to a new file
 !Use this on a grid of models, e.g. to pick out the models that fit V = 10+-1 and B-V = 1.1+-0.1
 !July 2007
+!
+!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-tools package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 program selplt
   use constants
