@@ -624,7 +624,7 @@ program plotplt
   call pgswin(xmin,xmax,ymin,ymax)
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   if(plot.eq.7) then
-     write(title1,'(A5,ES12.4,3(A,F6.2),A,F7.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
+     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else
      if(plot.ne.9) call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
