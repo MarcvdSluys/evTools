@@ -23,9 +23,10 @@ program findplt
   integer, parameter :: nn=30000,nnn=100,ny=18
   real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
   integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt,io
-  character :: findfile*20,fname*99,arg*99,tmpstr*10
+  character :: findfile*99,fname*99,arg*99,tmpstr*10
   
   call setconstants()
+  
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
@@ -38,12 +39,14 @@ program findplt
      write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
+  
   !Read the filename from the command line if any, search the current directory otherwise
   narg = iargc()
   if(narg.lt.3.or.narg.gt.4) then
-     write(6,'(A)')'Usage:  FINDPLT  <file.plt> <variable> <value>'
+     write(6,'(A)')'Usage:  FINDPLT  <file.plt> <variable> <value> [<output>]'
      write(6,'(A)')'        findplt finds every instant where <variable> becomes <value>, using interpolation'
-     write(6,*)''
+     write(6,'(A)')'        <output>: -1: all variables, 0: (default) selection of variables, >0: variable number <output>'
+     write(6,'(A)')''
      write(6,'(A)')'<variable>:                                                              '
      write(6,'(A)')'  1: model        16: Lh           28: Porb        34: Horb              '
      write(6,'(A)')'  2: t            17: Lhe          29: FLR         35: dHorb/dt          '
@@ -98,9 +101,10 @@ program findplt
   glt = 1               !glt determines whether we search the first model where:  x(iin) < xfind (glt=1),   or  x(iin) > xfind (glt=2)
   
   do j=1,nn
-     read(10,10,err=11,end=15) x(1:ncols)
+     !read(10,10,err=11,end=15) x(1:ncols)
      !10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
-10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)
+!10   format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)
+     read(10,*,err=11,end=15) x(1:ncols)
      
      !Calculate colours/magnitude
      x(99) = 1.d0 - x(42) - x(43)                       !Z_surf = 1 - X - Y
@@ -161,7 +165,7 @@ end program findplt
 !************************************************************************      
 subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
   implicit none
-  integer :: n,iin,iout
+  integer :: i,n,iin,iout
   real*8 :: x(n)
   
   if(iout.eq.0) then
@@ -177,8 +181,12 @@ subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
      write(6,'(A10,5x,5A10,3A8,A10)')'Core:','H','He','C','N','O','log Tc','log rho','Mhe'
      write(6,'(15x,5es10.3,3f8.4)')x((/56,57,58,59,60,11,13,5/))
      write(6,*)''
-  else
+  else if(iout.gt.0) then
      write(6,'(70x,2G12.3)')x(iin),x(iout)
+  else !iout.lt.0
+     do i=1,n
+        write(6,'(I6,G12.3)')i,x(i)
+     end do
   end if
   
   

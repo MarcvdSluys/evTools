@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    58: AstroFloyd, 05/01/2010
+      - added convert_initdat.f, plt2dat.f
+      - findplt: read unformatted, allows reading CVS plt output
+    
     56: AstroFloyd, 17/11/2009
       - updated/changed NRF functions to put online
       - added copyright labels
