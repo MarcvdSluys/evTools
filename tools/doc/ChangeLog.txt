@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    59: AstroFloyd, 05/01/2010
+      - fixed small bug in findplt: iout undefined when calling w/o command-line options
+      
     58: AstroFloyd, 05/01/2010
       - added convert_initdat.f, plt2dat.f
       - findplt: read unformatted, allows reading CVS plt output

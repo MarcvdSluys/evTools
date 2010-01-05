@@ -42,6 +42,7 @@ program findplt
   
   !Read the filename from the command line if any, search the current directory otherwise
   narg = iargc()
+  iout = 0
   if(narg.lt.3.or.narg.gt.4) then
      write(6,'(A)')'Usage:  FINDPLT  <file.plt> <variable> <value> [<output>]'
      write(6,'(A)')'        findplt finds every instant where <variable> becomes <value>, using interpolation'
@@ -81,7 +82,6 @@ program findplt
      read(arg,*)iin
      call getarg(3,arg)
      read(arg,*)xfind
-     iout = 0
      if(narg.eq.4) then
         call getarg(4,arg)
         read(arg,*)iout
