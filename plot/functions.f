@@ -454,6 +454,193 @@ end subroutine getpltlabels
 !***********************************************************************
 
 
+
+!***********************************************************************
+subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
+  implicit none
+  integer :: maxi
+  character :: pglabels(maxi)*(*),asclabels(maxi)*(*)
+  
+  pglabels(1) = 'Model'
+  pglabels(2) = 't (yr)'
+  pglabels(3) = '\gDt (yr)'
+  pglabels(4) = 'M (M\d\(2281)\u)'
+  pglabels(5) = 'M\dHe\u (M\d\(2281)\u)'
+  pglabels(6) = 'M\dCO\u (M\d\(2281)\u)'
+  pglabels(7) = 'M\dONe\u (M\d\(2281)\u)'
+  pglabels(8) = 'R (R\d\(2281)\u)'
+  pglabels(9) = 'L (L\d\(2281)\u)'
+  pglabels(10) = 'T\deff\u (K)'
+  pglabels(11) = 'T\dc\u (K)'
+  pglabels(12) = 'T\dmax\u (K)'
+  pglabels(13) = '\gr\dc\u (g cm\u-3\d)'
+  pglabels(14) = '\gr\dTmax\u (g cm\u-3\d)'
+  pglabels(15) = 'U\dbind,env\u (erg)'
+  pglabels(16) = 'L\dH\u (L\d\(2281)\u)'
+  pglabels(17) = 'L\dHe\u (L\d\(2281)\u)'
+  pglabels(18) = 'L\dC\u (L\d\(2281)\u)'
+  pglabels(19) = 'L\d\gn\u (L\d\(2281)\u)'
+  pglabels(20) = 'L\dth\u (L\d\(2281)\u)'
+  pglabels(21) = 'P\drot\u (d)'
+  pglabels(22) = 'K\u2\d'
+  pglabels(23) = 'R\dcz\u'
+  pglabels(24) = 'dR\dcz\u'
+  pglabels(25) = 'T\det\u'
+  pglabels(26) = 'R\dalfven\u'
+  pglabels(27) = 'B\dp\u'
+  pglabels(28) = 'P\dorb\u (d)'
+  pglabels(29) = 'FLR'
+  pglabels(30) = 'F1'
+  pglabels(31) = 'dM (M\d\(2281)\u/yr)'
+  pglabels(32) = 'dM\dwind\u (M\d\(2281)\u/yr)'
+  pglabels(33) = 'dM\dmt\u (M\d\(2281)\u/yr)'
+  pglabels(34) = 'H\dorb\u'
+  pglabels(35) = 'H\dorb\u/dt'
+  pglabels(36) = 'dH\dgw\u/dt'
+  pglabels(37) = 'dH\dwml\u/dt'
+  pglabels(38) = 'dH\ds-o\u/dt'
+  pglabels(39) = 'dH\dmtr\u/dt'
+  pglabels(40) = 'M\dcomp\u'
+  pglabels(41) = 'e'
+  pglabels(42) = 'H\dsurf\u'
+  pglabels(43) = 'He\dsurf\u'
+  pglabels(44) = 'C\dsurf\u'
+  pglabels(45) = 'N\dsurf\u'
+  pglabels(46) = 'O\dsurf\u'
+  pglabels(47) = 'Ne\dsurf\u'
+  pglabels(48) = 'Mg\dsurf\u'
+  pglabels(49) = 'H\dTmax\u'
+  pglabels(50) = 'He\dTmax\u'
+  pglabels(51) = 'C\dTmax\u'
+  pglabels(52) = 'N\dTmax\u'
+  pglabels(53) = 'O\dTmax\u'
+  pglabels(54) = 'Ne\dTmax\u'
+  pglabels(55) = 'Mg\dTmax\u'
+  pglabels(56) = 'H\dcentr\u'
+  pglabels(57) = 'He\dcentr\u'
+  pglabels(58) = 'C\dcentr\u'
+  pglabels(59) = 'N\dcentr\u'
+  pglabels(60) = 'O\dcentr\u'
+  pglabels(61) = 'Ne\dcentr\u'
+  pglabels(62) = 'Mg\dcentr\u'
+  pglabels(71) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
+  pglabels(72) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
+  pglabels(73) = '\gr\davg\u (g cm\u-3\d)'
+  pglabels(74) = 'Q\dconv\u'
+  pglabels(75) = 'Z\dsurf\u'
+  pglabels(76) = '(t\df\u - t)  (yr)'
+  pglabels(77) = 't/t\df\u'
+  pglabels(78) = 'L\dHe\u/L\dH\u'
+  
+  pglabels(81) = 'V'
+  pglabels(82) = 'U-B'
+  pglabels(83) = 'B-V'
+  pglabels(84) = 'V-R'
+  pglabels(85) = 'R-I'
+  pglabels(86) = 'U-V'
+  pglabels(87) = 'V-I'
+  
+  pglabels(88) = 'k\u2\dR\u2\d'
+  pglabels(89) = 'M\denv\u'        !M_env
+  pglabels(90) = '\(2137)\denv\u'  !lambda_env
+  pglabels(91) = 'Reimers ratio'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  
+  
+  
+  
+  
+  asclabels(1) = 'model'
+  asclabels(2) = 'time'
+  asclabels(3) = 'dtime'
+  asclabels(4) = 'mass'
+  asclabels(5) = 'Mhe'
+  asclabels(6) = 'Mco'
+  asclabels(7) = 'Mone'
+  asclabels(8) = 'radius'
+  asclabels(9) = 'luminosity'
+  asclabels(10) = 'Teff'
+  asclabels(11) = 'Tc'
+  asclabels(12) = 'Tmax'
+  asclabels(13) = 'cendens'
+  asclabels(14) = 'Tmaxdens'
+  asclabels(15) = 'Ebind'
+  asclabels(16) = 'LH'
+  asclabels(17) = 'LHe'
+  asclabels(18) = 'LC'
+  asclabels(19) = 'L\gn'
+  asclabels(20) = 'Lth'
+  asclabels(21) = 'Prot'
+  asclabels(22) = 'K2'
+  asclabels(23) = 'Rcz'
+  asclabels(24) = 'dRcz'
+  asclabels(25) = 'Tet'
+  asclabels(26) = 'Ralfven'
+  asclabels(27) = 'Bp'
+  asclabels(28) = 'Porb'
+  asclabels(29) = 'FLR'
+  asclabels(30) = 'F1'
+  asclabels(31) = 'dM'
+  asclabels(32) = 'dMwind'
+  asclabels(33) = 'dMmt'
+  asclabels(34) = 'Horb'
+  asclabels(35) = 'Horbdt'
+  asclabels(36) = 'dHgwdt'
+  asclabels(37) = 'dHwmldt'
+  asclabels(38) = 'dHsodt'
+  asclabels(39) = 'dHmtrdt'
+  asclabels(40) = 'Mcomp'
+  asclabels(41) = 'e'
+  asclabels(42) = 'Hsurf'
+  asclabels(43) = 'Hesurf'
+  asclabels(44) = 'Csurf'
+  asclabels(45) = 'Nsurf'
+  asclabels(46) = 'Osurf'
+  asclabels(47) = 'Nesurf'
+  asclabels(48) = 'Mgsurf'
+  asclabels(49) = 'HTmax'
+  asclabels(50) = 'HeTmax'
+  asclabels(51) = 'CTmax'
+  asclabels(52) = 'NTmax'
+  asclabels(53) = 'OTmax'
+  asclabels(54) = 'NeTmax'
+  asclabels(55) = 'MgTmax'
+  asclabels(56) = 'Hcentr'
+  asclabels(57) = 'Hecentr'
+  asclabels(58) = 'Ccentr'
+  asclabels(59) = 'Ncentr'
+  asclabels(60) = 'Ocentr'
+  asclabels(61) = 'Necentr'
+  asclabels(62) = 'Mgcentr'
+  asclabels(71) = 'MHe-MCO'
+  asclabels(72) = 'M.I.'
+  asclabels(73) = 'avgdens'
+  asclabels(74) = 'Qconv'
+  asclabels(75) = 'Zsurf'
+  asclabels(76) = 'tf-t'
+  asclabels(77) = 'ttf'
+  asclabels(78) = 'LHeLH'
+  
+  asclabels(81) = 'V'
+  asclabels(82) = 'U-B'
+  asclabels(83) = 'B-V'
+  asclabels(84) = 'V-R'
+  asclabels(85) = 'R-I'
+  asclabels(86) = 'U-V'
+  asclabels(87) = 'V-I'
+  
+  asclabels(88) = 'k2R2'
+  asclabels(89) = 'Menv'        !M_env
+  asclabels(90) = 'lambda'  !lambda_env
+  asclabels(91) = 'Reimersrat'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  
+  
+  
+  
+  
+end subroutine set_plotpltn_labels
+!***********************************************************************
+
+
 !***********************************************************************
 !Print the list of variables in a *.plt? file to screen, for input menu
 subroutine printpltvarlist
@@ -644,14 +831,22 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      end do !i
   end do !j0
   
+  
+  
   !************************************************************************      
-  !***   CREATE EXTRA PLOT VARIABLES
+  !***   CHANGE EXISTING PLOT VARIABLES
   !************************************************************************      
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
   dat(15,:) = dat(15,:)*m0*1.d-40                               !Ubind in 10^40 ergs
   
   dat(42:62,:) = max(dat(42:62,:),1.e-10)                       !Abundances: limit them to >10^-10  -  isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  
+  
+  
+  !************************************************************************      
+  !***   CREATE EXTRA PLOT VARIABLES
+  !************************************************************************      
   
   do i=1,n
      dat(82,i) = dat(5,i)-dat(6,i)                              !Intershell mass
@@ -1395,5 +1590,31 @@ function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UT
 end function time_stamp
 !************************************************************************
 
+
+
+!************************************************************************************************************************************
+subroutine set_PGPS_title(PSfile,PStitle)  !Set the title in a Postscript file generated by PGPlot
+  implicit none
+  integer :: status,system
+  character :: PSfile*(*),PStitle*(*),tempfile*99
+  
+  tempfile = 'temp_PGPS_file.eps'
+  
+  status = system("sed -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile)//" > "//trim(tempfile))
+  if(status.eq.0) then
+     status = system('mv -f '//trim(tempfile)//' '//trim(PSfile))
+  else
+     status = system('rm -f '//trim(tempfile))
+  end if
+  
+  status = system("sed -e 's/For: AstroFloyd/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile)//" > "//trim(tempfile))
+  if(status.eq.0) then
+     status = system('mv -f '//trim(tempfile)//' '//trim(PSfile))
+  else
+     status = system('rm -f '//trim(tempfile))
+  end if
+  
+end subroutine set_PGPS_title
+!************************************************************************************************************************************
 
 

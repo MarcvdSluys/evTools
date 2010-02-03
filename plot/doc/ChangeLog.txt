@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    60: AstroFloyd, 02/02/2010
+      - plotpltn:
+        - moved label definition to subroutine set_plotpltn_labels in functions.f
+	- added ascii labels to pgplot labels
+	- added var 91: Reimers ratio
+	- rename file and plot PS-title to include variable names with set_PGPS_title
+    
     56: AstroFloyd, 17/11/2009
       - updated/changed NRF functions to put online
       - added copyright labels

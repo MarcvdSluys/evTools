@@ -33,7 +33,7 @@ program plotpltn
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10
-  character :: rng,log,labels(100)*45,lx*45,ly*45,title*100
+  character :: rng,log,pglabels(100)*99,pglx*99,pgly*99,asclabels(100)*99,asclx*99,ascly*99,title*100,pstitle*99
   logical :: ex
   
   call setconstants()
@@ -88,89 +88,8 @@ program plotpltn
   lgx = 0
   lgy = 0
   
-  labels(1) = 'Model'
-  labels(2) = 't (yr)'
-  labels(3) = '\gDt (yr)'
-  labels(4) = 'M (M\d\(2281)\u)'
-  labels(5) = 'M\dHe\u (M\d\(2281)\u)'
-  labels(6) = 'M\dCO\u (M\d\(2281)\u)'
-  labels(7) = 'M\dONe\u (M\d\(2281)\u)'
-  labels(8) = 'R (R\d\(2281)\u)'
-  labels(9) = 'L (L\d\(2281)\u)'
-  labels(10) = 'T\deff\u (K)'
-  labels(11) = 'T\dc\u (K)'
-  labels(12) = 'T\dmax\u (K)'
-  labels(13) = '\gr\dc\u (g cm\u-3\d)'
-  labels(14) = '\gr\dTmax\u (g cm\u-3\d)'
-  labels(15) = 'U\dbind,env\u (erg)'
-  labels(16) = 'L\dH\u (L\d\(2281)\u)'
-  labels(17) = 'L\dHe\u (L\d\(2281)\u)'
-  labels(18) = 'L\dC\u (L\d\(2281)\u)'
-  labels(19) = 'L\d\gn\u (L\d\(2281)\u)'
-  labels(20) = 'L\dth\u (L\d\(2281)\u)'
-  labels(21) = 'P\drot\u (d)'
-  labels(22) = 'K\u2\d'
-  labels(23) = 'R\dcz\u'
-  labels(24) = 'dR\dcz\u'
-  labels(25) = 'T\det\u'
-  labels(26) = 'R\dalfven\u'
-  labels(27) = 'B\dp\u'
-  labels(28) = 'P\dorb\u (d)'
-  labels(29) = 'FLR'
-  labels(30) = 'F1'
-  labels(31) = 'dM (M\d\(2281)\u/yr)'
-  labels(32) = 'dM\dwind\u (M\d\(2281)\u/yr)'
-  labels(33) = 'dM\dmt\u (M\d\(2281)\u/yr)'
-  labels(34) = 'H\dorb\u'
-  labels(35) = 'H\dorb\u/dt'
-  labels(36) = 'dH\dgw\u/dt'
-  labels(37) = 'dH\dwml\u/dt'
-  labels(38) = 'dH\ds-o\u/dt'
-  labels(39) = 'dH\dmtr\u/dt'
-  labels(40) = 'M\dcomp\u'
-  labels(41) = 'e'
-  labels(42) = 'H\dsurf\u'
-  labels(43) = 'He\dsurf\u'
-  labels(44) = 'C\dsurf\u'
-  labels(45) = 'N\dsurf\u'
-  labels(46) = 'O\dsurf\u'
-  labels(47) = 'Ne\dsurf\u'
-  labels(48) = 'Mg\dsurf\u'
-  labels(49) = 'H\dTmax\u'
-  labels(50) = 'He\dTmax\u'
-  labels(51) = 'C\dTmax\u'
-  labels(52) = 'N\dTmax\u'
-  labels(53) = 'O\dTmax\u'
-  labels(54) = 'Ne\dTmax\u'
-  labels(55) = 'Mg\dTmax\u'
-  labels(56) = 'H\dcentr\u'
-  labels(57) = 'He\dcentr\u'
-  labels(58) = 'C\dcentr\u'
-  labels(59) = 'N\dcentr\u'
-  labels(60) = 'O\dcentr\u'
-  labels(61) = 'Ne\dcentr\u'
-  labels(62) = 'Mg\dcentr\u'
-  labels(71) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
-  labels(72) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
-  labels(73) = '\gr\davg\u (g cm\u-3\d)'
-  labels(74) = 'Q\dconv\u'
-  labels(75) = 'Z\dsurf\u'
-  labels(76) = '(t\df\u - t)  (yr)'
-  labels(77) = 't/t\df\u'
-  labels(78) = 'L\dHe\u/L\dH\u'
-
-  labels(81) = 'V'
-  labels(82) = 'U-B'
-  labels(83) = 'B-V'
-  labels(84) = 'V-R'
-  labels(85) = 'R-I'
-  labels(86) = 'U-V'
-  labels(87) = 'V-I'
+  call set_plotpltn_labels(pglabels,asclabels,100)
   
-  labels(88) = 'k\u2\dR\u2\d'
-  labels(89) = 'M\denv\u'        !M_env
-  labels(90) = '\(2137)\denv\u'  !lambda_env
-
   i = system('pwd > tmppwd.txt')
   open(unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
@@ -297,6 +216,14 @@ program plotpltn
         if(dabs(dat(f,5,i)).lt.1.d-29) dat(f,90,i) = 0.d0  !If there's no He core mass, there's no lambda
         !write(*,'(I6,9ES20.5)')i,dat(f,4:5,i),dat(f,83,i),dat(f,15,i),dat(f,8,i),dat(f,90,i)
      end do
+     
+     !91: Ratio of the two terms in the "Reimers-like" mass-loss prescription in the Eggleton code:
+     do i=1,n(f)
+        if(dat(f,15,i).gt.0.d0) dat(f,91,i) = 3.29d-5*dat(f,4,i)/(dat(f,15,i)/1.d10)  !3.29e-5 * (M/Mo) * (Ebind/10^50 erg)^-1
+     end do
+     do i=n(f)-1,1,-1
+        if(dat(f,91,i).eq.0.d0) dat(f,91,i) = dat(f,91,i+1)
+     end do
   end do !f, file
   
   
@@ -332,7 +259,7 @@ program plotpltn
      write(6,'(A70)')' 73: Rho_avg                   83: B-V   88: (kR)^2                   '
      write(6,'(A70)')' 74: Qconv                     84: V-I   89: M_env                    '
      write(6,'(A70)')' 75: Zsurf                     85: I-R   90: lambda_env               '
-     write(6,'(A70)')' 76: t_f-t                                                            '
+     write(6,'(A70)')' 76: t_f-t                               91: Reimers ratio            '
      write(6,'(A70)')' 77: t/t_f                                                            '
      write(6,'(A70)')' 78: Lhe/Lh                                                           '
      write(6,'(A70)')'                                                                      '
@@ -341,7 +268,7 @@ program plotpltn
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.101) goto 35
      if(vx.gt.78.and.vx.lt.81) goto 35
-     if(vx.gt.90.and.vx.lt.101) goto 35
+     if(vx.gt.91.and.vx.lt.101) goto 35
   end if   !if(plot.ne.6) then   
   
   
@@ -350,10 +277,10 @@ program plotpltn
   if(hrd.eq.1) goto 50
   
   if(plot.lt.2) then      
-36   write(6,'(A,$)')'  Choose the Y-axis variable (1-90): '
+36   write(6,'(A,$)')'  Choose the Y-axis variable (1-91): '
      read*,vy
      if(vy.eq.0) goto 9999
-     if(vy.lt.0.or.vy.gt.90) goto 36
+     if(vy.lt.0.or.vy.gt.91) goto 36
      if(vy.gt.78.and.vy.lt.81) goto 36
   end if   !if(plot.lt.2) then   
   
@@ -383,8 +310,10 @@ program plotpltn
   if(log.eq.'y'.or.log.eq.'b') lgy = 1
   
   
-  lx = labels(vx)
-  ly = labels(vy)
+  pglx = pglabels(vx)
+  pgly = pglabels(vy)
+  asclx = asclabels(vx)
+  ascly = asclabels(vy)
   
   exclx = 0
   if(lgx.eq.1) then
@@ -397,7 +326,8 @@ program plotpltn
         xx(f,1:n(f)) = log10(abs(xx(f,1:n(f)))+minx(f)*1.e-3)
         if(abs(minx(f)-1.e33).lt.1e32) exclx(f) = 1  !Exclude it in determining ranges
      end do
-     lx = trim('log '//lx)
+     pglx = 'log '//trim(pglx)
+     asclx = 'log'//trim(asclx)
   end if
   excly = 0
   if(lgy.eq.1) then
@@ -410,14 +340,18 @@ program plotpltn
         yy(f,1:n(f)) = log10(abs(yy(f,1:n(f)))+miny(f)*1.e-3)
         if(abs(miny(f)-1.e33).lt.1e32) excly(f) = 1  !Exclude it in determining ranges
      end do
-     ly = trim('log '//ly)
+     pgly = 'log '//trim(pgly)
+     ascly = 'log'//trim(ascly)
   end if
+  
   
 50 if(hrd.eq.1) then
      vx = 10
      vy = 9
-     lx = trim('log '//labels(vx))
-     ly = trim('log '//labels(vy))
+     pglx = 'log '//trim(pglabels(vx))
+     pgly = 'log '//trim(pglabels(vy))
+     asclx = 'log'//trim(asclabels(vx))
+     ascly = 'log'//trim(asclabels(vy))
 
      do f=1,nf
         xx(f,1:n(f)) = real(dlog10(abs(dat(f,vx,1:n(f)))))
@@ -584,8 +518,8 @@ program plotpltn
   end if
   
   
-  call pgscf(1)
-  if(os.eq.2.or.plot.eq.8) call pgscf(2)
+  call pgscf(1)  !'Arial'
+  !if(os.eq.2.or.plot.eq.8) call pgscf(2)  !'Roman'
   if(prlegend.eq.0) then
      call pgsvp(0.06,0.96,0.07,0.96)
   else  !Make room for 'legend'
@@ -600,8 +534,8 @@ program plotpltn
   end if
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   if(prtitle.eq.1) call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:100))//'/')
-  call pgmtxt('B',2.4,0.5,0.5,lx)
-  call pgmtxt('L',2.0,0.5,0.5,ly)
+  call pgmtxt('B',2.4,0.5,0.5,trim(pglx))
+  call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
   
   !Plot lines of constant R in HRD
   call pgsch(0.8)
@@ -662,11 +596,16 @@ program plotpltn
   if(plot.eq.8) then
      call pgend
      ex = .true.
+     pstitle = 'PlotPltN output: '//trim(asclx)//' vs. '//trim(ascly)//'.'
      i = 1
      do while(ex)
-        write(psname,'(A9,I3.3,A4)')'plot_pltn_',i,'.eps'
+        !write(psname,'(A,I3.3,A)')'plot_pltn_',i,'.eps'
+        write(psname,'(A,I3.3,A)')'plot_pltn__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
         inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
-        if(.not.ex) j = system('mv -f plot_pltn_000.eps '//trim(psname))
+        if(.not.ex) then
+           j = system('mv -f plot_pltn_000.eps '//trim(psname))
+           call set_PGPS_title(trim(psname),trim(pstitle))
+        end if
         i = i+1
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
