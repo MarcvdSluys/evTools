@@ -87,8 +87,8 @@ end subroutine plotzams
 !Make a convection plot from the data in a *.plt? file
 subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   implicit none
-  integer :: nn,nvar,n,nl, nhp,hp(1000),  i,j
-  integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
+  integer :: nn,nvar,n,nl, nhp,hp(1000),  i,j,ci0,lw0
+  integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch,ch0
   real*8 :: dat(nvar,nn)
   real :: xx(nn),xx2(2),yy(nl,nn),y(nn),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),ymin,ymax,dat1(nn)
   character :: hlbls*5,hlp,hlbl
@@ -97,6 +97,12 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   plsmcv = 1  !Plot semiconvection
   plnuc  = 1  !Plot nuclear burning regions
   plcb   = 1  !Plot core boundaries
+  
+  !Get original styles and colours
+  call pgqci(ci0)
+  call pgqlw(lw0)
+  call pgqch(ch0)
+  
   
   call pgslw(3)
   y(1:n) = yy(1,1:n)
@@ -394,6 +400,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !convection bounds
   !   end do
   !end do !j
+  
   call pgsci(2)
   if(plnuc.eq.1) then
      do j=75,80
@@ -403,27 +410,27 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
      end do !j
   end if
   
+  !Plot core boundaries:
   if(plcb.eq.1) then
      call pgslw(3)
      call pgsls(1)
      do j=5,7 !core masses
         call pgsci(j-1)
-        dat1(1:n) = real(dat(j,1:n))
-        call pgline(n,xx(1:n),dat1(1:n))
+        do i=1,n-1
+           dat1(1:2) = real(dat(j,i:i+1))
+           if(maxval(dat1(1:2)).gt.1.e-10) call pgline(2,xx(i:i+1),dat1(1:2))  !Only plot when one of them != 0
+        end do
      end do !j
-     
-     call pgslw(4)
-     call pgsls(1)
-     call pgsci(0)
-     xx2 = xx((/1,n/))
-     yy2 = (/0.,0./)
-     call pgline(2,xx2,yy2)
   end if
   
-  call pgsci(1)
-  call pgslw(1)
-  call pgsch(1.)
-  call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
+  
+  !Set original styles and colours:
+  call pgsci(ci0)
+  call pgslw(lw0)
+  call pgsch(ch0)
+  
+  !Replot axes:
+  call pgbox('BCTS',0.0,0,'BCTS',0.0,0)
   
 end subroutine pltconvection
 !***********************************************************************

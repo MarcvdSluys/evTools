@@ -575,7 +575,7 @@ program plotplt
      call pgpap(10.,1.)
      call pgslw(5)
      sch = 1.5
-  else
+  else !plot.ne.9
      if(plot.eq.7) call pgend  !Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
         io = 0
@@ -602,9 +602,9 @@ program plotplt
         call pgrect(-2.,2.,-2.,2.)
         call pgsci(1)
      end if
-  end if
+  end if !plot.ne.9
   
-  if(whitebg.eq.1.and.plot.ne.8) then     !Create a white background; swap black (ci=0) and white (ci=1)
+  if(whitebg.eq.1.and.plot.ne.9) then     !Create a white background; swap black (ci=0) and white (ci=1)
      call pgscr(0,1.,1.,1.)  !Repeat this, to make it work for AquaTerm, for which it was designed
      call pgscr(1,0.,0.,0.)
      call pgsci(1)
@@ -619,15 +619,18 @@ program plotplt
   call pgscf(1)
   !if(os.eq.2.or.plot.eq.9) call pgscf(2)
   call pgsch(sch)
-  call pgsvp(0.06,0.95,0.07,0.96)
-  if(plot.eq.9) call pgsvp(0.10,0.95,0.12,0.95)
+  if(plot.eq.9) then
+     call pgsvp(0.10,0.95,0.12,0.95)
+  else
+     call pgsvp(0.06,0.95,0.07,0.96)
+  end if
   call pgswin(xmin,xmax,ymin,ymax)
   call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
   if(plot.eq.7) then
      write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
-  else
-     if(plot.ne.9) call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
+  else if(plot.ne.9) then
+     call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
   end if
   call pgmtxt('B',2.4,0.5,0.5,trim(lx))
   call pgmtxt('L',2.0,0.5,0.5,trim(ly))
@@ -680,7 +683,7 @@ program plotplt
   
   if(conv.eq.1) then
      call pgsci(1)
-     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot
+     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
      call pgsci(2)
   end if
   
@@ -711,9 +714,9 @@ program plotplt
      call pgline(n,xx(1:n),log10(real(dat(38,1:n))))
      call pgsls(1)
   end if
-   
+  
   call pgsci(1)
-     
+  
   if(plot.eq.9) then
      call pgend
      ex = .true.
@@ -771,6 +774,7 @@ program plotplt
   if(plot.lt.0.or.plot.gt.11) goto 900
   
   if(plot.ne.4.and.plot.ne.10) call pgend
+  
   if(plot.eq.1) goto 30
   if(plot.eq.2) goto 37
   if(plot.eq.3) goto 70
