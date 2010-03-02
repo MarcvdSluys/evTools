@@ -40,8 +40,9 @@ module constants
   real*8 :: pi,tpi,pi2,c3rd
   real*8 :: l0,r0,m0,g,c,day,yr,km
   real*8 :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
-  character :: homedir*99
+  character :: homedir*99,workdir*99,username*99,userID*9,hostname*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
+  logical :: student_mode
 end module constants
 !************************************************************************
 
@@ -77,7 +78,11 @@ subroutine setconstants
   a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
   sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
-  call getenv('HOME',homedir) !Set homedir = $HOME (the environment variable)
+  call getenv('HOME',homedir)       !Set homedir  = $HOME (the environment variable)
+  call getenv('PWD',workdir)        !Set workdir  = $PWD
+  call getenv('HOSTNAME',hostname)  !Set hostname = $HOSTNAME  !Apparently not always exported
+  call getenv('USER',username)      !Set username = $USER
+  call getenv('UID',userid)         !Set userid   = $UID
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)

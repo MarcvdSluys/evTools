@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    62: AstroFloyd, 02/03/2010
+     - plotpltn: plot x on log scale iso log(x)
+     - read some more environment variables
+    
     61: AstroFloyd, 08/02/2010
      - plotplt: fixed bug in and enhanced Kippenhahn diagram
     

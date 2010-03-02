@@ -32,7 +32,7 @@ program plotpltn
   integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
-  character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10
+  character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10,boxx*19,boxy*19
   character :: rng,log,pglabels(100)*99,pglx*99,pgly*99,asclabels(100)*99,asclx*99,ascly*99,title*100,pstitle*99
   logical :: ex
   
@@ -326,8 +326,6 @@ program plotpltn
         xx(f,1:n(f)) = log10(abs(xx(f,1:n(f)))+minx(f)*1.e-3)
         if(abs(minx(f)-1.e33).lt.1e32) exclx(f) = 1  !Exclude it in determining ranges
      end do
-     pglx = 'log '//trim(pglx)
-     asclx = 'log'//trim(asclx)
   end if
   excly = 0
   if(lgy.eq.1) then
@@ -340,19 +338,19 @@ program plotpltn
         yy(f,1:n(f)) = log10(abs(yy(f,1:n(f)))+miny(f)*1.e-3)
         if(abs(miny(f)-1.e33).lt.1e32) excly(f) = 1  !Exclude it in determining ranges
      end do
-     pgly = 'log '//trim(pgly)
-     ascly = 'log'//trim(ascly)
   end if
   
   
 50 if(hrd.eq.1) then
      vx = 10
      vy = 9
-     pglx = 'log '//trim(pglabels(vx))
-     pgly = 'log '//trim(pglabels(vy))
-     asclx = 'log'//trim(asclabels(vx))
-     ascly = 'log'//trim(asclabels(vy))
-
+     pglx = trim(pglabels(vx))
+     pgly = trim(pglabels(vy))
+     asclx = trim(asclabels(vx))
+     ascly = trim(asclabels(vy))
+     lgx = 1
+     lgy = 1
+     
      do f=1,nf
         xx(f,1:n(f)) = real(dlog10(abs(dat(f,vx,1:n(f)))))
         yy(f,1:n(f)) = real(dlog10(abs(dat(f,vy,1:n(f)))))
@@ -361,33 +359,31 @@ program plotpltn
   
   
   !Find plot range
-  if(plot.ne.6) then
-     xmin = 1.e33
-     xmax = -1.e33
-     do f=1,nf
-        if(exclx(f).eq.1) cycle
-        xmin = min(minval(xx(f,1:n(f))),xmin)
-        xmax = max(maxval(xx(f,1:n(f))),xmax)
-     end do
-     ymin = 1.e33
-     ymax = -1.e33
-     do f=1,nf
-        if(excly(f).eq.1) cycle
-        ymin = min(minval(yy(f,1:n(f))),ymin)
-        ymax = max(maxval(yy(f,1:n(f))),ymax)
-     end do
-     
-     
-     
-     !Limit ranges for logged axes like Mdot
-     if(lgx.eq.1) then
-        if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
-     end if
-     if(lgy.eq.1) then
-        if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
-        if(vy.ge.35.and.vy.le.39.and.ymin.lt.-18.) ymin = -18.
-        if(vy.ge.35.and.vy.le.39.and.ymax.gt.-12.) ymax = -12.
-     end if
+  xmin = 1.e33
+  xmax = -1.e33
+  do f=1,nf
+     if(exclx(f).eq.1) cycle
+     xmin = min(minval(xx(f,1:n(f))),xmin)
+     xmax = max(maxval(xx(f,1:n(f))),xmax)
+  end do
+  ymin = 1.e33
+  ymax = -1.e33
+  do f=1,nf
+     if(excly(f).eq.1) cycle
+     ymin = min(minval(yy(f,1:n(f))),ymin)
+     ymax = max(maxval(yy(f,1:n(f))),ymax)
+  end do
+  
+  
+  
+  !Limit ranges for logged axes like Mdot
+  if(lgx.eq.1) then
+     if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
+  end if
+  if(lgy.eq.1) then
+     if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
+     if(vy.ge.35.and.vy.le.39.and.ymin.lt.-18.) ymin = -18.
+     if(vy.ge.35.and.vy.le.39.and.ymax.gt.-12.) ymax = -12.
   end if
   
   
@@ -489,7 +485,8 @@ program plotpltn
   
   if(plot.eq.8) then
      call pgbegin(1,'plot_pltn_000.eps/cps',1,1)
-     call pgpap(11.0,0.70) !Make it fit on letter
+     !call pgpap(11.0,0.70) !Make it fit on letter
+     call pgpap(10.0,1.0)   !Talk,poster?
   else
      if(os.eq.1) call pgbegin(1,'/xserve',1,1)
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)                !Use Aquaterm on MacOSX
@@ -521,9 +518,9 @@ program plotpltn
   call pgscf(1)  !'Arial'
   !if(os.eq.2.or.plot.eq.8) call pgscf(2)  !'Roman'
   if(prlegend.eq.0) then
-     call pgsvp(0.06,0.96,0.07,0.96)
+     call pgsvp(0.10,0.96,0.07,0.96)
   else  !Make room for 'legend'
-     call pgsvp(0.06,0.90,0.07,0.96)
+     call pgsvp(0.10,0.90,0.07,0.96)
   end if
   if(hrd.eq.1.and.plhrdrad.eq.1) then  !Make room for Radius labels
      dx = (xmax - xmin)*0.02
@@ -532,7 +529,12 @@ program plotpltn
   else
      call pgswin(xmin,xmax,ymin,ymax)
   end if
-  call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
+  
+  boxx = 'BCNTS'
+  boxy = 'BCNTS'
+  if(lgx.ge.1) boxx = 'BCLNTS'
+  if(lgy.ge.1) boxy = 'BCLNTS'
+  call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   if(prtitle.eq.1) call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:100))//'/')
   call pgmtxt('B',2.4,0.5,0.5,trim(pglx))
   call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
@@ -599,8 +601,8 @@ program plotpltn
      pstitle = 'PlotPltN output: '//trim(asclx)//' vs. '//trim(ascly)//'.'
      i = 1
      do while(ex)
-        !write(psname,'(A,I3.3,A)')'plot_pltn_',i,'.eps'
         write(psname,'(A,I3.3,A)')'plot_pltn__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
+        if(hrd.ge.1) write(psname,'(A,I3.3,A)')'plot_pltn__HRD_',i,'.eps'
         inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
         if(.not.ex) then
            j = system('mv -f plot_pltn_000.eps '//trim(psname))
