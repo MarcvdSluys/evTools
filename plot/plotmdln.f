@@ -79,7 +79,7 @@ program plotmdln
   x=system('rm tmppwd.txt')
 
   !Search for input file in current dir
-  fname=findfile('*.mdl*',6)
+  fname=findfile('*.mdl*')
 
 
 

@@ -35,7 +35,7 @@ program plotplt
   real :: sch
   character :: findfile*99,fname*99,psname*99
   character :: rng,log,hlp,hlp1,hlbl,hlbls*5,lstr(6)*11
-  character :: abstr(7)*2,xwin*19,tmpstr
+  character :: abstr(7)*2,xwin*19,tmpstr,boxx*19,boxy*19
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
   logical :: ex
   
@@ -85,7 +85,7 @@ program plotplt
   if(iargc().eq.1.and.plot.eq.0) then
      call getarg(1,fname)
   else
-     fname=findfile('*.plt*',6) !Match string and its length
+     fname=findfile('*.plt*') !Match string
      if(fname(1:10).eq.'          ') goto 9999
   end if
   plot = 1
@@ -141,8 +141,8 @@ program plotplt
      hrd = 1
      xx = real(dlog10(abs(dat(10,1:nn))))
      yy(1,1:n) = real(dlog10(abs(dat(9,1:nn))))
-     lx = trim('log '//labels(10))
-     ly = trim('log '//labels(9))
+     lx = trim(labels(10))
+     ly = trim(labels(9))
      vy = 0
      lgx = 1
      lgy = 1
@@ -249,7 +249,6 @@ program plotplt
         if(abs(xx(j)).lt.minx.and.abs(xx(j)).ne.0.) minx = abs(xx(j))
      end do
      xx(1:n) = log10(abs(xx(1:n))+minx*1.e-3)
-     lx = trim('log '//lx)
   end if
   if(dhdt.eq.1) lgy = 1
   excly = 0
@@ -263,7 +262,6 @@ program plotplt
         yy(i,1:n) = log10(abs(yy(i,1:n))+miny(i)*1.e-3)
         if(abs(miny(i)-1.e33).lt.1e32) excly(i) = 1  !Exclude it in determining ranges
      end do
-     ly = trim('log '//ly)
   end if
   
 50 continue !HRD   
@@ -572,7 +570,11 @@ program plotplt
         write(0,'(A,/)')'  Error opening postscript file, aborting'
         stop
      end if
-     call pgpap(10.,1.)
+     
+     call pgpap(11.0,0.70) !Make it fit on letter
+     !call pgpap(10.,1.)  !Talk, plot
+     !call pgpap(30.,0.33)  !Talk, plot
+     
      call pgslw(5)
      sch = 1.5
   else !plot.ne.9
@@ -625,7 +627,11 @@ program plotplt
      call pgsvp(0.06,0.95,0.07,0.96)
   end if
   call pgswin(xmin,xmax,ymin,ymax)
-  call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
+  boxx = 'BCNTS'
+  boxy = 'BCNTS'
+  if(lgx.ge.1) boxx = 'BCLNTS'
+  if(lgy.ge.1) boxy = 'BCLNTS'
+  call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   if(plot.eq.7) then
      write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))

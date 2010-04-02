@@ -134,7 +134,7 @@ program plotpltp
   x=system('rm tmppwd.txt')
   
 5 plotagain = 0
-  fname = findfile('*.plt*',6) !Match string and its length
+  fname = findfile('*.plt*') !Match string
   
   write(6,*)''
   write(6,'(A)')'Reading file '//trim(fname)

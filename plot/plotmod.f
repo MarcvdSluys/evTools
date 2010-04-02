@@ -49,7 +49,7 @@ program plotmod
   
   narg = iargc()
   if(narg.eq.0) then  !Search for input file in current dir
-     fname = findfile('*.mod*',6)
+     fname = findfile('*.mod*')
   else if(narg.eq.1) then
      call getarg(1,fname)
   else

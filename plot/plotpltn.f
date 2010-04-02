@@ -105,7 +105,7 @@ program plotpltn
      end do
   end if
   if(nf.eq.0) then
-     call findfiles('*.plt*',6,nff,0,fnames,nf) !Give string length
+     call findfiles('*.plt*',nff,0,fnames,nf)
      if(nf.eq.0) goto 9999
   end if
   if(nf.gt.nff) write(6,'(A,I4)')'  Too many input files.  Maximum is',nff

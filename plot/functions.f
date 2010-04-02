@@ -176,13 +176,13 @@ end function getos
 !***********************************************************************
 
 
-!***********************************************************************
-function findfile(match,len)
+!***********************************************************************************************************************************
+function findfile(match)
   use constants
   implicit none
   integer, parameter :: maxfile=1000
-  integer :: i,k,len,fnum,system
-  character :: match*(len),names(maxfile)*99,findfile*99,fname*99,tempfile*99
+  integer :: i,k,fnum,system
+  character :: match*(*),names(maxfile)*99,findfile*99,fname*99,tempfile*99
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -190,7 +190,7 @@ function findfile(match,len)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
+  i = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  !Shell command to list all the files with the search string and pipe them to a temporary file
   
   k=0
   names = ''
@@ -203,7 +203,7 @@ function findfile(match,len)
   
 100 close(10, status='delete')
   
-  fname=names(1)
+  fname = names(1)
   
   fnum = 1
   if(k.gt.1) then
@@ -222,22 +222,20 @@ function findfile(match,len)
   
   if(k.eq.0.or.fnum.eq.0) then
      fname = ''
-     if(k.eq.0) write(6,'(A)')'  No file found in this directory'
+     !if(k.eq.0) write(6,'(A)')'  No file found in this directory'
   end if
   
-  findfile=fname
+  findfile = fname
   
-  return
 end function findfile
 !***********************************************************************
 
 
 
 !***********************************************************************
-subroutine findfiles(match,len,nff,all,fnames,nf)  
+subroutine findfiles(match,nff,all,fnames,nf)  
   !Input:
   !  match:   search string to match
-  !  len:     length of match
   !  nff:     maximum number of files to return
   !  all:     0-select manually from list, 1-always return all files in list
   !Output:
@@ -246,8 +244,8 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   
   use constants
   implicit none
-  integer :: i,j,k,len,fnum,nf,nff,system,all
-  character :: match*(len),names(nff)*99,fnames(nff)*99,tempfile*99
+  integer :: i,j,k,fnum,nf,nff,system,all
+  character :: match*(*),names(nff)*99,fnames(nff)*99,tempfile*99
   
   if(len_trim(homedir).eq.99) then
      write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -255,7 +253,7 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  i = system('ls '//match(1:len)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
+  i = system('ls '//trim(match)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
   
   do i=1,nff
      names(i)='                                                                                                   '
@@ -308,7 +306,7 @@ subroutine findfiles(match,len,nff,all,fnames,nf)
   
   if(k.eq.0) then
      fnames(1)='                                                                                                   '
-     write(6,'(A)')'  No file found in this directory'
+     !write(6,'(A)')'  No file found in this directory'
      nf = 0
   end if
   
@@ -1515,12 +1513,13 @@ end function rl2p
 
 
 !************************************************************************
-subroutine quit_program(message,len)  !Print a message and quit
+subroutine quit_program(message)  !Print a message and quit
   implicit none
-  character :: message*(len)
+  character :: message*(*)
   integer :: len
   
-  if(len.ge.1.and.len.le.199) write(0,'(/,A)')'  '//trim(message(1:len))
+  len = len_trim(message)
+  if(len.ge.1.and.len.le.199) write(0,'(/,A)')'  '//trim(message)
   write(0,'(A,/)')'  Aborting...'
   stop
 end subroutine quit_program

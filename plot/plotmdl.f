@@ -178,7 +178,7 @@ program plotmdl
   if(iargc().eq.1) then
      call getarg(1,fname)
   else
-     fname=findfile('*.mdl*',6)  !Search for input file in current dir
+     fname=findfile('*.mdl*')  !Search for input file in current dir
   end if
   
   
