@@ -43,7 +43,7 @@ program listmod
      write(6,'(A)')'           syntax:  listmod <filename>'
      write(6,*)''
      write(6,'(A)')"  I'll look in the current directory for a *.mod file..."
-     fname=findfile('*.mod',5)
+     fname=findfile('*.mod')
   end if
   
   

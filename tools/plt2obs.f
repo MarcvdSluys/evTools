@@ -52,8 +52,7 @@ program plt2obs
   
   fname = '                                                                                '
   oname = '                                                       '
-  !fname=findfile('*.plt*',6)
-  call findfiles('*.plt*',6,nff,1,fnames,nf)
+  call findfiles('*.plt*',nff,1,fnames,nf)
   if(nf.eq.0) goto 9999
   
   do f=1,nf

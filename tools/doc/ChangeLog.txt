@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    63: AstroFloyd, 01/04/2010
+      - Removed string length as an argument in findfile(s) and quit_program
+      - selplt.f: sorted Reddy&Lambert data
+      - functions.f: 
+        - get hostname,user,uid from environment
+      	- created set_plotpltn_labels(), set_PGPS_title()
+    
     59: AstroFloyd, 05/01/2010
       - fixed small bug in findplt: iout undefined when calling w/o command-line options
       

@@ -71,7 +71,9 @@ program findplt
      write(6,'(A)')'<value>: value to find for <variable>                                    '
      write(6,'(A)')'                                                                         ' 
      write(6,'(A)')'                                                                         '
-     fname=findfile('*.plt*',6)
+     
+     fname = findfile('*.plt*')
+     
      write(6,'(A27,$)')'Give the variable (1-99): '
      read*,iin
      write(6,'(A17,$)')'Give the value: '

@@ -133,8 +133,6 @@ program listplt
   
   
   
-  !      fname=findfile('*.plt*')
-  
   !************************************************************************
   !***   READ COMMAND LINE VARIABLES
   !************************************************************************
@@ -147,7 +145,7 @@ program listplt
      write(6,'(A)')'    syntax:  listplt <filename>'
      write(6,*)''
      write(6,'(A)')"I'll look in the current directory for a *.plt file..."
-     fname=findfile('*.plt*',6)
+     fname=findfile('*.plt*')
   end if
   
   

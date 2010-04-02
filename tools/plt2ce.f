@@ -23,7 +23,7 @@ program plt2ce
   m0 = 1.9891d33
   r0 = 6.9599d10
   
-  call findfiles('*.plt1',6,nff,1,fnames,nf)  !Use the first nff files
+  call findfiles('*.plt1',nff,1,fnames,nf)  !Use the first nff files
   
   do f=1,nf
      fname = fnames(f)

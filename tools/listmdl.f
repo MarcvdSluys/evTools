@@ -34,9 +34,13 @@ program listmdl
   
   svblk = 0
   
-  !Search for input file in current dir
-  fname = findfile('*.mdl*',6)
-  
+  if(iargc().eq.1) then
+     call getarg(1,fname)
+  else
+     fname = findfile('*.mdl*') !Search for input file in current dir
+     if(len_trim(fname).le.0) call quit_program('No file found in this directory.')
+  end if
+     
   
   
   
