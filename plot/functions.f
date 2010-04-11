@@ -51,8 +51,11 @@ end module constants
 subroutine setconstants
   use constants
   implicit none
-  scrsz=10.8  !Screen dimensions: MacBook, Gentoo
-  scrrat=0.57
+  !scrsz=10.8  !Screen dimensions: MacBook, Gentoo
+  !scrrat=0.57 
+  
+  scrsz=14.406   !Screen dimensions: ThinkPad
+  scrrat=0.5875 
   
   pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
   tpi      =  2*pi
@@ -444,8 +447,9 @@ subroutine getpltlabels(nvar,labels)
   labels(112) = 'q\dcrit\u'       !q_crit; q_1 > q_crit gives dynamical MT (Hurley et al., 2002, Eq.57)
   labels(113) = 'M\dcomp,crit\u'  !M2 < M2,crit gives dynamical MT (Hurley et al., 2002, Eq.57)
   labels(114) = 'v\drot\u (km/s)' !Rotational velocity
+  labels(115) = 'R/R\dZAMS\u'     !Radius over ZAMS radius
   
-  labels(202) = 'dH\dorb\u/dt'
+  labels(203) = 'dH\dorb\u/dt'
   labels(204) = 'dM/dt (M\d\(2281)\u/yr)'
   labels(205) = '\gt (yr)'
   labels(206) = 'L (L\d\(2281)\u)'
@@ -673,7 +677,7 @@ subroutine printpltvarlist
   write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B      112: q_crit               '  
   write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V      113: M2,crit              '
   write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R      114: Vrot                 '
-  write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I                                '
+  write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I      115: R/Rzams              '
   write(6,'(A)'),'   86: Rossby nr            96: Jspin           106: U-V                                '
   write(6,'(A)'),'   87: Pcr (MB)             97: Rho_avg         107: V-I                                '
   write(6,'(A)'),'   88: Sills MB             98: Zsurf                                                   '
@@ -682,8 +686,8 @@ subroutine printpltvarlist
   write(6,'(A)'),'                                                                                        '
   write(6,'(A)'),'  Special plots:                                                                        '
   write(6,'(A)'),'   201: HR Diagram         204: Mdots           207: Surface abundances                 '
-  write(6,'(A)'),"   202: dH/dt's            205: Timescales      208: Tmax abundances                    "
-  write(6,'(A)'),'   203: Convection plot    206: Luminosities    209: Core abundances                    '
+  write(6,'(A)'),'   202: Convection plot    205: Timescales      208: Tmax abundances                    '
+  write(6,'(A)'),"   203: dH/dt's            206: Luminosities    209: Core abundances                    "
   write(6,'(A)'),'                                                                                        '
   write(6,'(A)'),'                                                                                        '
   
@@ -947,11 +951,11 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   end do
   
   dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
-  
+  dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)            !R/Rzams
   
   !Timescales
-  dat(201,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
-  dat(202,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
+  dat(201,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
+  dat(202,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
   dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)                    !Mass transfer
   dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)                     !Gravitational waves
   !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)               !Magnetic braking (Actually SO-coupling!)
@@ -970,7 +974,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      labels(37) = 'dP\dwml\u/dt'
      labels(38) = 'dP\ds-o\u/dt'
      labels(39) = 'dP\dmtr\u/dt'
-     labels(202) = 'dP\dorb\u/dt'
+     labels(203) = 'dP\dorb\u/dt'
      dpdt = 1
   end if
   
@@ -984,7 +988,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      labels(37) = '\gt\dP\dwml\u\u (yr)'
      labels(38) = '\gt\dP\ds-o\u\u (yr)'
      labels(39) = '\gt\dP\dmtr\u\u (yr)'
-     labels(202) = '\gt\dP\dorb\u\u (yr)'
+     labels(203) = '\gt\dP\dorb\u\u (yr)'
      dpdt = 2
   end if
   

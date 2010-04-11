@@ -32,12 +32,13 @@ program plotplt
   integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,whitebg,strmdls(nn)
   integer :: ansi,xwini,pgopen
+  integer :: colours(29),ncolours,col
   real :: sch
   character :: findfile*99,fname*99,psname*99
-  character :: rng,log,hlp,hlp1,hlbl,hlbls*5,lstr(6)*11
-  character :: abstr(7)*2,xwin*19,tmpstr,boxx*19,boxy*19
+  character :: rng,log,hlp,hlp1,hlbl,hlbls*5,leglbl(29)*29
+  character :: xwin*19,tmpstr,boxx*19,boxy*19
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
-  logical :: ex
+  logical :: ex,prleg
   
   !Set constants:
   call setconstants()
@@ -48,6 +49,10 @@ program plotplt
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
   whitebg = 1  !0: black background on screen, 1: white
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
+  
+  !Line colours:
+  ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
+  colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  !Use black as last resort
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
@@ -62,8 +67,7 @@ program plotplt
   
   
   !Labels:
-  lstr = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)  !Line labels for Luminosities plot
-  abstr = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+  prleg = .false.  !Don't print legenda by default
   call getpltlabels(nvar,labels)                                                                  !Get the labels for the plot axes
   
   !Read current path and use it as plot title
@@ -123,7 +127,7 @@ program plotplt
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
      if(vx.gt.62.and.vx.lt.81) goto 35
-     if(vx.gt.114.and.vx.lt.201) goto 35
+     if(vx.gt.115.and.vx.lt.201) goto 35
      
      hrd   = 0
      dhdt  = 0
@@ -150,12 +154,12 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-114, 202-209): '
+36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-115, 202-209): '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.209) goto 36
      if(vy.gt.62.and.vy.lt.81) goto 36
-     if(vy.gt.114.and.vy.lt.202) goto 36
+     if(vy.gt.115.and.vy.lt.202) goto 36
   end if   !if(plot.lt.2) then   
   
   
@@ -168,14 +172,16 @@ program plotplt
      ny = 2
      yy(2,1:n) = real(dat(8,1:n))
   end if
-  if(vy.eq.202) then  !dH/dt
+  if(vy.eq.202.or.conv.eq.1) then  !Convection plot
+     conv = 1
+     vy = 4
+  end if
+  if(vy.eq.203) then  !dH/dt
      dhdt = 1
      ny = 5
      yy(1:5,1:n) = real(dat(35:39,1:n))
-  end if
-  if(vy.eq.203.or.conv.eq.1) then  !Convection plot
-     conv = 1
-     vy = 4
+     leglbl(1:5) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
+     prleg = .true.
   end if
   if(vy.eq.204) then !Mdots
      mdots = 1
@@ -186,28 +192,41 @@ program plotplt
      tscls = 1
      ny = 5
      yy(1:5,1:n) = real(dat(201:205,1:n))
+     leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)  !Line labels for Timescales plot
+     ny = 6
+     yy(6,1:n) = real(dat(85,1:n))
+     leglbl(6) = '\(0645)\ddR/dt\u  '
+     prleg = .true.
   end if
   if(vy.eq.206) then !Luminosities
      lums = 1
      ny = 6
      yy(1,1:n) = real(dat(9,1:n))
      yy(2:6,1:n) = real(dat(16:20,1:n))
+     leglbl(1:ny) = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)  !Line labels for Luminosities plot
+     prleg = .true.
   end if
   
   if(vy.eq.207) then !Surface abundances
      sabs = 1
      ny = 7
-     yy(1:7,1:n) = real(dat(42:48,1:n))
+     yy(1:ny,1:n) = real(dat(42:48,1:n))
+     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+     prleg = .true.
   end if
   if(vy.eq.208) then !Tmax abundances
      tabs = 1
      ny = 7
-     yy(1:7,1:n) = real(dat(49:55,1:n))
+     yy(1:ny,1:n) = real(dat(49:55,1:n))
+     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+     prleg = .true.
   end if
   if(vy.eq.209) then !Core abundances
      cabs = 1
      ny = 7
-     yy(1:7,1:n) = real(dat(56:62,1:n))
+     yy(1:ny,1:n) = real(dat(56:62,1:n))
+     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+     prleg = .true.
   end if
   
   xx = real(dat(vx,1:nn))         
@@ -277,14 +296,14 @@ program plotplt
   end do
   
   if(vx.eq.85) then !R/(dR/dt)
-     if(xmin.lt.1.e6.and.lgx.eq.0) xmin = 1.e6
-     if(xmin.lt.6..and.lgx.eq.1) xmin = 6.
+     if(xmin.lt.1.e4.and.lgx.eq.0) xmin = 1.e4
+     if(xmin.lt.4..and.lgx.eq.1) xmin = 4.
      if(xmax.gt.1.e12.and.lgx.eq.0) xmax = 1.e12
      if(xmax.gt.12..and.lgx.eq.0) xmax = 12.
   end if
   if(vy.eq.85) then !R/(dR/dt)
-     if(ymin.lt.1.e6.and.lgy.eq.0) ymin = 1.e6
-     if(ymin.lt.6..and.lgy.eq.1) ymin = 6.
+     if(ymin.lt.1.e4.and.lgy.eq.0) ymin = 1.e4
+     if(ymin.lt.4..and.lgy.eq.1) ymin = 4.
      if(ymax.gt.1.e12.and.lgy.eq.0) ymax = 1.e12
      if(ymax.gt.12..and.lgy.eq.1) ymax = 12.
   end if
@@ -302,13 +321,14 @@ program plotplt
   if(lgy.eq.1) then
      if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
      if(vy.eq.204.and.ymin.lt.-12.) ymin = -12.
-     if((vy.ge.35.and.vy.le.39).or.vy.eq.202) then
+     if((vy.ge.35.and.vy.le.39).or.vy.eq.203) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
-  if(vy.eq.205.and.lgy.eq.1.and.ymin.lt.4.) ymin = 4.
+  print*,ymin,ymax
+  if(vy.eq.205.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
   if(vy.eq.205.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.88.and.ymin.lt.-20.) ymin = -20.
   
@@ -377,7 +397,7 @@ program plotplt
   if(lgy.eq.1) then
      if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
      if(vy.eq.204.and.ymin.lt.-12.) ymin = -12.
-     if((vy.ge.35.and.vy.le.39).or.vy.eq.202) then
+     if((vy.ge.35.and.vy.le.39).or.vy.eq.203) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
@@ -400,22 +420,22 @@ program plotplt
 100 continue
   if(dhdt.eq.1) then
      write(6,*)''
-     write(6,'(A)')'  White       : total angular momentum loss'
-     write(6,'(A)')'  Red         : gravitational radiation AM loss'
-     write(6,'(A)')'  Green       : Sills MB AM loss (was: wind AM loss)'
-     write(6,'(A)')'  Dark blue   : Rappaport MB AML (was: SO coupling AML)'
-     write(6,'(A)')'  Light blue  : Non-conservative MT AM loss'
+     write(6,'(A)')'  dJ_tot  : total angular-momentum loss'
+     write(6,'(A)')'  dJ_GW   : gravitational-wave AM loss'
+     write(6,'(A)')'  dJ_SMB  : Sills MB AM loss (was: wind AM loss)'
+     write(6,'(A)')'  dJ_RMB  : Rappaport MB AML (was: SO coupling AML)'
+     write(6,'(A)')'  dJ_ML   : non-conservative MT AM loss'
      write(6,*)''
   end if
   
   if(tscls.eq.1) then
-     write(6,*)''
-     write(6,'(A)')' White        : Kelvin-Helmholz timescale'
-     write(6,'(A)')' Red          : nuclear evolution timescale'
-     write(6,'(A)')' Green        : mass loss timescale'
-     write(6,'(A)')' Dark Blue    : gravitational radiation timescale'
-     write(6,'(A)')' Light Blue   : dynamical timescale'
-     write(6,*)''
+     write(6,*)
+     write(6,'(A)')'  tau_nuc  : nuclear evolution timescale'
+     write(6,'(A)')'  tau_th   : Kelvin-Helmholz timescale'
+     write(6,'(A)')'  tau_ML   : mass loss timescale'
+     write(6,'(A)')'  tau_Gw   : gravitational-wave timescale'
+     write(6,'(A)')'  tau_dyn  : dynamical timescale'
+     write(6,*)
   end if
   
   if(conv.eq.1) then
@@ -455,7 +475,7 @@ program plotplt
      read*,hlp
      if(hlp.eq.'Y') hlp='y'
      if(hlp.eq.'N') hlp='n'
-
+     
      if(hlp.eq.'y') then
         hlp1 = 'm'
         write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
@@ -511,7 +531,7 @@ program plotplt
      end if !if(hlp.eq.'y') then
   end if !if(plot.lt.2.or.plot.eq.8) then
   
-
+  
   !Redetermine which structure models were saved after rereading file:
   if(plot.eq.6.or.plot.eq.7.and.hlp.eq.'y'.and.hlp1.eq.'s') then
      !Use saved structure models, store them in hp()
@@ -577,7 +597,9 @@ program plotplt
      
      call pgslw(5)
      sch = 1.5
+     
   else !plot.ne.9
+     
      if(plot.eq.7) call pgend  !Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
         io = 0
@@ -641,9 +663,12 @@ program plotplt
   call pgmtxt('B',2.4,0.5,0.5,trim(lx))
   call pgmtxt('L',2.0,0.5,0.5,trim(ly))
   
+  
+  !Draw curves/points:
   call pgsci(2)
   do i=1,ny
-     call pgsci(i+1)
+     col = colours(mod(i-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+     call pgsci(col)
      !if(ny.eq.1) call pgsci(2)
      yy1(1:n) = yy(i,1:n)
      if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy1(1:n),1)
@@ -652,7 +677,8 @@ program plotplt
   end do
   call pgsci(1)
   
-  !Highlight points
+  
+  !Highlight points:
   call pgsch(1.5*sch)
   call pgsci(2)
   if(hlp.eq.'y') call pgpoint(nhp,xx(hp(1:nhp)),yy(1,hp(1:nhp)),2)
@@ -666,24 +692,19 @@ program plotplt
      call pgsci(1)
   end if !if(hlbl.eq.'y') then
   
-  call pgsch(sch)
-  if(lums.eq.1) then  !Luminosity legenda
-     do j=1,6
-        call pgsci(j+1)
-        call pgmtext('RV',0.5,real(20-j)/20.,0.,lstr(j))
-     end do !j
-     call pgsci(1)
-  end if !if(lums.eq.1)
-  if(sabs+tabs+cabs.gt.0) then  !Abundances legenda
-     do j=1,7
-        call pgsci(j+1)
-        call pgmtext('RV',0.5,real(20-j)/20.,0.,abstr(j))
-     end do !j
-     call pgsci(1)
-  end if !if(sabs+tabs+cabs.gt.1)
-  call pgsch(sch)
   
+  !Print legenda:
+  call pgsch(sch)
+  if(prleg) then
+     do i=1,ny
+        col = colours(mod(i-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+        call pgsci(col)
+        call pgmtext('RV',0.5,real(20-i)/20.,0.,trim(leglbl(i)))
+     end do !i
+     call pgsci(1)
+  end if
   
+  call pgsch(sch)
   
   
   

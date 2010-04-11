@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    66: AstroFloyd, 11/04/2010
+     - plotplt.f:
+       - use proper colours and legenda for multi-variable plots
+       - added variable 115: R/Rzams
+       - swapped vars 202/203 (now convection and dH/dt plots)
+       - set screen dimensions for ThinkPad
+    
     64: AstroFloyd, 01/04/2010
      - remove string length from findfile(s)(), quit_program()
      - plotplt: plot x on log scale iso log(x)

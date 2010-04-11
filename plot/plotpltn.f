@@ -648,7 +648,8 @@ program plotpltn
   end if !if(plot.ne.8) then
   write(6,*)''
   write(6,'(A,$)')'  What do you want to do ?  '
-  read*,plot
+  read(5,*,iostat=io) plot
+  if(io.ne.0) goto 900
   if(plot.lt.0.or.plot.gt.9) goto 900
   
   if(plot.ne.4) call pgend
