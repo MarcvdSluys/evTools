@@ -406,7 +406,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
   implicit none
   real*8 :: dat(nvar,nn)
   integer :: nvar,nn,ncols,nc,nc1,verbose,i,j,n,ver,u
-  character :: fname*99
+  character :: fname*(*)
   
   nc1 = nc !Get rid of 'unused' message
   

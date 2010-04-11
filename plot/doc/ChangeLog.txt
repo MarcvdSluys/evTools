@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    69: AstroFloyd, 11/04/2010
+     - added plotplt_new.f to create a version of plotplt.f that can read multiple
+       files (and will replace plotpltn.f)
+    
     68: AstroFloyd, 11/04/2010
      - moved routines to read plt files from functions.f plt_functions.f
     

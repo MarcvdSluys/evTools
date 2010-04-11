@@ -174,7 +174,6 @@ function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
   close(16, status = 'delete')
   getos = 1 !Linux
   if(ostype(1:5).eq.'Darwi') getos = 2 !MacOSX
-  return
 end function getos
 !***********************************************************************
 
@@ -314,7 +313,7 @@ subroutine findfiles(match,nff,all,fnames,nf)
   end if
   
 200 continue
-  return
+  
 end subroutine findfiles
 !***********************************************************************
 
@@ -568,7 +567,7 @@ subroutine polint(xa,ya,n,x,y,dy)  !Single precision
      end if
      y = y+dy
   end do
-  return
+  
 end subroutine polint
 !***********************************************************************
 
@@ -616,7 +615,7 @@ subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
      end if
      y = y+dy
   end do
-  return
+  
 end subroutine polintd
 !***********************************************************************
 
