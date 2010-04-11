@@ -23,19 +23,24 @@ program plotplt
   use ubvdata
   
   implicit none
-  integer,parameter :: nn=30000,nvar=299,nc=81,nl=10
-  real*8 :: dat(nvar,nn),d(nvar)
-  real :: xx(nn),yy(nl,nn),yy1(nn),minx,miny(nl),dist,mindist
+  integer,parameter :: nmax=10000,nvar=229,nc=81,nl=10,nfmax=50
+  real*8 :: d(nvar)
+  
+  integer, allocatable :: strmdls(:,:),hp(:,:),nhp(:)
+  real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
+  real*8, allocatable :: dat(:,:,:),datf(:,:)
+  
+  real :: yy1(nmax),minx,dist,mindist
   real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
-  integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
+  integer :: f,nf,i,i0,j,j0,n,vx,vy,plot,ny,drawlines,ver,verbose
   integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
-  integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,whitebg,strmdls(nn)
+  integer :: nt,wait,lums,lgx,lgy,nsel,os,whitebg
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: colours(29),ncolours,col
   real :: sch
-  character :: findfile*99,fname*99,psname*99
+  character :: fname*99,fnames(nfmax)*99,psname*99
   character :: rng,log,hlp,hlp1,hlbl,hlbls*5,leglbl(29)*29
   character :: xwin*19,tmpstr,boxx*19,boxy*19
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
@@ -84,17 +89,31 @@ program plotplt
   end do
   
   
-  !Search for input file in current dir
   plot = 0
   xwini = 1  !Number of X window to try first
 5 continue
-  if(iargc().eq.1.and.plot.eq.0) then
-     call getarg(1,fname)
+  
+  !Search for input files in current dir:
+  nf = iargc()
+  if(nf.ge.1.and.plot.eq.0) then
+     do f=1,nf
+        call getarg(f,fname)
+        fnames(f) = fname
+     end do
   else
-     fname=findfile('*.plt*') !Match string
-     if(fname(1:10).eq.'          ') goto 9999
+     !fname = findfile('*.plt*') !Match string
+     !if(fname(1:10).eq.'          ') goto 9999
+     call findfiles('*.plt*',nfmax,0,fnames,nf)   !all=0
+     if(nf.le.0) goto 9999
   end if
   plot = 1
+  
+  
+  !Allocate arrays:
+  allocate(dat(nf,nvar,nmax), datf(nvar,nmax))
+  allocate(strmdls(nf,nmax))
+  allocate(xx(nf,nmax), yy(nf,nmax), miny(nf), excly(nf))
+  allocate(hp(nf,1000), nhp(nf))
   
   
   !************************************************************************      
@@ -105,15 +124,12 @@ program plotplt
   
   verbose = 1
   if(plot.eq.7) verbose = 0
-  call readplt(10,fname,nn,nvar,nc,verbose,dat,n,ver)  !Use unit 10
-  if(ver.eq.2005) strmdls(:) = nint(dat(83,:)) !Structure model was saved (1) or not (0)
-  
-  
-  !************************************************************************      
-  !***   CHANGE VARIABLES
-  !************************************************************************      
-  
-  call changepltvars(nn,nvar,n,dat,labels,dpdt)  !Change (e.g. de-log) and add plot variables
+  do f=1,nf
+     call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,n,ver)  !Use unit 10
+     if(ver.eq.2005) strmdls(f,:) = nint(datf(83,:)) !Structure model was saved (1) or not (0)
+     call changepltvars(nmax,nvar,n,datf,labels,dpdt)  !Change (e.g. de-log) and add plot variables
+     dat(f,:,:) = datf(:,:)
+  end do
   
   
   !************************************************************************      
@@ -144,8 +160,10 @@ program plotplt
   ny = 1
   if(vx.eq.201.or.hrd.eq.1) then  !HRD
      hrd = 1
-     xx = real(dlog10(abs(dat(10,1:nn))))
-     yy(1,1:n) = real(dlog10(abs(dat(9,1:nn))))
+     do f=1,nf
+        xx(f,1:nmax) = real(dlog10(abs(dat(f,10,1:nmax))))
+        yy(f,1:n) = real(dlog10(abs(dat(f,9,1:nmax))))
+     end do
      lx = trim(labels(10))
      ly = trim(labels(9))
      vy = 0
@@ -165,75 +183,79 @@ program plotplt
   
   
 37 continue
-  if(vy.eq.25) then !Tet + analytic Tet
-     ny = 2
-     yy(2,1:n) = real(dat(123,1:n))
-  end if
-  if(vy.eq.127) then !Rrl
-     ny = 2
-     yy(2,1:n) = real(dat(8,1:n))
-  end if
-  if(vy.eq.202.or.conv.eq.1) then  !Convection plot
-     conv = 1
-     vy = 4
-  end if
-  if(vy.eq.221) then  !dJ/dt
-     djdt = 1
-     ny = 5
-     yy(1:5,1:n) = real(dat(35:39,1:n))
-     leglbl(1:5) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
-     prleg = .true.
-  end if
-  if(vy.eq.222) then !Mdots
-     mdots = 1
-     ny = 3
-     yy(1:3,1:n) = real(dat(31:33,1:n))
-  end if
-  if(vy.eq.211) then !Timescales
-     tscls = 1
-     ny = 5
-     yy(1:5,1:n) = real(dat(201:205,1:n))
-     leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)  !Line labels for Timescales plot
-     ny = 6
-     yy(6,1:n) = real(dat(119,1:n))
-     leglbl(6) = '\(0645)\ddR/dt\u  '
-     prleg = .true.
-  end if
-  if(vy.eq.212) then !Luminosities
-     lums = 1
-     ny = 6
-     yy(1,1:n) = real(dat(9,1:n))
-     yy(2:6,1:n) = real(dat(16:20,1:n))
-     leglbl(1:ny) = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)  !Line labels for Luminosities plot
-     prleg = .true.
-  end if
+  if(nf.eq.1) then
+     f = 1
+     if(vy.eq.25) then !Tet + analytic Tet
+        ny = 2
+        yy(2,1:n) = real(dat(f,123,1:n))
+     end if
+     if(vy.eq.127) then !Rrl
+        ny = 2
+        yy(2,1:n) = real(dat(f,8,1:n))
+     end if
+     if(vy.eq.202.or.conv.eq.1) then  !Convection plot
+        conv = 1
+        vy = 4
+     end if
+     if(vy.eq.221) then  !dJ/dt
+        djdt = 1
+        ny = 5
+        yy(1:5,1:n) = real(dat(f,35:39,1:n))
+        leglbl(1:5) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
+        prleg = .true.
+     end if
+     if(vy.eq.222) then !Mdots
+        mdots = 1
+        ny = 3
+        yy(1:3,1:n) = real(dat(f,31:33,1:n))
+     end if
+     if(vy.eq.211) then !Timescales
+        tscls = 1
+        ny = 5
+        yy(1:5,1:n) = real(dat(f,201:205,1:n))
+        leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)  !Line labels for Timescales plot
+        ny = 6
+        yy(6,1:n) = real(dat(f,119,1:n))
+        leglbl(6) = '\(0645)\ddR/dt\u  '
+        prleg = .true.
+     end if
+     if(vy.eq.212) then !Luminosities
+        lums = 1
+        ny = 6
+        yy(1,1:n) = real(dat(f,9,1:n))
+        yy(2:6,1:n) = real(dat(f,16:20,1:n))
+        leglbl(1:ny) = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)  !Line labels for Luminosities plot
+        prleg = .true.
+     end if
+     
+     if(vy.eq.213) then !Surface abundances
+        sabs = 1
+        ny = 7
+        yy(1:ny,1:n) = real(dat(f,42:48,1:n))
+        leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        prleg = .true.
+     end if
+     if(vy.eq.214) then !Tmax abundances
+        tabs = 1
+        ny = 7
+        yy(1:ny,1:n) = real(dat(f,49:55,1:n))
+        leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        prleg = .true.
+     end if
+     if(vy.eq.215) then !Core abundances
+        cabs = 1
+        ny = 7
+        yy(1:ny,1:n) = real(dat(f,56:62,1:n))
+        leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        prleg = .true.
+     end if
+  end if  !if(nf.eq.1)
   
-  if(vy.eq.213) then !Surface abundances
-     sabs = 1
-     ny = 7
-     yy(1:ny,1:n) = real(dat(42:48,1:n))
-     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
-     prleg = .true.
-  end if
-  if(vy.eq.214) then !Tmax abundances
-     tabs = 1
-     ny = 7
-     yy(1:ny,1:n) = real(dat(49:55,1:n))
-     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
-     prleg = .true.
-  end if
-  if(vy.eq.215) then !Core abundances
-     cabs = 1
-     ny = 7
-     yy(1:ny,1:n) = real(dat(56:62,1:n))
-     leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
-     prleg = .true.
-  end if
-  
-  xx = real(dat(vx,1:nn))         
-  if(vy.lt.200) yy(1,1:n) = real(dat(vy,1:nn))  
-  
-  
+  do f=1,nf
+     xx(f,1:nmax) = real(dat(f,vx,1:nmax))         
+     !if(vy.lt.200) yy(1,1:n) = real(dat(f,vy,1:nmax))  
+     if(vy.lt.200) yy(f,1:n) = real(dat(f,vy,1:nmax))  
+  end do
   
   
   
@@ -263,12 +285,16 @@ program plotplt
   ly = labels(vy)
   
   if(lgx.eq.1) then
-     if(xx(1).le.0.) xx(1)=xx(2)
-     minx = 1.e33
-     do j=1,n
-        if(abs(xx(j)).lt.minx.and.abs(xx(j)).ne.0.) minx = abs(xx(j))
+     do f=1,nf
+        if(xx(f,1).le.0.) xx(f,1) = xx(f,2)
      end do
-     xx(1:n) = log10(abs(xx(1:n))+minx*1.e-3)
+     minx = 1.e33
+     do f=1,nf
+        do j=1,n
+           if(abs(xx(f,j)).lt.minx.and.abs(xx(f,j)).ne.0.) minx = abs(xx(f,j))
+        end do
+        xx(f,1:n) = log10(abs(xx(f,1:n))+minx*1.e-3)
+     end do
   end if
   if(djdt.eq.1) lgy = 1
   excly = 0
@@ -284,9 +310,18 @@ program plotplt
      end do
   end if
   
+  
+  
 50 continue !HRD   
-  xmin = minval(xx(1:n))
-  xmax = maxval(xx(1:n))
+  !xmin = minval(xx(f,1:n))
+  !xmax = maxval(xx(f,1:n))
+  xmin = 1.e33
+  xmax = -1.e33
+  do f=1,nf
+     !if(exclx(f).eq.1) cycle
+     xmin = min(minval(xx(f,1:n)),xmin)
+     xmax = max(maxval(xx(f,1:n)),xmax)
+  end do
   
   ymin = 1.e33
   ymax = -1.e33
@@ -478,48 +513,54 @@ program plotplt
      if(hlp.eq.'N') hlp='n'
      
      if(hlp.eq.'y') then
-        hlp1 = 'm'
-        write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
-        read*,hlp1
-        if(hlp1.eq.'S') hlp1='s'
-        if(hlp1.eq.'M') hlp1='m'
+        hlp1 = 's'
+        if(nf.gt.1) then
+           write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
+           read*,hlp1
+           if(hlp1.eq.'S') hlp1='s'
+           if(hlp1.eq.'M') hlp1='m'
+        end if
         
         !Use saved structure models, store them in hp()
         if(hlp1.eq.'s') then
-           write(6,'(/,A)')'      Nr    Line   Model'
-           i = 0
-           do j=1,n
-              if(strmdls(j).eq.1) then
-                 i = i+1
-                 hp(i) = j
-                 write(6,'(3I8)')i,hp(i),nint(dat(1,j))
-              end if
-           end do
-           nhp = i
-           write(6,'(I5,A)')nhp,' points selected.'
+           do f=1,nf
+              write(6,'(/,A)')'      Nr    Line   Model'
+              i = 0
+              do j=1,n
+                 if(strmdls(f,j).eq.1) then
+                    i = i+1
+                    hp(f,i) = j
+                    write(6,'(3I8)')i,hp(f,i),nint(dat(f,1,j))
+                 end if
+              end do
+              nhp(f) = i
+              write(6,'(I5,A)')nhp(f),' points selected.'
+           end do !f
         end if
         
+        
         !Enter points manually
-        if(hlp1.eq.'m') then
-           write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(1,n)),'), -1: end list: '
-           nhp = 1
+        if(nf.eq.1 .and. hlp1.eq.'m') then
+           f = 1
+           write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(f,1,n)),'), -1: end list: '
+           nhp(f) = 1
            do j=1,1000
-              read*,hp(nhp)
-              if(hp(nhp).eq.-1) goto 131
-              if(hp(nhp).lt.1.or.hp(nhp).gt.nint(dat(1,n))) nhp = nhp-1
-              nhp = nhp+1
+              read*,hp(f,nhp(f))
+              if(hp(f,nhp(f)).eq.-1) goto 131
+              if(hp(f,nhp(f)).lt.1.or.hp(f,nhp(f)).gt.nint(dat(f,1,n))) nhp(f) = nhp(f)-1
+              nhp(f) = nhp(f)+1
            end do
            
            !Convert model number to line number
-131        nhp = nhp-1
-           write(6,'(I5,A)')nhp,' points selected:'
+131        nhp(f) = nhp(f)-1
+           write(6,'(I5,A)')nhp(f),' points selected:'
            write(6,'(A)')'      Nr   Model    Line'
-           do i=1,nhp
-              call locate(dat(1,1:n),n,dble(hp(i)),j)
-              if(dabs(dat(1,j+1)-dble(hp(i))).lt.dabs(dat(1,j)-dble(hp(i)))) j = j+1
+           do i=1,nhp(f)
+              call locate(dat(f,1,1:n),n,dble(hp(f,i)),j)
+              if(dabs(dat(f,1,j+1)-dble(hp(f,i))).lt.dabs(dat(f,1,j)-dble(hp(f,i)))) j = j+1
               if(j.gt.n) j = n
-              write(6,'(3I8)')i,hp(i),j
-              hp(i) = j
+              write(6,'(3I8)')i,hp(f,i),j
+              hp(f,i) = j
            end do
         end if
         
@@ -538,15 +579,17 @@ program plotplt
      !Use saved structure models, store them in hp()
      !write(6,'(/,A)')'      Nr    Line   Model'
      i = 0
-     do j=1,n
-        if(strmdls(j).eq.1) then
-           i = i+1
-           hp(i) = j
-           !write(6,'(3I8)')i,hp(i),nint(dat(1,j))
-        end if
+     do f=1,nf
+        do j=1,n
+           if(strmdls(f,j).eq.1) then
+              i = i+1
+              hp(f,i) = j
+              !write(6,'(3I8)')i,hp(f,i),nint(dat(f,1,j))
+           end if
+        end do
+        nhp(f) = i
+        !write(6,'(I5,A)')nhp(f),' points selected.'
      end do
-     nhp = i
-     !write(6,'(I5,A)')nhp,' points selected.'
   end if
         
   
@@ -570,11 +613,7 @@ program plotplt
      xmin = max(xmin,xmax)
      xmax = x
   end if
-  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) then
-     x = ymin
-     ymin = ymax
-     ymax = x
-  end if
+  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) call rswap(ymin,ymax)
   
   if(plot.ne.0.and.plot.ne.7.and.plot.ne.9) then
      write(6,*)''     
@@ -655,8 +694,9 @@ program plotplt
   if(lgx.ge.1) boxx = 'BCLNTS'
   if(lgy.ge.1) boxy = 'BCLNTS'
   call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
-  if(plot.eq.7) then
-     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(2,n),' M:',dat(4,n),' Mhe:',dat(5,n),' Mco:',dat(6,n),' Porb:',dat(28,n)
+  if(nf.eq.1 .and. plot.eq.7) then
+     f = 1
+     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(f,2,n),' M:',dat(f,4,n),' Mhe:',dat(f,5,n),' Mco:',dat(f,6,n),' Porb:',dat(f,28,n)
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else if(plot.ne.9) then
      call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
@@ -667,14 +707,14 @@ program plotplt
   
   !Draw curves/points:
   call pgsci(2)
-  do i=1,ny
-     col = colours(mod(i-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+  do f=1,ny
+     col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
      call pgsci(col)
      !if(ny.eq.1) call pgsci(2)
-     yy1(1:n) = yy(i,1:n)
-     if(drawlines.eq.0) call pgpoint(n,xx(1:n),yy1(1:n),1)
-     if(drawlines.ge.1) call pgline(n,xx(1:n),yy1(1:n))
-     if(drawlines.eq.2) call pgpoint(n,xx(1:n),yy1(1:n),20)
+     yy1(1:n) = yy(f,1:n)
+     if(drawlines.eq.0) call pgpoint(n,xx(f,1:n),yy1(1:n),1)
+     if(drawlines.ge.1) call pgline(n,xx(f,1:n),yy1(1:n))
+     if(drawlines.eq.2) call pgpoint(n,xx(f,1:n),yy1(1:n),20)
   end do
   call pgsci(1)
   
@@ -682,16 +722,22 @@ program plotplt
   !Highlight points:
   call pgsch(1.5*sch)
   call pgsci(2)
-  if(hlp.eq.'y') call pgpoint(nhp,xx(hp(1:nhp)),yy(1,hp(1:nhp)),2)
-  if(hlbl.eq.'y') then
-     call pgsch(0.7*sch)
-     do i=1,nhp
-        write(hlbls,'(I5)')nint(dat(1,hp(i)))
-        call pgtext(xx(hp(i)),yy(1,hp(i)),hlbls)
-     end do
-     call pgsch(sch)
-     call pgsci(1)
-  end if !if(hlbl.eq.'y') then
+  if(hlp.eq.'y') then
+     do f=1,nf
+        call pgpoint(nhp(f),xx(1,hp(f,1:nhp(f))),yy(1,hp(f,1:nhp(f))),2)
+     
+        if(hlbl.eq.'y') then
+           call pgsch(0.7*sch)
+           do i=1,nhp(f)
+              write(hlbls,'(I5)')nint(dat(f,1,hp(f,i)))
+              call pgtext(xx(1,hp(f,i)),yy(1,hp(f,i)),hlbls)
+           end do
+           call pgsch(sch)
+           call pgsci(1)
+        end if !if(hlbl.eq.'y') then
+        
+     end do !f
+  end if
   
   
   !Print legenda:
@@ -709,9 +755,10 @@ program plotplt
   
   
   
-  if(conv.eq.1) then
+  if(nf.eq.1 .and. conv.eq.1) then
      call pgsci(1)
-     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
+     f = 1
+     call pltconvection(nmax,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp(f),hp,hlp,hlbl)   !Convection plot - replots axes at the end
      call pgsci(2)
   end if
   
@@ -732,14 +779,21 @@ program plotplt
   
   if(vy.eq.121) then !Prot,critical for sat-MB, add Prot
      call pgsls(4)
-     if(lgy.eq.0) call pgline(n,xx(1:n),real(dat(21,1:n)))
-     if(lgy.eq.1) call pgline(n,xx(1:n),log10(real(dat(21,1:n))))
+     do f=1,nf
+        if(lgy.eq.0) then
+           call pgline(n,xx(f,1:n),real(dat(f,21,1:n)))
+        else 
+           call pgline(n,xx(f,1:n),log10(real(dat(f,21,1:n))))
+        end if
+     end do
      call pgsls(1)
   end if
   
   if(vy.eq.122) then !Comp sat-MB with RVJ83-MB
      call pgsls(4)
-     call pgline(n,xx(1:n),log10(real(dat(38,1:n))))
+     do f=1,nf
+        call pgline(n,xx(f,1:n),log10(real(dat(f,38,1:n))))
+     end do
      call pgsls(1)
   end if
   
@@ -855,49 +909,57 @@ program plotplt
      call pgolin(1,nsel,xsel,ysel,2)
      !write(6,'(10ES10.2)')xsel,xmin,xmax
      !write(6,'(10ES10.2)')ysel,ymin,ymax
-     dx = abs(xmax-xmin)
-     dy = abs(ymax-ymin)
-     mindist = 1.e30
-     do i=1,n
-        do j=1,ny
-           dist = (abs(xsel(1)-xx(i))/dx)**2 + (abs(ysel(1)-yy(j,i))/dy)**2
-           if(dist.lt.mindist) then
-              i0 = i
-              j0 = j
-              mindist = dist
-           end if
+     
+     
+     do f=1,nf
+        dx = abs(xmax-xmin)
+        dy = abs(ymax-ymin)
+        mindist = 1.e30
+        do i=1,n
+           do j=1,ny
+              dist = (abs(xsel(1)-xx(j,i))/dx)**2 + (abs(ysel(1)-yy(j,i))/dy)**2
+              if(dist.lt.mindist) then
+                 i0 = i
+                 j0 = j
+                 mindist = dist
+              end if
+           end do
         end do
-     end do
-     write(6,*)''
-     write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-     write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(i0),',  y =',yy(j0,i0),'    line =',i0+1,',  model =',nint(dat(1,i0))
+        write(6,*)''
+        write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
+        write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(j0,i0),',  y =',yy(j0,i0),'    line =',i0+1,',  model =',nint(dat(f,1,i0))
+        
+        dx = 0
+        dy = 0
+        if(i0.gt.1.and.i0.lt.n) then
+           dx = xx(j0,i0+1)-xx(j0,i0-1)
+           dy = yy(j0,i0+1)-yy(j0,i0-1)
+        else if(i0.gt.1) then
+           dx = xx(j0,i0)-xx(j0,i0-1)
+           dy = yy(j0,i0)-yy(j0,i0-1)
+        else if(i0.lt.n) then
+           dx = xx(j0,i0+1)-xx(j0,i0)
+           dy = yy(j0,i0+1)-yy(j0,i0)
+        end if
+        
+        write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+        
+        write(6,*)''
+        !From listplt
+        write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
+        d = dat(f,:,i0)
+        write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
+        write(6,*)''
+        
+        !call pgsci(2)
+        col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+        call pgsci(col)
+
+        call pgpoint(1,xx(j0,i0),yy(j0,i0),2)
+        write(hlbls,'(I5)')nint(dat(f,1,i0))
+        call pgptxt(xx(j0,i0),yy(j0,i0),0.,0.,hlbls)
+     end do !f
      
-     dx = 0
-     dy = 0
-     if(i0.gt.1.and.i0.lt.n) then
-        dx = xx(i0+1)-xx(i0-1)
-        dy = yy(j0,i0+1)-yy(j0,i0-1)
-     else if(i0.gt.1) then
-        dx = xx(i0)-xx(i0-1)
-        dy = yy(j0,i0)-yy(j0,i0-1)
-     else if(i0.lt.n) then
-        dx = xx(i0+1)-xx(i0)
-        dy = yy(j0,i0+1)-yy(j0,i0)
-     end if
-     
-     write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
-     
-     d = dat(:,i0)
-     write(6,*)''
-     !From listplt
-     write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
-     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
-     write(6,*)''
-     
-     call pgsci(2)
-     call pgpoint(1,xx(i0),yy(j0,i0),2)
-     write(hlbls,'(I5)')nint(dat(1,i0))
-     call pgptxt(xx(i0),yy(j0,i0),0.,0.,hlbls)
      call pgsci(1)
      goto 900
   end if

@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    70: AstroFloyd, 11/04/2010
+     - developing plotplt_new: added a dimension to variables (e.g. dat(:,:) -> dat(:,:,:))
+     - to do: distinguish between multi-variable (ny) and multi-file plots (nf)
+    
     69: AstroFloyd, 11/04/2010
      - added plotplt_new.f to create a version of plotplt.f that can read multiple
        files (and will replace plotpltn.f)
