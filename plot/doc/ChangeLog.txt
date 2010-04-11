@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    68: AstroFloyd, 11/04/2010
+     - moved routines to read plt files from functions.f plt_functions.f
+    
     67: AstroFloyd, 11/04/2010
      - plotplt.f:
        - remapped variables 82-100 to 116-134

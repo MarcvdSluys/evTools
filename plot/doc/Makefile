@@ -2,6 +2,7 @@
 
 #No text/space after statements below!
 COMP = gfortran#  Use GNU fortran compiler
+COMP = gfortran-4.4.3#
 #COMP = ifort#     Use Intel fortran compiler
 
 
@@ -29,7 +30,8 @@ endif
 
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
-ifeq ($(COMP),gfortran)
+#ifeq ($(COMP),gfortran)
+ifneq (,$(filter $(COMP),gfortran gfortran-4.4.3))
    #CFLAGS = -O0 -ffree-form -ffree-line-length-none
    CFLAGS = -O0 -ffree-form -ffree-line-length-none   -Wall 
    #CFLAGS = -O -ffree-form -ffree-line-length-none
@@ -41,7 +43,9 @@ endif
 
 
 STDOBJ = functions.o
-PLTOBJ = plotfunctions.o
+PLTOBJ = plotfunctions.o plt_functions.o
+MDLOBJ = 
+MODOBJ = 
 
 %.o: %.f Makefile
 	$(COMP) $(CFLAGS) -c $<
@@ -53,14 +57,14 @@ exit:
 
 
 
-plotmdl: $(STDOBJ) $(PLTOBJ) plotmdl.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdl $(STDOBJ) $(PLTOBJ) plotmdl.o
+plotmdl: $(STDOBJ) $(MDLOBJ) plotmdl.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdl $(STDOBJ) $(MDLOBJ) plotmdl.o
 
-plotmdln: $(STDOBJ) $(PLTOBJ) plotmdln.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdln $(STDOBJ) $(PLTOBJ) plotmdln.o
+plotmdln: $(STDOBJ) $(MDLOBJ) plotmdln.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdln $(STDOBJ) $(MDLOBJ) plotmdln.o
 
-plotmod: $(STDOBJ) $(PLTOBJ) plotmod.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmod $(STDOBJ) $(PLTOBJ) plotmod.o
+plotmod: $(STDOBJ) $(MODOBJ) plotmod.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmod $(STDOBJ) $(MODOBJ) plotmod.o
 
 plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
