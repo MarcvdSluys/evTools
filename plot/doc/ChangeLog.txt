@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    67: AstroFloyd, 11/04/2010
+     - plotplt.f:
+       - remapped variables 82-100 to 116-134
+       - moved around variables >200
+       - renamed AM H -> J
+       - use defvar to determine whether a variable is defined
+    
     66: AstroFloyd, 11/04/2010
      - plotplt.f:
        - use proper colours and legenda for multi-variable plots

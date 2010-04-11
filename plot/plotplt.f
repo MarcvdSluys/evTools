@@ -21,17 +21,18 @@
 program plotplt
   use constants
   use ubvdata
+  
   implicit none
-  integer,parameter :: nn=30000,nvar=210,nc=81,nl=10
+  integer,parameter :: nn=30000,nvar=299,nc=81,nl=10
   real*8 :: dat(nvar,nn),d(nvar)
   real :: xx(nn),yy(nl,nn),yy1(nn),minx,miny(nl),dist,mindist
   real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
-  integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
+  integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,whitebg,strmdls(nn)
-  integer :: ansi,xwini,pgopen
+  integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: colours(29),ncolours,col
   real :: sch
   character :: findfile*99,fname*99,psname*99
@@ -68,7 +69,8 @@ program plotplt
   
   !Labels:
   prleg = .false.  !Don't print legenda by default
-  call getpltlabels(nvar,labels)                                                                  !Get the labels for the plot axes
+  call getpltlabels(nvar,labels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
+  
   
   !Read current path and use it as plot title
   x=system('pwd > '//trim(homedir)//'/tmppwd.txt')
@@ -122,15 +124,14 @@ program plotplt
      call printpltvarlist  !Print the list of variables in a *.plt? file to screen, for input menu
      
      
-35   write(6,'(A37,$)')' Choose the X-axis variable (0-201): '
+35   write(6,'(A,$)')'  Choose the X-axis variable: '
      read*,vx
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
-     if(vx.gt.62.and.vx.lt.81) goto 35
-     if(vx.gt.115.and.vx.lt.201) goto 35
+     if(defvar(vx).eq.0) goto 35
      
      hrd   = 0
-     dhdt  = 0
+     djdt  = 0
      conv  = 0
      mdots = 0
      tscls = 0
@@ -154,21 +155,21 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A53,$)')' Choose the Y-axis variable (0-62, 81-115, 202-209): '
+36   write(6,'(A,$)')'  Choose the Y-axis variable: '
      read*,vy
      if(vy.eq.0) goto 9999
-     if(vy.lt.0.or.vy.gt.209) goto 36
-     if(vy.gt.62.and.vy.lt.81) goto 36
-     if(vy.gt.115.and.vy.lt.202) goto 36
+     if(vy.lt.0) goto 36
+     if(defvar(vy).eq.0) goto 36
+     if(vy.eq.201) goto 36   !Can't take HRD as y-variable
   end if   !if(plot.lt.2) then   
   
   
 37 continue
   if(vy.eq.25) then !Tet + analytic Tet
      ny = 2
-     yy(2,1:n) = real(dat(89,1:n))
+     yy(2,1:n) = real(dat(123,1:n))
   end if
-  if(vy.eq.93) then !Rrl
+  if(vy.eq.127) then !Rrl
      ny = 2
      yy(2,1:n) = real(dat(8,1:n))
   end if
@@ -176,29 +177,29 @@ program plotplt
      conv = 1
      vy = 4
   end if
-  if(vy.eq.203) then  !dH/dt
-     dhdt = 1
+  if(vy.eq.221) then  !dJ/dt
+     djdt = 1
      ny = 5
      yy(1:5,1:n) = real(dat(35:39,1:n))
      leglbl(1:5) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
      prleg = .true.
   end if
-  if(vy.eq.204) then !Mdots
+  if(vy.eq.222) then !Mdots
      mdots = 1
      ny = 3
      yy(1:3,1:n) = real(dat(31:33,1:n))
   end if
-  if(vy.eq.205) then !Timescales
+  if(vy.eq.211) then !Timescales
      tscls = 1
      ny = 5
      yy(1:5,1:n) = real(dat(201:205,1:n))
      leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)  !Line labels for Timescales plot
      ny = 6
-     yy(6,1:n) = real(dat(85,1:n))
+     yy(6,1:n) = real(dat(119,1:n))
      leglbl(6) = '\(0645)\ddR/dt\u  '
      prleg = .true.
   end if
-  if(vy.eq.206) then !Luminosities
+  if(vy.eq.212) then !Luminosities
      lums = 1
      ny = 6
      yy(1,1:n) = real(dat(9,1:n))
@@ -207,21 +208,21 @@ program plotplt
      prleg = .true.
   end if
   
-  if(vy.eq.207) then !Surface abundances
+  if(vy.eq.213) then !Surface abundances
      sabs = 1
      ny = 7
      yy(1:ny,1:n) = real(dat(42:48,1:n))
      leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
      prleg = .true.
   end if
-  if(vy.eq.208) then !Tmax abundances
+  if(vy.eq.214) then !Tmax abundances
      tabs = 1
      ny = 7
      yy(1:ny,1:n) = real(dat(49:55,1:n))
      leglbl(1:ny) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
      prleg = .true.
   end if
-  if(vy.eq.209) then !Core abundances
+  if(vy.eq.215) then !Core abundances
      cabs = 1
      ny = 7
      yy(1:ny,1:n) = real(dat(56:62,1:n))
@@ -269,7 +270,7 @@ program plotplt
      end do
      xx(1:n) = log10(abs(xx(1:n))+minx*1.e-3)
   end if
-  if(dhdt.eq.1) lgy = 1
+  if(djdt.eq.1) lgy = 1
   excly = 0
   if(lgy.eq.1) then
      do i=1,ny
@@ -295,13 +296,13 @@ program plotplt
      ymax = max(maxval(yy(i,1:n)),ymax)
   end do
   
-  if(vx.eq.85) then !R/(dR/dt)
+  if(vx.eq.119) then !R/(dR/dt)
      if(xmin.lt.1.e4.and.lgx.eq.0) xmin = 1.e4
      if(xmin.lt.4..and.lgx.eq.1) xmin = 4.
      if(xmax.gt.1.e12.and.lgx.eq.0) xmax = 1.e12
      if(xmax.gt.12..and.lgx.eq.0) xmax = 12.
   end if
-  if(vy.eq.85) then !R/(dR/dt)
+  if(vy.eq.119) then !R/(dR/dt)
      if(ymin.lt.1.e4.and.lgy.eq.0) ymin = 1.e4
      if(ymin.lt.4..and.lgy.eq.1) ymin = 4.
      if(ymax.gt.1.e12.and.lgy.eq.0) ymax = 1.e12
@@ -320,17 +321,17 @@ program plotplt
   end if
   if(lgy.eq.1) then
      if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
-     if(vy.eq.204.and.ymin.lt.-12.) ymin = -12.
-     if((vy.ge.35.and.vy.le.39).or.vy.eq.203) then
+     if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.
+     if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
   print*,ymin,ymax
-  if(vy.eq.205.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
-  if(vy.eq.205.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
-  if(vy.eq.88.and.ymin.lt.-20.) ymin = -20.
+  if(vy.eq.211.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
+  if(vy.eq.211.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
+  if(vy.eq.122.and.ymin.lt.-20.) ymin = -20.
   
   
   
@@ -396,14 +397,14 @@ program plotplt
   end if
   if(lgy.eq.1) then
      if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
-     if(vy.eq.204.and.ymin.lt.-12.) ymin = -12.
-     if((vy.ge.35.and.vy.le.39).or.vy.eq.203) then
+     if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.
+     if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
-  if(vy.eq.88.and.ymin.gt.-20.) ymin = -20.
+  if(vy.eq.122.and.ymin.gt.-20.) ymin = -20.
   
   
   
@@ -418,7 +419,7 @@ program plotplt
   !************************************************************************      
   
 100 continue
-  if(dhdt.eq.1) then
+  if(djdt.eq.1) then
      write(6,*)''
      write(6,'(A)')'  dJ_tot  : total angular-momentum loss'
      write(6,'(A)')'  dJ_GW   : gravitational-wave AM loss'
@@ -564,12 +565,12 @@ program plotplt
   
 501 continue
   
-  if(hrd.eq.1.or.vx.eq.99.or.vx.eq.101) then
+  if(hrd.eq.1.or.vx.eq.133.or.vx.eq.101) then
      x = min(xmin,xmax)
      xmin = max(xmin,xmax)
      xmax = x
   end if
-  if((vy.eq.99.or.vy.eq.101) .and. plot.ne.9) then
+  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) then
      x = ymin
      ymin = ymax
      ymax = x
@@ -729,14 +730,14 @@ program plotplt
      call pgsls(1)
   end if
   
-  if(vy.eq.87) then !Prot,critical for sat-MB, add Prot
+  if(vy.eq.121) then !Prot,critical for sat-MB, add Prot
      call pgsls(4)
      if(lgy.eq.0) call pgline(n,xx(1:n),real(dat(21,1:n)))
      if(lgy.eq.1) call pgline(n,xx(1:n),log10(real(dat(21,1:n))))
      call pgsls(1)
   end if
   
-  if(vy.eq.88) then !Comp sat-MB with RVJ83-MB
+  if(vy.eq.122) then !Comp sat-MB with RVJ83-MB
      call pgsls(4)
      call pgline(n,xx(1:n),log10(real(dat(38,1:n))))
      call pgsls(1)

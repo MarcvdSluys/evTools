@@ -342,10 +342,12 @@ end subroutine findfiles
 
 !***********************************************************************
 !Provides the labels for the plot axes of a *.plt? file
-subroutine getpltlabels(nvar,labels)
+subroutine getpltlabels(nvar,labels,defvar)
   implicit none
-  integer :: nvar
+  integer :: nvar,defvar(0:nvar)
   character :: labels(nvar)*99
+  
+  defvar = 0
   
   labels(1) = 'Model'
   labels(2) = 't (yr)'
@@ -357,6 +359,7 @@ subroutine getpltlabels(nvar,labels)
   labels(8) = 'R (R\d\(2281)\u)'
   labels(9) = 'L (L\d\(2281)\u)'
   labels(10) = 'T\deff\u (K)'
+  
   labels(11) = 'T\dc\u (K)'
   labels(12) = 'T\dmax\u (K)'
   labels(13) = '\gr\dc\u (g cm\u-3\d)'
@@ -367,6 +370,7 @@ subroutine getpltlabels(nvar,labels)
   labels(18) = 'L\dC\u (L\d\(2281)\u)'
   labels(19) = 'L\d\gn\u (L\d\(2281)\u)'
   labels(20) = 'L\dth\u (L\d\(2281)\u)'
+  
   labels(21) = 'P\drot\u (d)'
   labels(22) = 'K\u2\d'
   labels(23) = 'R\dcz\u'
@@ -377,16 +381,18 @@ subroutine getpltlabels(nvar,labels)
   labels(28) = 'P\dorb\u (d)'
   labels(29) = 'FLR'
   labels(30) = 'F1'
+  
   labels(31) = 'dM/dt (M\d\(2281)\u/yr)'
   labels(32) = 'dM\dwind\u/dt (M\d\(2281)\u/yr)'
   labels(33) = 'dM\dmt\u/dt (M\d\(2281)\u/yr)'
-  labels(34) = 'H\dorb\u (10\u50\d g cm\u2\d s\u-1\d)'
-  labels(35) = 'dH\dorb\u/dt'
-  labels(36) = 'dH\dgw\u/dt'
-  labels(37) = 'dH\dwml\u/dt'
-  labels(38) = 'dH\ds-o\u/dt'
-  labels(39) = 'dH\dmtr\u/dt'
+  labels(34) = 'J\dorb\u (10\u50\d g cm\u2\d s\u-1\d)'
+  labels(35) = 'dJ\dorb\u/dt'
+  labels(36) = 'dJ\dgw\u/dt'
+  labels(37) = 'dJ\dwml\u/dt'
+  labels(38) = 'dJ\ds-o\u/dt'
+  labels(39) = 'dJ\dmtr\u/dt'
   labels(40) = 'M\dcomp\u'
+  
   labels(41) = 'e'
   labels(42) = 'H\dsurf\u'
   labels(43) = 'He\dsurf\u'
@@ -397,6 +403,7 @@ subroutine getpltlabels(nvar,labels)
   labels(48) = 'Mg\dsurf\u'
   labels(49) = 'H\dTmax\u'
   labels(50) = 'He\dTmax\u'
+  
   labels(51) = 'C\dTmax\u'
   labels(52) = 'N\dTmax\u'
   labels(53) = 'O\dTmax\u'
@@ -407,34 +414,19 @@ subroutine getpltlabels(nvar,labels)
   labels(58) = 'C\dcentr\u'
   labels(59) = 'N\dcentr\u'
   labels(60) = 'O\dcentr\u'
+  
   labels(61) = 'Ne\dcentr\u'
   labels(62) = 'Mg\dcentr\u'
   
-  labels(63) = 'M\denv\u (M\d\(2281)\u)'
-  labels(64) = 'X\df\u'
+  defvar(1:62) = 1
   
-  labels(75) = '\gt (yr)'
+  
   labels(81) = 'Q\dconv\u'
-  labels(82) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
-  labels(83) = 'M\denv\u (M\d\(2281)\u)'
-  labels(84) = 'M\dconv\u (M\d\(2281)\u)'
-  labels(85) = 'R/(dR/dt) (yr)'
-  labels(86) = 'Rossby number'
-  labels(87) = 'P\drot,crit\u (d)'
-  labels(88) = 'MB\dSills\u'
-  labels(89) = 't\det,int\u/t\det,anal.\u'
-  labels(90) = 't-t\d0\u (yr)'
-  labels(91) = '(Ne/O)\dc\u/(Ne/O)\ds\u'
-  labels(92) = 'P\dGW,max\u (d)'
-  labels(93) = 'R\drl\u (R\d\(2281)\u)'
-  labels(94) = 'X\df\u'
-  labels(95) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
-  labels(96) = 'J\dspin\u (10\u50\d g cm\u2\d s\u-1\d)'
-  labels(97) = '\gr\davg\u (g cm\u-3\d)'
-  labels(98) = 'Z\dsurf\u'
-  labels(99) = '(t\df\u - t)  (yr)'
-  labels(100) = 'P\drot\u/P\dcrit\u'
   
+  defvar(81) = 1
+  
+  
+  !Derived variables:
   labels(101) = 'V'
   labels(102) = 'U-B'
   labels(103) = 'B-V'
@@ -449,13 +441,46 @@ subroutine getpltlabels(nvar,labels)
   labels(114) = 'v\drot\u (km/s)' !Rotational velocity
   labels(115) = 'R/R\dZAMS\u'     !Radius over ZAMS radius
   
-  labels(203) = 'dH\dorb\u/dt'
-  labels(204) = 'dM/dt (M\d\(2281)\u/yr)'
-  labels(205) = '\gt (yr)'
-  labels(206) = 'L (L\d\(2281)\u)'
-  labels(207) = 'Surface abundances'
-  labels(208) = 'T\dmax\u abundances'
-  labels(209) = 'Core abundances'
+  labels(116) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
+  labels(117) = 'M\denv\u (M\d\(2281)\u)'
+  labels(118) = 'M\dconv\u (M\d\(2281)\u)'
+  labels(119) = 'R/(dR/dt) (yr)'
+  labels(120) = 'Rossby number'
+  
+  labels(121) = 'P\drot,crit\u (d)'
+  labels(122) = 'MB\dSills\u'
+  labels(123) = 't\det,int\u/t\det,anal.\u'
+  labels(124) = 't-t\d0\u (yr)'
+  labels(125) = '(Ne/O)\dc\u/(Ne/O)\ds\u'
+  labels(126) = 'P\dGW,max\u (d)'
+  labels(127) = 'R\drl\u (R\d\(2281)\u)'
+  labels(128) = 'X\df\u'
+  labels(129) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
+  labels(130) = 'J\dspin\u (10\u50\d g cm\u2\d s\u-1\d)'
+  
+  labels(131) = '\gr\davg\u (g cm\u-3\d)'
+  labels(132) = 'Z\dsurf\u'
+  labels(133) = '(t\df\u - t)  (yr)'
+  labels(134) = 'P\drot\u/P\dcrit\u'
+  
+  defvar(101:134) = 1
+  
+  
+  !Special plots:
+  defvar(201:202) = 1  !HRD, convection plot
+  
+  !Combination plots:
+  labels(211) = '\gt (yr)'
+  labels(212) = 'L (L\d\(2281)\u)'
+  labels(213) = 'Surface abundances'
+  labels(214) = 'T\dmax\u abundances'
+  labels(215) = 'Core abundances'
+  defvar(211:215) = 1
+  
+  labels(221) = 'dJ\dorb\u/dt'
+  labels(222) = 'dM/dt (M\d\(2281)\u/yr)'
+  defvar(221:222) = 1
+  
   
 end subroutine getpltlabels
 !***********************************************************************
@@ -501,12 +526,12 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   pglabels(31) = 'dM (M\d\(2281)\u/yr)'
   pglabels(32) = 'dM\dwind\u (M\d\(2281)\u/yr)'
   pglabels(33) = 'dM\dmt\u (M\d\(2281)\u/yr)'
-  pglabels(34) = 'H\dorb\u'
-  pglabels(35) = 'H\dorb\u/dt'
-  pglabels(36) = 'dH\dgw\u/dt'
-  pglabels(37) = 'dH\dwml\u/dt'
-  pglabels(38) = 'dH\ds-o\u/dt'
-  pglabels(39) = 'dH\dmtr\u/dt'
+  pglabels(34) = 'J\dorb\u'
+  pglabels(35) = 'J\dorb\u/dt'
+  pglabels(36) = 'dJ\dgw\u/dt'
+  pglabels(37) = 'dJ\dwml\u/dt'
+  pglabels(38) = 'dJ\ds-o\u/dt'
+  pglabels(39) = 'dJ\dmtr\u/dt'
   pglabels(40) = 'M\dcomp\u'
   pglabels(41) = 'e'
   pglabels(42) = 'H\dsurf\u'
@@ -589,12 +614,12 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   asclabels(31) = 'dM'
   asclabels(32) = 'dMwind'
   asclabels(33) = 'dMmt'
-  asclabels(34) = 'Horb'
-  asclabels(35) = 'Horbdt'
-  asclabels(36) = 'dHgwdt'
-  asclabels(37) = 'dHwmldt'
-  asclabels(38) = 'dHsodt'
-  asclabels(39) = 'dHmtrdt'
+  asclabels(34) = 'Jorb'
+  asclabels(35) = 'Jorbdt'
+  asclabels(36) = 'dJgwdt'
+  asclabels(37) = 'dJwmldt'
+  asclabels(38) = 'dJsodt'
+  asclabels(39) = 'dJmtrdt'
   asclabels(40) = 'Mcomp'
   asclabels(41) = 'e'
   asclabels(42) = 'Hsurf'
@@ -656,39 +681,42 @@ subroutine printpltvarlist
   write(6,*)''
   write(6,'(A)'),'  Primary variables:                                  0: Quit                           '
   write(6,'(A)'),'                                                                                        '
-  write(6,'(A)'),'    1: model        16: Lh           28: Porb        34: Horb                           '
-  write(6,'(A)'),'    2: t            17: Lhe          29: FLR         35: dHorb/dt                       '
-  write(6,'(A)'),'    3: dt           18: Lc           30: F1          36: dHgw/dt                        '
-  write(6,'(A)'),'    4: M            19: Lnu          31: dM          37: dHwml/dt                       '
-  write(6,'(A)'),'    5: Mhe          20: Lth          32: dMwind      38: dHmb/dt                        '
-  write(6,'(A)'),'    6: Mco          21: Prot         33: dMmt        39: dHmtr/dt                       '
+  write(6,'(A)'),'    1: model        16: Lh           28: Porb        34: Jorb                           '
+  write(6,'(A)'),'    2: t            17: Lhe          29: FLR         35: dJorb/dt                       '
+  write(6,'(A)'),'    3: dt           18: Lc           30: F1          36: dJgw/dt                        '
+  write(6,'(A)'),'    4: M            19: Lnu          31: dM          37: dJwml/dt                       '
+  write(6,'(A)'),'    5: Mhe          20: Lth          32: dMwind      38: dJmb/dt                        '
+  write(6,'(A)'),'    6: Mco          21: Prot         33: dMmt        39: dJmtr/dt                       '
   write(6,'(A)'),'    7: Mone         22: VK2                          40: Mcomp                          '
   write(6,'(A)'),'    8: R            23: Rcz                          41: e                              '
   write(6,'(A)'),'    9: L            24: dRcz                                                            '
   write(6,'(A)'),'   10: Teff         25: Tet                                                             '
   write(6,'(A)'),'   11: Tc           26: Ralv       Abundances:                                          '
   write(6,'(A)'),'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
-  write(6,'(A)'),'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   207              '
-  write(6,'(A)'),'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   208              '
-  write(6,'(A)'),'   15: Ub,env                      Core:  56  57  58  59  60  61  62   209              '
+  write(6,'(A)'),'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
+  write(6,'(A)'),'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
+  write(6,'(A)'),'   15: Ub,env                      Core:  56  57  58  59  60  61  62   215              '
+  write(6,'(A)'),'                                                                                        ' 
+  write(6,'(A)'),'   81: Qconv                                                                            '
   write(6,'(A)'),'                                                                                        ' 
   write(6,'(A)'),'  Derived variables:                                                                    '
-  write(6,'(A)'),'   81: Qconv                91: Ne/O change     101: V        111: lambda_env           '  
-  write(6,'(A)'),'   82: Mhe-Mco              92: Pgw,max         102: U-B      112: q_crit               '  
-  write(6,'(A)'),'   83: Menv                 93: Rrl             103: B-V      113: M2,crit              '
-  write(6,'(A)'),'   84: Mconv                94: Xf              104: V-R      114: Vrot                 '
-  write(6,'(A)'),'   85: R/(dR/dt)            95: M.I.            105: R-I      115: R/Rzams              '
-  write(6,'(A)'),'   86: Rossby nr            96: Jspin           106: U-V                                '
-  write(6,'(A)'),'   87: Pcr (MB)             97: Rho_avg         107: V-I                                '
-  write(6,'(A)'),'   88: Sills MB             98: Zsurf                                                   '
-  write(6,'(A)'),'   89: Tet: int/anal        99: t_f-t                                                   '
-  write(6,'(A)'),'   90: t-to                100: P_rot/crit                                              '
+  write(6,'(A)'),'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg                    '  
+  write(6,'(A)'),'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
+  write(6,'(A)'),'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
+  write(6,'(A)'),'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
+  write(6,'(A)'),'   105: R-I    115: R/Rzams       125: Ne/O change                                      '
+  write(6,'(A)'),'   106: U-V    116: Mhe-Mco       126: Pgw,max                                          '
+  write(6,'(A)'),'   107: V-I    117: Menv          127: Rrl                                              '
+  write(6,'(A)'),'               118: Mconv         128: Xf                                               '
+  write(6,'(A)'),'               119: R/(dR/dt)     129: M.I.                                             '
+  write(6,'(A)'),'               120: Rossby nr     130: Jspin                                            '
   write(6,'(A)'),'                                                                                        '
   write(6,'(A)'),'  Special plots:                                                                        '
-  write(6,'(A)'),'   201: HR Diagram         204: Mdots           207: Surface abundances                 '
-  write(6,'(A)'),'   202: Convection plot    205: Timescales      208: Tmax abundances                    '
-  write(6,'(A)'),"   203: dH/dt's            206: Luminosities    209: Core abundances                    "
-  write(6,'(A)'),'                                                                                        '
+  write(6,'(A)'),"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
+  write(6,'(A)'),'   202: Convection plot    212: Luminosities          222: Mdots                        '
+  write(6,'(A)'),'                           213: Surface abundances                                      '
+  write(6,'(A)'),'                           214: Tmax abundances                                         '
+  write(6,'(A)'),'                           215: Core abundances                                         '
   write(6,'(A)'),'                                                                                        '
   
 end subroutine printpltvarlist
@@ -802,7 +830,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real*8 :: dat(nvar,nn),var(nn),dpdj(nn)
-  real*8 :: c92(nn),c85a,c85b,x,z,mbol,bc
+  real*8 :: c126(nn),c119a,c119b,x,z,mbol,bc
   character :: labels(nvar)*99
   
   !de-log some variables
@@ -856,32 +884,32 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !************************************************************************      
   
   do i=1,n
-     dat(82,i) = dat(5,i)-dat(6,i)                              !Intershell mass
+     dat(116,i) = dat(5,i)-dat(6,i)                              !Intershell mass
   end do
-  dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                         !H-envelope mass
+  dat(117,1:n) = dat(4,1:n) - dat(5,1:n)                         !H-envelope mass
   do i=1,n
-     dat(84,i) = 0.d0
-     if(dat(64,i).lt.0.d0) dat(84,i) = abs(dat(64,i))          !Convective core boundary
+     dat(118,i) = 0.d0
+     if(dat(64,i).lt.0.d0) dat(118,i) = abs(dat(64,i))          !Convective core boundary
   end do
   
-  dat(85,1) = 0.d0
+  dat(119,1) = 0.d0
   do i=2,n
-     c85a = abs(dat(8,i)-dat(8,i-1))+1.d-30                    !dR
-     c85b = abs(dat(2,i)-dat(2,i-1))+1.d-30                    !dt
-     dat(85,i) = dat(8,i)/(c85a/c85b)                           !R/(dR/dt)
+     c119a = abs(dat(8,i)-dat(8,i-1))+1.d-30                    !dR
+     c119b = abs(dat(2,i)-dat(2,i-1))+1.d-30                    !dt
+     dat(119,i) = dat(8,i)/(c119a/c119b)                           !R/(dR/dt)
   end do
   
-  dat(86,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)                !Rossby number = Prot/Tet
-  dat(87,1:n) = 2.5d0/13.8d0 * dat(25,1:n)                      !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d
+  dat(120,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)                !Rossby number = Prot/Tet
+  dat(121,1:n) = 2.5d0/13.8d0 * dat(25,1:n)                      !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d
   
   do i=1,n                                                      !Saturated MB - Sills et al, 2000ApJ.534.335
-     dat(88,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(87,i))**2* dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
-     if(dat(21,i).gt.dat(87,i)) dat(88,i) = 2.7e-3* (2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
-     if(dat(81,i).lt.0.02)  dat(88,i) = dat(88,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
-     if(dat(81,i).lt.1.d-9)  dat(88,i) = 0.d0
-     if(dat(81,i).gt.1.d0-1.d-9)  dat(88,i) = 0.d0  !No MB for fully convective star
+     dat(122,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(121,i))**2* dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
+     if(dat(21,i).gt.dat(121,i)) dat(122,i) = 2.7e-3* (2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
+     if(dat(81,i).lt.0.02)  dat(122,i) = dat(122,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
+     if(dat(81,i).lt.1.d-9)  dat(122,i) = 0.d0
+     if(dat(81,i).gt.1.d0-1.d-9)  dat(122,i) = 0.d0  !No MB for fully convective star
   end do !i
-  dat(88,1:n) = dat(88,1:n)/day**3
+  dat(122,1:n) = dat(122,1:n)/day**3
   
   
   dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50  !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983
@@ -891,8 +919,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      if(dat(81,i).gt.1.d0-1.d-9)  dat(38,i) = 0.d0  !No MB for fully convective star
   end do !i
   
-  dat(37,1:n) = dat(88,1:n)                                     !Take Sills MB in stead of Wind AML
-  !dat(38,1:n) = dat(88,1:n)                                    !Take Sills in stead of Rappaport MB
+  dat(37,1:n) = dat(122,1:n)                                     !Take Sills MB in stead of Wind AML
+  !dat(38,1:n) = dat(122,1:n)                                    !Take Sills in stead of Rappaport MB
   
   dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
   
@@ -901,43 +929,43 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 +  0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  dat(89,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F)
-  dat(89,1:n) = dat(25,1:n)/dat(89,1:n)  !Actual Tet / analitic Tet
+  dat(123,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F)
+  dat(123,1:n) = dat(25,1:n)/dat(123,1:n)  !Actual Tet / analitic Tet
   
-  dat(90,1:n) = dat(2,1:n) - dat(2,1) !t-t0
-  dat(91,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
+  dat(124,1:n) = dat(2,1:n) - dat(2,1) !t-t0
+  dat(125,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
   
-  c92(1:n)    = 2*pi*(256.d0/5.d0)**(3.d0/8.d0)* g**(5.d0/8.d0)/c**(15.d0/8.d0) *(dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/ (dat(5,1:n)+1.4)**(1.d0/8.d0)
-  dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c92(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
+  c126(1:n)    = 2*pi*(256.d0/5.d0)**(3.d0/8.d0)* g**(5.d0/8.d0)/c**(15.d0/8.d0) *(dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/ (dat(5,1:n)+1.4)**(1.d0/8.d0)
+  dat(126,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c126(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
   
-  dat(93,1:n) = dat(8,1:n)/dexp(dat(29,1:n))     
-  dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
-  dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                 !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
-  dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
-  dat(97,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
-  dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
-  dat(99,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
+  dat(127,1:n) = dat(8,1:n)/dexp(dat(29,1:n))     
+  dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
+  dat(129,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                 !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
+  dat(130,1:n) = dat(129,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
+  dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
+  dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
+  dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
   
-  !dat(100,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
-  dat(100,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day         !Critical (Keplerian) rotation period
-  dat(100,1:n) = dat(21,1:n)/(dat(100,1:n)+1.e-30)                           !Prot/Pcrit
+  !dat(134,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
+  dat(134,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day         !Critical (Keplerian) rotation period
+  dat(134,1:n) = dat(21,1:n)/(dat(134,1:n)+1.e-30)                           !Prot/Pcrit
   
   !Colours
   do i=1,n
-     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
   end do
   
-  dat(111,1:n) = g*dat(4,1:n)*dat(83,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+  dat(111,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
   !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
   dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
      if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
-     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(83,i),dat(15,i),dat(8,i),dat(111,i)
+     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(117,i),dat(15,i),dat(8,i),dat(111,i)
   end do
   
-  z = log10(dat(98,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
+  z = log10(dat(132,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
   x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
   
   dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
@@ -962,7 +990,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(205,1:n) = dsqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
   dpdt  = 0
   
-  !Replace dH/dt by dP/dt
+  !Replace dJ/dt by dP/dt
   !35 = H_orb,  36 = H_gw, 37 = H_wml, 38 = H_s-o, 39 = H_mtr
   if(1.eq.2) then
      dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
@@ -974,7 +1002,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      labels(37) = 'dP\dwml\u/dt'
      labels(38) = 'dP\ds-o\u/dt'
      labels(39) = 'dP\dmtr\u/dt'
-     labels(203) = 'dP\dorb\u/dt'
+     labels(221) = 'dP\dorb\u/dt'
      dpdt = 1
   end if
   
@@ -988,7 +1016,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      labels(37) = '\gt\dP\dwml\u\u (yr)'
      labels(38) = '\gt\dP\ds-o\u\u (yr)'
      labels(39) = '\gt\dP\dmtr\u\u (yr)'
-     labels(203) = '\gt\dP\dorb\u\u (yr)'
+     labels(221) = '\gt\dP\dorb\u\u (yr)'
      dpdt = 2
   end if
   
