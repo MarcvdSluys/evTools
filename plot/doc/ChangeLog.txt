@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    75: AstroFloyd, 12/04/2010
+     - Renamed plotplt_new.f to plotplt.f
+    
     74: AstroFloyd, 11/04/2010
      - Added old plotplt.f as plotplt_r066.f
      - Added nagfor.f with dummy routines

@@ -2,7 +2,7 @@
 
 #No text/space after statements below!
 COMP = gfortran#  Use GNU fortran compiler
-COMP = gfortran-4.4.3#
+#COMP = gfortran-4.4.3#
 #COMP = ifort#     Use Intel fortran compiler
 #COMP = nagfor#
 
@@ -77,9 +77,6 @@ plotmod: $(STDOBJ) $(MODOBJ) plotmod.o
 
 plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
-
-plotplt_new: $(STDOBJ) $(PLTOBJ) plotplt_new.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_new $(STDOBJ) $(PLTOBJ) plotplt_new.o
 
 plotplt_r066: $(STDOBJ) $(PLTOBJ) plotplt_r066.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_r066 $(STDOBJ) $(PLTOBJ) plotplt_r066.o
