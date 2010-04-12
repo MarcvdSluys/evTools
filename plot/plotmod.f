@@ -27,7 +27,7 @@ program plotmod
   real*8 :: r1,l1,ts,tc,hc,hec,zc
   real*8 :: mhe,mco
   integer :: i,j,kh,kp,jmod,jb,jin,n
-  integer :: narg,iargc,blk
+  integer :: narg,blk
   character :: fname*99,findfile*99
   
   real :: dat(nc,nm),dat1(nc,nm)
@@ -47,11 +47,11 @@ program plotmod
   x=system('rm tmppwd.txt')
 
   
-  narg = iargc()
+  narg = command_argument_count()
   if(narg.eq.0) then  !Search for input file in current dir
      fname = findfile('*.mod*')
   else if(narg.eq.1) then
-     call getarg(1,fname)
+     call get_command_argument(1,fname)
   else
      write(6,'(A)')' Plotmod: plots the contents of a structure model file'
      write(6,'(A)')'          syntax:  plotmod <filename>'
@@ -105,7 +105,7 @@ program plotmod
   write(6,*)''
   blk = 1
   if(n.eq.1) goto 21
-20 write(6,'(A37,I2,A15,$)')' Which block do you want to plot (1 -', n,'), 0 to quit: '
+20 write(6,'(A37,I2,A15)',advance='no')' Which block do you want to plot (1 -', n,'), 0 to quit: '
   read*,blk
   if(blk.eq.0) goto 9999
   if(blk.lt.1.or.blk.gt.n) goto 20
@@ -196,16 +196,16 @@ program plotmod
 
 
 
-35 write(6,'(A36,$)')' Choose the X-axis variable (1-15): '
+35 write(6,'(A36)',advance='no')' Choose the X-axis variable (1-15): '
   read*,vx
   if(vx.eq.0) goto 9999
   if(vx.lt.1.or.vx.gt.15) goto 35
-36 write(6,'(A36,$)')' Choose the Y-axis variable (1-15): '
+36 write(6,'(A36)',advance='no')' Choose the Y-axis variable (1-15): '
   read*,vy
   if(vy.eq.0) goto 9999
   if(vy.lt.1.or.vy.gt.15) goto 36
 
-37 write(6,'(A68,$)')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
+37 write(6,'(A68)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
   read*,log
 
   lx = labels(vx)
@@ -235,14 +235,14 @@ program plotmod
 70 write(6,*)''
   write(6,*)' X-range:',xmin,'-',xmax
   write(6,*)' Y-range:',ymin,'-',ymax
-  write(6,'(A66,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis:  '
+  write(6,'(A66)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis:  '
   read*,ans
 
   if(ans.eq.'N'.or.ans.eq.'n'.or.ans.eq.' ') goto 100
 
 
   if(ans.eq.'X'.or.ans.eq.'x') then
-     write(6,'(A49,$)')' Give the new range for the X-axis (Xmin, Xmax): '
+     write(6,'(A49)',advance='no')' Give the new range for the X-axis (Xmin, Xmax): '
      read*,xmin,xmax
      if(xmin.lt.xmin0) xmin = xmin0
      if(xmax.gt.xmax0) xmax = xmax0
@@ -258,7 +258,7 @@ program plotmod
   end if
 
   if(ans.eq.'Y'.or.ans.eq.'y') then
-     write(6,'(A49,$)')' Give the new range for the Y-axis (Ymin, Ymax): '
+     write(6,'(A49)',advance='no')' Give the new range for the Y-axis (Ymin, Ymax): '
      read*,ymin,ymax
      if(ymin.lt.ymin0) ymin = ymin0
      if(ymax.gt.ymax0) ymax = ymax0
@@ -290,7 +290,7 @@ program plotmod
 
   hmp = 0
   !      if(vx.eq.1) then
-111 write(6,'(A28,I4,A3,$)')' Highlight a mesh point (1 -',kh,'): '
+111 write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',kh,'): '
   read*,hmp
   if(hmp.gt.kh) goto 111
   if(hmp.lt.1) hmp=0
@@ -332,7 +332,7 @@ program plotmod
   write(6,'(A)')'   3) change axis ranges'
   write(6,'(A)')'   4) change structure model'
   write(6,'(A)')'   5) save plot as postscript'
-  write(6,'(A,$)')' What would you like to do:  '
+  write(6,'(A)',advance='no')' What would you like to do:  '
   read*,plotagain
   write(6,*)''
 

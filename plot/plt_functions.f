@@ -497,49 +497,49 @@ subroutine printpltvarlist(nf)
   integer :: nf
   
   write(6,*)''
-  write(6,'(A)'),'  Primary variables:                                  0: Quit                           '
-  write(6,'(A)'),'                                                                                        '
-  write(6,'(A)'),'    1: model        16: Lh           28: Porb        34: Jorb                           '
-  write(6,'(A)'),'    2: t            17: Lhe          29: FLR         35: dJorb/dt                       '
-  write(6,'(A)'),'    3: dt           18: Lc           30: F1          36: dJgw/dt                        '
-  write(6,'(A)'),'    4: M            19: Lnu          31: dM          37: dJwml/dt                       '
-  write(6,'(A)'),'    5: Mhe          20: Lth          32: dMwind      38: dJmb/dt                        '
-  write(6,'(A)'),'    6: Mco          21: Prot         33: dMmt        39: dJmtr/dt                       '
-  write(6,'(A)'),'    7: Mone         22: VK2                          40: Mcomp                          '
-  write(6,'(A)'),'    8: R            23: Rcz                          41: e                              '
-  write(6,'(A)'),'    9: L            24: dRcz                                                            '
-  write(6,'(A)'),'   10: Teff         25: Tet                                                             '
-  write(6,'(A)'),'   11: Tc           26: Ralv       Abundances:                                          '
-  write(6,'(A)'),'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
-  write(6,'(A)'),'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
-  write(6,'(A)'),'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
-  write(6,'(A)'),'   15: Ub,env                      Core:  56  57  58  59  60  61  62   215              '
-  write(6,'(A)'),'                                                                                        ' 
-  write(6,'(A)'),'   81: Qconv                                                                            '
-  write(6,'(A)'),'                                                                                        ' 
-  write(6,'(A)'),'  Derived variables:                                                                    '
-  write(6,'(A)'),'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg                    '  
-  write(6,'(A)'),'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
-  write(6,'(A)'),'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
-  write(6,'(A)'),'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
-  write(6,'(A)'),'   105: R-I    115: R/Rzams       125: Ne/O change                                      '
-  write(6,'(A)'),'   106: U-V    116: Mhe-Mco       126: Pgw,max                                          '
-  write(6,'(A)'),'   107: V-I    117: Menv          127: Rrl                                              '
-  write(6,'(A)'),'               118: Mconv         128: Xf                                               '
-  write(6,'(A)'),'               119: R/(dR/dt)     129: M.I.                                             '
-  write(6,'(A)'),'               120: Rossby nr     130: Jspin                                            '
-  write(6,'(A)'),'                                                                                        '
-  write(6,'(A)'),'  Special plots:                                                                        '
+  write(6,'(A)')'  Primary variables:                                  0: Quit                           '
+  write(6,'(A)')'                                                                                        '
+  write(6,'(A)')'    1: model        16: Lh           28: Porb        34: Jorb                           '
+  write(6,'(A)')'    2: t            17: Lhe          29: FLR         35: dJorb/dt                       '
+  write(6,'(A)')'    3: dt           18: Lc           30: F1          36: dJgw/dt                        '
+  write(6,'(A)')'    4: M            19: Lnu          31: dM          37: dJwml/dt                       '
+  write(6,'(A)')'    5: Mhe          20: Lth          32: dMwind      38: dJmb/dt                        '
+  write(6,'(A)')'    6: Mco          21: Prot         33: dMmt        39: dJmtr/dt                       '
+  write(6,'(A)')'    7: Mone         22: VK2                          40: Mcomp                          '
+  write(6,'(A)')'    8: R            23: Rcz                          41: e                              '
+  write(6,'(A)')'    9: L            24: dRcz                                                            '
+  write(6,'(A)')'   10: Teff         25: Tet                                                             '
+  write(6,'(A)')'   11: Tc           26: Ralv       Abundances:                                          '
+  write(6,'(A)')'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
+  write(6,'(A)')'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
+  write(6,'(A)')'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
+  write(6,'(A)')'   15: Ub,env                      Core:  56  57  58  59  60  61  62   215              '
+  write(6,'(A)')'                                                                                        ' 
+  write(6,'(A)')'   81: Qconv                                                                            '
+  write(6,'(A)')'                                                                                        ' 
+  write(6,'(A)')'  Derived variables:                                                                    '
+  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg                    '  
+  write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
+  write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
+  write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
+  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change                                      '
+  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max                                          '
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl                                              '
+  write(6,'(A)')'               118: Mconv         128: Xf                                               '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.                                             '
+  write(6,'(A)')'               120: Rossby nr     130: Jspin                                            '
+  write(6,'(A)')'                                                                                        '
+  write(6,'(A)')'  Special plots:                                                                        '
   if(nf.eq.1) then
-     write(6,'(A)'),"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
-     write(6,'(A)'),'   202: Convection plot    212: Luminosities          222: Mdots                        '
-     write(6,'(A)'),'                           213: Surface abundances                                      '
-     write(6,'(A)'),'                           214: Tmax abundances                                         '
-     write(6,'(A)'),'                           215: Core abundances                                         '
+     write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
+     write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
+     write(6,'(A)')'                           213: Surface abundances                                      '
+     write(6,'(A)')'                           214: Tmax abundances                                         '
+     write(6,'(A)')'                           215: Core abundances                                         '
   else
-     write(6,'(A)'),'   201: HR Diagram                                                                      '
+     write(6,'(A)')'   201: HR Diagram                                                                      '
   end if
-  write(6,'(A)'),'                                                                                        '
+  write(6,'(A)')'                                                                                        '
   
 end subroutine printpltvarlist
 !***********************************************************************
@@ -551,8 +551,9 @@ end subroutine printpltvarlist
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use constants
   implicit none
+  integer :: nvar,nn
   real*8 :: dat(nvar,nn)
-  integer :: nvar,nn,ncols,nc,nc1,verbose,i,j,n,version,u
+  integer :: ncols,nc,nc1,verbose,i,j,n,version,u
   character :: fname*(*)
   
   nc1 = nc !Get rid of 'unused' message
@@ -698,7 +699,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
   dat(15,:) = dat(15,:)*m0*1.d-40                               !Ubind in 10^40 ergs
   
-  dat(42:62,:) = max(dat(42:62,:),1.e-10)                       !Abundances: limit them to >10^-10  -  isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  dat(42:62,:) = max(dat(42:62,:),1.d-10)                       !Abundances: limit them to >10^-10  -  isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
   
   
   
@@ -807,8 +808,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !Timescales
   dat(201,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
   dat(202,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
-  dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)                    !Mass transfer
-  dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)                     !Gravitational waves
+  dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                    !Mass transfer
+  dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                     !Gravitational waves
   !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)               !Magnetic braking (Actually SO-coupling!)
   dat(205,1:n) = dsqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
   dpdt  = 0

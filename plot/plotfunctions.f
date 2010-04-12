@@ -90,10 +90,10 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   implicit none
   integer :: nmax,nvar,n, nhp,hp(1000),vx
   integer :: i,j,ci0,lw0
-  integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch,ch0
+  integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
   real*8 :: dat(nvar,nmax)
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
-  real :: ymin,ymax
+  real :: ymin,ymax,ch0
   character :: hlp,hlbl
   character :: hlbls*5
   

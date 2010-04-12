@@ -98,10 +98,10 @@ program plotpltn
   i = system('rm tmppwd.txt')
 
   plot = 0
-5 nf = iargc()
+5 nf = command_argument_count()
   if(nf.gt.0.and.nf.le.nff) then
      do i=1,nf
-        call getarg(i,fnames(i))
+        call get_command_argument(i,fnames(i))
      end do
   end if
   if(nf.eq.0) then
@@ -121,14 +121,14 @@ program plotpltn
   
 7 write(6,*)''
   do f=1,nf
-     write(6,'(A,$)')'  Reading file '//trim(fnames(f))//','
+     write(6,'(A)',advance='no')'  Reading file '//trim(fnames(f))//','
      if(nf.eq.1) write(*,*)
 
      dat(f,:,:) = 0.d0
      open(unit=10,form='formatted',status='old',file=fnames(f))
      rewind 10
      read(10,*)ncols
-     write(6,'(I4,A,$)')ncols,' columns.'
+     write(6,'(I4,A)',advance='no')ncols,' columns.'
      do j=1,nn
         read(10,*,err=12,end=11) (dat(f,i,j),i=1,ncols)
         !dat(f,1,j) = j
@@ -263,7 +263,7 @@ program plotpltn
      write(6,'(A70)')' 77: t/t_f                                                            '
      write(6,'(A70)')' 78: Lhe/Lh                                                           '
      write(6,'(A70)')'                                                                      '
-35   write(6,'(A,$)')'  Choose the X-axis variable (1-101): '
+35   write(6,'(A)',advance='no')'  Choose the X-axis variable (1-101): '
      read*,vx
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.101) goto 35
@@ -277,7 +277,7 @@ program plotpltn
   if(hrd.eq.1) goto 50
   
   if(plot.lt.2) then      
-36   write(6,'(A,$)')'  Choose the Y-axis variable (1-91): '
+36   write(6,'(A)',advance='no')'  Choose the Y-axis variable (1-91): '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0.or.vy.gt.91) goto 36
@@ -296,7 +296,7 @@ program plotpltn
   !***   LIN/LOG AXES
   !************************************************************************      
 37 if(plot.ne.6) then      
-     write(6,'(A,$)')'  Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A)',advance='no')'  Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,log
      if(log.eq.'X') log='x'
      if(log.eq.'Y') log='y'
@@ -405,7 +405,7 @@ program plotpltn
      write(6,*)''
      write(6,*)'  X-range:',xmin,'-',xmax
      write(6,*)'  Y-range:',ymin,'-',ymax
-     write(6,'(A,$)')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A)',advance='no')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'N') rng='n'
@@ -416,7 +416,7 @@ program plotpltn
      if(rng.eq.'n'.or.rng.eq.' ') goto 100
      
      if(rng.eq.'x'.or.rng.eq.'b') then
-        write(6,'(A,$)')'  Give the new range for the X-axis (Xmin, Xmax): '
+        write(6,'(A)',advance='no')'  Give the new range for the X-axis (Xmin, Xmax): '
         read*,xmin,xmax
         if(xmin.gt.xmax) then
            call rswap(xmin,xmax)
@@ -426,7 +426,7 @@ program plotpltn
      
      
      if(rng.eq.'y'.or.rng.eq.'b') then
-        write(6,'(A51,$)')'  Give the new range for the Y-axis (Ymin, Ymax): '
+        write(6,'(A51)',advance='no')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
            call rswap(ymin,ymax)
@@ -647,7 +647,7 @@ program plotpltn
      write(6,'(A)')'   9) toggle drawing line/points'
   end if !if(plot.ne.8) then
   write(6,*)''
-  write(6,'(A,$)')'  What do you want to do ?  '
+  write(6,'(A)',advance='no')'  What do you want to do ?  '
   read(5,*,iostat=io) plot
   if(io.ne.0) goto 900
   if(plot.lt.0.or.plot.gt.9) goto 900
@@ -704,7 +704,7 @@ program plotpltn
         write(*,'(A)')'  1: dots'
         write(*,'(A)')'  2: lines'
         write(*,'(A)')'  3: both'
-        write(*,'(A,$)')'  What would you like to plot?  '
+        write(*,'(A)',advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
      if(ansi.gt.0) drawlines = ansi-1 !0-2

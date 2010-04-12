@@ -20,7 +20,7 @@ program plotmdl
   use constants
   implicit none
   integer, parameter :: nn=2001,nq=300  !nq: max number of columns
-  integer :: nm,nc,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),iargc,io,whitebg
+  integer :: nm,nc,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,whitebg
   real*8 :: dat1(nq)
   real :: dat(nq,nn),age,ver,x
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
@@ -175,8 +175,8 @@ program plotmdl
      if(title(i:i).ne.' ') ttlen = i
   end do
   
-  if(iargc().eq.1) then
-     call getarg(1,fname)
+  if(command_argument_count().eq.1) then
+     call get_command_argument(1,fname)
   else
      fname=findfile('*.mdl*')  !Search for input file in current dir
   end if
@@ -284,7 +284,7 @@ program plotmdl
   
   
   !***   CHOOSE STRUCTURE MODEL
-20 write(6,'(A47,I3,A3,$)')' Which structure model do you want to plot (1-',nblk,'): '
+20 write(6,'(A47,I3,A3)',advance='no')' Which structure model do you want to plot (1-',nblk,'): '
   read*,blk
   if(blk.eq.0) goto 9999
   if(blk.lt.1.or.blk.gt.nblk) goto 20 
@@ -406,12 +406,12 @@ program plotmdl
   do i=1,ii
      do j=0,nr-1
         if(pxnr(i+j*ii).eq.0) then
-           write(6,'(A19,$)')''
+           write(6,'(A19)',advance='no')''
         else
-           write(6,'(I9,A10,5x,$)')i+j*ii,': '//pxns(pxnr(i+j*ii))
+           write(6,'(I9,A10,5x)',advance='no')i+j*ii,': '//pxns(pxnr(i+j*ii))
         end if
      end do
-     write(6,*)''
+     write(6,*)
   end do
   
   !Print derived variables, from number 201 on:
@@ -425,7 +425,7 @@ program plotmdl
   !      j = 0
   !   end if
   !   if(pxnr(i).gt.0) then
-  !      write(6,'(I5,A15,5x,$)')i,': '//pxns(i)
+  !      write(6,'(I5,A15,5x)',advance='no')i,': '//pxns(i)
   !      j = j+1
   !   end if
   !end do
@@ -435,9 +435,9 @@ program plotmdl
   do i=1,ii
      do j=0,nr-1
         if(pxnr(200+i+j*ii).eq.0) then
-           write(6,'(A19,$)')''
+           write(6,'(A19)',advance='no')''
         else
-           write(6,'(I9,A10,5x,$)')200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
+           write(6,'(I9,A10,5x)',advance='no')200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
         end if
      end do
      write(6,*)''
@@ -449,13 +449,13 @@ program plotmdl
   
   
   
-35 write(6,'(A,$)')' Choose the X-axis variable: '
+35 write(6,'(A)',advance='no')' Choose the X-axis variable: '
   ab = 0
   read*,vx
   if(vx.eq.0) goto 9999
   if(pxnr(vx).eq.0) goto 35
   
-36 write(6,'(A,$)')' Choose the Y-axis variable: '
+36 write(6,'(A)',advance='no')' Choose the Y-axis variable: '
   read*,vy
   if(vy.eq.0) goto 9999
   if(pxnr(vy).eq.0) goto 36
@@ -493,7 +493,7 @@ program plotmdl
   
   !***   LIN/LOG AXES
   
-  write(6,'(A,$)')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
+  write(6,'(A)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
   read*,log
   if(log.eq.'X') log='x'
   if(log.eq.'Y') log='y'
@@ -536,7 +536,7 @@ program plotmdl
 70 write(6,*)''
   write(6,*)' X-range:',xmin,'-',xmax
   write(6,*)' Y-range:',ymin,'-',ymax
-  write(6,'(A,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth:  '
+  write(6,'(A)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth:  '
   read*,rng
   if(rng.eq.'N') rng='n'
   if(rng.eq.'X') rng='x'
@@ -591,7 +591,7 @@ program plotmdl
   
   hmp = 0
   if(vx.eq.201) then
-111  write(6,'(A28,I4,A3,$)')' Highlight a mesh point (1 -',nm,'): '
+111  write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',nm,'): '
      read*,hmp
      if(hmp.gt.nm) goto 111
      if(hmp.lt.1) hmp=0
@@ -711,7 +711,7 @@ program plotmdl
      write(6,'(A)')'  8) save plot as postscript'
   end if !if(plot.ne.9) then
   write(6,*)''
-  write(6,'(A27,$)')' What do you want to do ?  '
+  write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot
   if(plot.lt.0.or.plot.gt.8) goto 900
   

@@ -183,19 +183,19 @@ program plotpltp
   end do
   
   dat(72,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr                 !KH timescale
-  dat(73,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)                      !Gravitational waves
-  dat(74,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)                 !Magnetic braking
-  dat(75,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)                     !Mass transfer
+  dat(73,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                      !Gravitational waves
+  dat(74,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)                 !Magnetic braking
+  dat(75,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                     !Mass transfer
   dat(76,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10                  !Nuclear timescale
-  dat(77,1:n) = dat(34,1:n)/max(abs(dat(35,1:n))*yr,1.e-30)                 !Total dOA
-  dat(78,1:n) = dat(34,1:n)/max(dat(39,1:n)*yr,1.e-30)                      !dOA due to Mass loss
+  dat(77,1:n) = dat(34,1:n)/max(abs(dat(35,1:n))*yr,1.d-30)                 !Total dOA
+  dat(78,1:n) = dat(34,1:n)/max(dat(39,1:n)*yr,1.d-30)                      !dOA due to Mass loss
   
   
 30 continue
   call pgbegin(1,'plotpltp.ps/vps',1,1)
   call pgscf(2)
   
-  write(6,'(A48,$)')' How many panels do you want to plot ?   (1-6): '
+  write(6,'(A48)',advance='no')' How many panels do you want to plot ?   (1-6): '
   read*,np
   
   write(6,*)''
@@ -224,14 +224,14 @@ program plotpltp
   write(6,'(A)')' Core  56  57  58  59  60  61  62  Core                  '
   write(6,'(A)')'                                                         '
   write(6,*)''
-35 write(6,'(A36,$)')' Choose the X-axis variable (1-92): '
+35 write(6,'(A36)',advance='no')' Choose the X-axis variable (1-92): '
   vx = 1
   read*,vx
   if(vx.eq.0) goto 9999
   if(vx.lt.0.or.vx.gt.92) goto 35
   if(vx.gt.61.and.vx.lt.92) goto 35
   
-  write(6,'(A51,$)')' Do you want a logarithmic X-axis ?   (Y)es, (N)o: '
+  write(6,'(A51)',advance='no')' Do you want a logarithmic X-axis ?   (Y)es, (N)o: '
   log='n'
   read*,log
   
@@ -257,7 +257,7 @@ program plotpltp
   ! **********************************************************************
   do p=1,np
      
-36   write(6,'(A28,I1,A22,$)')' Choose the Y-axis variable ',p,'   (1-62, 81, 92-96): '
+36   write(6,'(A28,I1,A22)',advance='no')' Choose the Y-axis variable ',p,'   (1-62, 81, 92-96): '
      vy = 2*p
      read*,vy
      if(vy.eq.0) goto 9999
@@ -290,7 +290,7 @@ program plotpltp
      
      yy = real(dat(vy,1:nn))  !Problem with converting to float: small time ranges after a long time are rounded to the same floating number
      
-     write(6,'(A51,$)')' Do you want a logarithmic Y-axis ?   (Y)es, (N)o: '
+     write(6,'(A51)',advance='no')' Do you want a logarithmic Y-axis ?   (Y)es, (N)o: '
      read*,log
      
      ly = labels(vy)
@@ -351,11 +351,11 @@ program plotpltp
      
      
      goto 100  !Skip rescale (at least for x)
-     write(6,'(A73,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A73)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'X'.or.rng.eq.'x'.or.rng.eq.'B'.or.rng.eq.'b') then
-        write(6,'(A51,$)')'  Give the new range for the X-axis (Xmin, Xmax): '
+        write(6,'(A51)',advance='no')'  Give the new range for the X-axis (Xmin, Xmax): '
         read*,xmin,xmax
         if(xmin.gt.xmax) then
            x = xmin
@@ -366,7 +366,7 @@ program plotpltp
      end if !if(rng.eq.'X'.or.rng.eq.'x'.or.rng.eq.'B'.or.rng.eq.'b')
      
      if(rng.eq.'Y'.or.rng.eq.'y'.or.rng.eq.'B'.or.rng.eq.'b') then
-        write(6,'(A51,$)')'  Give the new range for the Y-axis (Ymin, Ymax): '
+        write(6,'(A51)',advance='no')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
            x = ymin
@@ -430,7 +430,7 @@ program plotpltp
      
      if(conv.eq.1) then
         ch = 0
-        write(6,'(A42,$)')' Do you want to plot hatches (Y)es/(N)o: '
+        write(6,'(A42)',advance='no')' Do you want to plot hatches (Y)es/(N)o: '
         read*,cnvh
         if(cnvh.eq.'y'.or.cnvh.eq.'Y') ch = 1
      end if
@@ -469,7 +469,7 @@ program plotpltp
      if(p.eq.np) call pgmtxt('B',2.2,0.5,0.5,lx)
      call pgmtxt('L',2.2,0.5,0.5,ly)
      
-     call pgline(n,xx(1:n),yy(1:n),.true.)
+     call pgline(n,xx(1:n),yy(1:n))
      
      if(dhdt.eq.1) then
         do j=36,39
@@ -490,7 +490,7 @@ program plotpltp
      
      if(conv.eq.1) then
         call pgslw(3)
-        call pgline(n,xx(1:n),yy(1:n),.true.)
+        call pgline(n,xx(1:n),yy(1:n))
         call pgslw(1)
         call pgsls(2)
         do j=64,67

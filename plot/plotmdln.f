@@ -254,12 +254,12 @@ program plotmdln
   write(6,'(A)')' 9: Nrad    16: Mg      23: Nrad-Nad                     '
   write(6,*)''
 
-35 write(6,'(A36,$)')' Choose the X-axis variable (1-28): '
+35 write(6,'(A36)',advance='no')' Choose the X-axis variable (1-28): '
   read*,vx
   if(vx.eq.0) goto 9999
   if(vx.lt.1.or.vx.gt.28) goto 35
 
-36 write(6,'(A36,$)')' Choose the Y-axis variable (1-28): '
+36 write(6,'(A36)',advance='no')' Choose the Y-axis variable (1-28): '
   read*,vy
   if(vy.eq.0) goto 9999
   if(vy.lt.1.or.vy.gt.28) goto 36
@@ -280,7 +280,7 @@ program plotmdln
   !***   LIN/LOG AXES
   !************************************************************************      
 
-  write(6,'(A68,$)')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
+  write(6,'(A68)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
   read*,log
   if(log.eq.'X') log='x'
   if(log.eq.'Y') log='y'
@@ -324,7 +324,7 @@ program plotmdln
 70 write(6,*)''
   write(6,'(A,ES12.3,A1,ES12.3)')'  X-range:',xmin,'-',xmax
   write(6,'(A,ES12.3,A1,ES12.3)')'  Y-range:',ymin,'-',ymax
-  write(6,'(A,$)')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth:  '
+  write(6,'(A)',advance='no')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth:  '
   read*,rng
   if(rng.eq.'N') rng='n'
   if(rng.eq.'X') rng='x'
@@ -466,7 +466,7 @@ program plotmdln
   write(6,'(A)')'  6) change structure model'
   write(6,'(A)')'  7) change input file'
   write(6,*)''
-  write(6,'(A27,$)')' What do you want to do ?  '
+  write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plotagain
   if(plotagain.lt.0.or.plotagain.gt.7) goto 900
 

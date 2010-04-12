@@ -81,11 +81,11 @@ subroutine setconstants
   a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
   sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
-  call getenv('HOME',homedir)       !Set homedir  = $HOME (the environment variable)
-  call getenv('PWD',workdir)        !Set workdir  = $PWD
-  call getenv('HOSTNAME',hostname)  !Set hostname = $HOSTNAME  !Apparently not always exported
-  call getenv('USER',username)      !Set username = $USER
-  call getenv('UID',userid)         !Set userid   = $UID
+  call get_environment_variable('HOME',homedir)       !Set homedir  = $HOME (the environment variable)
+  call get_environment_variable('PWD',workdir)        !Set workdir  = $PWD
+  call get_environment_variable('HOSTNAME',hostname)  !Set hostname = $HOSTNAME  !Apparently not always exported
+  call get_environment_variable('USER',username)      !Set username = $USER
+  call get_environment_variable('UID',userid)         !Set userid   = $UID
   
   cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
@@ -213,7 +213,7 @@ function findfile(match)
      do i=1,k
         write(6,'(I5,A)')i,':  '//trim(names(i))
      end do
-     write(6,'(/,A,$)')'  Enter the number of the file you want to view: '
+     write(6,'(/,A)',advance='no')'  Enter the number of the file you want to view: '
      read*,fnum
      if(fnum.le.0.or.fnum.gt.k) then
         write(*,'(/,A,/)')'  No file selected, quitting...'

@@ -88,8 +88,8 @@ program plotplt
   plot = 0
   xwini = 1  !Number of X window to try first
 5 continue
-  if(iargc().eq.1.and.plot.eq.0) then
-     call getarg(1,fname)
+  if(command_argument_count().eq.1.and.plot.eq.0) then
+     call get_command_argument(1,fname)
   else
      fname=findfile('*.plt*') !Match string
      if(fname(1:10).eq.'          ') goto 9999
@@ -124,7 +124,7 @@ program plotplt
      call printpltvarlist(1)  !Print the list of variables in a *.plt? file to screen, for input menu
      
      
-35   write(6,'(A,$)')'  Choose the X-axis variable: '
+35   write(6,'(A)',advance='no')'  Choose the X-axis variable: '
      read*,vx
      if(vx.eq.0) goto 9999
      if(vx.lt.0.or.vx.gt.201) goto 35
@@ -155,7 +155,7 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A,$)')'  Choose the Y-axis variable: '
+36   write(6,'(A)',advance='no')'  Choose the Y-axis variable: '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0) goto 36
@@ -245,7 +245,7 @@ program plotplt
   !***   LIN/LOG AXES
   !************************************************************************      
   if(plot.ne.6.and.plot.ne.7) then      
-     write(6,'(A,$)')' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A)',advance='no')' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,log
      if(log.eq.'X') log='x'
      if(log.eq.'Y') log='y'
@@ -355,7 +355,7 @@ program plotplt
      write(6,*)''
      write(6,*)' X-range:',xmin,'-',xmax
      write(6,*)' Y-range:',ymin,'-',ymax
-     write(6,'(A,$)')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'N') rng='n'
@@ -366,7 +366,7 @@ program plotplt
      if(rng.eq.'n'.or.rng.eq.' ') goto 100
      
      if(rng.eq.'x'.or.rng.eq.'b') then
-        write(6,'(A51,$)')'  Give the new range for the X-axis (Xmin, Xmax): '
+        write(6,'(A51)',advance='no')'  Give the new range for the X-axis (Xmin, Xmax): '
         read*,xmin,xmax
         if(xmin.gt.xmax) then
            x = xmin
@@ -378,7 +378,7 @@ program plotplt
      
      
      if(rng.eq.'y'.or.rng.eq.'b') then
-        write(6,'(A51,$)')'  Give the new range for the Y-axis (Ymin, Ymax): '
+        write(6,'(A51)',advance='no')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
            x = ymin
@@ -441,7 +441,7 @@ program plotplt
   
   if(conv.eq.1) then
      ch = 0
-     !write(6,'(A42,$)')' Do you want to plot hatches (Y)es/(N)o: '
+     !write(6,'(A42)',advance='no')' Do you want to plot hatches (Y)es/(N)o: '
      !read*,cnvh
      !if(cnvh.eq.'y'.or.cnvh.eq.'Y') ch = 1
   end if
@@ -474,14 +474,14 @@ program plotplt
      hp = 0
      hlbl = 'n'
      hlp = 'n'
-     write(6,'(A47,$)')' Do you want to highlight model points (y/n) ? '
+     write(6,'(A47)',advance='no')' Do you want to highlight model points (y/n) ? '
      read*,hlp
      if(hlp.eq.'Y') hlp='y'
      if(hlp.eq.'N') hlp='n'
      
      if(hlp.eq.'y') then
         hlp1 = 'm'
-        write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
+        write(6,'(A)',advance='no')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
         read*,hlp1
         if(hlp1.eq.'S') hlp1='s'
         if(hlp1.eq.'M') hlp1='m'
@@ -526,7 +526,7 @@ program plotplt
         end if
         
         write(6,*)''     
-        write(6,'(A43,$)')' Do you want to label these points (y/n) ? '
+        write(6,'(A43)',advance='no')' Do you want to label these points (y/n) ? '
         read*,hlbl
         if(hlbl.eq.'Y') hlbl='y'
         if(hlbl.eq.'N') hlbl='n'
@@ -799,7 +799,7 @@ program plotplt
      write(6,'(A)')' 11) toggle drawing line/points'
   end if !if(plot.ne.9) then
   write(6,*)''
-  write(6,'(A27,$)')' What do you want to do ?  '
+  write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot
   if(plot.lt.0.or.plot.gt.11) goto 900
   
@@ -912,7 +912,7 @@ program plotplt
         write(6,'(A)')'  1: dots'
         write(6,'(A)')'  2: lines'
         write(6,'(A)')'  3: both'
-        write(6,'(A,$)')'  What would you like to plot?  '
+        write(6,'(A)',advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
      if(ansi.gt.0) drawlines = ansi-1 !0-2

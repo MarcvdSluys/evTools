@@ -93,10 +93,10 @@ program plotplt
 5 continue
   
   !Search for input files in current dir:
-  nf = iargc()
+  nf = command_argument_count()
   if(nf.ge.1.and.plot.eq.0) then
      do f=1,nf
-        call getarg(f,fname)
+        call get_command_argument(f,fname)
         fnames(f) = fname
      end do
   else
