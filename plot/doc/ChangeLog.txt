@@ -2,6 +2,14 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    72: AstroFloyd, 11/04/2010
+     - developing plotplt_new: fixing details
+       - added entry in Makefile
+       - use both pglabels and asclabels, use the latter for PS file names and title
+       - fix strmdl (version doesn't work because of unformatted read)
+         - plotting where structure models were stored now works
+       - print legenda when using multiple input files
+           
     71: AstroFloyd, 11/04/2010
      - developing plotplt_new: replaced f,nf with pl,npl in most places
      - adapted getpltlabels(), printpltvarlist() and pltconvection()

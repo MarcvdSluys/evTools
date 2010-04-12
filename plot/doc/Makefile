@@ -4,7 +4,7 @@
 COMP = gfortran#  Use GNU fortran compiler
 COMP = gfortran-4.4.3#
 #COMP = ifort#     Use Intel fortran compiler
-
+#COMP = nagfor#
 
 #ifort:
 ifeq ($(COMP),ifort)
@@ -41,6 +41,11 @@ endif
 
 
 
+#nagfor:
+ifeq ($(COMP),nagfor)
+   CFLAGS = -O0 -132 -free -colour -w=all
+endif
+
 
 STDOBJ = functions.o
 PLTOBJ = plotfunctions.o plt_functions.o
@@ -68,6 +73,9 @@ plotmod: $(STDOBJ) $(MODOBJ) plotmod.o
 
 plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
+
+plotplt_new: $(STDOBJ) $(PLTOBJ) plotplt_new.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_new $(STDOBJ) $(PLTOBJ) plotplt_new.o
 
 plotpltn: $(STDOBJ) $(PLTOBJ) plotpltn.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltn $(STDOBJ) $(PLTOBJ) plotpltn.o

@@ -17,126 +17,126 @@
 
 !***********************************************************************
 !Provides the labels for the plot axes of a *.plt? file
-subroutine getpltlabels(nf,nvar,labels,defvar)
+subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   implicit none
   integer :: nf,nvar,defvar(0:nvar)
-  character :: labels(nvar)*99
+  character :: pglabels(nvar)*99,asclabels(nvar)*99
   
   defvar = 0
   
-  labels(1) = 'Model'
-  labels(2) = 't (yr)'
-  labels(3) = '\gDt (yr)'
-  labels(4) = 'M (M\d\(2281)\u)'
-  labels(5) = 'M\dHe\u (M\d\(2281)\u)'
-  labels(6) = 'M\dCO\u (M\d\(2281)\u)'
-  labels(7) = 'M\dONe\u (M\d\(2281)\u)'
-  labels(8) = 'R (R\d\(2281)\u)'
-  labels(9) = 'L (L\d\(2281)\u)'
-  labels(10) = 'T\deff\u (K)'
+  pglabels(1) = 'Model'
+  pglabels(2) = 't (yr)'
+  pglabels(3) = '\gDt (yr)'
+  pglabels(4) = 'M (M\d\(2281)\u)'
+  pglabels(5) = 'M\dHe\u (M\d\(2281)\u)'
+  pglabels(6) = 'M\dCO\u (M\d\(2281)\u)'
+  pglabels(7) = 'M\dONe\u (M\d\(2281)\u)'
+  pglabels(8) = 'R (R\d\(2281)\u)'
+  pglabels(9) = 'L (L\d\(2281)\u)'
+  pglabels(10) = 'T\deff\u (K)'
   
-  labels(11) = 'T\dc\u (K)'
-  labels(12) = 'T\dmax\u (K)'
-  labels(13) = '\gr\dc\u (g cm\u-3\d)'
-  labels(14) = '\gr\dTmax\u (g cm\u-3\d)'
-  labels(15) = 'U\dbind,env\u (10\u40\d erg)'
-  labels(16) = 'L\dH\u (L\d\(2281)\u)'
-  labels(17) = 'L\dHe\u (L\d\(2281)\u)'
-  labels(18) = 'L\dC\u (L\d\(2281)\u)'
-  labels(19) = 'L\d\gn\u (L\d\(2281)\u)'
-  labels(20) = 'L\dth\u (L\d\(2281)\u)'
+  pglabels(11) = 'T\dc\u (K)'
+  pglabels(12) = 'T\dmax\u (K)'
+  pglabels(13) = '\gr\dc\u (g cm\u-3\d)'
+  pglabels(14) = '\gr\dTmax\u (g cm\u-3\d)'
+  pglabels(15) = 'U\dbind,env\u (10\u40\d erg)'
+  pglabels(16) = 'L\dH\u (L\d\(2281)\u)'
+  pglabels(17) = 'L\dHe\u (L\d\(2281)\u)'
+  pglabels(18) = 'L\dC\u (L\d\(2281)\u)'
+  pglabels(19) = 'L\d\gn\u (L\d\(2281)\u)'
+  pglabels(20) = 'L\dth\u (L\d\(2281)\u)'
   
-  labels(21) = 'P\drot\u (d)'
-  labels(22) = 'K\u2\d'
-  labels(23) = 'R\dcz\u'
-  labels(24) = '\gDR\dcz\u'
-  labels(25) = 't\det\u (d)'
-  labels(26) = 'R\dalfven\u'
-  labels(27) = 'B\dp\u'
-  labels(28) = 'P\dorb\u (d)'
-  labels(29) = 'FLR'
-  labels(30) = 'F1'
+  pglabels(21) = 'P\drot\u (d)'
+  pglabels(22) = 'K\u2\d'
+  pglabels(23) = 'R\dcz\u'
+  pglabels(24) = '\gDR\dcz\u'
+  pglabels(25) = 't\det\u (d)'
+  pglabels(26) = 'R\dalfven\u'
+  pglabels(27) = 'B\dp\u'
+  pglabels(28) = 'P\dorb\u (d)'
+  pglabels(29) = 'FLR'
+  pglabels(30) = 'F1'
   
-  labels(31) = 'dM/dt (M\d\(2281)\u/yr)'
-  labels(32) = 'dM\dwind\u/dt (M\d\(2281)\u/yr)'
-  labels(33) = 'dM\dmt\u/dt (M\d\(2281)\u/yr)'
-  labels(34) = 'J\dorb\u (10\u50\d g cm\u2\d s\u-1\d)'
-  labels(35) = 'dJ\dorb\u/dt'
-  labels(36) = 'dJ\dgw\u/dt'
-  labels(37) = 'dJ\dwml\u/dt'
-  labels(38) = 'dJ\ds-o\u/dt'
-  labels(39) = 'dJ\dmtr\u/dt'
-  labels(40) = 'M\dcomp\u'
+  pglabels(31) = 'dM/dt (M\d\(2281)\u/yr)'
+  pglabels(32) = 'dM\dwind\u/dt (M\d\(2281)\u/yr)'
+  pglabels(33) = 'dM\dmt\u/dt (M\d\(2281)\u/yr)'
+  pglabels(34) = 'J\dorb\u (10\u50\d g cm\u2\d s\u-1\d)'
+  pglabels(35) = 'dJ\dorb\u/dt'
+  pglabels(36) = 'dJ\dgw\u/dt'
+  pglabels(37) = 'dJ\dwml\u/dt'
+  pglabels(38) = 'dJ\ds-o\u/dt'
+  pglabels(39) = 'dJ\dmtr\u/dt'
+  pglabels(40) = 'M\dcomp\u'
   
-  labels(41) = 'e'
-  labels(42) = 'H\dsurf\u'
-  labels(43) = 'He\dsurf\u'
-  labels(44) = 'C\dsurf\u'
-  labels(45) = 'N\dsurf\u'
-  labels(46) = 'O\dsurf\u'
-  labels(47) = 'Ne\dsurf\u'
-  labels(48) = 'Mg\dsurf\u'
-  labels(49) = 'H\dTmax\u'
-  labels(50) = 'He\dTmax\u'
+  pglabels(41) = 'e'
+  pglabels(42) = 'H\dsurf\u'
+  pglabels(43) = 'He\dsurf\u'
+  pglabels(44) = 'C\dsurf\u'
+  pglabels(45) = 'N\dsurf\u'
+  pglabels(46) = 'O\dsurf\u'
+  pglabels(47) = 'Ne\dsurf\u'
+  pglabels(48) = 'Mg\dsurf\u'
+  pglabels(49) = 'H\dTmax\u'
+  pglabels(50) = 'He\dTmax\u'
   
-  labels(51) = 'C\dTmax\u'
-  labels(52) = 'N\dTmax\u'
-  labels(53) = 'O\dTmax\u'
-  labels(54) = 'Ne\dTmax\u'
-  labels(55) = 'Mg\dTmax\u'
-  labels(56) = 'H\dcentr\u'
-  labels(57) = 'He\dcentr\u'
-  labels(58) = 'C\dcentr\u'
-  labels(59) = 'N\dcentr\u'
-  labels(60) = 'O\dcentr\u'
+  pglabels(51) = 'C\dTmax\u'
+  pglabels(52) = 'N\dTmax\u'
+  pglabels(53) = 'O\dTmax\u'
+  pglabels(54) = 'Ne\dTmax\u'
+  pglabels(55) = 'Mg\dTmax\u'
+  pglabels(56) = 'H\dcentr\u'
+  pglabels(57) = 'He\dcentr\u'
+  pglabels(58) = 'C\dcentr\u'
+  pglabels(59) = 'N\dcentr\u'
+  pglabels(60) = 'O\dcentr\u'
   
-  labels(61) = 'Ne\dcentr\u'
-  labels(62) = 'Mg\dcentr\u'
+  pglabels(61) = 'Ne\dcentr\u'
+  pglabels(62) = 'Mg\dcentr\u'
   
   defvar(1:62) = 1
   
   
-  labels(81) = 'Q\dconv\u'
+  pglabels(81) = 'Q\dconv\u'
   
   defvar(81) = 1
   
   
   !Derived variables:
-  labels(101) = 'V'
-  labels(102) = 'U-B'
-  labels(103) = 'B-V'
-  labels(104) = 'V-R'
-  labels(105) = 'R-I'
-  labels(106) = 'U-V'
-  labels(107) = 'V-I'
+  pglabels(101) = 'V'
+  pglabels(102) = 'U-B'
+  pglabels(103) = 'B-V'
+  pglabels(104) = 'V-R'
+  pglabels(105) = 'R-I'
+  pglabels(106) = 'U-V'
+  pglabels(107) = 'V-I'
   
-  labels(111) = '\(2137)\denv\u'  !lambda_env
-  labels(112) = 'q\dcrit\u'       !q_crit; q_1 > q_crit gives dynamical MT (Hurley et al., 2002, Eq.57)
-  labels(113) = 'M\dcomp,crit\u'  !M2 < M2,crit gives dynamical MT (Hurley et al., 2002, Eq.57)
-  labels(114) = 'v\drot\u (km/s)' !Rotational velocity
-  labels(115) = 'R/R\dZAMS\u'     !Radius over ZAMS radius
+  pglabels(111) = '\(2137)\denv\u'  !lambda_env
+  pglabels(112) = 'q\dcrit\u'       !q_crit; q_1 > q_crit gives dynamical MT (Hurley et al., 2002, Eq.57)
+  pglabels(113) = 'M\dcomp,crit\u'  !M2 < M2,crit gives dynamical MT (Hurley et al., 2002, Eq.57)
+  pglabels(114) = 'v\drot\u (km/s)' !Rotational velocity
+  pglabels(115) = 'R/R\dZAMS\u'     !Radius over ZAMS radius
   
-  labels(116) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
-  labels(117) = 'M\denv\u (M\d\(2281)\u)'
-  labels(118) = 'M\dconv\u (M\d\(2281)\u)'
-  labels(119) = 'R/(dR/dt) (yr)'
-  labels(120) = 'Rossby number'
+  pglabels(116) = 'M\dHe\u-M\dCO\u (M\d\(2281)\u)'
+  pglabels(117) = 'M\denv\u (M\d\(2281)\u)'
+  pglabels(118) = 'M\dconv\u (M\d\(2281)\u)'
+  pglabels(119) = 'R/(dR/dt) (yr)'
+  pglabels(120) = 'Rossby number'
   
-  labels(121) = 'P\drot,crit\u (d)'
-  labels(122) = 'MB\dSills\u'
-  labels(123) = 't\det,int\u/t\det,anal.\u'
-  labels(124) = 't-t\d0\u (yr)'
-  labels(125) = '(Ne/O)\dc\u/(Ne/O)\ds\u'
-  labels(126) = 'P\dGW,max\u (d)'
-  labels(127) = 'R\drl\u (R\d\(2281)\u)'
-  labels(128) = 'X\df\u'
-  labels(129) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
-  labels(130) = 'J\dspin\u (10\u50\d g cm\u2\d s\u-1\d)'
+  pglabels(121) = 'P\drot,crit\u (d)'
+  pglabels(122) = 'MB\dSills\u'
+  pglabels(123) = 't\det,int\u/t\det,anal.\u'
+  pglabels(124) = 't-t\d0\u (yr)'
+  pglabels(125) = '(Ne/O)\dc\u/(Ne/O)\ds\u'
+  pglabels(126) = 'P\dGW,max\u (d)'
+  pglabels(127) = 'R\drl\u (R\d\(2281)\u)'
+  pglabels(128) = 'X\df\u'
+  pglabels(129) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
+  pglabels(130) = 'J\dspin\u (10\u50\d g cm\u2\d s\u-1\d)'
   
-  labels(131) = '\gr\davg\u (g cm\u-3\d)'
-  labels(132) = 'Z\dsurf\u'
-  labels(133) = '(t\df\u - t)  (yr)'
-  labels(134) = 'P\drot\u/P\dcrit\u'
+  pglabels(131) = '\gr\davg\u (g cm\u-3\d)'
+  pglabels(132) = 'Z\dsurf\u'
+  pglabels(133) = '(t\df\u - t)  (yr)'
+  pglabels(134) = 'P\drot\u/P\dcrit\u'
   
   defvar(101:134) = 1
   
@@ -150,17 +150,153 @@ subroutine getpltlabels(nf,nvar,labels,defvar)
      defvar(202) = 1  !Convection plot
      
      
-     labels(211) = '\gt (yr)'
-     labels(212) = 'L (L\d\(2281)\u)'
-     labels(213) = 'Surface abundances'
-     labels(214) = 'T\dmax\u abundances'
-     labels(215) = 'Core abundances'
+     pglabels(211) = '\gt (yr)'
+     pglabels(212) = 'L (L\d\(2281)\u)'
+     pglabels(213) = 'Surface abundances'
+     pglabels(214) = 'T\dmax\u abundances'
+     pglabels(215) = 'Core abundances'
      defvar(211:215) = 1
      
-     labels(221) = 'dJ\dorb\u/dt'
-     labels(222) = 'dM/dt (M\d\(2281)\u/yr)'
+     pglabels(221) = 'dJ\dorb\u/dt'
+     pglabels(222) = 'dM/dt (M\d\(2281)\u/yr)'
      defvar(221:222) = 1
   end if
+  
+  
+
+
+
+  asclabels(1) = 'model'
+  asclabels(2) = 'time'
+  asclabels(3) = 'dtime'
+  asclabels(4) = 'mass'
+  asclabels(5) = 'Mhe'
+  asclabels(6) = 'Mco'
+  asclabels(7) = 'Mone'
+  asclabels(8) = 'radius'
+  asclabels(9) = 'luminosity'
+  asclabels(10) = 'Teff'
+  
+  asclabels(11) = 'Tc'
+  asclabels(12) = 'Tmax'
+  asclabels(13) = 'cendens'
+  asclabels(14) = 'Tmaxdens'
+  asclabels(15) = 'Ebind'
+  asclabels(16) = 'LH'
+  asclabels(17) = 'LHe'
+  asclabels(18) = 'LC'
+  asclabels(19) = 'L\gn'
+  asclabels(20) = 'Lth'
+  
+  asclabels(21) = 'Prot'
+  asclabels(22) = 'K2'
+  asclabels(23) = 'Rcz'
+  asclabels(24) = 'dRcz'
+  asclabels(25) = 'Tet'
+  asclabels(26) = 'Ralfven'
+  asclabels(27) = 'Bp'
+  asclabels(28) = 'Porb'
+  asclabels(29) = 'FLR'
+  asclabels(30) = 'F1'
+  
+  asclabels(31) = 'dM'
+  asclabels(32) = 'dMwind'
+  asclabels(33) = 'dMmt'
+  asclabels(34) = 'Jorb'
+  asclabels(35) = 'Jorbdt'
+  asclabels(36) = 'dJgwdt'
+  asclabels(37) = 'dJwmldt'
+  asclabels(38) = 'dJsodt'
+  asclabels(39) = 'dJmtrdt'
+  asclabels(40) = 'Mcomp'
+  
+  asclabels(41) = 'e'
+  asclabels(42) = 'Hsurf'
+  asclabels(43) = 'Hesurf'
+  asclabels(44) = 'Csurf'
+  asclabels(45) = 'Nsurf'
+  asclabels(46) = 'Osurf'
+  asclabels(47) = 'Nesurf'
+  asclabels(48) = 'Mgsurf'
+  asclabels(49) = 'HTmax'
+  asclabels(50) = 'HeTmax'
+  
+  asclabels(51) = 'CTmax'
+  asclabels(52) = 'NTmax'
+  asclabels(53) = 'OTmax'
+  asclabels(54) = 'NeTmax'
+  asclabels(55) = 'MgTmax'
+  asclabels(56) = 'Hcentr'
+  asclabels(57) = 'Hecentr'
+  asclabels(58) = 'Ccentr'
+  asclabels(59) = 'Ncentr'
+  asclabels(60) = 'Ocentr'
+  
+  asclabels(61) = 'Necentr'
+  asclabels(62) = 'Mgcentr'
+  
+  asclabels(81) = 'Qconv'
+  
+  
+  
+  asclabels(101) = 'V'
+  asclabels(102) = 'U-B'
+  asclabels(103) = 'B-V'
+  asclabels(104) = 'V-R'
+  asclabels(105) = 'R-I'
+  asclabels(106) = 'U-V'
+  asclabels(107) = 'V-I'
+  
+
+  asclabels(111) = 'lambda'  !lambda_env
+  asclabels(112) = 'qcr'
+  asclabels(113) = 'M2cr'
+  asclabels(114) = 'Vrot'
+  asclabels(115) = 'RRzams'
+  asclabels(116) = 'MHe-MCO'
+  asclabels(117) = 'Menv'        !M_env
+  asclabels(118) = 'Mconv'
+  asclabels(119) = 'tauR'
+  asclabels(120) = 'RosbNr'
+  
+  asclabels(121) = 'Pcr'
+  asclabels(122) = 'SillsMB'
+  asclabels(123) = 'TetRat'
+  asclabels(124) = 't-t0'
+  asclabels(125) = 'dNeO'
+  asclabels(126) = 'Pgwmax'
+  asclabels(127) = 'Rrl'
+  asclabels(128) = 'Xf'
+  asclabels(129) = 'M.I.'
+  asclabels(130) = 'Jspin'
+  
+  asclabels(131) = 'avgdens'
+  asclabels(132) = 'Zsurf'
+  asclabels(133) = 'tf-t'
+  asclabels(134) = 'ProtPcrit'
+  
+  
+  asclabels(201) = 'HRD'
+  asclabels(202) = 'Convection'
+  
+  asclabels(211) = 'taus'
+  asclabels(212) = 'Lums'
+  asclabels(213) = 'SurfAbd'
+  asclabels(214) = 'TmaxAbd'
+  asclabels(215) = 'CoreAbd'
+  
+  asclabels(221) = 'dJdts'
+  asclabels(222) = 'Mdots'
+  !asclabels(22) = ''
+  
+  
+  
+  !These were available in plotpltn
+  !asclabels() = 'k2R2'
+  !asclabels() = 'Reimersrat'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  !asclabels() = 'ttf'
+  !asclabels() = 'LHeLH'
+  
   
   
 end subroutine getpltlabels
@@ -412,18 +548,19 @@ end subroutine printpltvarlist
 
 !***********************************************************************
 !Read the *.plt? file fname from unit u and return its length and the contents
-subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
+subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use constants
   implicit none
   real*8 :: dat(nvar,nn)
-  integer :: nvar,nn,ncols,nc,nc1,verbose,i,j,n,ver,u
+  integer :: nvar,nn,ncols,nc,nc1,verbose,i,j,n,version,u
   character :: fname*(*)
   
   nc1 = nc !Get rid of 'unused' message
   
   !*** Old output format (2003)
   dat = 0.d0
-  ver = 2003
+  !version = 2003
+  version = 2005  !Can no longer distinguish if unformatted read
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
@@ -466,7 +603,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,ver)
      write(6,'(A)')'  I will try the new output format...'
   end if
   dat = 0.d0
-  ver = 2005
+  version = 2005
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols

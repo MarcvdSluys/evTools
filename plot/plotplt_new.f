@@ -33,19 +33,21 @@ program plotplt
   real*8, allocatable :: dat(:,:,:),datf(:,:)
   
   real :: yy1(nmax),minx,dist,mindist
-  real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
+  real :: x,y,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
-  integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,drawlines,ver,verbose
+  integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,drawlines,version,verbose
   integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,wait,lums,lgx,lgy,nsel,os,whitebg
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
-  integer :: colours(29),ncolours,col
+  integer :: colours(29),ncolours,col,lng
   real :: sch
+  
   character :: fname*99,fnames(nfmax)*99,psname*99
   character :: rng,log,hlp,hlp1,hlbl,hlbls*5,leglbl(29)*29
   character :: xwin*19,tmpstr,boxx*19,boxy*19
-  character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
+  character :: pglabels(nvar)*99,asclabels(nvar)*99,pglx*99,pgly*99,title*99,title1*99
+  character :: pstitle*99,asclx*99,ascly*99
   logical :: ex,prleg
   
   !Set constants:
@@ -115,7 +117,7 @@ program plotplt
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))
   allocate(hp(npl,1000), nhp(npl))
   
-  call getpltlabels(nf,nvar,labels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
+  call getpltlabels(nf,nvar,pglabels,asclabels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
   
   
   !************************************************************************      
@@ -127,9 +129,9 @@ program plotplt
   verbose = 1
   if(plot.eq.7) verbose = 0
   do f=1,nf
-     call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,ver)  !Use unit 10
-     if(ver.eq.2005) strmdls(f,:) = nint(datf(83,:)) !Structure model was saved (1) or not (0)
-     call changepltvars(nmax,nvar,nfi,datf,labels,dpdt)  !Change (e.g. de-log) and add plot variables
+     call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  !Use unit 10
+     if(version.eq.2005) strmdls(f,:) = nint(datf(83,:)) !Structure model was saved (1) or not (0)
+     call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)  !Change (e.g. de-log) and add plot variables
      dat(f,:,:) = datf(:,:)
      n(f) = nfi
   end do
@@ -162,6 +164,8 @@ program plotplt
   
   
   npl = nf  !npl is the number of curves that will be plotted.  This can be >1 because nf>1, or because nf=1, but we plot >1 variable
+  prleg = .false.  !Don't print legenda by default
+  if(nf.gt.1) prleg = .true.
   
   if(vx.eq.201.or.hrd.eq.1) then  !HRD
      hrd = 1
@@ -169,8 +173,10 @@ program plotplt
         xx(pl,1:n(pl)) = real(log10(abs(dat(pl,10,1:n(pl) ))))
         yy(pl,1:n(pl)) = real(log10(abs(dat(pl, 9,1:n(pl) ))))
      end do
-     lx = trim(labels(10))
-     ly = trim(labels(9))
+     pglx = trim(pglabels(10))
+     pgly = trim(pglabels(9))
+     asclx = 'HRD'
+     ascly = 'HRD'
      vy = 0
      lgx = 1
      lgy = 1
@@ -191,7 +197,6 @@ program plotplt
   
   if(nf.eq.1) then  !Then you can do multi-variable plots
      f = 1
-     prleg = .false.  !Don't print legenda by default
      
      
      if(vy.eq.25) then !Tet + analytic Tet
@@ -217,7 +222,7 @@ program plotplt
         mdots = 1
         npl = 3
         yy(1:3,1:nmax) = real(dat(f,31:33,1:nmax))
-        leglbl(1:3) = (/'dM\dtot\u','dM\dwind\u ','dM\dMT\u'/)
+        leglbl(1:3) = (/'dM\dtot\u ','dM\dwind\u','dM\dMT\u  '/)
         prleg = .true.
      end if
      if(vy.eq.211) then !Timescales
@@ -307,8 +312,10 @@ program plotplt
   if(log.eq.'y'.or.log.eq.'b') lgy = 1
   
   
-  lx = labels(vx)
-  ly = labels(vy)
+  pglx = pglabels(vx)
+  pgly = pglabels(vy)
+  asclx = asclabels(vx)
+  ascly = asclabels(vy)
   
   if(lgx.eq.1) then
      do pl=1,npl
@@ -329,7 +336,6 @@ program plotplt
      do pl=1,npl
         if(yy(pl,1).eq.0.) yy(pl,1) = yy(pl,2)
         miny(pl) = 1.e33
-        print*,pl,n(pl)
         do j=1,n(pl)
            if(abs(yy(pl,j)).lt.miny(pl).and.abs(yy(pl,j)).ne.0.) miny(pl) = abs(yy(pl,j))
         end do
@@ -358,8 +364,6 @@ program plotplt
      ymin = min(minval(yy(pl,1:n(pl))),ymin)
      ymax = max(maxval(yy(pl,1:n(pl))),ymax)
   end do
-  
-  print*,1,xmin,xmax,ymin,ymax
   
   if(vx.eq.119) then !R/(dR/dt)
      !if(xmin.lt.1.e4.and.lgx.eq.0) xmin = 1.e4
@@ -393,7 +397,7 @@ program plotplt
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
-  print*,ymin,ymax
+  
   if(vy.eq.211.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
   if(vy.eq.211.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.122.and.ymin.lt.-20.) ymin = -20.
@@ -546,7 +550,7 @@ program plotplt
      
      if(hlp.eq.'y') then
         hlp1 = 's'
-        if(nf.gt.1) then
+        if(nf.eq.1) then
            write(6,'(A,$)')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
            read*,hlp1
            if(hlp1.eq.'S') hlp1='s'
@@ -645,7 +649,11 @@ program plotplt
      xmin = max(xmin,xmax)
      xmax = x
   end if
-  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) call rswap(ymin,ymax)
+  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) then
+     y = min(ymin,ymax)
+     ymin = max(ymin,ymax)
+     ymax = y
+  end if
   
   if(plot.ne.0.and.plot.ne.7.and.plot.ne.9) then
      write(6,*)''     
@@ -656,7 +664,6 @@ program plotplt
   
   
   if(plot.eq.9) then
-     !call pgbegin(1,'plot_plt_000.eps/cps',1,1)
      io = pgopen('plot_plt_000.eps/cps')
      if(io.le.0) then
         write(0,'(A,/)')'  Error opening postscript file, aborting'
@@ -716,9 +723,17 @@ program plotplt
   !if(os.eq.2.or.plot.eq.9) call pgscf(2)
   call pgsch(sch)
   if(plot.eq.9) then
-     call pgsvp(0.10,0.95,0.12,0.95)
+     if(prleg) then
+        call pgsvp(0.10,0.90,0.12,0.95)
+     else
+        call pgsvp(0.10,0.95,0.12,0.95)
+     end if
   else
-     call pgsvp(0.06,0.95,0.07,0.96)
+     if(prleg) then
+        call pgsvp(0.06,0.90,0.07,0.96)
+     else
+        call pgsvp(0.06,0.95,0.07,0.96)
+     end if
   end if
   call pgswin(xmin,xmax,ymin,ymax)
   boxx = 'BCNTS'
@@ -733,8 +748,8 @@ program plotplt
   else if(plot.ne.9) then
      call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
   end if
-  call pgmtxt('B',2.4,0.5,0.5,trim(lx))
-  call pgmtxt('L',2.0,0.5,0.5,trim(ly))
+  call pgmtxt('B',2.4,0.5,0.5,trim(pglx))
+  call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
   
   
   !Draw curves/points:
@@ -756,13 +771,15 @@ program plotplt
   call pgsci(2)
   if(hlp.eq.'y') then
      do pl=1,npl
-        call pgpoint(nhp(pl),xx(1,hp(pl,1:nhp(pl))),yy(1,hp(pl,1:nhp(pl))),2)
-     
+        col = colours(mod(pl-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+        call pgsci(col)
+        call pgpoint(nhp(pl),xx(pl,hp(pl,1:nhp(pl))),yy(pl,hp(pl,1:nhp(pl))),2)
+        
         if(hlbl.eq.'y') then
            call pgsch(0.7*sch)
            do i=1,nhp(pl)
               write(hlbls,'(I5)')nint(dat(pl,1,hp(pl,i)))
-              call pgtext(xx(1,hp(pl,i)),yy(1,hp(pl,i)),hlbls)
+              call pgtext(xx(pl,hp(pl,i)),yy(pl,hp(pl,i)),hlbls)
            end do
            call pgsch(sch)
            call pgsci(1)
@@ -775,11 +792,24 @@ program plotplt
   !Print legenda:
   call pgsch(sch)
   if(prleg) then
-     do i=1,npl
-        col = colours(mod(i-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
-        call pgsci(col)
-        call pgmtext('RV',0.5,real(20-i)/20.,0.,trim(leglbl(i)))
-     end do !i
+     if(nf.eq.1) then  !Then multi-variable plot
+        do pl=1,npl
+           col = colours(mod(pl-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+           call pgsci(col)
+           call pgmtext('RV',0.5,real(20-pl)/20.,0.,trim(leglbl(pl)))
+        end do !pl
+        
+     else  !Then: multi-file plot
+        do f=1,nf
+           fname = fnames(f)
+           lng = len_trim(fname)
+           if(fname(lng:lng).eq.'1'.or.fname(lng:lng).eq.'2') lng = lng-1
+           lng = lng-4 !get rid of '.plt'
+           col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+           call pgsci(col)
+           call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,fname(1:lng))
+        end do
+     end if
      call pgsci(1)
   end if
   
@@ -790,8 +820,7 @@ program plotplt
   if(nf.eq.1 .and. conv.eq.1) then
      call pgsci(1)
      pl = 1
-     print*,13
-     print*,nmax,nvar,n(pl),vx,ymin,ymax,nhp(pl),hp(pl,1:10),hlp,hlbl
+     
      !call pltconvection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)   !Convection plot - replots axes at the end
      call pltconvection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)   !Convection plot - replots axes at the end
      call pgsci(2)
@@ -837,11 +866,17 @@ program plotplt
   if(plot.eq.9) then
      call pgend
      ex = .true.
+     pstitle = 'PlotPlt output: '//trim(asclx)//' vs. '//trim(ascly)//'.'
+     if(vx.eq.201) pstitle = 'PlotPlt output: HRD.'
      i = 1
      do while(ex)
-        write(psname,'(A9,I3.3,A4)')'plot_plt_',i,'.eps'
-        inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
-        if(.not.ex) j = system('mv -f plot_plt_000.eps '//trim(psname))
+        write(psname,'(A,I3.3,A)')'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
+        if(vx.eq.201) write(psname,'(A,I3.3,A)')'plot_plt__HRD_',i,'.eps'
+        inquire(file=trim(psname), exist=ex)                                                   !Check whether the file already exists
+        if(.not.ex) then
+           j = system('mv -f plot_plt_000.eps '//trim(psname))
+           call set_PGPS_title(trim(psname),trim(pstitle))
+        end if
         i = i+1
      end do
      write(6,'(A)')' Plot saved to '//trim(psname)
@@ -985,7 +1020,8 @@ program plotplt
      write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
      write(6,*)''
      
-     col = 2
+     !col = 2
+     col = colours(mod(pl0-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
      call pgsci(col)
      
      call pgpoint(1,xx(pl0,i0),yy(pl0,i0),2)
