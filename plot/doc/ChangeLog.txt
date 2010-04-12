@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    74: AstroFloyd, 11/04/2010
+     - Added old plotplt.f as plotplt_r066.f
+     - Added nagfor.f with dummy routines
+     
     73: AstroFloyd, 11/04/2010
      - Everything in plot/ compiles with nagfor (warnings off)
     

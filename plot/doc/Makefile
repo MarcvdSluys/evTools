@@ -6,6 +6,13 @@ COMP = gfortran-4.4.3#
 #COMP = ifort#     Use Intel fortran compiler
 #COMP = nagfor#
 
+
+STDOBJ = functions.o
+PLTOBJ = plotfunctions.o plt_functions.o
+MDLOBJ = 
+MODOBJ = 
+
+
 #ifort:
 ifeq ($(COMP),ifort)
    #To develop code  (don't mix -check bounds with -O>0!):
@@ -44,13 +51,10 @@ endif
 #nagfor:
 ifeq ($(COMP),nagfor)
    CFLAGS = -O0 -132 -free -colour -w=all
+   LFLAGS = -lpgplot
+   STDOBJ += nagfor.o
 endif
 
-
-STDOBJ = functions.o
-PLTOBJ = plotfunctions.o plt_functions.o
-MDLOBJ = 
-MODOBJ = 
 
 %.o: %.f Makefile
 	$(COMP) $(CFLAGS) -c $<
@@ -76,6 +80,9 @@ plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
 
 plotplt_new: $(STDOBJ) $(PLTOBJ) plotplt_new.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_new $(STDOBJ) $(PLTOBJ) plotplt_new.o
+
+plotplt_r066: $(STDOBJ) $(PLTOBJ) plotplt_r066.o
+	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_r066 $(STDOBJ) $(PLTOBJ) plotplt_r066.o
 
 plotpltn: $(STDOBJ) $(PLTOBJ) plotpltn.o
 	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltn $(STDOBJ) $(PLTOBJ) plotpltn.o
