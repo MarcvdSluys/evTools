@@ -85,13 +85,18 @@ end subroutine plotzams
 
 !***********************************************************************
 !Make a convection plot from the data in a *.plt? file
-subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
+subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
+  
   implicit none
-  integer :: nn,nvar,n,nl, nhp,hp(1000),  i,j,ci0,lw0
+  integer :: nmax,nvar,n, nhp,hp(1000),vx
+  integer :: i,j,ci0,lw0
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch,ch0
-  real*8 :: dat(nvar,nn)
-  real :: xx(nn),xx2(2),yy(nl,nn),y(nn),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),ymin,ymax,dat1(nn)
-  character :: hlbls*5,hlp,hlbl
+  real*8 :: dat(nvar,nmax)
+  real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
+  real :: ymin,ymax
+  character :: hlp,hlbl
+  character :: hlbls*5
+  
   
   plconv = 1  !Plot convection
   plsmcv = 1  !Plot semiconvection
@@ -105,7 +110,8 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
   
   
   call pgslw(3)
-  y(1:n) = yy(1,1:n)
+  xx(1:n) = dat(vx,1:n)
+  y(1:n) = dat(4,1:n)
   call pgline(n,xx(1:n),y(1:n))
   
   ch = 1 !Plot hatches
@@ -379,7 +385,7 @@ subroutine pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)
               yy2 = (/ymin,ymax/)
               call pgline(2,xx2,yy2)
               write(hlbls,'(I5)')nint(dat(1,hp(i)))
-              if(hlbl.eq.'y') call pgtext(xx(hp(i)),yy(1,hp(i)),hlbls)
+              if(hlbl.eq.'y') call pgtext(xx(hp(i)),y(hp(i)),hlbls)
            end do
         end if
      end if !If plnuc.eq.1

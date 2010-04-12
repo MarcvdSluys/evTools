@@ -17,9 +17,9 @@
 
 !***********************************************************************
 !Provides the labels for the plot axes of a *.plt? file
-subroutine getpltlabels(nvar,labels,defvar)
+subroutine getpltlabels(nf,nvar,labels,defvar)
   implicit none
-  integer :: nvar,defvar(0:nvar)
+  integer :: nf,nvar,defvar(0:nvar)
   character :: labels(nvar)*99
   
   defvar = 0
@@ -142,19 +142,25 @@ subroutine getpltlabels(nvar,labels,defvar)
   
   
   !Special plots:
-  defvar(201:202) = 1  !HRD, convection plot
+  defvar(201) = 1  !HRD
   
-  !Combination plots:
-  labels(211) = '\gt (yr)'
-  labels(212) = 'L (L\d\(2281)\u)'
-  labels(213) = 'Surface abundances'
-  labels(214) = 'T\dmax\u abundances'
-  labels(215) = 'Core abundances'
-  defvar(211:215) = 1
   
-  labels(221) = 'dJ\dorb\u/dt'
-  labels(222) = 'dM/dt (M\d\(2281)\u/yr)'
-  defvar(221:222) = 1
+  !These plots can only be made when reading 1 file:
+  if(nf.eq.1) then
+     defvar(202) = 1  !Convection plot
+     
+     
+     labels(211) = '\gt (yr)'
+     labels(212) = 'L (L\d\(2281)\u)'
+     labels(213) = 'Surface abundances'
+     labels(214) = 'T\dmax\u abundances'
+     labels(215) = 'Core abundances'
+     defvar(211:215) = 1
+     
+     labels(221) = 'dJ\dorb\u/dt'
+     labels(222) = 'dM/dt (M\d\(2281)\u/yr)'
+     defvar(221:222) = 1
+  end if
   
   
 end subroutine getpltlabels
@@ -350,8 +356,9 @@ end subroutine set_plotpltn_labels
 
 !***********************************************************************
 !Print the list of variables in a *.plt? file to screen, for input menu
-subroutine printpltvarlist
+subroutine printpltvarlist(nf)
   implicit none
+  integer :: nf
   
   write(6,*)''
   write(6,'(A)'),'  Primary variables:                                  0: Quit                           '
@@ -387,11 +394,15 @@ subroutine printpltvarlist
   write(6,'(A)'),'               120: Rossby nr     130: Jspin                                            '
   write(6,'(A)'),'                                                                                        '
   write(6,'(A)'),'  Special plots:                                                                        '
-  write(6,'(A)'),"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
-  write(6,'(A)'),'   202: Convection plot    212: Luminosities          222: Mdots                        '
-  write(6,'(A)'),'                           213: Surface abundances                                      '
-  write(6,'(A)'),'                           214: Tmax abundances                                         '
-  write(6,'(A)'),'                           215: Core abundances                                         '
+  if(nf.eq.1) then
+     write(6,'(A)'),"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
+     write(6,'(A)'),'   202: Convection plot    212: Luminosities          222: Mdots                        '
+     write(6,'(A)'),'                           213: Surface abundances                                      '
+     write(6,'(A)'),'                           214: Tmax abundances                                         '
+     write(6,'(A)'),'                           215: Core abundances                                         '
+  else
+     write(6,'(A)'),'   201: HR Diagram                                                                      '
+  end if
   write(6,'(A)'),'                                                                                        '
   
 end subroutine printpltvarlist

@@ -69,7 +69,7 @@ program plotplt
   
   !Labels:
   prleg = .false.  !Don't print legenda by default
-  call getpltlabels(nvar,labels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
+  call getpltlabels(1,nvar,labels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
   
   
   !Read current path and use it as plot title
@@ -121,7 +121,7 @@ program plotplt
   !************************************************************************      
   
 30 if(plot.ne.6.and.plot.ne.7) then      
-     call printpltvarlist  !Print the list of variables in a *.plt? file to screen, for input menu
+     call printpltvarlist(1)  !Print the list of variables in a *.plt? file to screen, for input menu
      
      
 35   write(6,'(A,$)')'  Choose the X-axis variable: '
@@ -328,7 +328,7 @@ program plotplt
         if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
      end if
   end if
-  print*,ymin,ymax
+  
   if(vy.eq.211.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
   if(vy.eq.211.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.122.and.ymin.lt.-20.) ymin = -20.
@@ -470,6 +470,8 @@ program plotplt
   
   if(plot.lt.2.or.plot.eq.8) then 
      write(6,*)''
+     nhp = 0
+     hp = 0
      hlbl = 'n'
      hlp = 'n'
      write(6,'(A47,$)')' Do you want to highlight model points (y/n) ? '
@@ -711,7 +713,7 @@ program plotplt
   
   if(conv.eq.1) then
      call pgsci(1)
-     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
+     call pltconvection(nn,nvar,n,dat,vx,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
      call pgsci(2)
   end if
   

@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    71: AstroFloyd, 11/04/2010
+     - developing plotplt_new: replaced f,nf with pl,npl in most places
+     - adapted getpltlabels(), printpltvarlist() and pltconvection()
+     - most things seem to work
+     
     70: AstroFloyd, 11/04/2010
      - developing plotplt_new: added a dimension to variables (e.g. dat(:,:) -> dat(:,:,:))
      - to do: distinguish between multi-variable (ny) and multi-file plots (nf)
