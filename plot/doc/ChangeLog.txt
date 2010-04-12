@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    76: AstroFloyd, 12/04/2010
+     - Moved source, object and module files to subdirs
+    
     75: AstroFloyd, 12/04/2010
      - Renamed plotplt_new.f to plotplt.f
     

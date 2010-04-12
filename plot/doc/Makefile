@@ -1,33 +1,47 @@
 #Compile the program and put the executable in ~/usr/bin
 
+.PHONY: clean cleanwarnings code_version exit 
+
+
 #No text/space after statements below!
 COMP = gfortran#  Use GNU fortran compiler
-#COMP = gfortran-4.4.3#
+COMP = gfortran-4.4.3#
 #COMP = ifort#     Use Intel fortran compiler
 #COMP = nagfor#
 
 
-STDOBJ = functions.o
-PLTOBJ = plotfunctions.o plt_functions.o
+# Directories for the source, object, module, libary and executable files:
+SRCDIR = src
+OBJDIR = obj
+MODDIR = mod
+BINDIR = ~/usr/bin
+
+
+STDOBJ = $(OBJDIR)/functions.o
+PLTOBJ = $(OBJDIR)/plotfunctions.o $(OBJDIR)/plt_functions.o
 MDLOBJ = 
 MODOBJ = 
+
+
+
 
 
 #ifort:
 ifeq ($(COMP),ifort)
    #To develop code  (don't mix -check bounds with -O>0!):
-   #CFLAGS = -free -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
-   CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all  -check noarg_temp_created
+   #CFLAGS = -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
+   CFLAGS = -O0  -vec-report0 -traceback -warn all -check all  -check noarg_temp_created
 
    #To debug code:
-   #CFLAGS = -free -O0  -vec-report0 -g
+   #CFLAGS = -O0  -vec-report0 -g
 
    #To use optimum run speed
-   #CFLAGS = -free -O3 -vec-report0 -traceback
-   #CFLAGS = -free -O3 -arch SSE2 -vec-report0 -traceback           #SSE2 needs -lsvml
-   ##CFLAGS = -free -O3 -arch SSE2 -ipo -vec-report0 -traceback
+   #CFLAGS = -O3 -vec-report0 -traceback
+   #CFLAGS = -O3 -arch SSE2 -vec-report0 -traceback           #SSE2 needs -lsvml
+   ##CFLAGS = -O3 -arch SSE2 -ipo -vec-report0 -traceback
 
    CFLAGS += -nogen-interfaces  #For ifort v.11
+   CFLAGS += -module $(MODDIR) -I$(MODDIR)
 
    #LFLAGS = -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
    #LFLAGS = -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
@@ -39,10 +53,12 @@ endif
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(COMP),gfortran)
 ifneq (,$(filter $(COMP),gfortran gfortran-4.4.3))
-   #CFLAGS = -O0 -ffree-form -ffree-line-length-none
-   CFLAGS = -O0 -ffree-form -ffree-line-length-none   -Wall 
-   #CFLAGS = -O -ffree-form -ffree-line-length-none
-   #CFLAGS = -O3 -ffree-form -ffree-line-length-none
+   #CFLAGS = -O0 -ffree-line-length-none
+   CFLAGS = -O0 -ffree-line-length-none   -Wall 
+   #CFLAGS = -O -ffree-line-length-none
+   #CFLAGS = -O3 -ffree-line-length-none
+   CFLAGS += -I$(MODDIR) -J$(MODDIR)
+
    LFLAGS = -lpgplot
 endif
 
@@ -50,14 +66,16 @@ endif
 
 #nagfor:
 ifeq ($(COMP),nagfor)
-   CFLAGS = -O0 -132 -free -colour -w=all
+   CFLAGS = -O0 -132 -colour -w=all
+   CFLAGS += -I$(MODDIR) -mdir $(MODDIR)
+
    LFLAGS = -lpgplot
-   STDOBJ += nagfor.o
+   STDOBJ += $(OBJDIR)/nagfor.o
 endif
 
 
-%.o: %.f Makefile
-	$(COMP) $(CFLAGS) -c $<
+$(OBJDIR)/%.o: $(SRCDIR)/%.f90 Makefile
+	$(COMP) $(CFLAGS) -c $< -o $@
 
 
 all: plotmdl plotmdln plotmod plotplt plotpltn plotpltp
@@ -66,34 +84,45 @@ exit:
 
 
 
-plotmdl: $(STDOBJ) $(MDLOBJ) plotmdl.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdl $(STDOBJ) $(MDLOBJ) plotmdl.o
+plotmdl: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 
-plotmdln: $(STDOBJ) $(MDLOBJ) plotmdln.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmdln $(STDOBJ) $(MDLOBJ) plotmdln.o
+plotmdln: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
-plotmod: $(STDOBJ) $(MODOBJ) plotmod.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotmod $(STDOBJ) $(MODOBJ) plotmod.o
+plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
-plotplt: $(STDOBJ) $(PLTOBJ) plotplt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt $(STDOBJ) $(PLTOBJ) plotplt.o
+plotplt: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
-plotplt_r066: $(STDOBJ) $(PLTOBJ) plotplt_r066.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotplt_r066 $(STDOBJ) $(PLTOBJ) plotplt_r066.o
+plotplt_r066: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
 
-plotpltn: $(STDOBJ) $(PLTOBJ) plotpltn.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltn $(STDOBJ) $(PLTOBJ) plotpltn.o
+plotpltn: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 
-plotpltp: $(STDOBJ) $(PLTOBJ) plotpltp.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plotpltp $(STDOBJ) $(PLTOBJ) plotpltp.o
+plotpltp: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
+	$(COMP) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
 
 
 
+#code_version.f90: code_version    #code_version is PHONY and always out-of-date
+#	@echo 'Generating '$(SRCDIR)'/code_version.f90'
+#	@echo '!code_version.f90:  source file automatically generated by Makefile to report the code version used.' > $(SRCDIR)/code_version.f90
+#	@echo 'subroutine print_code_version' >> $(SRCDIR)/code_version.f90
+#	@echo '   use basic' >> $(SRCDIR)/code_version.f90
+#	@echo '   implicit none' >> $(SRCDIR)/code_version.f90
+#	@echo "   character :: svn_revision*99 = '"`svnversion`"'" >> $(SRCDIR)/code_version.f90
+#	@echo "   character :: compile_date*99 = '"`date`"'" >> $(SRCDIR)/code_version.f90
+#	@echo "   character :: compiler*99 = '$(COMP)'" >> $(SRCDIR)/code_version.f90
+#	@echo "   write(stdOut,'(A)')'svn revision: '//trim(svn_revision)//', compiled on '//trim(compile_date)//' with '//trim(compiler)//'.'" >> $(SRCDIR)/code_version.f90
+#	@echo 'end subroutine print_code_version' >> $(SRCDIR)/code_version.f90
 
 
 
 clean:
-	rm -f *.o *.mod
+	rm -f $(OBJDIR)/*.o $(MODDIR)/*.mod
 
 cleanwarnings:
 	rm -f *__genmod.f90 *__genmod.mod
