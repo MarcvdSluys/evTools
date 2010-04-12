@@ -52,6 +52,8 @@ program plotplt
   
   !Set constants:
   call setconstants()
+  write(6,'(/,A)', advance='no')' PlotPlt, '
+  call print_code_version
   
   sch = 1.0
   

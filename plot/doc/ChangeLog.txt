@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    77: AstroFloyd, 12/04/2010
+     - Added code version
+    
     76: AstroFloyd, 12/04/2010
      - Moved source, object and module files to subdirs
     
