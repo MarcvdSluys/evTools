@@ -1,11 +1,9 @@
-!Plots the data contained in a plt* file, highlight selected points
-!Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-!Uses code in functions.f
+!Plots the data contained in a .plt* file, highlights selected points
+!Uses code in functions.f90
 !Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-!Uses PGPLOT window 1 to plot to
 !AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-plot package.
@@ -323,7 +321,7 @@ program plotplt
      do pl=1,npl
         if(xx(pl,1).le.0.) xx(pl,1) = xx(pl,2)
      end do
-     minx = 1.e33
+     minx = huge(minx)
      do pl=1,npl
         do j=1,n(pl)
            if(abs(xx(pl,j)).lt.minx.and.abs(xx(pl,j)).ne.0.) minx = abs(xx(pl,j))
@@ -337,34 +335,42 @@ program plotplt
   if(lgy.eq.1) then
      do pl=1,npl
         if(yy(pl,1).eq.0.) yy(pl,1) = yy(pl,2)
-        miny(pl) = 1.e33
+        miny(pl) = huge(miny(pl))
         do j=1,n(pl)
            if(abs(yy(pl,j)).lt.miny(pl).and.abs(yy(pl,j)).ne.0.) miny(pl) = abs(yy(pl,j))
         end do
         yy(pl,1:n(pl)) = log10(abs(yy(pl,1:n(pl)))+miny(pl)*1.e-3)
-        if(abs(miny(pl)-1.e33).lt.1e32) excly(pl) = 1  !Exclude it in determining ranges
+        if(abs(miny(pl)-huge(miny(pl))).lt.1e32) excly(pl) = 1  !Exclude it in determining ranges
      end do !pl
   end if
   
   
   
-50 continue !HRD   
-  !xmin = minval(xx(f,1:n))
-  !xmax = maxval(xx(f,1:n))
-  xmin = 1.e33
-  xmax = -1.e33
+50 continue !HRD jumps here
+  
+  xmin = huge(xmin)
+  xmax = -huge(xmax)
   do pl=1,npl
      !if(exclx(pl).eq.1) cycle
      xmin = min(minval(xx(pl,1:n(pl))),xmin)
      xmax = max(maxval(xx(pl,1:n(pl))),xmax)
   end do
   
-  ymin = 1.e33
-  ymax = -1.e33
+  print*
+  ymin = huge(ymin)
+  ymax = -huge(ymax)
   do pl=1,npl
      if(excly(pl).eq.1) cycle
-     ymin = min(minval(yy(pl,1:n(pl))),ymin)
-     ymax = max(maxval(yy(pl,1:n(pl))),ymax)
+     !ymin = min(minval(yy(pl,1:n(pl))),ymin)
+     !ymax = max(maxval(yy(pl,1:n(pl))),ymax)
+     print*,ymin,minval(yy(pl,1:n(pl))),ymax,maxval(yy(pl,1:n(pl)))
+     if(lgy.eq.0) then
+        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.1.e-20),ymin)
+        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt.1.e20),ymax)
+     else
+        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-20.),ymin)
+        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt.20.),ymax)
+     end if
   end do
   
   if(vx.eq.119) then !R/(dR/dt)
@@ -985,7 +991,7 @@ program plotplt
      
      dx = abs(xmax-xmin)
      dy = abs(ymax-ymin)
-     mindist = 1.e30
+     mindist = huge(mindist)
      do pl=1,npl
         do i=1,n(pl)
            dist = (abs(xsel(1)-xx(pl,i))/dx)**2 + (abs(ysel(1)-yy(pl,i))/dy)**2
