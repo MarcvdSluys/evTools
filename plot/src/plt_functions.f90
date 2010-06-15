@@ -137,8 +137,12 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(132) = 'Z\dsurf\u'
   pglabels(133) = '(t\df\u - t)  (yr)'
   pglabels(134) = 'P\drot\u/P\dcrit\u'
+  pglabels(135) = 'g\dsurf\u (cm s\u-2\d)'
+  pglabels(136) = 'dM/dt\dReimers\u (M\d\(2281)\u yr\u-1\d)'
+  pglabels(137) = 'dM/dt\dReimers-like\u (M\d\(2281)\u yr\u-1\d)'
+  pglabels(138) = 'dM/dt\dReimers-like\u / dM/dt\dReimers\u'
   
-  defvar(101:134) = 1
+  defvar(101:138) = 1
   
   
   !Special plots:
@@ -274,6 +278,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(132) = 'Zsurf'
   asclabels(133) = 'tf-t'
   asclabels(134) = 'ProtPcrit'
+  asclabels(135) = 'gsurf'
+  asclabels(136) = 'dM_Rmr'
+  asclabels(137) = 'dM_Rmrlk'
+  asclabels(138) = 'dMRmrlk_dMRmr'
   
   
   asclabels(201) = 'HRD'
@@ -522,10 +530,10 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
   write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
-  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change                                      '
-  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max                                          '
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl                                              '
-  write(6,'(A)')'               118: Mconv         128: Xf                                               '
+  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf                     '
+  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot               '
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like               '
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs              '
   write(6,'(A)')'               119: R/(dR/dt)     129: M.I.                                             '
   write(6,'(A)')'               120: Rossby nr     130: Jspin                                            '
   write(6,'(A)')'                                                                                        '
@@ -565,18 +573,19 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
-  if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
+  if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
   !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
   do j=1,nn
      !read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
      read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
+     if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
   end do
 !10 format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(u)
   goto 15
   
-11 if(verbose.eq.1) write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
+11 if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
   close(u)
   goto 15
   
@@ -585,7 +594,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   if(j.lt.3) goto 19
   if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
 15 continue
-  if(verbose.eq.1) write(6,*)''
+  !if(verbose.eq.1) write(6,*)''
   
   n = j-1   !Number of models in the file
   goto 29
@@ -608,23 +617,25 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
-  if(verbose.eq.1) write(6,'(A,I4,A)')'  Reading',ncols,' columns of data'
+  if(verbose.eq.1) write(6,'(A,I4,A)')'  Found',ncols,' columns.'
   !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
   if(ncols.eq.81) then
      do j=1,nn
         read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,81)  !81 Columns
+        if(j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
      end do
   end if
   if(ncols.gt.81) then
      do j=1,nn
         read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F5.1)',err=22,end=21) (dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+        if(j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
      end do
   end if
   write(6,'(A)')'  End of file reached, arrays too small!'
   close(u)
   goto 25
   
-21 if(verbose.eq.1) write(6,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
+21 if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
   close(u)
   goto 25
   
@@ -636,7 +647,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   write(6,'(A)')"  I'll skip the rest of the file and use the first part."
   close(u)
 25 continue
-  if(verbose.eq.1) write(6,*)''
+  !if(verbose.eq.1) write(6,*)''
   
   n = j-1   !Number of models in the file
   
@@ -654,7 +665,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real*8 :: dat(nvar,nn),var(nn),dpdj(nn)
-  real*8 :: c126(nn),c119a,c119b,x,z,mbol,bc
+  real*8 :: c126(nn),c119a,c119b,x,z,mbol,bc,g0
   character :: labels(nvar)*99
   
   !de-log some variables
@@ -681,7 +692,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
         do j=ib,j0+1,-2
            if(abs((dat(j-1,i)+dat(j,i))/dat(4,i)).lt.1.d-4) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are close enough, remove them
         end do !j
-        do while(abs(dat(j0,i))/dat(4,i).lt.1.d-4.and.sum(abs(dat(j0:j0+5,i))).gt.1.e-7)  !Remove all the leading zeroes
+        do while(abs(dat(j0,i))/dat(4,i).lt.1.d-4.and.sum(abs(dat(j0:j0+5,i))).gt.1.d-7)  !Remove all the leading zeroes
            do j=j0,j0+4
               dat(j,i) = dat(j+1,i)
            end do
@@ -765,14 +776,23 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(127,1:n) = dat(8,1:n)/dexp(dat(29,1:n))     
   dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
   dat(129,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                 !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
-  dat(130,1:n) = dat(129,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
+  dat(130,1:n) = dat(129,1:n)*2*pi/(dat(21,1:n)+1.d-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
   dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
   dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
   
   !dat(134,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
   dat(134,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day         !Critical (Keplerian) rotation period
-  dat(134,1:n) = dat(21,1:n)/(dat(134,1:n)+1.e-30)                           !Prot/Pcrit
+  dat(134,1:n) = dat(21,1:n)/(dat(134,1:n)+1.d-30)                           !Prot/Pcrit
+  
+  dat(135,1:n) = G*dat(4,1:n)*M0/((dat(8,1:n)*R0)**2+1.d-30)                 !g_surf = GM/R^2 (cgs)
+  g0 = G*M0/R0**2
+  dat(136,1:n) = 4.d-13*dat(9,1:n)/(dat(135,1:n)/g0*dat(4,1:n))              !Reimers wind = 4e-13*(L/Lo)/((g/g0)*(R/Ro))  (Mo/yr)
+  dat(137,1:n) = min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), &   !Reimers-like wind: min of
+       9.61e-10*dat(9,1:n))                                                           !  3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr
+  dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
+  
+  
   
   !Colours
   do i=1,n
@@ -795,7 +815,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
   dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
   do i=1,n
-     if(dat(5,i).lt.1.e-6) then
+     if(dat(5,i).lt.1.d-6) then
         dat(112,i) = 0.
         dat(113,i) = 0.
      end if
@@ -805,12 +825,15 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
   dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)            !R/Rzams
   
+  
+  
+  
   !Timescales
   dat(201,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
   dat(202,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
   dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                    !Mass transfer
   dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                     !Gravitational waves
-  !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)               !Magnetic braking (Actually SO-coupling!)
+  !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)               !Magnetic braking (Actually SO-coupling!)
   dat(205,1:n) = dsqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
   dpdt  = 0
   

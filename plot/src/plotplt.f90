@@ -124,11 +124,13 @@ program plotplt
   !***   READ THE INPUT FILE
   !************************************************************************      
   
-7 if(plot.ne.7) write(6,'(/,A)')' Reading file '//trim(fname)
+7 continue
   
   verbose = 1
   if(plot.eq.7) verbose = 0
+  if(verbose.eq.1) write(6,*)
   do f=1,nf
+     if(verbose.eq.1) write(6,'(A)', advance='no')' Reading file '//trim(fnames(f))//':'
      call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  !Use unit 10
      if(version.eq.2005) strmdls(f,:) = nint(datf(83,:)) !Structure model was saved (1) or not (0)
      call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)  !Change (e.g. de-log) and add plot variables
@@ -356,14 +358,12 @@ program plotplt
      xmax = max(maxval(xx(pl,1:n(pl))),xmax)
   end do
   
-  print*
   ymin = huge(ymin)
   ymax = -huge(ymax)
   do pl=1,npl
      if(excly(pl).eq.1) cycle
      !ymin = min(minval(yy(pl,1:n(pl))),ymin)
      !ymax = max(maxval(yy(pl,1:n(pl))),ymax)
-     print*,ymin,minval(yy(pl,1:n(pl))),ymax,maxval(yy(pl,1:n(pl)))
      if(lgy.eq.0) then
         ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.1.e-20),ymin)
         ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt.1.e20),ymax)
@@ -402,7 +402,7 @@ program plotplt
      if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
-        if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
+        if(ymax.gt.13..and.dpdt.eq.2) ymax = 13.
      end if
   end if
   
@@ -478,7 +478,7 @@ program plotplt
      if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
-        if(ymax.gt.12..and.dpdt.eq.2) ymax = 12.
+        if(ymax.gt.13..and.dpdt.eq.2) ymax = 13.
      end if
   end if
   if(vy.eq.122.and.ymin.gt.-20.) ymin = -20.
@@ -751,10 +751,15 @@ program plotplt
   call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   if(nf.eq.1 .and. plot.eq.7) then
      f = 1
-     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(f,2,n),' M:',dat(f,4,n),' Mhe:',dat(f,5,n),' Mco:',dat(f,6,n),' Porb:',dat(f,28,n)
+     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(f,2,n(f)),' M:',dat(f,4,n(f)),' Mhe:',dat(f,5,n(f)), &
+          ' Mco:',dat(f,6,n(f)),' Porb:',dat(f,28,n(f))
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else if(plot.ne.9) then
-     call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//fname)
+     if(nf.eq.1) then
+        call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/'//trim(fnames(1)))
+     else
+        call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/*.plt*')
+     end if
   end if
   call pgmtxt('B',2.4,0.5,0.5,trim(pglx))
   call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
