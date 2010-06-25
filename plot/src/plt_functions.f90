@@ -1,10 +1,30 @@
+!>  Plt_functions.f90: 
+!!
+!!  Functions and subroutines for plotplt* in the Eggleton plot package that need pgplot
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
 
 
 
-!***********************************************************************
-!***  ROUTINES FOR *.PLT? FILES   **************************************
-!***********************************************************************
+
+
+!***********************************************************************************************************************************
+!***  ROUTINES FOR *.PLT? FILES   **************************************************************************************************
+!***********************************************************************************************************************************
 
 
 
@@ -15,7 +35,7 @@
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !Provides the labels for the plot axes of a *.plt? file
 subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   implicit none
@@ -308,11 +328,11 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   
 end subroutine getpltlabels
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   implicit none
   integer :: maxi
@@ -495,10 +515,10 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   
   
 end subroutine set_plotpltn_labels
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !Print the list of variables in a *.plt? file to screen, for input menu
 subroutine printpltvarlist(nf)
   implicit none
@@ -550,17 +570,18 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'                                                                                        '
   
 end subroutine printpltvarlist
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !Read the *.plt? file fname from unit u and return its length and the contents
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
+  use basic
   use constants
   implicit none
   integer :: nvar,nn
-  real*8 :: dat(nvar,nn)
+  real(double) :: dat(nvar,nn)
   integer :: ncols,nc,nc1,verbose,i,j,n,version,u
   character :: fname*(*)
   
@@ -574,7 +595,8 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
-  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
+  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)') &
+  !'  WARNING: Number of colums in this file does not match that of the program: ',nc
   do j=1,nn
      !read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
      read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
@@ -618,7 +640,8 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)')'  Found',ncols,' columns.'
-  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)')'  WARNING: Number of colums in this file does not match that of the program: ',nc
+  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)') &
+  !'  WARNING: Number of colums in this file does not match that of the program: ',nc
   if(ncols.eq.81) then
      do j=1,nn
         read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,81)  !81 Columns
@@ -627,7 +650,8 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   end if
   if(ncols.gt.81) then
      do j=1,nn
-        read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F5.1)',err=22,end=21) (dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+        !83 Columns, Evert(?) added 82, 83=strmdl flag:
+        read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F5.1)',err=22,end=21) (dat(i,j),i=1,83)
         if(j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
      end do
   end if
@@ -654,18 +678,19 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
 29 continue
   
 end subroutine readplt
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !Change (e.g. de-log) and add plot variables for a *.plt? file
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
+  use basic
   use constants
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
-  real*8 :: dat(nvar,nn),var(nn),dpdj(nn)
-  real*8 :: c126(nn),c119a,c119b,x,z,mbol,bc,g0
+  real(double) :: dat(nvar,nn),var(nn),dpdj(nn)
+  real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0
   character :: labels(nvar)*99
   
   !de-log some variables
@@ -690,7 +715,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
            if(dat(j,i).lt.0.d0) exit
         end do !j
         do j=ib,j0+1,-2
-           if(abs((dat(j-1,i)+dat(j,i))/dat(4,i)).lt.1.d-4) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are close enough, remove them
+           !If upper and lower boundary are close enough, remove them:
+           if(abs((dat(j-1,i)+dat(j,i))/dat(4,i)).lt.1.d-4) dat(j-1:j,i) = (/0.d0,0.d0/)
         end do !j
         do while(abs(dat(j0,i))/dat(4,i).lt.1.d-4.and.sum(abs(dat(j0:j0+5,i))).gt.1.d-7)  !Remove all the leading zeroes
            do j=j0,j0+4
@@ -710,7 +736,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
   dat(15,:) = dat(15,:)*m0*1.d-40                               !Ubind in 10^40 ergs
   
-  dat(42:62,:) = max(dat(42:62,:),1.d-10)                       !Abundances: limit them to >10^-10  -  isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  !Abundances: limit them to >10^-10
+  !isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  dat(42:62,:) = max(dat(42:62,:),1.d-10)
   
   
   
@@ -734,10 +762,12 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dat(119,i) = dat(8,i)/(c119a/c119b)                           !R/(dR/dt)
   end do
   
-  dat(120,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)                !Rossby number = Prot/Tet
-  dat(121,1:n) = 2.5d0/13.8d0 * dat(25,1:n)                      !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d
+  !Rossby number = Prot/Tet:
+  dat(120,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)
+  !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d:
+  dat(121,1:n) = 2.5d0/13.8d0 * dat(25,1:n)
   
-  do i=1,n                                                      !Saturated MB - Sills et al, 2000ApJ.534.335
+  do i=1,n                                             !Saturated MB - Sills et al, 2000ApJ.534.335
      dat(122,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(121,i))**2* dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(21,i).gt.dat(121,i)) dat(122,i) = 2.7e-3* (2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(81,i).lt.0.02)  dat(122,i) = dat(122,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
@@ -747,7 +777,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(122,1:n) = dat(122,1:n)/day**3
   
   
-  dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50  !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983
+  !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983:
+  dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50
   do i=1,n
      if(dat(81,i).lt.0.02)  dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
      if(dat(81,i).lt.1.d-9)  dat(38,i) = 0.d0
@@ -757,25 +788,32 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(37,1:n) = dat(122,1:n)                                     !Take Sills MB in stead of Wind AML
   !dat(38,1:n) = dat(122,1:n)                                    !Take Sills in stead of Rappaport MB
   
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
+  !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
+  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)
   
   !Replace AML due to non-conservative MT by 'negative AML' due to MT
-  !dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr* **(1.d0/3.d0)/1.d50                     !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of dat(33)
+  !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, 
+  !  in case of no wind: use dat(31) instead of dat(33):
+  !dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr* **(1.d0/3.d0)/1.d50
   
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 +  0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  dat(123,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F)
+  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F):
+  dat(123,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  
   dat(123,1:n) = dat(25,1:n)/dat(123,1:n)  !Actual Tet / analitic Tet
   
   dat(124,1:n) = dat(2,1:n) - dat(2,1) !t-t0
   dat(125,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
   
-  c126(1:n)    = 2*pi*(256.d0/5.d0)**(3.d0/8.d0)* g**(5.d0/8.d0)/c**(15.d0/8.d0) *(dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/ (dat(5,1:n)+1.4)**(1.d0/8.d0)
-  dat(126,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c126(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
+  c126(1:n)    = 2*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) *  &
+       (dat(5,1:n)*1.4)**(3.d0/8.d0) * m0**(5.d0/8.d0) / (dat(5,1:n)+1.4)**(1.d0/8.d0)
+  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
+  dat(126,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c126(1:n)/day
   
   dat(127,1:n) = dat(8,1:n)/dexp(dat(29,1:n))     
   dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
-  dat(129,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                 !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
+  !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed:
+  dat(129,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2
   dat(130,1:n) = dat(129,1:n)*2*pi/(dat(21,1:n)+1.d-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
   dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
@@ -789,14 +827,15 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   g0 = G*M0/R0**2
   dat(136,1:n) = 4.d-13*dat(9,1:n)/(dat(135,1:n)/g0*dat(4,1:n))              !Reimers wind = 4e-13*(L/Lo)/((g/g0)*(R/Ro))  (Mo/yr)
   dat(137,1:n) = min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), &   !Reimers-like wind: min of
-       9.61e-10*dat(9,1:n))                                                           !  3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr
+       9.61e-10*dat(9,1:n))                                  !  3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr
   dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
   
   
   
   !Colours
   do i=1,n
-     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),  &
+          mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
   end do
@@ -840,7 +879,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !Replace dJ/dt by dP/dt
   !35 = H_orb,  36 = H_gw, 37 = H_wml, 38 = H_s-o, 39 = H_mtr
   if(1.eq.2) then
-     dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
+     !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
+     dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)
      do i=35,39
         dat(i,1:n) = dat(i,1:n)*dpdj(1:n)*1.d50+1.d-30
      end do
@@ -868,6 +908,5 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   end if
   
 end subroutine changepltvars
-!***********************************************************************
-
+!***********************************************************************************************************************************
 

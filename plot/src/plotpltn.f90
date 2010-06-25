@@ -1,31 +1,36 @@
-!Plots the data contained in different star.plt*-files into one graph
-!This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
-!This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
-!Uses code in functions.f
-!Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-!AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!!>  Plotpltn.f90:
+!!
+!!   Plots the data contained in different star.plt*-files into one graph
+!!   This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
+!!   This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
+!!   Uses code in functions.f90
+!!   Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!!   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!< 
 
-
-program plotpltn  
+program plotpltn
+  use basic
   use constants
   use ubvdata
+  
   implicit none
   integer, parameter :: nn=10000,nc=100,nff=120  !10000x100x120 takes ~1Gb!
-  real*8, allocatable :: dat(:,:,:)
-  real*8 :: mbol,bc
+  real(double), allocatable :: dat(:,:,:)
+  real(double) :: mbol,bc
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
@@ -158,10 +163,12 @@ program plotpltn
      rewind 20
      read(20,*)ncols
      do j=1,nn
-        !if(ncols.eq.81) read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
+        !81 Columns:
+        !if(ncols.eq.81) read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(f,i,j),i=1,81)
         if(ncols.eq.81) read(20,*,err=22,end=21) (dat(f,i,j),i=1,81)  !81 Columns
         if(ncols.gt.81) then
-           !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+           !83 Columns; Evert(?) added 82, 83=strmdl flag:
+           !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=22,end=21) (dat(f,i,j),i=1,83)
            read(20,*,err=22,end=21) (dat(f,i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
            strmdls(j) = nint(dat(f,83,j)) !Structure model was saved (1) or not (0)
         end if
@@ -201,7 +208,8 @@ program plotpltn
      
      !Colours
      do i=1,n(f)
-        call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),mbol,bc,dat(f,81,i),dat(f,82,i),dat(f,83,i),dat(f,84,i),dat(f,85,i))
+        call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),mbol,bc,dat(f,81,i),dat(f,82,i),  &
+             dat(f,83,i),dat(f,84,i),dat(f,85,i))
         dat(f,86,i) = dat(f,82,i)+dat(f,83,i)  !(U-V) = (U-B) + (B-V)
         dat(f,87,i) = dat(f,84,i)+dat(f,85,i)  !(V-I) = (V-R) + (R-I)
      end do
@@ -209,7 +217,8 @@ program plotpltn
      dat(f,88,1:n(f)) = dat(f,8,1:n(f))**2*dat(f,22,1:n(f))  !k^2*R^2
      
      dat(f,89,1:n(f)) = dat(f,4,1:n(f)) - dat(f,5,1:n(f))                         !H-envelope mass
-     dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+     !lambda_env = G*M*M_env/(Ubind*R):
+     dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)
      !dat(f,90,1:n(f)) = dabs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ubind changes sign
      dat(f,90,1:n(f)) = max(dat(f,90,1:n(f)),0.d0)
      do i=1,n(f)

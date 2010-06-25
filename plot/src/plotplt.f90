@@ -1,34 +1,39 @@
-!Plots the data contained in a .plt* file, highlights selected points
-!Uses code in functions.f90
-!Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-!AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
-!
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!>  Plotplt.f90
+!!  
+!!  Plots the data contained in a .plt* file, highlights selected points
+!!  Uses routines from functions.f90, plt_functions.f90
+!!  Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!!  AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
 
 
 program plotplt
+  use basic
   use constants
   use ubvdata
   
   implicit none
   integer,parameter :: nmax=10000,nvar=229,nc=81,nl=7,nfmax=50
-  real*8 :: d(nvar)
+  real(double) :: d(nvar)
   
   integer, allocatable :: n(:), strmdls(:,:),hp(:,:),nhp(:)
   real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
-  real*8, allocatable :: dat(:,:,:),datf(:,:)
+  real(double), allocatable :: dat(:,:,:),datf(:,:)
   
   real :: yy1(nmax),minx,dist,mindist
   real :: x,y,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
@@ -117,7 +122,8 @@ program plotplt
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))
   allocate(hp(npl,1000), nhp(npl))
   
-  call getpltlabels(nf,nvar,pglabels,asclabels,defvar)                                                               !Get the labels for the plot axes; defvar = 0 for non-defined variables
+  !Get the labels for the plot axes; defvar = 0 for non-defined variables:
+  call getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   
   !************************************************************************      
@@ -231,7 +237,8 @@ program plotplt
         tscls = 1
         npl = 5
         yy(1:5,1:nmax) = real(dat(f,201:205,1:nmax))
-        leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)  !Line labels for Timescales plot
+        !Line labels for Timescales plot:
+        leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)
         npl = 6
         yy(6,1:nmax) = real(dat(f,119,1:nmax))
         leglbl(6) = '\(0645)\ddR/dt\u  '
@@ -242,7 +249,8 @@ program plotplt
         npl = 6
         yy(1,1:nmax) = real(dat(f,9,1:nmax))
         yy(2:6,1:nmax) = real(dat(f,16:20,1:nmax))
-        leglbl(1:npl) = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)  !Line labels for Luminosities plot
+        !Line labels for Luminosities plot:
+        leglbl(1:npl) = (/'L\dsurf\u  ','L\dH\u     ','L\dHe\u    ','L\dC\u     ','L\d\(639)\u','L\dth\u    '/)
         prleg = .true.
      end if
      
@@ -250,21 +258,24 @@ program plotplt
         sabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,42:48,1:nmax))
-        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        !Line labels for Abundances plots:
+        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
      if(vy.eq.214) then !Tmax abundances
         tabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,49:55,1:nmax))
-        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        !Line labels for Abundances plots:
+        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
      if(vy.eq.215) then !Core abundances
         cabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,56:62,1:nmax))
-        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)                                                  !Line labels for Abundances plots
+        !Line labels for Abundances plots:
+        leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
      
@@ -586,7 +597,8 @@ program plotplt
         !Enter points manually
         if(nf.eq.1 .and. hlp1.eq.'m') then
            pl = 1
-           write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(pl,1,n)),'), -1: end list: '
+           write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(pl,1,n)), &
+                '), -1: end list: '
            nhp(pl) = 1
            do j=1,1000
               read*,hp(pl,nhp(pl))
@@ -601,7 +613,7 @@ program plotplt
            write(6,'(A)')'      Nr   Model    Line'
            do i=1,nhp(pl)
               call locate(dat(pl,1,1:n(pl)),n,dble(hp(pl,i)),j)
-              if(dabs(dat(pl,1,j+1)-dble(hp(pl,i))).lt.dabs(dat(pl,1,j)-dble(hp(pl,i)))) j = j+1
+              if(abs(dat(pl,1,j+1)-dble(hp(pl,i))).lt.abs(dat(pl,1,j)-dble(hp(pl,i)))) j = j+1
               if(j.gt.n(pl)) j = n(pl)
               write(6,'(3I8)')i,hp(pl,i),j
               hp(pl,i) = j
@@ -834,8 +846,9 @@ program plotplt
      call pgsci(1)
      pl = 1
      
-     !call pltconvection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)   !Convection plot - replots axes at the end
-     call pltconvection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)   !Convection plot - replots axes at the end
+     !Convection plot - replots axes at the end:
+     !call pltconvection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
+     call pltconvection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
      call pgsci(2)
   end if
   
@@ -885,7 +898,7 @@ program plotplt
      do while(ex)
         write(psname,'(A,I3.3,A)')'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
         if(vx.eq.201) write(psname,'(A,I3.3,A)')'plot_plt__HRD_',i,'.eps'
-        inquire(file=trim(psname), exist=ex)                                                   !Check whether the file already exists
+        inquire(file=trim(psname), exist=ex)                                                 !Check whether the file already exists
         if(.not.ex) then
            j = system('mv -f plot_plt_000.eps '//trim(psname))
            call set_PGPS_title(trim(psname),trim(pstitle))
@@ -990,8 +1003,6 @@ program plotplt
      nsel=0
      call pgsci(1)
      call pgolin(1,nsel,xsel,ysel,2)
-     !write(6,'(10ES10.2)')xsel,xmin,xmax
-     !write(6,'(10ES10.2)')ysel,ymin,ymax
      
      
      dx = abs(xmax-xmin)
@@ -1009,7 +1020,8 @@ program plotplt
      end do
      write(6,*)''
      write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-     write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(pl0,i0),',  y =',yy(pl0,i0),'    line =',i0+1,',  model =',nint(dat(pl0,1,i0))
+     write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(pl0,i0),',  y =',yy(pl0,i0),  &
+          '    line =',i0+1,',  model =',nint(dat(pl0,1,i0))
      
      dx = 0
      dy = 0
@@ -1028,9 +1040,11 @@ program plotplt
      
      write(6,*)''
      !From listplt
-     write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
+     write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
+          '       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
      d = dat(pl0,:,i0)
-     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
+     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
+          d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
      write(6,*)''
      
      !col = 2

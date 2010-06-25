@@ -1,26 +1,29 @@
-!Plotpltp: Plots the data contained in star.plt1,2 in different panels
-!  This program reads and plots data from the plot output file from Eggletons code, the TWIN version
-!  The idea is to plot np panels with the same horizontal axis and different vertical axes.
-!  The output is written to ps only.
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
-   
+!>  Plotpltp: Plots the data contained in star.plt1,2 in different panels
+!!  This program reads and plots data from the plot output file from Eggletons code, the TWIN version
+!!  The idea is to plot np panels with the same horizontal axis and different vertical axes.
+!!  The output is written to ps only.
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<   
 
 program plotpltp      
+  use basic
+  
   implicit none
   integer, parameter :: nn=30000, nvar=100
-  real*8 :: dat(nvar,nn)
+  real(double) :: dat(nvar,nn)
   real :: xx(nn),yy(nn)
   real :: x,system,xmin,xmax,ymin,ymax,ymin0,ymax0
   real :: px(5000),py(5000)
@@ -43,7 +46,7 @@ program plotpltp
   ! Switches:
   !-----------
   psname            = 'plot_plt.ps'                         ! Name of the output file
-  plotmode          = 1                                     ! 0 - plot all graphs on 1 sheet only,  1 - as 0, but plots each graph on an additional sheet as well
+  plotmode          = 1        ! 0 - plot all graphs on 1 sheet only,  1 - as 0, but plots each graph on an additional sheet as well
   ps                = 0                                     ! 0 - plot to screen, 1 - plot to postscript file(s).
   
   
@@ -177,7 +180,8 @@ program plotpltp
   dat(13,1:n) = 10**dat(13,1:n)
   dat(14,1:n) = 10**dat(14,1:n)
   
-  dat(38,1:n) = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50                         !TRUE Magnetic braking in stead of Spin-orbit coupling
+  !TRUE Magnetic braking in stead of Spin-orbit coupling:
+  dat(38,1:n) = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50
   do i=1,nn
      if(dat(81,i).lt.0.02) dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
   end do
@@ -235,7 +239,8 @@ program plotpltp
   log='n'
   read*,log
   
-  xx = real(dat(vx,1:nn))  !Problem with converting to float: small time ranges after a long time are rounded to the same floating number
+  !Problem with converting to float: small time ranges after a long time are rounded to the same floating number:
+  xx = real(dat(vx,1:nn))  
   lx = labels(vx)
   if(log.eq.'Y'.or.log.eq.'y') then
      if(xx(1).le.0.) xx(1)=xx(2)
@@ -288,7 +293,8 @@ program plotpltp
         vy = 72
      end if
      
-     yy = real(dat(vy,1:nn))  !Problem with converting to float: small time ranges after a long time are rounded to the same floating number
+     !Problem with converting to float: small time ranges after a long time are rounded to the same floating number:
+     yy = real(dat(vy,1:nn))
      
      write(6,'(A51)',advance='no')' Do you want a logarithmic Y-axis ?   (Y)es, (N)o: '
      read*,log

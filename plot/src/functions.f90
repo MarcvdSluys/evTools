@@ -1,25 +1,50 @@
-!functions.f: Shared modules, functions and subroutines for the Eggleton plot package
-!For functions and routines that need pgplot, see plotfunctions.f
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!> functions.f90: Shared modules, functions and subroutines for the Eggleton plot package
+!! For functions and routines that need pgplot, see plotfunctions.f
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
-!************************************************************************
+!***********************************************************************************************************************************
+!> module basic:
+!! 
+!! Contains the integers double and dbl, which shall be used in (almost) all routines
+!! to provide the kind of a (currently double-precision) real variable type.
+!! 
+!! Variables can be declared using "real(double) :: "; constants can be defined as 
+!! e.g. "x = 3.0_dbl".
+!< 
+module basic
+   implicit none
+   
+   !Integer, double precision:
+   integer, parameter :: long = selected_int_kind(18)
+   
+   !Real, double precision:
+   integer, parameter :: double = selected_real_kind(15,307)  !Precision = 15, range = 307
+   integer, parameter :: dbl = selected_real_kind(15,307)     !Precision = 15, range = 307
+   
+end module basic
+!***********************************************************************************************************************************
+
+!***********************************************************************************************************************************
 module ubvdata
+  use basic
   implicit none
   save
   integer, parameter :: nzgr=9,ntgr=61,nggr=11
-  real*8 :: zgr(nzgr),tgr(ntgr),ggr(nggr),ubv(8,nggr,ntgr,nzgr)
+  real(double) :: zgr(nzgr),tgr(ntgr),ggr(nggr),ubv(8,nggr,ntgr,nzgr)
   
   data zgr /-1.d0,-0.5d0,-0.3d0,-0.2d0,-0.1d0,0.d0,0.1d0,0.2d0,0.3d0/
   data ggr /0.d0,0.5d0,1.d0,1.5d0,2.d0,2.5d0,3.d0,3.5d0,4.d0,4.5d0,5.d0/
@@ -29,25 +54,26 @@ module ubvdata
        200.d0,210.d0,220.d0,230.d0,240.d0,250.d0,260.d0,270.d0,280.d0,290.d0,300.d0,  &
        310.d0,320.d0,330.d0,340.d0,350.d0,375.d0,400.d0,425.d0,450.d0,475.d0,500.d0/
 end module ubvdata
-!************************************************************************
+!***********************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 module constants
+  use basic
   implicit none
   save
   real :: scrsz,scrrat
-  real*8 :: pi,tpi,pi2,c3rd
-  real*8 :: l0,r0,m0,g,c,day,yr,km
-  real*8 :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
+  real(double) :: pi,tpi,pi2,c3rd
+  real(double) :: l0,r0,m0,g,c,day,yr,km
+  real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*99,workdir*99,username*99,userID*9,hostname*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
   logical :: student_mode
 end module constants
-!************************************************************************
+!***********************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 subroutine setconstants
   use constants
   implicit none
@@ -93,7 +119,7 @@ subroutine setconstants
   cursorleft = char(27)//'[1D' !Makes the cursor move left one space
   
 end subroutine setconstants
-!************************************************************************
+!***********************************************************************************************************************************
 
 
 
@@ -102,20 +128,22 @@ end subroutine setconstants
 
 
 
-!************************************************************************      
+!***********************************************************************************************************************************
 subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   !Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
   !  See: http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
   !  UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
   !  UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
   
+  use basic
   use ubvdata
+  
   implicit none
-  real*8, parameter :: gconst=-10.6071d0
+  real(double), parameter :: gconst=-10.6071d0
   integer :: k,ig,it,iz,find_index
-  real*8 :: cm(5),ltgr(ntgr)
-  real*8 :: logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini
-  real*8 :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
+  real(double) :: cm(5),ltgr(ntgr)
+  real(double) :: logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini
+  real(double) :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
   external find_index
   
   logm = log10(mass)
@@ -157,12 +185,12 @@ subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   rmini = cm(5)
   
 end subroutine lt2ubv
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
   use constants
   implicit none
@@ -175,7 +203,7 @@ function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
   getos = 1 !Linux
   if(ostype(1:5).eq.'Darwi') getos = 2 !MacOSX
 end function getos
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
@@ -192,7 +220,8 @@ function findfile(match)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  i = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  !Shell command to list all the files with the search string and pipe them to a temporary file
+  !Shell command to list all the files with the search string and pipe them to a temporary file:
+  i = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  
   
   k=0
   names = ''
@@ -230,11 +259,11 @@ function findfile(match)
   findfile = fname
   
 end function findfile
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine findfiles(match,nff,all,fnames,nf)  
   !Input:
   !  match:   search string to match
@@ -255,7 +284,8 @@ subroutine findfiles(match,nff,all,fnames,nf)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  i = system('ls '//trim(match)//' > '//trim(tempfile))  !Shell command to list all the files with the search string and pipe them to a temporary file
+  !Shell command to list all the files with the search string and pipe them to a temporary file:
+  i = system('ls '//trim(match)//' > '//trim(tempfile))
   
   do i=1,nff
      names(i)='                                                                                                   '
@@ -315,14 +345,14 @@ subroutine findfiles(match,nff,all,fnames,nf)
 200 continue
   
 end subroutine findfiles
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine rswap(x,y) !Swap two real numbers
   implicit none
   real :: x,y,z
@@ -330,18 +360,19 @@ subroutine rswap(x,y) !Swap two real numbers
   x = y
   y = z
 end subroutine rswap
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 
 
-!************************************************************************      
+!***********************************************************************************************************************************
 function find_index(v,arr,narr)  !Double precision
   !Finds index of value v in monotonously increasing or decreasing array arr of length narr
+  use basic
   implicit none
   integer :: find_index,narr,i,iLow,iHigh
-  real*8 :: v,arr(narr),range
+  real(double) :: v,arr(narr),range
   
   range = arr(narr) - arr(1)
   iLow = 1
@@ -358,12 +389,12 @@ function find_index(v,arr,narr)  !Double precision
   
   find_index = iHigh
 end function find_index
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine locate(arr,narr,v,i)  !Double precision
   !Input: 
   !  arr: monotonic array
@@ -372,9 +403,10 @@ subroutine locate(arr,narr,v,i)  !Double precision
   !  Output:
   !  i:  returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
+  use basic
   implicit none
   integer :: i,narr,iLow,iMid,iHigh
-  real*8 :: v,arr(narr)
+  real(double) :: v,arr(narr)
   
   iLow = 0
   iHigh = narr+1
@@ -396,10 +428,10 @@ subroutine locate(arr,narr,v,i)  !Double precision
   end if
   
 end subroutine locate
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine locater(rarr,narr,rv,i)  !Single precision
   !Input: 
   !  rarr:  monotonic array
@@ -408,25 +440,27 @@ subroutine locater(rarr,narr,rv,i)  !Single precision
   !  Output:
   !  i:     returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
+  use basic
   implicit none
   integer :: i,narr
   real :: rv,rarr(narr)
-  real*8 :: dv,darr(narr)
+  real(double) :: dv,darr(narr)
   
   darr = dble(rarr)
   dv  = dble(rv)
   call locate(darr,narr,dv,i)  !i will be returned to the calling routine
   
 end subroutine locater
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 !************************************************************************************************************************************
 subroutine rindex(narr,rarr,indx)  !Return a sorted index indx of array rarr of length n - single precision
+  use basic
   implicit none
   integer :: narr,indx(narr)
   real :: rarr(narr)
-  real*8 :: darr(narr)
+  real(double) :: darr(narr)
   
   darr = dble(rarr)
   call dindex(narr,darr,indx)  !Call the double-precision routine
@@ -436,10 +470,11 @@ end subroutine rindex
 
 !************************************************************************************************************************************
 subroutine dindex(narr,arr,ind)  !Return a sorted index ind of array arr of length narr - double precision
+  use basic
   implicit none
   integer, parameter :: m=7,nstack=50
   integer :: narr,ind(narr)
-  real*8 :: arr(narr),a
+  real(double) :: arr(narr),a
   integer :: i,indxt,ir,itemp,j,jstack,k,l,istack(nstack)
   
   do j=1,narr
@@ -526,7 +561,7 @@ end subroutine dindex
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine polint(xa,ya,n,x,y,dy)  !Single precision
   implicit none
   integer, parameter :: nmax=10
@@ -569,19 +604,20 @@ subroutine polint(xa,ya,n,x,y,dy)  !Single precision
   end do
   
 end subroutine polint
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
+  use basic
   implicit none
   integer, parameter :: nmax=10
   integer :: n
-  real*8 :: dy,x,y,xa(n),ya(n)
+  real(double) :: dy,x,y,xa(n),ya(n)
   integer :: i,m,ns
-  real*8 :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
+  real(double) :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
   
   ns = 1
   dif = abs(x-xa(1))
@@ -617,12 +653,12 @@ subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
   end do
   
 end subroutine polintd
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 function ran1(seed)
   implicit none
   integer, parameter :: ia=16807,im=2147483647,iq=127773,ir=2836,ntab=32,ndiv=1+(im-1)/ntab
@@ -654,17 +690,18 @@ function ran1(seed)
   ran1 = min(am*iy,rnmx)
   
 end function ran1
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine spline(x,y,n,yp1,ypn,y2)
+  use basic
   implicit none
   !integer, parameter :: nmax=1000
   integer :: n,i,k
-  real*8 :: yp1,ypn,x(n),y(n),y2(n)
-  real*8 :: p,qn,sig,un,u(n)
+  real(double) :: yp1,ypn,x(n),y(n),y2(n)
+  real(double) :: p,qn,sig,un,u(n)
   
   !if(n.gt.nmax) then
   !   write(0,'(/,A)')'  ERROR: spline():  n > nmax'
@@ -701,14 +738,15 @@ subroutine spline(x,y,n,yp1,ypn,y2)
   end do
   
 end subroutine spline
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 subroutine splint(xa,ya,y2a,n,x,y)
+  use basic
   implicit none
   integer :: n,k,khi,klo
-  real*8 :: x,y,xa(n),y2a(n),ya(n),a,b,h
+  real(double) :: x,y,xa(n),y2a(n),ya(n),a,b,h
   
   klo = 1
   khi = n
@@ -729,7 +767,7 @@ subroutine splint(xa,ya,y2a,n,x,y)
   y = a*ya(klo)+b*ya(khi)+((a**3-a)*y2a(klo)+(b**3-b)*y2a(khi))*(h**2)/6.
   
 end subroutine splint
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
@@ -738,111 +776,121 @@ end subroutine splint
 
 !********************************************************************************      
 function a2j(m1,m2,a)  !a to Orbital angular momentum
+  use basic
   use constants
   implicit none
-  real*8 :: a2j,m1,m2,a
+  real(double) :: a2j,m1,m2,a
   a2j = m1*m2*dsqrt(g*a*r0/(m1+m2)*m0**3)!*m0**1.5d0
 end function a2j
-!***********************************************************************
+!***********************************************************************************************************************************
 
 !********************************************************************************      
 function j2a(m1,m2,j)  !Orbital angular momentum to a
+  use basic
   use constants
   implicit none
-  real*8 :: j2a,m1,m2,j
+  real(double) :: j2a,m1,m2,j
   j2a = (j/(m1*m2))**2 * (m1+m2)/(g*m0**3)/r0
 end function j2a
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 !********************************************************************************      
 function p2j(m1,m2,p)  !P to Orbital angular momentum, all in cgs units
+  use basic
   use constants
   implicit none
-  real*8 :: p2j,m1,m2,p,a,p2a
+  real(double) :: p2j,m1,m2,p,a,p2a
   a = p2a(m1+m2,p)
   p2j = m1*m2*sqrt(g*a/(m1+m2))
 end function p2j
-!***********************************************************************
+!***********************************************************************************************************************************
 
 !********************************************************************************      
 function j2p(m1,m2,j)  !Orbital angular momentum to P, all in cgs units
+  use basic
   use constants
   implicit none
-  real*8 :: j2p,m1,m2,j,a,a2p
+  real(double) :: j2p,m1,m2,j,a,a2p
   a = (j/(m1*m2))**2 * (m1+m2)/g
   j2p = a2p(m1+m2,a)
 end function j2p
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
 !********************************************************************************      
 function p2a(mtot,p)  !P, a, mtot in cgs units
+  use basic
   use constants
   implicit none
-  real*8 :: p2a,mtot,p
+  real(double) :: p2a,mtot,p
   p2a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
 end function p2a
-!***********************************************************************
+!***********************************************************************************************************************************
 
 !********************************************************************************      
 function a2p(mtot,a)  !P, a, mtot in cgs units
+  use basic
   use constants
   implicit none
-  real*8 :: a2p,mtot,a
+  real(double) :: a2p,mtot,a
   a2p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
 end function a2p
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 function a2rl(m1,m2,a)  !m1 and m2 in the same units, Rl and a in the same units
+  use basic
   use constants
   implicit none
-  real*8 :: a2rl,q,m1,m2,a
+  real(double) :: a2rl,q,m1,m2,a
   q = m1/m2
   a2rl = a / (0.6d0*q**(2*c3rd) + log(1.d0 + q**c3rd)) * (0.49d0*q**(2*c3rd))
 end function a2rl
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 function rl2a(m1,m2,rl1)  !m1 and m2 in the same units, Rl and a in the same units
+  use basic
   use constants
   implicit none
-  real*8 :: rl2a,q,m1,m2,rl1
+  real(double) :: rl2a,q,m1,m2,rl1
   q = m1/m2
   rl2a = rl1/(0.49d0*q**(2*c3rd)/(0.6d0*q**(2*c3rd) + log(1.d0+q**c3rd)))
 end function rl2a
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 function p2rl(m1,m2,p)  !All in cgs units
+  use basic
   implicit none
-  real*8 :: p2rl,m1,m2,p,a,p2a,a2rl
+  real(double) :: p2rl,m1,m2,p,a,p2a,a2rl
   a = p2a(m1+m2,p)
   p2rl = a2rl(m1,m2,a)
 end function p2rl
-!************************************************************************
+!***********************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 function rl2p(m1,m2,rl1)  !All in cgs units
+  use basic
   implicit none
-  real*8 :: rl2p,m1,m2,rl1,a,a2p,rl2a
+  real(double) :: rl2p,m1,m2,rl1,a,a2p,rl2a
   a = rl2a(m1,m2,rl1)
   rl2p = a2p(m1+m2,a)
 end function rl2p
-!************************************************************************
+!***********************************************************************************************************************************
 
 
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 subroutine quit_program(message)  !Print a message and quit
   implicit none
   character :: message*(*)
@@ -853,7 +901,7 @@ subroutine quit_program(message)  !Print a message and quit
   write(0,'(A,/)')'  Aborting...'
   stop
 end subroutine quit_program
-!************************************************************************
+!***********************************************************************************************************************************
 
 
 
@@ -904,10 +952,11 @@ end subroutine bin_data_1d
 !************************************************************************************************************************************
 
 
-!************************************************************************
+!***********************************************************************************************************************************
 function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+  use basic
   implicit none
-  real*8 :: time_stamp
+  real(double) :: time_stamp
   integer :: os,i,system
   character :: fname*99
   
@@ -922,7 +971,7 @@ function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UT
   close(9)
   i = system('rm -f '//trim(fname))
 end function time_stamp
-!************************************************************************
+!***********************************************************************************************************************************
 
 
 

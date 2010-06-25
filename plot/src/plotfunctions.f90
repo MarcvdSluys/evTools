@@ -1,18 +1,21 @@
-!plotfunctions.f: Functions and subroutines for the Eggleton plot package that need pgplot
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
-
+!>  Plotfunctions.f90: 
+!!
+!!  Functions and subroutines for the Eggleton plot package that need pgplot
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
 
 !***********************************************************************
@@ -86,12 +89,12 @@ end subroutine plotzams
 !***********************************************************************
 !Make a convection plot from the data in a *.plt? file
 subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
-  
+  use basic
   implicit none
   integer :: nmax,nvar,n, nhp,hp(1000),vx
   integer :: i,j,ci0,lw0
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
-  real*8 :: dat(nvar,nmax)
+  real(double) :: dat(nvar,nmax)
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
   real :: ymin,ymax,ch0
   character :: hlp,hlbl
@@ -169,7 +172,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            end if
            
            do j=1,nz
-              if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then  !Zeroes or change in the number of zones can mean trouble
+              !Zeroes or change in the number of zones can mean trouble:
+              if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
                     zoney(j,2) = (zoney(j,3)+zoney(j,4))/2.
@@ -258,7 +262,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            
            
            do j=1,nz
-              if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then  !Zeroes or change in the number of zones can mean trouble
+              !Zeroes or change in the number of zones can mean trouble:
+              if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
                     zoney(j,2) = (zoney(j,3)+zoney(j,4))/2.
@@ -303,7 +308,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
         ibold = 0
         do i=2,n
            do j=80,76,-1
-              if(dabs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)  !If upper and lower boundary are equal, remove them
+              !If upper and lower boundary are equal, remove them:
+              if(dabs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)
            end do
            ib = 80
            do j=80,75,-1
@@ -346,7 +352,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            
            
            do j=1,nz
-              !if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then  !Zeroes or change in the number of zones can mean trouble
+              !Zeroes or change in the number of zones can mean trouble:
+              !if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then
               if(dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
@@ -356,7 +363,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
                     zoney(j,3) = (zoney(j,1)+zoney(j,2))/2.  !Zone ends, make it end nicely in a point at the right
                     zoney(j,4) = (zoney(j,1)+zoney(j,2))/2.
                  end if
-                 !if(zoney(j,2).lt.1.e-10.and.zoney(j,1)*zoney(j,3)*zoney(j,4).gt.1.e-10) zoney(j,2) = zoney(j,3) !Doesn't seem necessary
+                 !Doesn't seem necessary:
+                 !if(zoney(j,2).lt.1.e-10.and.zoney(j,1)*zoney(j,3)*zoney(j,4).gt.1.e-10) zoney(j,2) = zoney(j,3)
                  !if(zoney(j,3).lt.1.e-10.and.zoney(j,1)*zoney(j,2)*zoney(j,4).gt.1.e-10) zoney(j,3) = zoney(j,2)
               end if
            end do

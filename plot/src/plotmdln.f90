@@ -1,23 +1,27 @@
-!Plotmdln.f:   Plots the data contained in star.mdl, for some or all (n) structure models in the file, ONE variable
-! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-! Uses PGPLOT window 3 to plot to
-! AF, 19-05-2005
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!> Plotmdln.f90:   Plots the data contained in star.mdl, for some or all (n) structure models in the file, ONE variable
+!! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
+!! Uses PGPLOT window 3 to plot to
+!! AF, 19-05-2005
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
+
 
 program plotmdln  
   use constants
+  
   implicit none
   integer, parameter :: nn=1000,nq=30,nbb=500
   integer :: nm,nv,mdl(nbb),nblk,nsel,whitebg
@@ -95,7 +99,8 @@ program plotmdln
   read(10,5,err=11,end=11) nm,nv,dov
 5 format (2x,I4,4x,I2,F7.3)
   write(6,*)''
-  write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
+  write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
+       '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
 
   do b=1,nbb
      read(10,6,err=12,end=15) mdl(b),age(b)
@@ -131,7 +136,8 @@ program plotmdln
 
      if(mod(b,25).eq.0) then
         write(6,*)''
-        write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
+        write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
+             '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
      end if
      write(6,9)b,mdl(b),nm,age(b),m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs!,bms,p,p1
   end do !b
@@ -154,7 +160,8 @@ program plotmdln
   goto 9999
 15 close(10)
   
-  write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
+  write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
+       '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
   write(6,*)''
   nblk = b-1
   write(6,'(A,I4,A)')'  EOF reached,',nblk,' blocks read.'
@@ -203,7 +210,8 @@ program plotmdln
   write(6,'(I5,A)')nb,' blocks selected:'
   write(6,'(A)')'  Nr  Model       Age    Mass  Radius   Luminos      Teff       H    He   C+O'
   do b=1,nb
-     write(6,8)blk(b),mdl(blk(b)),age(blk(b)),dat(blk(b),2,nm),    dat(blk(b),3,nm),dat(blk(b),17,nm),dat(blk(b),6,nm),    dat(blk(b),10,1),dat(blk(b),11,1),    dat(blk(b),12,1)+dat(blk(b),14,1)
+     write(6,8)blk(b),mdl(blk(b)),age(blk(b)),dat(blk(b),2,nm),    dat(blk(b),3,nm),dat(blk(b),17,nm),dat(blk(b),6,nm),  &
+          dat(blk(b),10,1),dat(blk(b),11,1),    dat(blk(b),12,1)+dat(blk(b),14,1)
   end do
   write(6,*)''
 

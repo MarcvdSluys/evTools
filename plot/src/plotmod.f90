@@ -1,31 +1,36 @@
-! Plotmod.f
-! Reads an input or output structure model file for Eggeltons TWIN code v.2003 and lists the properties of each model it contains.
-! One can then select a model to plot its contents. Adapted from Listmod.f
-! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-! AF 2004-08-05
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!> Plotmod.f90
+!! Reads an input or output structure model file for Eggeltons TWIN code v.2003 and lists the properties of each model it contains.
+!! One can then select a model to plot its contents. Adapted from Listmod.f
+!! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
+!! AF 2004-08-05
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published 
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
-program plotmod  
+
+program plotmod
+  use basic
   use constants
+  
   implicit none
   integer, parameter :: nc=25,nm=1000
-  real*8 :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real*8 :: lnf,lnt,x16,lnm,x1,lnr,l,x4,x12,x20
-  real*8 :: mi,pr,phi,phis,e,f,x
-  real*8 :: r1,l1,ts,tc,hc,hec,zc
-  real*8 :: mhe,mco
+  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real(double) :: lnf,lnt,x16,lnm,x1,lnr,l,x4,x12,x20
+  real(double) :: mi,pr,phi,phis,e,f,x
+  real(double) :: r1,l1,ts,tc,hc,hec,zc
+  real(double) :: mhe,mco
   integer :: i,j,kh,kp,jmod,jb,jin,n
   integer :: narg,blk
   character :: fname*99,findfile*99
@@ -68,7 +73,8 @@ program plotmod
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
 
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc     Xc     Yc     Zc    Mtot      Porb       e      Prot'
+  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc'//  &
+       '     Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      mhe = 0.d0
@@ -99,7 +105,8 @@ program plotmod
 6 write(6,'(A36,I3)')'  Error reading second line of block',i
 9 format (I3,2I7,ES12.4,ES10.2,5F8.3,I7,ES10.2,3F7.4,2(F8.3,ES10.2))
 10 n=i-1
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc     Xc     Yc     Zc    Mtot      Porb       e      Prot'
+  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc'//  &
+       '     Xc     Yc     Zc    Mtot      Porb       e      Prot'
   write(6,'(I3,A)')n,' blocks read.'
 12 if(n.eq.0) goto 999
   write(6,*)''

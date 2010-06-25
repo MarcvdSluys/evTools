@@ -1,29 +1,34 @@
-! Plots the data contained in a mdl* file
-! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-! Uses PGPLOT window 2 to plot to
-! AF, 19-05-2005
-!
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-plot package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!> Plotmdl.f90
+!!
+!! Plots the data contained in a mdl* file
+!! Uses PGPLOT window 2 to plot to
+!! AF, 19-05-2005
+!!
+!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!!   
+!!   
+!!   This file is part of the eggleton-plot package.
+!!   
+!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!!   
+!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!!   
+!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!!   <http://www.gnu.org/licenses/>.
+!<
 
 program plotmdl  
+  use basic
   use constants
+  
   implicit none
   integer, parameter :: nn=2001,nq=300  !nq: max number of columns
-  integer :: nm,nc,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,whitebg
-  real*8 :: dat1(nq)
+  integer :: nm,nc,nv_der,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,whitebg,system
+  real(double) :: dat1(nq)
   real :: dat(nq,nn),age,ver,x
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
@@ -60,7 +65,7 @@ program plotmdl
   pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
   
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
-  pxns(211:216) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','Ubind']
+  pxns(211:218) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','Ub,*','Ub,env','P/rho']
   pxns(251:252) = [character(len=99) :: 'Abundances','Nablas']
   
   !Axis labels
@@ -157,8 +162,11 @@ program plotmdl
   labels(213) = 'P\drad\u (dyn cm\u-2\d)'
   labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
   labels(215) = '\(2128) = P\drad\u/P\dgas\u'  !\beta - Prad/Pgas
-  labels(216) = 'U\dbind\u ()'  !Binding energy
+  labels(216) = 'U\db,*\u ()'    !Binding energy of the star
+  labels(217) = 'U\db,env\u ()'  !Binding energy of the envelope
+  labels(218) = 'P/\(2143) (cgs)'  !P/rho
   
+  nv_der = 18  !Number of derived variables
   
   labels(251) = 'Abundances'
   labels(252) = "\(2266)'s"
@@ -211,11 +219,13 @@ program plotmdl
   end if
 5 format (2x,I4,4x,I2,F7.3)
   write(6,*)''
-  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
+  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
+       '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
   do ii=1,999
      if(mod(ii,25).eq.0) then
         write(6,*)''
-        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
+        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
+             '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
      end if
      read(10,6,iostat=io) mdl,age
      if(io.lt.0) exit
@@ -356,7 +366,8 @@ program plotmdl
         dat(201,i) = real(i)
      end do
      dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
-     dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))                              !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad
+     !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
+     dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
      dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     !M/M*
      dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
      dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
@@ -370,7 +381,8 @@ program plotmdl
      dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
      pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
      
-     dat(211,1:nm) = 2. / (1 + 3*dat(9,1:nm) + 0.5*dat(10,1:nm))                           !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62)
+     !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
+     dat(211,1:nm) = 2. / (1 + 3*dat(9,1:nm) + 0.5*dat(10,1:nm))
      dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       !Particle density       n = rho/(mu*m_H)
      dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             !                   P_rad = aT^4/3
      dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         !                   P_gas = nkT
@@ -380,11 +392,13 @@ program plotmdl
      dat(216,1) = 0.
      dat(217,1) = 0.
      do i=2,nm
-        dat(216,i) = dat(216,i-1) + dat(207,i)
-        if(dat(pxin(10),i).lt.0.1) dat(217,i) = dat(217,i-1) + dat(207,i)                     !Start at core-envelope boundary
+        dat(216,i) = dat(216,i-1) + dat(207,i)                                             !BE of whole star
+        if(dat(pxin(10),i).lt.0.1) dat(217,i) = dat(217,i-1) + dat(207,i)                  !Start at core-envelope boundary
      end do
      
-     pxnr(211:217) = (/211,212,213,214,215,216,217/)
+     dat(218,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               !P/rho
+     
+     pxnr(211:218) = (/211,212,213,214,215,216,217,218/)
      
      
      if(pxin(60).ne.0) then !Brint-Vailasakatralala frequency
@@ -431,7 +445,7 @@ program plotmdl
   !end do
   
   nr = 4 !Number of variable columns
-  ii = ceiling(real(nc)/real(nr)) !Number of rows
+  ii = ceiling(real(nv_der)/real(nr)) !Number of rows
   do i=1,ii
      do j=0,nr-1
         if(pxnr(200+i+j*ii).eq.0) then
@@ -440,7 +454,7 @@ program plotmdl
            write(6,'(I9,A10,5x)',advance='no')200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
         end if
      end do
-     write(6,*)''
+     write(6,*)
   end do
   
   write(6,*)''
@@ -709,13 +723,15 @@ program plotmdl
      write(6,'(A)')'  6) change structure model'
      write(6,'(A)')'  7) change input file'
      write(6,'(A)')'  8) save plot as postscript'
+     write(6,'(A)')'  '
+     write(6,'(A)')' 10) identify a point in the graph'
   end if !if(plot.ne.9) then
   write(6,*)''
   write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot
-  if(plot.lt.0.or.plot.gt.8) goto 900
+  if(plot.lt.0 .or. plot.gt.8.and.plot.ne.10) goto 900
   
-  if(plot.ne.4) call pgend
+  if(plot.ne.4.and.plot.ne.10) call pgend
   if(plot.eq.1) goto 32
   if(plot.eq.2) goto 37
   if(plot.eq.3) goto 70
@@ -758,9 +774,97 @@ program plotmdl
      goto 501
   end if
   
+  
+  if(plot.eq.10) then
+     !call identify_closest_model(nq,nn,ny,dat,xx,yy,xmin,xmax,ymin,ymax)
+     call identify_closest_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
+     goto 900
+  end if
+  
 9999 continue
   write(6,'(A,/)')' Program finished'
 end program plotmdl
+!***********************************************************************************************************************************
 
 
 
+
+!***********************************************************************************************************************************
+!subroutine identify_closest_model(nq,nn,ny,dat,xx,yy,xmin,xmax,ymin,ymax)
+subroutine identify_closest_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
+  implicit none
+  integer, intent(in) :: nn,ny!,nq
+  real, intent(in) :: xx(nn),yy(10,nn)  
+  !real, intent(in) :: dat(nq,nn)
+  
+  integer :: iy,iy0,i,i0,nsel,col
+  real :: dist,mindist
+  real :: xmin,xmax,ymin,ymax,dx,dy,xsel(4),ysel(4)
+  !real :: d(nq)
+  
+  character :: hlbls*5
+  
+  !Identify closest model
+  xsel = 0.
+  ysel = 0.
+  write(6,'(A)')' Select a point in the graph and press "x" to finish'
+  nsel=0
+  call pgsci(1)
+  call pgolin(1,nsel,xsel,ysel,2)
+  
+  
+  dx = abs(xmax-xmin)
+  dy = abs(ymax-ymin)
+  mindist = huge(mindist)
+  do iy=1,ny
+     do i=1,nn
+        dist = (abs(xsel(1)-xx(i))/dx)**2 + (abs(ysel(1)-yy(iy,i))/dy)**2
+        if(dist.lt.mindist) then
+           i0 = i
+           iy0 = iy
+           mindist = dist
+        end if
+     end do
+  end do
+  write(6,*)''
+  write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
+  write(6,'(A,ES12.4,A,ES12.4,A,I5)')' Closest model:     x =',xx(i0),',  y =',yy(iy0,i0),  &
+       ',  model =',i0
+  
+  !Copied from plotplt:
+  !dx = 0
+  !dy = 0
+  !if(i0.gt.1.and.i0.lt.nn) then
+  !   dx = xx(i0+1)-xx(i0-1)
+  !   dy = yy(iy0,i0+1)-yy(iy0,i0-1)
+  !else if(i0.gt.1) then
+  !   dx = xx(i0)-xx(i0-1)
+  !   dy = yy(iy0,i0)-yy(iy0,i0-1)
+  !else if(i0.lt.nn) then
+  !   dx = xx(i0+1)-xx(i0)
+  !   dy = yy(iy0,i0+1)-yy(iy0,i0)
+  !end if
+  !
+  !write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+  !
+  !write(6,*)''
+  !!From listiyt
+  !write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
+  !     '       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
+  !d = dat(:,i0)
+  !write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
+  !     d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
+  !write(6,*)''
+  
+  col = 2
+  !col = colours(mod(iy0-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+  call pgsci(col)
+  
+  call pgpoint(1,xx(i0),yy(iy0,i0),2)
+  write(hlbls,'(I5)')i0
+  call pgptxt(xx(i0),yy(iy0,i0),0.,0.,hlbls)
+  
+  call pgsci(1)
+  
+end subroutine identify_closest_model
+!***********************************************************************************************************************************

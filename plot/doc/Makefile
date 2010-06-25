@@ -4,10 +4,10 @@
 
 
 #No text/space after statements below!
-COMP = gfortran#  Use GNU fortran compiler
-COMP = gfortran-4.4.3#
-#COMP = ifort#     Use Intel fortran compiler
-#COMP = nagfor#
+FORT = gfortran#  Use GNU fortran compiler
+FORT = gfortran-4.4.3#
+FORT = ifort#     Use Intel fortran compiler
+#FORT = nagfor#
 
 
 # Directories for the source, object, module, libary and executable files:
@@ -27,7 +27,7 @@ MODOBJ =
 
 
 #ifort:
-ifeq ($(COMP),ifort)
+ifeq ($(FORT),ifort)
    #To develop code  (don't mix -check bounds with -O>0!):
    #CFLAGS = -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
    CFLAGS = -O0  -vec-report0 -traceback -warn all -check all  -check noarg_temp_created
@@ -35,7 +35,7 @@ ifeq ($(COMP),ifort)
    #To debug code:
    #CFLAGS = -O0  -vec-report0 -g
 
-   CFLAGS = -O2
+   #CFLAGS = -O2
 
    #To use optimum run speed
    #CFLAGS = -O3 -vec-report0 -traceback
@@ -53,8 +53,8 @@ endif
 
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
-#ifeq ($(COMP),gfortran)
-ifneq (,$(filter $(COMP),gfortran gfortran-4.4.3))
+#ifeq ($(FORT),gfortran)
+ifneq (,$(filter $(FORT),gfortran gfortran-4.4.3))
    #CFLAGS = -O0 -ffree-line-length-none
    CFLAGS = -O0 -ffree-line-length-none   -Wall 
    #CFLAGS = -O -ffree-line-length-none
@@ -67,8 +67,11 @@ endif
 
 
 #nagfor:
-ifeq ($(COMP),nagfor)
-   CFLAGS = -O0 -132 -colour -w=all
+ifeq ($(FORT),nagfor)
+   CFLAGS = -O0 -colour -gline
+   CFLAGS += -f2003 
+#   CFLAGS += -w=all
+#   CFLAGS += -info
    CFLAGS += -I$(MODDIR) -mdir $(MODDIR)
 
    LFLAGS = -lpgplot
@@ -77,7 +80,7 @@ endif
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.f90 Makefile
-	$(COMP) $(CFLAGS) -c $< -o $@
+	$(FORT) $(CFLAGS) -c $< -o $@
 
 
 all: plotmdl plotmdln plotmod plotplt plotpltn plotpltp
@@ -87,25 +90,25 @@ exit:
 
 
 plotmdl: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 
 plotmdln: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
 plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
 plotplt: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
 plotplt_r066: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
 
 plotpltn: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 
 plotpltp: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
-	$(COMP) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
 
 
 
@@ -117,7 +120,7 @@ $(SRCDIR)/code_version.f90: code_version    #code_version is PHONY and always ou
 	@echo '   implicit none' >> $(SRCDIR)/code_version.f90
 	@echo "   character :: svn_revision*99 = '"`svnversion`"'" >> $(SRCDIR)/code_version.f90
 	@echo "   character :: compile_date*99 = '"`date`"'" >> $(SRCDIR)/code_version.f90
-	@echo "   character :: compiler*99 = '$(COMP)'" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: compiler*99 = '$(FORT)'" >> $(SRCDIR)/code_version.f90
 	@echo "   write(6,'(A)')'svn revision: '//trim(svn_revision)//', compiled on '//trim(compile_date)//' with '//trim(compiler)//'.'" >> $(SRCDIR)/code_version.f90
 	@echo 'end subroutine print_code_version' >> $(SRCDIR)/code_version.f90
 
