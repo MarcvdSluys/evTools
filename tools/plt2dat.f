@@ -15,24 +15,33 @@
 
 
 program plt2dat
+  use constants
   implicit none   
   integer, parameter :: nff=200, n=100000,nc=89
   integer :: i,j,nc1,f,nf,fl,sel(99),nsel,io1,io2
-  real*8 :: dat(nc),m0,r0
+  real*8 :: dat(nc)
   character :: fnames(nff)*99,infile*99,outfile*99
   
   call setconstants()
   
   !Give the columns of the plt file which you want to output:
-  nsel = 7
-                 !t,M,R,L,Teff,M_He,X_c
-  sel(1:nsel) = (/2,4,8,9,10,  5,   56/)
+  !nsel = 7       !t,M,R,L,Teff,M_He,X_c
+  !sel(1:nsel) = (/2,4,8,9,10,  5,   56/)
+  
+  !For Lennart (May 2010):
+  !nsel = 15      !t,M,Mhe,R,L,Teff,Po,Mtr, Xc,Xs,Ys,Cs,Ns,Os,Qcnv
+  !sel(1:nsel) = (/2,4,  5,8,9,  10,28, 33, 56,42,43,44,45,46,  81/)
+  
+  !Simple version for Lennart (May 2010):
+  nsel = 4      ! i,t,Po,Mtr
+  sel(1:nsel) = (/1,2,28, 33/)
   
   
-  m0 = 1.9891d33
-  r0 = 6.9599d10
+  !Use the first nff files of *.plt1, *.plt or *.plt2:
+  call findfiles('*.plt1',nff,1,fnames,nf)
+  if(nf.eq.0) call findfiles('*.plt',nff,1,fnames,nf)
+  if(nf.eq.0) call findfiles('*.plt2',nff,1,fnames,nf)
   
-  call findfiles('*.plt1',nff,1,fnames,nf)  !Use the first nff files
   
   do f=1,nf
      infile = fnames(f)
@@ -50,7 +59,7 @@ program plt2dat
      end if
      rewind(10)
      read(10,'(I4)')nc1
-     if(nc1.ne.nc) write(6,'(A,I3,A,I3,A)')'Data file has',nc1,' columns, the programme is designed for',nc,' columns !'
+     if(nc1.ne.nc) write(6,'(A,I3,A,I3,A)')'  Warning: this plt file has',nc1,' columns, the programme is designed for',nc,' columns !'
      
      open(unit=20,form='formatted',status='replace',file=trim(outfile),iostat=io2)
      if(io2.ne.0) then
@@ -62,6 +71,7 @@ program plt2dat
         !Read data:
         !read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6,E13.5,F2.0,4E13.5)',err=12,end=15) dat
         read(10,*,iostat=io1) dat
+        if(io1.lt.0) exit  !EOF
         if(io1.gt.0) then
            write(0,'(A,I4,A,/)')'  Error reading '//trim(infile)//', line',i,' aborting...'
            stop
@@ -74,7 +84,11 @@ program plt2dat
         
         !Write selected variables:
         do j=1,nsel
-           write(20,'(ES17.9,$)',iostat=io2)dat(sel(j))
+           if(sel(j).eq.1) then
+              write(20,'(I6,$)',iostat=io2)nint(dat(1))
+           else
+              write(20,'(ES17.9,$)',iostat=io2)dat(sel(j))
+           end if
            if(io2.gt.0) then
               write(0,'(A,I4,A,/)')'  Error writing to '//trim(outfile)//', line',i,' aborting...'
               stop
@@ -83,7 +97,6 @@ program plt2dat
         write(20,'(A)')''
         
         
-        if(io1.lt.0) exit  !EOF
      end do! i=1,n
      
      

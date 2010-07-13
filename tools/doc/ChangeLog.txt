@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    86: AstroFloyd, 13/07/2010
+      - Most of these changes in functions were done in ../plot/
+        - Introduced module kinds
+        - Moved routines from functions.f to new file plt_functions.f
+      - plt2dat.f: added output for Lennart
+    
     63: AstroFloyd, 01/04/2010
       - Removed string length as an argument in findfile(s) and quit_program
       - selplt.f: sorted Reddy&Lambert data
