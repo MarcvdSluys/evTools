@@ -19,9 +19,10 @@ program dat2plt
   use constants
   implicit none
   integer, parameter :: nci1=99,nco=89
-  integer :: i,iargc,ioi,ioo,nci,translate(nci1),skipinlines
+  integer :: i,iargc,ioi,ioo,nci,translate(nci1),skipinlines,ci
   real*8 :: dati(nci1),dato(nco)
   character :: infile*99,outfile*99,bla
+  
   
   !Current settings: for Lev's file, 1/2/2009
   skipinlines = 1 !Skip the first skipinlines from the input file
@@ -129,8 +130,8 @@ program dat2plt
         end if
      end if
      
-     do c=1,nci
-        dato(translate(c)) = dati(c)
+     do ci=1,nci
+        dato(translate(ci)) = dati(ci)
      end do
      
      write(20,'(I6,ES17.9,ES14.6,12ES13.5,6ES12.4,3ES13.5,17ES12.4,39ES13.5,ES14.6,ES13.5,F5.1,6ES13.5)')nint(dato(1)),dato(2:nco)

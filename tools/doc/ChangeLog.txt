@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    88: AstroFloyd, 13/07/2010
+      - Updated Makefile
+      - small bugfix
+    
     86: AstroFloyd, 13/07/2010
       - Most of these changes in functions were done in ../plot/
         - Introduced module kinds

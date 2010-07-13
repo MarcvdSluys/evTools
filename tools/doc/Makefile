@@ -1,12 +1,12 @@
 #Compile the program and put the executable in ~/usr/bin
 
 #No text/space after statements below!
-COMP = gfortran#  Use GNU fortran compiler
-COMP = ifort#     Use Intel fortran compiler
+FORT = gfortran#  Use GNU fortran compiler
+#FORT = ifort#     Use Intel fortran compiler
 
 
 #ifort:
-ifeq ($(COMP),ifort)
+ifeq ($(FORT),ifort)
     #To develop code  (don't mix -check bounds with -O>0!):
     CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all -check noarg_temp_created
 
@@ -14,6 +14,7 @@ ifeq ($(COMP),ifort)
     #CFLAGS = -free -O0  -vec-report0 -g
 
     #To use optimum run speed
+    CFLAGS = -free -O2 -vec-report0 -traceback
     #CFLAGS = -free -O3 -vec-report0 -traceback
     #CFLAGS = -free -O3 -arch SSE4.1 -vec-report0 -traceback
     #CFLAGS = -free -O3 -arch SSE4.1 -ipo -vec-report0 -traceback
@@ -25,7 +26,8 @@ endif
 
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
-ifeq ($(COMP),gfortran)
+#ifeq ($(FORT),gfortran)
+ifneq (,$(filter $(FORT),gfortran gfortran-4.4.2))
     #CFLAGS = -O0 -ffree-form -ffree-line-length-none
     CFLAGS = -O0 -ffree-form -ffree-line-length-none   -Wall 
     #CFLAGS = -O3 -ffree-form -ffree-line-length-none
@@ -36,13 +38,13 @@ endif
 
 
 
-STDOBJ = functions.o
+STDOBJ = functions.o plt_functions.o
 
 
 .f.o: 
-	$(COMP) $(CFLAGS) -c $?
+	$(FORT) $(CFLAGS) -c $?
 
-all: findplt listmdl listmod listplt makerun mergeplt plt2ce plt2obs selplt
+all: dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plt2ce plt2dat plt2obs selplt
 
 exit:
 
@@ -50,42 +52,48 @@ exit:
 
 
 dat2plt: $(STDOBJ) dat2plt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/dat2plt $(STDOBJ) dat2plt.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/dat2plt $(STDOBJ) dat2plt.o
+
+convert_initdat: $(STDOBJ) convert_initdat.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/convert_initdat $(STDOBJ) convert_initdat.o
 
 findplt: $(STDOBJ) findplt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/findplt $(STDOBJ) findplt.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/findplt $(STDOBJ) findplt.o
 
 getgrid: $(STDOBJ) getgrid.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/getgrid $(STDOBJ) getgrid.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/getgrid $(STDOBJ) getgrid.o
 
 grid: $(STDOBJ) grid.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/grid $(STDOBJ) grid.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/grid $(STDOBJ) grid.o
 
 listmdl: $(STDOBJ) listmdl.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/listmdl $(STDOBJ) listmdl.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/listmdl $(STDOBJ) listmdl.o
 
 listmod: $(STDOBJ) listmod.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/listmod $(STDOBJ) listmod.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/listmod $(STDOBJ) listmod.o
 
 listplt: $(STDOBJ) listplt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/listplt $(STDOBJ) listplt.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/listplt $(STDOBJ) listplt.o
 
 makerun: $(STDOBJ) makerun.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/makerun $(STDOBJ) makerun.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/makerun $(STDOBJ) makerun.o
 
 mergeplt: $(STDOBJ) mergeplt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/mergeplt $(STDOBJ) mergeplt.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/mergeplt $(STDOBJ) mergeplt.o
 
 
 
 plt2ce: $(STDOBJ) plt2ce.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plt2ce $(STDOBJ) plt2ce.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2ce $(STDOBJ) plt2ce.o
+
+plt2dat: $(STDOBJ) plt2dat.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2dat $(STDOBJ) plt2dat.o
 
 plt2obs: $(STDOBJ) plt2obs.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/plt2obs $(STDOBJ) plt2obs.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2obs $(STDOBJ) plt2obs.o
 
 selplt: $(STDOBJ) selplt.o
-	$(COMP) $(LFLAGS) -o ~/usr/bin/selplt $(STDOBJ) selplt.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/selplt $(STDOBJ) selplt.o
 
 
 
