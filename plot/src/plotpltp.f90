@@ -19,7 +19,7 @@
 !<   
 
 program plotpltp      
-  use basic
+  use kinds
   
   implicit none
   integer, parameter :: nn=30000, nvar=100

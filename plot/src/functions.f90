@@ -17,7 +17,7 @@
 !<
 
 !***********************************************************************************************************************************
-!> module basic:
+!> module kinds:
 !! 
 !! Contains the integers double and dbl, which shall be used in (almost) all routines
 !! to provide the kind of a (currently double-precision) real variable type.
@@ -25,7 +25,7 @@
 !! Variables can be declared using "real(double) :: "; constants can be defined as 
 !! e.g. "x = 3.0_dbl".
 !< 
-module basic
+module kinds
    implicit none
    
    !Integer, double precision:
@@ -35,12 +35,12 @@ module basic
    integer, parameter :: double = selected_real_kind(15,307)  !Precision = 15, range = 307
    integer, parameter :: dbl = selected_real_kind(15,307)     !Precision = 15, range = 307
    
-end module basic
+end module kinds
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
 module ubvdata
-  use basic
+  use kinds
   implicit none
   save
   integer, parameter :: nzgr=9,ntgr=61,nggr=11
@@ -59,7 +59,7 @@ end module ubvdata
 
 !***********************************************************************************************************************************
 module constants
-  use basic
+  use kinds
   implicit none
   save
   real :: scrsz,scrrat
@@ -135,7 +135,7 @@ subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   !  UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
   !  UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
   
-  use basic
+  use kinds
   use ubvdata
   
   implicit none
@@ -369,7 +369,7 @@ end subroutine rswap
 !***********************************************************************************************************************************
 function find_index(v,arr,narr)  !Double precision
   !Finds index of value v in monotonously increasing or decreasing array arr of length narr
-  use basic
+  use kinds
   implicit none
   integer :: find_index,narr,i,iLow,iHigh
   real(double) :: v,arr(narr),range
@@ -403,7 +403,7 @@ subroutine locate(arr,narr,v,i)  !Double precision
   !  Output:
   !  i:  returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
-  use basic
+  use kinds
   implicit none
   integer :: i,narr,iLow,iMid,iHigh
   real(double) :: v,arr(narr)
@@ -440,7 +440,7 @@ subroutine locater(rarr,narr,rv,i)  !Single precision
   !  Output:
   !  i:     returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
   
-  use basic
+  use kinds
   implicit none
   integer :: i,narr
   real :: rv,rarr(narr)
@@ -456,7 +456,7 @@ end subroutine locater
 
 !************************************************************************************************************************************
 subroutine rindex(narr,rarr,indx)  !Return a sorted index indx of array rarr of length n - single precision
-  use basic
+  use kinds
   implicit none
   integer :: narr,indx(narr)
   real :: rarr(narr)
@@ -470,7 +470,7 @@ end subroutine rindex
 
 !************************************************************************************************************************************
 subroutine dindex(narr,arr,ind)  !Return a sorted index ind of array arr of length narr - double precision
-  use basic
+  use kinds
   implicit none
   integer, parameter :: m=7,nstack=50
   integer :: narr,ind(narr)
@@ -611,7 +611,7 @@ end subroutine polint
 
 !***********************************************************************************************************************************
 subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
-  use basic
+  use kinds
   implicit none
   integer, parameter :: nmax=10
   integer :: n
@@ -696,7 +696,7 @@ end function ran1
 
 !***********************************************************************************************************************************
 subroutine spline(x,y,n,yp1,ypn,y2)
-  use basic
+  use kinds
   implicit none
   !integer, parameter :: nmax=1000
   integer :: n,i,k
@@ -743,7 +743,7 @@ end subroutine spline
 
 !***********************************************************************************************************************************
 subroutine splint(xa,ya,y2a,n,x,y)
-  use basic
+  use kinds
   implicit none
   integer :: n,k,khi,klo
   real(double) :: x,y,xa(n),y2a(n),ya(n),a,b,h
@@ -776,7 +776,7 @@ end subroutine splint
 
 !********************************************************************************      
 function a2j(m1,m2,a)  !a to Orbital angular momentum
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: a2j,m1,m2,a
@@ -786,7 +786,7 @@ end function a2j
 
 !********************************************************************************      
 function j2a(m1,m2,j)  !Orbital angular momentum to a
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: j2a,m1,m2,j
@@ -798,7 +798,7 @@ end function j2a
 
 !********************************************************************************      
 function p2j(m1,m2,p)  !P to Orbital angular momentum, all in cgs units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: p2j,m1,m2,p,a,p2a
@@ -809,7 +809,7 @@ end function p2j
 
 !********************************************************************************      
 function j2p(m1,m2,j)  !Orbital angular momentum to P, all in cgs units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: j2p,m1,m2,j,a,a2p
@@ -822,7 +822,7 @@ end function j2p
 
 !********************************************************************************      
 function p2a(mtot,p)  !P, a, mtot in cgs units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: p2a,mtot,p
@@ -832,7 +832,7 @@ end function p2a
 
 !********************************************************************************      
 function a2p(mtot,a)  !P, a, mtot in cgs units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: a2p,mtot,a
@@ -843,7 +843,7 @@ end function a2p
 
 !***********************************************************************************************************************************
 function a2rl(m1,m2,a)  !m1 and m2 in the same units, Rl and a in the same units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: a2rl,q,m1,m2,a
@@ -856,7 +856,7 @@ end function a2rl
 
 !***********************************************************************************************************************************
 function rl2a(m1,m2,rl1)  !m1 and m2 in the same units, Rl and a in the same units
-  use basic
+  use kinds
   use constants
   implicit none
   real(double) :: rl2a,q,m1,m2,rl1
@@ -868,7 +868,7 @@ end function rl2a
 
 !***********************************************************************************************************************************
 function p2rl(m1,m2,p)  !All in cgs units
-  use basic
+  use kinds
   implicit none
   real(double) :: p2rl,m1,m2,p,a,p2a,a2rl
   a = p2a(m1+m2,p)
@@ -879,7 +879,7 @@ end function p2rl
 
 !***********************************************************************************************************************************
 function rl2p(m1,m2,rl1)  !All in cgs units
-  use basic
+  use kinds
   implicit none
   real(double) :: rl2p,m1,m2,rl1,a,a2p,rl2a
   a = rl2a(m1,m2,rl1)
@@ -954,7 +954,7 @@ end subroutine bin_data_1d
 
 !***********************************************************************************************************************************
 function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UTC
-  use basic
+  use kinds
   implicit none
   real(double) :: time_stamp
   integer :: os,i,system

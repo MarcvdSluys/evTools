@@ -89,7 +89,7 @@ end subroutine plotzams
 !***********************************************************************
 !Make a convection plot from the data in a *.plt? file
 subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
-  use basic
+  use kinds
   implicit none
   integer :: nmax,nvar,n, nhp,hp(1000),vx
   integer :: i,j,ci0,lw0

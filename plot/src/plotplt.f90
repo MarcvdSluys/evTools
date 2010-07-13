@@ -23,7 +23,7 @@
 
 
 program plotplt
-  use basic
+  use kinds
   use constants
   use ubvdata
   

@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    85: AstroFloyd, 25/06/2010
+     - Renamed module basic to kinds
+     
     83: AstroFloyd, 25/06/2010
      - Compile code with NAG Fortran, update Makefile
     

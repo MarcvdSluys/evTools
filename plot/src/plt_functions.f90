@@ -577,7 +577,7 @@ end subroutine printpltvarlist
 !***********************************************************************************************************************************
 !Read the *.plt? file fname from unit u and return its length and the contents
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
-  use basic
+  use kinds
   use constants
   implicit none
   integer :: nvar,nn
@@ -685,7 +685,7 @@ end subroutine readplt
 !***********************************************************************************************************************************
 !Change (e.g. de-log) and add plot variables for a *.plt? file
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
-  use basic
+  use kinds
   use constants
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib

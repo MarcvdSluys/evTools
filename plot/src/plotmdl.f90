@@ -20,7 +20,7 @@
 !<
 
 program plotmdl  
-  use basic
+  use kinds
   use constants
   
   implicit none
