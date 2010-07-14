@@ -35,8 +35,8 @@ program plotmdl
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
   real :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
   
-  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab,ttlen
-  character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,mdlnr*5,bla*3
+  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab
+  character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,bla*3
   character :: labels(nq)*60,lx*60,ly*60,title*100,pxns(0:nq)*99,psname*99
   logical :: ex
   
@@ -179,9 +179,6 @@ program plotmdl
   read(10,'(a100)')title
   close(10)
   i = system('rm -f tmppwd.txt')
-  do i=1,100
-     if(title(i:i).ne.' ') ttlen = i
-  end do
   
   if(command_argument_count().eq.1) then
      call get_command_argument(1,fname)
@@ -348,9 +345,7 @@ program plotmdl
   close(10)
   
   !Add model number to plot title
-  write(mdlnr,'(I5)')mdl
-  write(title,*)title(1:ttlen)//' '//mdlnr
-  ttlen = ttlen + 8
+  write(title,'(A,I6)')trim(title),mdl
   
   
   
@@ -646,7 +641,7 @@ program plotmdl
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
   if(log.eq.'y') call pgbox('BCNTS',0.0,0,'BCLNTS',0.0,0)
   if(log.eq.'b') call pgbox('BCLNTS',0.0,0,'BCLNTS',0.0,0)
-  call pgmtxt('T',0.7,0.5,0.5,title(14:ttlen))  !13 to remove /home/user/
+  call pgmtxt('T',0.7,0.5,0.5,trim(title(14:)))  !13 to remove /home/user/
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.0,0.5,0.5,ly)
   
@@ -811,6 +806,8 @@ subroutine identify_closest_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
   nsel=0
   call pgsci(1)
   call pgolin(1,nsel,xsel,ysel,2)
+  
+  iy0 = 1
   
   
   dx = abs(xmax-xmin)

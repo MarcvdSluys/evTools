@@ -72,6 +72,15 @@ program plotplt
   ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
   colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  !Use black as last resort
   
+  !Remove 'uninitialised' compiler warnings:
+  hrd   = 0
+  djdt  = 0
+  conv  = 0
+  tscls = 0
+  lums  = 0
+  i0 = 1
+  pl0 = 1
+  
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then

@@ -79,6 +79,7 @@ program plotmod
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      mhe = 0.d0
      mco = 0.d0
+     ts = 1.d0
      do j=1,kh
         read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         if(j.eq.1) then

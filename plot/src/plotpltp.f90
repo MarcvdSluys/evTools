@@ -61,6 +61,8 @@ program plotpltp
   yr        =       3.15569d7
   
   
+  !Remove 'uninitialised' compiler warnings:
+  ch = 0
   
   
   labels(1) = 'Model'
