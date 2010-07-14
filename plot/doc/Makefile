@@ -5,8 +5,7 @@
 
 #No text/space after statements below!
 FORT = gfortran#  Use GNU fortran compiler
-FORT = gfortran-4.4.3#
-FORT = ifort#     Use Intel fortran compiler
+#FORT = ifort#     Use Intel fortran compiler
 #FORT = nagfor#
 
 

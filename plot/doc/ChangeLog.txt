@@ -2,7 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
-    85: AstroFloyd, 25/06/2010
+    89: AstroFloyd, 13/07/2010
+     - Plotplt: added variables 139,140: Mzams-M, (Mzams-M)/Mzams
+     
+    85: AstroFloyd, 13/07/2010
      - Renamed module basic to kinds
      
     83: AstroFloyd, 25/06/2010

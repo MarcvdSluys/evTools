@@ -161,8 +161,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(136) = 'dM/dt\dReimers\u (M\d\(2281)\u yr\u-1\d)'
   pglabels(137) = 'dM/dt\dReimers-like\u (M\d\(2281)\u yr\u-1\d)'
   pglabels(138) = 'dM/dt\dReimers-like\u / dM/dt\dReimers\u'
+  pglabels(139) = 'M\dZAMS\u - M (M\d\(2281)\u)'
+  pglabels(140) = '(M\dZAMS\u - M)/M\dZAMS\u'
   
-  defvar(101:138) = 1
+  defvar(101:140) = 1
   
   
   !Special plots:
@@ -302,6 +304,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(136) = 'dM_Rmr'
   asclabels(137) = 'dM_Rmrlk'
   asclabels(138) = 'dMRmrlk_dMRmr'
+  asclabels(139) = 'Mzams-M'
+  asclabels(140) = 'Mzams-M_Mzams'
+  
   
   
   asclabels(201) = 'HRD'
@@ -554,8 +559,8 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot               '
   write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like               '
   write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs              '
-  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.                                             '
-  write(6,'(A)')'               120: Rossby nr     130: Jspin                                            '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M                    '
+  write(6,'(A)')'               120: Rossby nr     130: Jspin            140: (Mzams-M)/Mzams            '
   write(6,'(A)')'                                                                                        '
   write(6,'(A)')'  Special plots:                                                                        '
   if(nf.eq.1) then
@@ -829,7 +834,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(137,1:n) = min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), &   !Reimers-like wind: min of
        9.61e-10*dat(9,1:n))                                  !  3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr
   dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
-  
+  dat(139,1:n) = dat(4,1) - dat(4,1:n)                                       !M_zams - M
+  dat(140,1:n) = dat(139,1:n)/dat(4,1)                                       !(M_zams - M)/M_zams
   
   
   !Colours
