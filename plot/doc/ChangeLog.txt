@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    90: AstroFloyd, 13/07/2010
+     - Added routine eggletonplot_settings() to read write a settings file in the user's
+       home directory
+    
     89: AstroFloyd, 13/07/2010
      - Plotplt: added variables 139,140: Mzams-M, (Mzams-M)/Mzams
      

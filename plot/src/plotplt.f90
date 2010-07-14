@@ -58,6 +58,9 @@ program plotplt
   write(6,'(/,A)', advance='no')' PlotPlt, '
   call print_code_version
   
+  call eggletonplot_settings()
+  
+  
   sch = 1.0
   
   !os = getos() !1-Linux, 2-MacOS
