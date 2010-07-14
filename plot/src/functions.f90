@@ -62,6 +62,7 @@ module constants
   use kinds
   implicit none
   save
+  integer :: dpi,screen_size_h,screen_size_v
   real :: scrsz,scrrat
   real(double) :: pi,tpi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
@@ -77,11 +78,17 @@ end module constants
 subroutine setconstants
   use constants
   implicit none
-  scrsz=10.8  !Screen dimensions: MacBook, Gentoo on 1024x768
-  scrrat=0.57 
   
-  !scrsz=14.406   !Screen dimensions: ThinkPad
-  !scrrat=0.5875 
+  !ThinkPad, Gentoo with 1440x900:
+  !screen_size_h = 1436
+  !screen_size_v = 860
+  
+  !Default:
+  screen_size_h = 1000  !Horizontal screen size (pixels)
+  screen_size_v = 700   !Vertical screen size (pixels)
+  
+  dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
+  
   
   pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
   tpi      =  2*pi
@@ -1003,20 +1010,15 @@ end subroutine set_PGPS_title
 
 !***********************************************************************************************************************************
 !> \brief Read/create EggletonPlot settings file
-!! \todo  Find a conversion from paper size/ratio to screen size in pixels
-!<
 subroutine eggletonplot_settings()
   use constants
   implicit none
   integer :: io,u
   logical :: ex
   character :: filename*99
-  !integer :: screen_size_x,screen_size_y
-  real :: screen_size, screen_ratio
   
   !Define namelist, file name
-  !namelist /ep_settings/ screen_size_x,screen_size_y
-  namelist /ep_settings/ screen_size, screen_ratio
+  namelist /ep_settings/ screen_size_h,screen_size_v,dpi
   filename = trim(homedir)//'/.eggletonplot'
   inquire(file=trim(filename), exist=ex)
   
@@ -1032,9 +1034,7 @@ subroutine eggletonplot_settings()
      close(u)
      
      if(io.eq.0) then
-        !call pgxy2szrat(screen_size_x,screen_size_y, scrsz,scrrat)
-        scrsz = screen_size
-        scrrat = screen_ratio
+        call pgxy2szrat_screen(screen_size_h,screen_size_v, dpi, scrsz,scrrat)
      else
         
         write(6,*)
@@ -1053,10 +1053,6 @@ subroutine eggletonplot_settings()
      write(6,'(A)')'  please edit it to set your preferences.'
      write(6,*)
      
-     !call pgszrat2xy(scrsz,scrrat, screen_size_x,screen_size_y)
-     screen_size = scrsz
-     screen_ratio = scrrat
-     
      open(unit=u,form='formatted',status='new',action='write',position='rewind',file=trim(filename),iostat=io)
      if(io.ne.0) then
         write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
@@ -1067,6 +1063,8 @@ subroutine eggletonplot_settings()
      if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   end if
   
+  call pgxy2szrat_screen(screen_size_h,screen_size_v, dpi, scrsz,scrrat)
+  
 end subroutine eggletonplot_settings
 !***********************************************************************************************************************************
 
@@ -1074,8 +1072,8 @@ end subroutine eggletonplot_settings
 
 
 !***********************************************************************************************************************************
-!> Convert PGPlot x,y dimensions to paper size and ratio  -  these may work for bitmap, but not necessarily for screens
-subroutine pgxy2szrat(x,y,size,ratio)
+!> Convert PGPlot x,y dimensions to paper size and ratio for bitmap
+subroutine pgxy2szrat_bitmap(x,y,size,ratio)
   implicit none
   integer, intent(in) :: x,y
   real, intent(out) :: size,ratio
@@ -1083,13 +1081,13 @@ subroutine pgxy2szrat(x,y,size,ratio)
   size = real(x-1)/85.
   ratio = real(y-1)/real(x-1)
   
-end subroutine pgxy2szrat
+end subroutine pgxy2szrat_bitmap
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> Convert PGPlot x,y dimensions to paper size and ratio  -  these may work for bitmap, but not necessarily for screens
-subroutine pgszrat2xy(size,ratio,x,y)
+!> Convert PGPlot x,y dimensions to paper size and ratio for bitmap
+subroutine pgszrat2xy_bitmap(size,ratio,x,y)
   implicit none
   real, intent(in) :: size,ratio
   integer, intent(out) :: x,y
@@ -1097,7 +1095,49 @@ subroutine pgszrat2xy(size,ratio,x,y)
   x = nint(size*85) + 1
   y = nint(size*ratio*85) + 1
   
-end subroutine pgszrat2xy
+end subroutine pgszrat2xy_bitmap
+!***********************************************************************************************************************************
+
+
+
+!***********************************************************************************************************************************
+!> Convert x,y screen dimensions to PGPlot paper size and ratio for a screen
+!! \param horiz   Horizontal screen size (pixels) (int)
+!! \param vert    Vertical screen size (pixels) (int)
+!! \param dpi     Screen resolution in dots per inch (int)
+!! \retval size   PGPlot screen size (real)
+!! \retval ratio  PGPlot screen ratio (real)
+!<
+subroutine pgxy2szrat_screen(horiz,vert, dpi, size,ratio)
+  implicit none
+  integer, intent(in) :: horiz,vert,dpi
+  real, intent(out) :: size,ratio
+  
+  size  = real(horiz-48) / real(dpi)
+  ratio = real(vert -48) / real(x-48)
+  
+end subroutine pgxy2szrat_screen
+!***********************************************************************************************************************************
+
+
+!***********************************************************************************************************************************
+!> Convert PGPlot paper size and ratio to screen dimensions
+!! \param size    PGPlot screen size (real)
+!! \param ratio   PGPlot screen ratio (real)
+!! \param dpi     Screen resolution in dots per inch (int)
+!! \retval horiz  Horizontal screen size (pixels) (int)
+!! \retval vert   Vertical screen size (pixels) (int)
+!<
+subroutine pgszrat2xy_screen(size,ratio, dpi, horiz,vert)
+  implicit none
+  real, intent(in) :: size,ratio
+  integer, intent(in) :: dpi
+  integer, intent(out) :: horiz,vert
+  
+  horiz = nint(dpi*size)       + 48
+  vert  = nint(dpi*size*ratio) + 48
+  
+end subroutine pgszrat2xy_screen
 !***********************************************************************************************************************************
 
 
