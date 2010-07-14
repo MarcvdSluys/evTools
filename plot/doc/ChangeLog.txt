@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    92: AstroFloyd, 13/07/2010
+     - Updated Makefile
+     - Small changes in settings file
+     - Small bugfix
+    
     91: AstroFloyd, 13/07/2010
      - Store screen size + dpi in settings file iso paper size/ratio
     

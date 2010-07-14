@@ -8,6 +8,17 @@ FORT = gfortran#  Use GNU fortran compiler
 #FORT = ifort#     Use Intel fortran compiler
 #FORT = nagfor#
 
+WARN = yes#   #compile with compile-time warnings
+#CHECK = yes#   #compile with run-time checks
+#DEBUG = yes#   #compile with debug options
+
+
+#General:
+#OPT = -O0
+#OPT = -O1
+OPT = -O2
+#OPT = -O3
+
 
 # Directories for the source, object, module, libary and executable files:
 SRCDIR = src
@@ -23,63 +34,94 @@ MODOBJ =
 
 
 
-
-
 #ifort:
 ifeq ($(FORT),ifort)
+   CFLAGS += -I/home/user/usr/include/libAF/ifort
+   LFLAGS += -L/home/user/usr/lib -lAF_ifort
+   STATLIBS += /home/user/usr/lib/libAF_ifort.a
+
    #To develop code  (don't mix -check bounds with -O>0!):
-   #CFLAGS = -O0  -vec-report0 -warn alignments -warn declarations -warn uncalled -warn usage -check bounds -traceback #-check format -check output_conversion
-   CFLAGS = -O0  -vec-report0 -traceback -warn all -check all  -check noarg_temp_created
-
-   #To debug code:
-   #CFLAGS = -O0  -vec-report0 -g
-
-   #CFLAGS = -O2
-
-   #To use optimum run speed
-   #CFLAGS = -O3 -vec-report0 -traceback
-   #CFLAGS = -O3 -arch SSE2 -vec-report0 -traceback           #SSE2 needs -lsvml
-   ##CFLAGS = -O3 -arch SSE2 -ipo -vec-report0 -traceback
-
-   CFLAGS += -nogen-interfaces  #For ifort v.11
+   ifeq ($(CHECK),yes)
+      OPT = -O0
+      CFLAGS += -check all -check noarg_temp_created
+   endif
+   ifeq ($(WARN),yes)
+      CFLAGS += -warn all
+   endif
+   CFLAGS += -vec-report0 -traceback
    CFLAGS += -module $(MODDIR) -I$(MODDIR)
 
-   #LFLAGS = -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
-   #LFLAGS = -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
-   LFLAGS = -lpgplot
-   #LFLAGS = -ipo -vec-report0 -lpgplot_ifort -lX11 -lm -lifcore -limf -lirc -lsvml -lifport -Xlinker 
+   #To debug code:
+   ifeq ($(DEBUG),yes)
+      OPT = -O0
+      CFLAGS += -g
+   endif
+
+
+   CFLAGS += -nogen-interfaces
+   STATIC = -static
+
+   #OPT += -ipo
+   #LFLAGS += -ipo
+   #OPT += -xsse4.1
+   #OPT += -xhost
+   #CFLAGS += -static $(STATLIBS)
+   #CFLAGS += -prof-gen -prof-dir./  #Don't use -ipo. Run the code thus compiled (a few times) and use -prof-use below for the final version
+   #CFLAGS += -prof-use -prof-dir./
+
 endif
 
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
 ifneq (,$(filter $(FORT),gfortran gfortran-4.4.3))
-   #CFLAGS = -O0 -ffree-line-length-none
-   CFLAGS = -O0 -ffree-line-length-none   -Wall 
-   #CFLAGS = -O -ffree-line-length-none
-   #CFLAGS = -O3 -ffree-line-length-none
+   CFLAGS += -I/home/user/usr/include/libAF/gfortran
+   LFLAGS += -L/home/user/usr/lib -lAF_gfortran
+   STATLIBS += /home/user/usr/lib/libAF_gfortran.a
+
+   ifeq ($(CHECK),yes)
+      OPT = -O0
+      CFLAGS += -fbounds-check
+      #CFLAGS += -fcheck-array-temporaries  #Doesn't seem to work...
+      CFLAGS += -fbacktrace
+   endif
+   ifeq ($(WARN),yes)
+      CFLAGS += -Wall
+      CFLAGS += -fmax-errors=10
+   endif
+   #To debug code:
+   ifeq ($(DEBUG),yes)
+      OPT = -O0
+      CFLAGS += -g
+   endif
    CFLAGS += -I$(MODDIR) -J$(MODDIR)
-
-   LFLAGS = -lpgplot
+   STATIC = -static
 endif
-
 
 
 #nagfor:
 ifeq ($(FORT),nagfor)
-   CFLAGS = -O0 -colour -gline
-   CFLAGS += -f2003 
-#   CFLAGS += -w=all
-#   CFLAGS += -info
-   CFLAGS += -I$(MODDIR) -mdir $(MODDIR)
-
-   LFLAGS = -lpgplot
+   ifeq ($(CHECK),yes)
+      CFLAGS = -O0
+      CFLAGS += -C=all
+   endif
+   ifneq ($(WARN),yes)
+      CFLAGS += -w=all  #Warnings are on by default
+   endif
+   CFLAGS += -colour -f2003 -u -gline
    STDOBJ += $(OBJDIR)/nagfor.o
+   CFLAGS += -I$(MODDIR) -mdir $(MODDIR)
+   STATIC = -Bstatic
 endif
 
 
+LFLAGS = -lpgplot
+
+
+
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.f90 Makefile
-	$(FORT) $(CFLAGS) -c $< -o $@
+	$(FORT) $(OPT) $(CFLAGS) -c $< -o $@
 
 
 all: plotmdl plotmdln plotmod plotplt plotpltn plotpltp

@@ -62,7 +62,7 @@ module constants
   use kinds
   implicit none
   save
-  integer :: dpi,screen_size_h,screen_size_v
+  integer :: screen_dpi,screen_size_h,screen_size_v
   real :: scrsz,scrrat
   real(double) :: pi,tpi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
@@ -87,7 +87,7 @@ subroutine setconstants
   screen_size_h = 1000  !Horizontal screen size (pixels)
   screen_size_v = 700   !Vertical screen size (pixels)
   
-  dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
+  screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
   
   
   pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
@@ -1018,7 +1018,7 @@ subroutine eggletonplot_settings()
   character :: filename*99
   
   !Define namelist, file name
-  namelist /ep_settings/ screen_size_h,screen_size_v,dpi
+  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi
   filename = trim(homedir)//'/.eggletonplot'
   inquire(file=trim(filename), exist=ex)
   
@@ -1030,11 +1030,11 @@ subroutine eggletonplot_settings()
         write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for reading.'
         return
      end if
-     read(u, nml=ep_settings, iostat=io)
+     read(u, nml=screen_settings, iostat=io)
      close(u)
      
      if(io.eq.0) then
-        call pgxy2szrat_screen(screen_size_h,screen_size_v, dpi, scrsz,scrrat)
+        call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
      else
         
         write(6,*)
@@ -1058,12 +1058,12 @@ subroutine eggletonplot_settings()
         write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
         return
      end if
-     write(u, nml=ep_settings, iostat=io)
+     write(u, nml=screen_settings, iostat=io)
      close(u)
      if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   end if
   
-  call pgxy2szrat_screen(screen_size_h,screen_size_v, dpi, scrsz,scrrat)
+  call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
   
 end subroutine eggletonplot_settings
 !***********************************************************************************************************************************
@@ -1114,7 +1114,7 @@ subroutine pgxy2szrat_screen(horiz,vert, dpi, size,ratio)
   real, intent(out) :: size,ratio
   
   size  = real(horiz-48) / real(dpi)
-  ratio = real(vert -48) / real(x-48)
+  ratio = real(vert -48) / real(horiz-48)
   
 end subroutine pgxy2szrat_screen
 !***********************************************************************************************************************************
