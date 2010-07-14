@@ -56,7 +56,7 @@ program plotplt
   !Set constants:
   call setconstants()
   write(6,'(/,A)', advance='no')' PlotPlt, '
-  call print_code_version
+  call print_code_version(6)  !To screen
   
   call eggletonplot_settings()
   
