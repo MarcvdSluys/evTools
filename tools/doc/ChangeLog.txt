@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    95: AstroFloyd, 20/07/2010
+      - updates in (plt_)functions from plot rev.90-92
+      
     88: AstroFloyd, 13/07/2010
       - Updated Makefile
       - small bugfix
