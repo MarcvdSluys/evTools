@@ -13,11 +13,13 @@
 !   
 !   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-program listplt  
+program listplt
+  use kinds
   use constants
   use ubvdata
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81
+  real(double), parameter :: c8th=0.125_dbl
   real*8 :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
   real*8 :: c82(nn),c85a,c85b,c92(nn),mbol,bc
   
@@ -25,6 +27,7 @@ program listplt
   character :: findfile*99, fname*99,labels(nnn)*99,tmpstr*10
   
   call setconstants()
+  print*,c3rd
   
   !Read atmosphere-model data
   open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
@@ -246,13 +249,15 @@ program listplt
   end do !i
   
   
-  !      dat(38,1:n) = dat(88,1:n)  !Take Sills in stead of Rappaport MB
+  !dat(38,1:n) = dat(88,1:n)  !Take Sills in stead of Rappaport MB
   dat(37,1:n) = dat(88,1:n)  !Take Sills MB in stead of Wind AML
   
+  !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
+  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (tpi*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**c3rd
   
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (2.d0*pi*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**(1.d0/3.d0)                      !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3
-  
-  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(2.d0*pi*(dat(4,1:n)+dat(40,1:n))*m0))**(1.d0/3.d0)/1.d50                     !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of dat(33)
+  !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of 
+  !dat(33):
+  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(tpi*(dat(4,1:n)+dat(40,1:n))*m0))**c3rd/1.d50
   
   
   dat(63,1:n) = dat(4,1:n) - dat(5,1:n) 
@@ -266,8 +271,9 @@ program listplt
   dat(80,1:n) = dat(79,1:n)
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30
-  c82(1:n) = 2.d0*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) * (dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/(dat(5,1:n)+1.4)**(1.d0/8.d0)
-  dat(82,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c82(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
+  c82(1:n) = tpi*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) * (dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
+  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
+  dat(82,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c82(1:n)/day
   
   
   dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                                 !H-envelope mass
@@ -293,27 +299,31 @@ program listplt
   dat(88,1:n) = dat(88,1:n)/day**3
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 + 0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  dat(89,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F)
+  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F):
+  dat(89,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/dat(9,1:n))**c3rd * (dat(8,1:n)/var(1:n))**2.7d0
   
   
   dat(90,1:n) = dat(2,1:n) - dat(2,1) !t-t0
   
   dat(91,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
   
-  c92(1:n) = 2*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) *(dat(5,1:n)*1.4)**(3.d0/8.d0)*m0**(5.d0/8.d0)/(dat(5,1:n)+1.4)**(1.d0/8.d0)
-  dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c92(1:n)/day  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs
+  c92(1:n) = 2*pi*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) *(dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
+  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
+  dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c92(1:n)/day
   
   dat(93,1:n) = dat(8,1:n)/dexp(dat(29,1:n))    
   dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                                !Xf := 2Xc + Yc + 1
-  dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2                     !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed
+  !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed:
+  dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2
   dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day)     !Jspin = I*w in 10^50 g cm^2 s^-1
-  dat(97,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
+  dat(97,1:n) = dat(4,1:n)*m0/(4*c3rd*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y
   
   
   !Colours
   do i=1,n
-     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i),dat(103,i),dat(104,i),dat(105,i))
+     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i),dat(103,i), &
+          dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)  ! (U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)  ! (V-I) = (V-R) + (R-I)
   enddo
@@ -330,11 +340,11 @@ program listplt
      d(1:nnn) = dat(1:nnn,i)
      if(mod(i,25).eq.1) then
         write(6,*)''
-        !write(6,'(A5,A6,A14,2x,A8,2A7,A8,2x,2(2A10,2x),2A7,2x,2A10,A7)')'Line','Mdl','t (yr)','M(Mo)','Mhe','Mco','Menv','R (Ro)', 'L (Lo)','Te (K)','Tc (K)','Xc','Yc','Porb (d)','dM/dt','M2/Mo'
-        write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
+        write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V'// &
+             '     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
      end if
-     !write(6,'(I5,I6,ES14.6,2x,F8.3,2F7.3,F8.3,2x,2(2ES10.2,2x),2F7.3,2x,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(56),d(57),d(28),dabs(d(31)),d(40)
-     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
+     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63), &
+          d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
   end do
   
   
@@ -357,7 +367,8 @@ program listplt
   end do
   
   do i=1,16
-     write(6,'(2x,4(I3,1x,A9,1x,ES15.7,9x))')i,trim(labels(i)),a(i),i+16,trim(labels(i+16)),a(i+16),i+32,trim(labels(i+32)),a(i+32),i+48,trim(labels(i+48)),a(i+48)
+     write(6,'(2x,4(I3,1x,A9,1x,ES15.7,9x))')i,trim(labels(i)),a(i),i+16,trim(labels(i+16)),a(i+16),i+32,trim(labels(i+32)), &
+          a(i+32),i+48,trim(labels(i+48)),a(i+48)
   end do
   
   do i=1,2
@@ -365,7 +376,8 @@ program listplt
   end do
   
   do i=1,10
-     write(6,'(4(I5,1x,A13,2x,ES15.7,10x))')80+i,trim(labels(80+i)),a(80+i), 90+i,trim(labels(90+i)),a(90+i), 100+i,trim(labels(100+i)),a(100+i)
+     write(6,'(4(I5,1x,A13,2x,ES15.7,10x))')80+i,trim(labels(80+i)),a(80+i), 90+i,trim(labels(90+i)),a(90+i), 100+i, &
+          trim(labels(100+i)),a(100+i)
   end do
   
   do i=1,2

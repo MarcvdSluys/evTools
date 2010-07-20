@@ -57,7 +57,8 @@ program listmod
   open (unit=10,form='formatted',status='old',file=trim(fname))
 3 rewind 10
   
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
+       '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   do i=1,999
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      !print*,kh,kp,jmod,jb,jin
@@ -105,7 +106,8 @@ program listmod
         if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
      end do !j
-     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
+          '        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
      write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
   end do !i
   write(6,'(A)')'  EOF not reached, array too small!'
@@ -116,7 +118,8 @@ program listmod
 6 write(6,'(A36,I3)')'  Error reading second line of block',i
 9 format (I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)
 10 n=i-1
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
+  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
+       '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   
   write(6,'(I5,A)')n,' blocks read.'
@@ -221,13 +224,11 @@ program listmod
   
 81 format ('  Model:        Model nr:',i5,',    Mass:',f7.2,' Mo,    Age: ',es10.4,' yr,  Time step:   ',es10.4,' yr,    Z ='f7.4)
 82 format ('                Mesh pts: ',i4,',      Kp: ',i6,',       Jin: ',i3',            Binary component:',i2)
-  !83 format ('  Primary:      M  =',f9.5,' Mo,  R  =',f9.5,' Ro,   L  =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K,   Mhe =',f9.5,',   Mco =',f9.5)
 83 format ('  Primary:      M   =',f9.5,' Mo,  R   =',f9.5,' Ro,   L   =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K')
 84 format ('                Mhe =',f9.5,' Mo,  Mco =',f9.5,' Mo,   Menv=',f9.5,' Mo')
 85 format ('  Binary:       M1  =',f9.5,' Mo,  M2  =',f9.5,' Mo,   Mb  =',f9.4' Mo,     q1 =',f9.5,',        q2   =',f9.5)
-  !86 format ('  Orbit:        P  =',f9.5,' d,   a  =',f9.5,' Ro,   a1 =',f9.5,' Ro,    a2 =',f9.5,' Ro,   Rrl1 =',f9.5' Ro,   Rrl2 = ',f9.5,' Ro')
-86 format ('  Orbit:        P  =',ES12.5,' d,   a  =',ES12.5,' Ro,   a1 =',ES12.5,' Ro,    a2 =',ES12.5,' Ro,   Rrl1 =',ES12.5' Ro,   Rrl2 = ',ES12.5,' Ro')
-!87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',f9.5,' days')
+86 format ('  Orbit:        P  =',ES12.5,' d,   a  =',ES12.5,' Ro,   a1 =',ES12.5,' Ro,    a2 =',ES12.5,' Ro,   Rrl1 =',ES12.5, &
+        ' Ro,   Rrl2 = ',ES12.5,' Ro')
 87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',ES12.5,' days')
 88 format ('  Composition:  Surface:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',    Z: ',f6.4)
 89 format ('  Composition:     Core:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',    Z: ',f6.4)

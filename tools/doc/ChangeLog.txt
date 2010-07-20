@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    98: AstroFloyd, 20/07/2010
+      - Change source code to free format, .f90
+    
     95: AstroFloyd, 20/07/2010
       - updates in (plt_)functions from plot rev.90-92
       

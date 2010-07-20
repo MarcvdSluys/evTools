@@ -46,9 +46,12 @@ program plt2ce
         r = 10.d0**dat(8)
         l = 10.d0**dat(9)
         t = 10.d0**dat(10)
-        !write 1:age, 2:M, 3:Mhe, 4:Mco, 5:R, 6:L, 7:Teff, 8:be, 9:be0, 10:be1, 11:be2, 12:be3, 13:I, 14:core He, 15:core C+O, 16:core entropy, 17:T10^5K entropy
-        !BEs: 8:be: Total Binding Energy, 9:be0: Gravitational BE, 10:be1: Internal BE, 11:be2: Recombination BE, 12:be3: H2 dissociation BE.   13:I: Moment of Inertia
-        write(20,20)dat(2),dat(4:6),r,l,t, dat(15)*m0,dat(84:87)*m0, dat(22)*dat(4)*m0*(r*r0)**2, dat(57),dat(58)+dat(60), dat(88),dat(89)
+        !write 1:age, 2:M, 3:Mhe, 4:Mco, 5:R, 6:L, 7:Teff, 8:be, 9:be0, 10:be1, 11:be2, 12:be3, 13:I, 14:core He, 15:core C+O, 
+        !  16:core entropy, 17:T10^5K entropy
+        !BEs: 8:be: Total Binding Energy, 9:be0: Gravitational BE, 10:be1: Internal BE, 11:be2: Recombination BE, 
+        !  12:be3: H2 dissociation BE.   13:I: Moment of Inertia
+        write(20,20)dat(2),dat(4:6),r,l,t, dat(15)*m0,dat(84:87)*m0, dat(22)*dat(4)*m0*(r*r0)**2, dat(57),dat(58)+dat(60), &
+             dat(88),dat(89)
 20      format(ES17.9,16ES13.5)
      end do! i=1,n
      write(6,'(A)')'End of file not reached, arrays too small!'

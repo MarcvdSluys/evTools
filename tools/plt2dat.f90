@@ -59,7 +59,8 @@ program plt2dat
      end if
      rewind(10)
      read(10,'(I4)')nc1
-     if(nc1.ne.nc) write(6,'(A,I3,A,I3,A)')'  Warning: this plt file has',nc1,' columns, the programme is designed for',nc,' columns !'
+     if(nc1.ne.nc) write(6,'(A,I3,A,I3,A)')'  Warning: this plt file has',nc1,' columns, the programme is designed for', &
+          nc,' columns !'
      
      open(unit=20,form='formatted',status='replace',file=trim(outfile),iostat=io2)
      if(io2.ne.0) then

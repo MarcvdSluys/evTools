@@ -29,8 +29,8 @@ endif
 #ifeq ($(FORT),gfortran)
 ifneq (,$(filter $(FORT),gfortran gfortran-4.4.2))
     #CFLAGS = -O0 -ffree-form -ffree-line-length-none
-    CFLAGS = -O0 -ffree-form -ffree-line-length-none   -Wall 
-    #CFLAGS = -O3 -ffree-form -ffree-line-length-none
+    CFLAGS = -O0 -Wall 
+    #CFLAGS = -O2 -ffree-form -ffree-line-length-none   -Wall
     LFLAGS = 
 endif
 
@@ -41,8 +41,9 @@ endif
 STDOBJ = functions.o plt_functions.o
 
 
-.f.o: 
-	$(FORT) $(CFLAGS) -c $?
+%.o: %.f90 Makefile
+	$(FORT) $(CFLAGS) -c $< -o $@
+
 
 all: dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plt2ce plt2dat plt2obs selplt
 
