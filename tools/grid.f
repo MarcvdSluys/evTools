@@ -20,7 +20,8 @@ program grid
   character :: bla*99
   
   if(iargc().ne.3) then
-     write(*,'(/,A)')'  This program shows what values are used in a grid of models for the Eggleton code with specified grid settings'
+     write(*,'(/,A)')'  This program shows what values are used in a grid of models for the Eggleton code'// &
+          ' with specified grid settings'
      write(6,'(A,/)')'  syntax:  grid <Xi, dX, n> '
      stop
   end if

@@ -56,11 +56,13 @@ program listmdl
   read(10,5,err=11,end=11) nmsh,nv,dov
 5 format (2x,I4,4x,I2,F7.3)
   write(6,*)''
-  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
+  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
+       '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
   do ii=1,999
      if(mod(ii,25).eq.0) then
         write(6,*)''
-        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
+        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
+             '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
      end if
      read(10,6,err=12,end=15) nmdl,age
 6    format (1P,I6,1x,E16.9)
@@ -250,11 +252,10 @@ program listmdl
 84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3')
 85 format('  Cores:        Mhe = ',f9.5,' Mo,  Mco =',f9.5,' Mo,     Menv =',f9.5,' Mo')
   
-!88 format('  Composition:  Surface:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
-!89 format('  Composition:     Core:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   N: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',  Mg: ',f6.4,',    Z: ',f6.4)
-  
-90 format('  Composition:  Surface:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4,',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
-91 format('  Composition:     Core:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4,',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
+90 format('  Composition:  Surface:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4, &
+        ',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
+91 format('  Composition:     Core:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4, &
+        ',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
   
   
   

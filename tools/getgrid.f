@@ -20,7 +20,8 @@ program getgrid
   character :: bla*99
   
   if(iargc().ne.3) then
-     write(*,'(/,A)')'  This program returns the parameters you need for a certain grid of N models with values between X1 and X2 in the Eggleton code'
+     write(*,'(/,A)')'  This program returns the parameters you need for a certain grid of N models with values between'// &
+          ' X1 and X2 in the Eggleton code'
      write(6,'(A,/)')'  Syntax:  getgrid <X1> <X2> <N>'
      stop
   end if
