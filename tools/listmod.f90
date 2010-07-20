@@ -1,10 +1,10 @@
-! Listmod.f
-! Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
-! One can then select a model to display its contents more precisely and optionally copy the model to a different file to serve as input. 
+!> \file listmod.f90
+!<
+!
 ! AF 2003-12-17
 ! Write an extra 0 at the end of the first line to make the output with the V.2005 code.
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.
@@ -17,19 +17,25 @@
 !   
 !   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
+
+!> Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
+!! One can then select a model to display its contents more precisely and optionally copy the model to a different file to serve as input. 
+!<
 program listmod
+  use kinds
   use constants
   implicit none
-  real*8 :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real*8 :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
-  real*8 :: mi,pr,phi,phis,e,f
-  real*8 :: m2,q1,q2,a,a1,a2,rl1,rl2,x
-  real*8 :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
-  real*8 :: mhe,mco,mhenv
-  real*8 :: dat1(8),dat2(24),dat(99)
+  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
+  real(double) :: mi,pr,phi,phis,e,f
+  real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2,x
+  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
+  real(double) :: mhe,mco,mhenv
+  real(double) :: dat1(8),dat2(24),dat(99)
   integer :: i,j,kh,kp,jmod,jb,jin,n
-  integer :: narg,iargc,blk,ans,iout
-  character :: fname*99,findfile*99,outname*7
+  integer :: narg,iargc,blk,ans
+  character :: fname*99,findfile*99,outname*99
+  logical :: ex
   
   call setconstants()
   
@@ -59,13 +65,13 @@ program listmod
   
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
-  do i=1,999
+  
+  i = 0
+  do
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
-     !print*,kh,kp,jmod,jb,jin
      mhe = 0.d0
      mco = 0.d0
      do j=1,kh
-        !read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         read(10,*,err=6,end=10)dat(1:jin)
         lnf = dat(1)
         lnt = dat(2)
@@ -82,7 +88,6 @@ program listmod
         pr = dat(13)
         phi = dat(14)
         phis = dat(15)
-        !x = dat(16)
         horb = dat(17)
         e = dat(18)
         f = dat(19)
@@ -90,7 +95,6 @@ program listmod
         if(j.eq.1) then
            r1  = exp(lnr)*1.e11/r0
            l1  = l*1.d33/l0
-           !l1  = l/3.844d0  !Peter's CLSN
            ts  = exp(lnt)
            m1 = lnm*1.d33/m0
            hs  = x1
@@ -109,7 +113,8 @@ program listmod
      if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
           '        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
      write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
-  end do !i
+     i = i+1
+  end do 
   write(6,'(A)')'  EOF not reached, array too small!'
   n=999
   goto 12
@@ -132,7 +137,7 @@ program listmod
   !***   CHOOSE STRUCTURE MODEL
   
   blk = 1
-20 write(6,'(A,I3,A4,$)')'  For which model do you want to print details (1 -',n,'):  '
+20 write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',n,'):  '
   read*,blk
   if(blk.eq.0) goto 9999
   if(blk.lt.1.or.blk.gt.n) goto 20
@@ -257,12 +262,13 @@ program listmod
   if(ans.eq.1) goto 3
   if(ans.eq.0) goto 999
   
-
+  
   
   
   
   !***   COPY MODEL TO DIFFERENT FILE
   
+  !Read blocks before the desired one:
   rewind 10
   do i=1,blk-1
      read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
@@ -271,29 +277,29 @@ program listmod
      end do !j
   end do !i
   
-  outname = 'fort.  '   !Copy to fort.99. If it exists, fort.98, etc
-  iout = 99
-205 write(outname(6:7),'(I2)')iout
   
-  open (unit=20,form='formatted',status='new',file=outname,iostat=i)
-  if(i.gt.0) then
-     write(6,'(A)')'  File exists: '//trim(outname)
-     iout = iout-1
-     if(iout.gt.50) goto 205
-     write(6,'(A,$)')'  Please enter the name of the output file: '
-     read*,outname
-     goto 205
-  end if
-  
-  
+  !Read desired block:
+  !Read header line:
   read(10,*,err=991)dat1,kh,kp,jmod,jb,jin
-  write(20,211)dat1,kh,kp,jmod,jb,jin,0
+  
+  write(outname,'(I5.6,A4)')jmod,'.mod'
+  inquire(file=trim(outname), exist=ex)
+  if(ex) then
+     write(6,'(A)')'  '//trim(outname)//' exists.'
+     write(6,'(A,$)')'  Please enter a different name for the output file: '
+     read*,outname
+  end if
+     
+  open (unit=20,form='formatted',status='new',file=trim(outname),iostat=i)
+  
+  !Write header line
+  write(20,'(1X, 8ES23.15, 6I6)')dat1,kh,kp,jmod,jb,jin,0
+  
+  !Copy model block:
   do j=1,kh
      read(10,*,err=993)dat2
-     write(20,212)dat2
+     write(20,'(1X, 24ES23.15)')dat2
   end do !j
-211 format(1X, 8ES23.15, 6I6)
-212 format(1X, 24ES23.15)
   close(20)
   write(6,'(A)')'  Model written to '//trim(outname)//'.'
   

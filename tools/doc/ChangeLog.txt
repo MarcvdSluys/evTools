@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+    99: AstroFloyd, 20/07/2010
+      - Update listmod: give the output file the model number as name; allow >999 blocks
+    
     98: AstroFloyd, 20/07/2010
       - Change source code to free format, .f90
     

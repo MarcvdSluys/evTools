@@ -2,23 +2,24 @@
 
 #No text/space after statements below!
 FORT = gfortran#  Use GNU fortran compiler
-#FORT = ifort#     Use Intel fortran compiler
+FORT = ifort#     Use Intel fortran compiler
 
 
 #ifort:
 ifeq ($(FORT),ifort)
     #To develop code  (don't mix -check bounds with -O>0!):
-    CFLAGS = -free -O0  -vec-report0 -traceback -warn all -check all -check noarg_temp_created
+    CFLAGS = -O0  -vec-report0 -traceback -check all -check noarg_temp_created
 
     #To debug code:
-    #CFLAGS = -free -O0  -vec-report0 -g
+    #CFLAGS = -O0  -vec-report0 -g
 
     #To use optimum run speed
-    CFLAGS = -free -O2 -vec-report0 -traceback
-    #CFLAGS = -free -O3 -vec-report0 -traceback
-    #CFLAGS = -free -O3 -arch SSE4.1 -vec-report0 -traceback
-    #CFLAGS = -free -O3 -arch SSE4.1 -ipo -vec-report0 -traceback
+    CFLAGS = -O2 -vec-report0 -traceback
+    #CFLAGS = -O3 -vec-report0 -traceback
+    #CFLAGS = -O3 -arch SSE4.1 -vec-report0 -traceback
+    #CFLAGS = -O3 -arch SSE4.1 -ipo -vec-report0 -traceback
 
+    CFLAGS += -warn all
     CFLAGS += -nogen-interfaces  #For ifort v.11
 
     LFLAGS = 
@@ -28,9 +29,9 @@ endif
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
 ifneq (,$(filter $(FORT),gfortran gfortran-4.4.2))
-    #CFLAGS = -O0 -ffree-form -ffree-line-length-none
-    CFLAGS = -O0 -Wall 
-    #CFLAGS = -O2 -ffree-form -ffree-line-length-none   -Wall
+    CFLAGS = -O0
+    #CFLAGS = -O2 
+    CFLAGS += -Wall
     LFLAGS = 
 endif
 
