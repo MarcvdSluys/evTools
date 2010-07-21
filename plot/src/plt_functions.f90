@@ -1,21 +1,19 @@
-!>  Plt_functions.f90: 
-!!
-!!  Functions and subroutines for plotplt* in the Eggleton plot package that need pgplot
-!!
-!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!!   
-!!   
-!!   This file is part of the eggleton-plot package.
-!!   
-!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
-!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!!   
-!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!!   
-!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
-!!   <http://www.gnu.org/licenses/>.
-!<
+!> \file plt_functions.f90  Functions and subroutines for plotplt* in the Eggleton plot package that need pgplot
+
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!   <http://www.gnu.org/licenses/>.
+
 
 
 
@@ -36,7 +34,7 @@
 
 
 !***********************************************************************************************************************************
-!Provides the labels for the plot axes of a *.plt? file
+!> \brief Provides the labels for the plot axes of a *.plt? file in plotplt
 subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   implicit none
   integer :: nf,nvar,defvar(0:nvar)
@@ -338,6 +336,7 @@ end subroutine getpltlabels
 
 
 !***********************************************************************************************************************************
+!> \brief Provides the labels for the plot axes of a *.plt? file in plotpltn (obsolescent)
 subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   implicit none
   integer :: maxi
@@ -524,7 +523,7 @@ end subroutine set_plotpltn_labels
 
 
 !***********************************************************************************************************************************
-!Print the list of variables in a *.plt? file to screen, for input menu
+!> \brief Print the list of variables in a *.plt? file to screen, for input menu of plotplt
 subroutine printpltvarlist(nf)
   implicit none
   integer :: nf
@@ -580,7 +579,7 @@ end subroutine printpltvarlist
 
 
 !***********************************************************************************************************************************
-!Read the *.plt? file fname from unit u and return its length and the contents
+!> \brief Read the *.plt? file fname from unit u and return its length and the contents
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use kinds
   use constants
@@ -688,7 +687,7 @@ end subroutine readplt
 
 
 !***********************************************************************************************************************************
-!Change (e.g. de-log) and add plot variables for a *.plt? file
+!> \brief Change (e.g. de-log) and add plot variables for a *.plt? file
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use kinds
   use constants

@@ -1,25 +1,23 @@
-!>  Plotfunctions.f90: 
-!!
-!!  Functions and subroutines for the Eggleton plot package that need pgplot
-!!
-!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!!   
-!!   
-!!   This file is part of the eggleton-plot package.
-!!   
-!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
-!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!!   
-!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!!   
-!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
-!!   <http://www.gnu.org/licenses/>.
-!<
+!>  \file plotfunctions.f90  Functions and subroutines for the Eggleton plot package that need pgplot
+
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!   <http://www.gnu.org/licenses/>.
+
 
 
 !***********************************************************************
-!Plot lines of constant R on HRD (plotplt*)
+!> \brief Plot lines of constant R on HRD (plotplt*)
 subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
   use constants
   implicit none
@@ -67,9 +65,10 @@ end subroutine plotlinesofconstantradius
 
 
 !***********************************************************************
-!Plot the zams; use ~/bin/lib/zams_z0_02.plt
-!It would be nice to not only plot a HRD, but any parameter
-!Write a routine to read a plt file first, then use it here
+!> \brief Plot the zams; use ~/bin/lib/zams_z0_02.plt
+!!It would be nice to not only plot a HRD, but any parameter
+!! \todo Write a routine to read a plt file first, then use it here
+!<
 subroutine plotzams()
   implicit none
   
@@ -87,7 +86,7 @@ end subroutine plotzams
 
 
 !***********************************************************************
-!Make a convection plot from the data in a *.plt? file
+!> \brief Make a convection plot from the data in a *.plt? file
 subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   use kinds
   implicit none
