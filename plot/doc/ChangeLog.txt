@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   101-4: AstroFloyd, 21/07/2010
+     - Try to fix mod and obj directories
+    
    100: AstroFloyd, 21/07/2010
      - Updated Makefile
     
