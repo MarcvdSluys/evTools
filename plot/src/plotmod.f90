@@ -333,10 +333,20 @@ program plotmod
   call pgenv(xmin,xmax,ymin,ymax,0,0)
   call pglabel(lx,ly,trim(title(13:100)))
   if(plotagain.eq.5) call pgslw(2)
-  if(vx.ne.1.and.vy.ne.1) call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
-  if(vx.eq.1.or.vy.eq.1) call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)
-  call pgsch(1.5)
+  
+  !Plot line:
   call pgsci(2)
+  !if(vx.eq.1.or.vy.eq.1) then
+  !   call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)
+  !else
+  !   call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
+  !end if
+  call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
+  call pgsci(1)
+  call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)
+  
+  call pgsch(1.5)
+  call pgsci(4)
   if(hmp.ne.0) call pgpoint(1,dat(vx,hmp),dat(vy,hmp),2)
   call pgsch(1.)
   call pgsci(1)
@@ -364,17 +374,17 @@ program plotmod
   if(plotagain.eq.4) goto 2
   if(plotagain.eq.5) goto 201
   goto 200
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
   goto 999
 991 write(6,'(A)')' Error reading first line'
   goto 999
 993 write(6,'(A)')' Error reading second line'
-
+  
 999 close(10)
 9999 write(6,*)''
 end program plotmod

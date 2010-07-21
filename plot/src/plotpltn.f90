@@ -34,7 +34,7 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system,colours(99),ncolours
+  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10,boxx*19,boxy*19
@@ -58,12 +58,6 @@ program plotpltn
   plhrdrad  = 1      !Draw lines of constant radius in HRD
   prtitle   = 0      !Print dir as title: 0-no, 1-yes
   prlegend  = 1      !Print input file names to right of plot as legend: 0-no, 1-yes
-  
-  ncolours = 13      !Number of colours used to distinguish tracks.  Default: 13
-  colours(1:ncolours) = (/2,3,4,5,6,7,8,9,10,11,12,13,1/)  !Use black as last resort
-  !ncolours = 4
-  !colours(1:ncolours) = (/15,2,15,4/) !Grey-red-grey-blue
-  
   
   !Predefined colours in PGPlot:
   ! 0: background 
@@ -561,7 +555,7 @@ program plotpltn
   
   call pgsch(0.6)
   do f=1,nf
-     col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+     col = colours(mod(f-1,ncolours)+1)
      call pgsci(col)
      xx1(1:n(f)) = xx(f,1:n(f))
      yy1(1:n(f)) = yy(f,1:n(f)) 

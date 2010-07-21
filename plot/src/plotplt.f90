@@ -42,7 +42,7 @@ program plotplt
   integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,wait,lums,lgx,lgy,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
-  integer :: colours(29),ncolours,col,lng
+  integer :: col,lng
   real :: sch
   
   character :: fname*99,fnames(nfmax)*99,psname*99
@@ -65,10 +65,6 @@ program plotplt
   !os = getos() !1-Linux, 2-MacOS
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
-  
-  !Line colours:
-  ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
-  colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  !Use black as last resort
   
   !Remove 'uninitialised' compiler warnings:
   hrd   = 0
@@ -790,7 +786,7 @@ program plotplt
   !Draw curves/points:
   call pgsci(2)
   do pl=1,npl
-     col = colours(mod(pl-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+     col = colours(mod(pl-1,ncolours)+1)
      call pgsci(col)
      !if(npl.eq.1) call pgsci(2)
      yy1(1:n(pl)) = yy(pl,1:n(pl))
@@ -806,7 +802,7 @@ program plotplt
   call pgsci(2)
   if(hlp.eq.'y') then
      do pl=1,npl
-        col = colours(mod(pl-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+        col = colours(mod(pl-1,ncolours)+1)
         call pgsci(col)
         call pgpoint(nhp(pl),xx(pl,hp(pl,1:nhp(pl))),yy(pl,hp(pl,1:nhp(pl))),2)
         
@@ -829,7 +825,7 @@ program plotplt
   if(prleg) then
      if(nf.eq.1) then  !Then multi-variable plot
         do pl=1,npl
-           col = colours(mod(pl-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+           col = colours(mod(pl-1,ncolours)+1)
            call pgsci(col)
            call pgmtext('RV',0.5,real(20-pl)/20.,0.,trim(leglbl(pl)))
         end do !pl
@@ -840,7 +836,7 @@ program plotplt
            lng = len_trim(fname)
            if(fname(lng:lng).eq.'1'.or.fname(lng:lng).eq.'2') lng = lng-1
            lng = lng-4 !get rid of '.plt'
-           col = colours(mod(f-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+           col = colours(mod(f-1,ncolours)+1)
            call pgsci(col)
            call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,fname(1:lng))
         end do
@@ -1058,7 +1054,7 @@ program plotplt
      write(6,*)''
      
      !col = 2
-     col = colours(mod(pl0-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
+     col = colours(mod(pl0-1,ncolours)+1)
      call pgsci(col)
      
      call pgpoint(1,xx(pl0,i0),yy(pl0,i0),2)

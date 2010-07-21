@@ -63,6 +63,7 @@ module constants
   implicit none
   save
   integer :: screen_dpi,screen_size_h,screen_size_v
+  integer :: colours(29), ncolours
   real :: scrsz,scrrat
   real(double) :: pi,tpi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
@@ -125,6 +126,11 @@ subroutine setconstants
   cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
   cursorright = char(27)//'[1C' !Makes the cursor move right one space
   cursorleft = char(27)//'[1D' !Makes the cursor move left one space
+  
+  
+  !Line colours:
+  ncolours = 13                                            ! Number of (line) colours used to distinguish tracks.  Default: 13
+  colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  ! Use black as last resort
   
 end subroutine setconstants
 !***********************************************************************************************************************************

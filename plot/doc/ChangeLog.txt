@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   107: AstroFloyd, 21/07/2010
+     - Put line colours in the module constants
+     
    106: AstroFloyd, 21/07/2010
      - Add white_bg to module constants and settings file (integer -> logical)
      - Updated print_code_version() in Makefile

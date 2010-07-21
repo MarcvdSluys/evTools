@@ -653,7 +653,7 @@ program plotmdl
   
   if(vx.ne.201.and.vy.ne.201) then
      do i=1,ny
-        call pgsci(mod(i-1,6)+1)
+        call pgsci(colours(mod(i-1,ncolours)+1))
         yy1(1:nm) = yy(i,1:nm)
         call pgline(nm,xx(1:nm),yy1(1:nm))
         if(ab.eq.1) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,abds(i))
