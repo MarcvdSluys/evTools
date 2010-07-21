@@ -4,7 +4,8 @@
 
 
 #No text/space after statements below!
-FORT = gfortran#  Use GNU fortran compiler
+FORT = gfortran#  Use GNU fortran compiler >=4.4
+FORT = gfortran-4.5.0#  Use GNU fortran compiler 4.5
 #FORT = ifort#     Use Intel fortran compiler
 #FORT = nagfor#
 
@@ -74,20 +75,28 @@ endif
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
-ifneq (,$(filter $(FORT),gfortran gfortran-4.4.3))
+ifneq (,$(filter $(FORT),gfortran gfortran-4.5.0))
    CFLAGS += -I/home/user/usr/include/libAF/gfortran
    LFLAGS += -L/home/user/usr/lib -lAF_gfortran
    STATLIBS += /home/user/usr/lib/libAF_gfortran.a
 
    ifeq ($(CHECK),yes)
       OPT = -O0
-      CFLAGS += -fbounds-check
+      ifeq ($(FORT),gfortran-4.5.0)
+         CFLAGS += -fcheck=all
+      else
+         CFLAGS += -fbounds-check
+      endif
       #CFLAGS += -fcheck-array-temporaries  #Doesn't seem to work...
       CFLAGS += -fbacktrace
    endif
    ifeq ($(WARN),yes)
       CFLAGS += -Wall
       CFLAGS += -fmax-errors=10
+      ifeq ($(FORT),gfortran-4.5.0)
+         CFLAGS += -fwhole-file
+         #CFLAGS += -fwhole-program
+      endif
    endif
    #To debug code:
    ifeq ($(DEBUG),yes)

@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   100: AstroFloyd, 21/07/2010
+     - Updated Makefile
+    
     94: AstroFloyd, 14/07/2010
      - Minor update in Makefile to report program version
     
