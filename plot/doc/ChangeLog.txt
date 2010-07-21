@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   106: AstroFloyd, 21/07/2010
+     - Add white_bg to module constants and settings file (integer -> logical)
+     - Updated print_code_version() in Makefile
+   
    101-4: AstroFloyd, 21/07/2010
      - Try to fix mod and obj directories
     

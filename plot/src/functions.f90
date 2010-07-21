@@ -69,7 +69,7 @@ module constants
   real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*99,workdir*99,username*99,userID*9,hostname*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
-  logical :: student_mode
+  logical :: student_mode,white_bg
 end module constants
 !***********************************************************************************************************************************
 
@@ -80,7 +80,7 @@ subroutine setconstants
   implicit none
   
   !ThinkPad, Gentoo with 1440x900:
-  !screen_size_h = 1436
+  !screen_size_h = 1435
   !screen_size_v = 860
   
   !Default:
@@ -88,6 +88,7 @@ subroutine setconstants
   screen_size_v = 700   !Vertical screen size (pixels)
   
   screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
+  white_bg = .true.      ! F: black background on screen, T: white
   
   
   pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
@@ -1018,13 +1019,15 @@ subroutine eggletonplot_settings()
   character :: filename*99
   
   !Define namelist, file name
-  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi
+  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
   filename = trim(homedir)//'/.eggletonplot'
   inquire(file=trim(filename), exist=ex)
   
   u = 10
   
   if(ex) then
+     
+     ! Read the settings file:
      open(unit=u,form='formatted',status='old',action='read',position='rewind',file=trim(filename),iostat=io)
      if(io.ne.0) then
         write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for reading.'
@@ -1036,7 +1039,6 @@ subroutine eggletonplot_settings()
      if(io.eq.0) then
         call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
      else
-        
         write(6,*)
         write(0,'(A)')'  An error occured when reading the settings file '//trim(filename)// &
              ', using default settings.'
@@ -1053,15 +1055,17 @@ subroutine eggletonplot_settings()
      write(6,'(A)')'  please edit it to set your preferences.'
      write(6,*)
      
-     open(unit=u,form='formatted',status='new',action='write',position='rewind',file=trim(filename),iostat=io)
-     if(io.ne.0) then
-        write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
-        return
-     end if
-     write(u, nml=screen_settings, iostat=io)
-     close(u)
-     if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   end if
+  
+  ! Write settings file (do this always, to update in case variables are added):
+  open(unit=u,form='formatted',status='unknown',action='write',position='rewind',file=trim(filename),iostat=io)
+  if(io.ne.0) then
+     write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
+     return
+  end if
+  write(u, nml=screen_settings, iostat=io)
+  close(u)
+  if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   
   call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
   

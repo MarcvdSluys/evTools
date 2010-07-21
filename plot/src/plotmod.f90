@@ -42,6 +42,9 @@ program plotmod
   character :: labels(nc)*60,lx*60,ly*60,title*100
   
   call setconstants()
+  write(6,*)
+  call print_code_version(6)  !To screen
+  call eggletonplot_settings()
   
   plotagain = 0
   x=system('pwd > tmppwd.txt')
@@ -73,8 +76,8 @@ program plotmod
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
 
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc'//  &
-       '     Xc     Yc     Zc    Mtot      Porb       e      Prot'
+  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+       '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
      read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      mhe = 0.d0
@@ -96,7 +99,8 @@ program plotmod
         if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
      end do !j
-     write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,nint(ts),tc,hc,hec,zc,bms,p,ecc,p1
+     write(6,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
+          i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,ts,tc,hc,hec,zc,bms,p,ecc,p1
   end do !i
   write(6,'(A)')'  EOF not reached, array too small!'
   n=999
@@ -104,10 +108,9 @@ program plotmod
 5 write(6,'(A35,I3)')'  Error reading first line of block',i
   goto 10
 6 write(6,'(A36,I3)')'  Error reading second line of block',i
-9 format (I3,2I7,ES12.4,ES10.2,5F8.3,I7,ES10.2,3F7.4,2(F8.3,ES10.2))
 10 n=i-1
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco       R       L   Teff        Tc'//  &
-       '     Xc     Yc     Zc    Mtot      Porb       e      Prot'
+  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+       '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
   write(6,'(I3,A)')n,' blocks read.'
 12 if(n.eq.0) goto 999
   write(6,*)''
@@ -315,6 +318,16 @@ program plotmod
      call pgbegin(1,'/xserve',1,1)
      call pgpap(scrsz,scrrat)
      call pgscf(1)
+     if(white_bg) then           !Create a white background; swap black (ci=0) and white (ci=1)
+        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
+        call pgscr(1,0.,0.,0.)
+        call pgsci(1)
+        call pgsci(0)
+        call pgsvp(0.,1.,0.,1.)
+        call pgswin(-1.,1.,-1.,1.)
+        call pgrect(-2.,2.,-2.,2.)
+        call pgsci(1)
+     end if
   end if
   call pgslw(1)
   call pgenv(xmin,xmax,ymin,ymax,0,0)

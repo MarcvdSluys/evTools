@@ -25,7 +25,7 @@ program plotmdl
   
   implicit none
   integer, parameter :: nn=2001,nq=300  !nq: max number of columns
-  integer :: nm,nc,nv_der,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,whitebg,system
+  integer :: nm,nc,nv_der,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,system
   real(double) :: dat1(nq)
   real :: dat(nq,nn),age,ver,x
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
@@ -40,9 +40,13 @@ program plotmdl
   character :: labels(nq)*60,lx*60,ly*60,title*100,pxns(0:nq)*99,psname*99
   logical :: ex
   
+  !Set constants:
   call setconstants()
+  write(6,*)
+  call print_code_version(6)  !To screen
   
-  whitebg = 1  !0: black background on screen, 1: white
+  call eggletonplot_settings()
+  
   plot = 0
   log = 'n'
   pxnr = 0
@@ -623,7 +627,7 @@ program plotmdl
      call pgbegin(1,'2/xserve',1,1)
      call pgpap(scrsz,scrrat)
      call pgscf(1)
-     if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
+     if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
         call pgsci(1)

@@ -24,7 +24,7 @@ program plotmdln
   
   implicit none
   integer, parameter :: nn=1000,nq=30,nbb=500
-  integer :: nm,nv,mdl(nbb),nblk,nsel,whitebg
+  integer :: nm,nv,mdl(nbb),nblk,nsel
   real :: dat(nbb,nq,nn),age(nbb),dov,x,xx(nbb,nn),yy(nbb,nn)
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
   real :: xsel(4),ysel(4)
@@ -38,9 +38,14 @@ program plotmdln
   character :: labels(nq)*60,lx*50,ly*50,title*100
   
   
+  !Set constants:
   call setconstants()
+  write(6,*)
+  call print_code_version(6)  !To screen
   
-  whitebg = 1  !0: black background on screen, 1: white
+  call eggletonplot_settings()
+  
+  
   plotagain = 0
   
   !Axis labels
@@ -405,7 +410,7 @@ program plotmdln
      if(plt.eq.2) then
         call pgbegin(1,'3/xserve',1,1)
         call pgpap(scrsz,scrrat) !MacBook, Gentoo
-        if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
+        if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
            call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
            call pgscr(1,0.,0.,0.)
            call pgsci(1)

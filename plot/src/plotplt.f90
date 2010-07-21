@@ -21,7 +21,6 @@
 !<
 
 
-
 program plotplt
   use kinds
   use constants
@@ -41,7 +40,7 @@ program plotplt
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,drawlines,version,verbose
   integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
-  integer :: nt,wait,lums,lgx,lgy,nsel,os,whitebg
+  integer :: nt,wait,lums,lgx,lgy,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: colours(29),ncolours,col,lng
   real :: sch
@@ -55,7 +54,7 @@ program plotplt
   
   !Set constants:
   call setconstants()
-  write(6,'(/,A)', advance='no')' PlotPlt, '
+  write(6,*)
   call print_code_version(6)  !To screen
   
   call eggletonplot_settings()
@@ -65,7 +64,6 @@ program plotplt
   
   !os = getos() !1-Linux, 2-MacOS
   os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
-  whitebg = 1  !0: black background on screen, 1: white
   drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
   
   !Line colours:
@@ -727,7 +725,7 @@ program plotplt
      call pgpap(scrsz,scrrat)
      call pgslw(1)
      sch = 1.0
-     if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
+     if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
         call pgsci(1)
@@ -739,16 +737,16 @@ program plotplt
      end if
   end if !plot.ne.9
   
-  if(whitebg.eq.1.and.plot.ne.9) then     !Create a white background; swap black (ci=0) and white (ci=1)
-     call pgscr(0,1.,1.,1.)  !Repeat this, to make it work for AquaTerm, for which it was designed
-     call pgscr(1,0.,0.,0.)
-     call pgsci(1)
-     call pgsci(0)
-     call pgsvp(0.,1.,0.,1.)
-     call pgswin(-1.,1.,-1.,1.)
-     call pgrect(-2.,2.,-2.,2.)
-     call pgsci(1)
-  end if
+  !if(white_bg.and.plot.ne.9) then     !Create a white background; swap black (ci=0) and white (ci=1)
+  !   call pgscr(0,1.,1.,1.)  !Repeat this, to make it work for AquaTerm, for which it was designed
+  !   call pgscr(1,0.,0.,0.)
+  !   call pgsci(1)
+  !   call pgsci(0)
+  !   call pgsvp(0.,1.,0.,1.)
+  !   call pgswin(-1.,1.,-1.,1.)
+  !   call pgrect(-2.,2.,-2.,2.)
+  !   call pgsci(1)
+  !end if
   
   
   call pgscf(1)

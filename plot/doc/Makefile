@@ -172,9 +172,12 @@ $(SRCDIR)/code_version.f90: code_version    #code_version is PHONY and always ou
 	@echo "   character :: compile_date*99 = '"`date`"'" >> $(SRCDIR)/code_version.f90
 	@echo "   character :: compiler*99 = '$(FORT)'" >> $(SRCDIR)/code_version.f90
 	@echo "   character :: compiler_flags*99 = '$(OPT)'" >> $(SRCDIR)/code_version.f90
-	@echo "   write(unit,'(A)')'svn revision '//trim(svn_revision)//', compiled on '//trim(compile_date)// &" >> $(SRCDIR)/code_version.f90
-	@echo "        ' with '//trim(compiler)//' '//trim(compiler_flags)" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: program_name*99" >> $(SRCDIR)/code_version.f90
+	@echo "   call get_command_argument(0,program_name)" >> $(SRCDIR)/code_version.f90
+	@echo "   write(unit,'(A)')' '//trim(program_name)//', svn revision '//trim(svn_revision)// &" >> $(SRCDIR)/code_version.f90
+	@echo "        ', compiled on '//trim(compile_date)//' with '//trim(compiler)//' '//trim(compiler_flags)" >> $(SRCDIR)/code_version.f90
 	@echo 'end subroutine print_code_version' >> $(SRCDIR)/code_version.f90
+	@touch -d "1 Jan 2001" $(SRCDIR)/code_version.f90  #Make it old, so that this file is not a reason to relink
 
 
 
@@ -183,3 +186,4 @@ clean:
 
 cleanwarnings:
 	rm -f *__genmod.f90 *__genmod.mod
+

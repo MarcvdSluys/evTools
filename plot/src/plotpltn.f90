@@ -34,28 +34,32 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,whitebg,strmdls(nn),system,colours(99),ncolours
+  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system,colours(99),ncolours
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10,boxx*19,boxy*19
   character :: rng,log,pglabels(100)*99,pglx*99,pgly*99,asclabels(100)*99,asclx*99,ascly*99,title*100,pstitle*99
   logical :: ex
   
+  !Set constants:
   call setconstants()
+  write(6,*)
+  call print_code_version(6)  !To screen
+  
+  call eggletonplot_settings()
   
   
   !****************************************************************************************************
   !Settings:
   
-  !os = getos() !1-Linux, 2-MacOS
-  os = 1        !Don't use Mac OS's silly AquaTerm
-  whitebg = 1   !0: black background on screen, 1: white
-  drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
-  plhrdrad  = 1 !Draw lines of constant radius in HRD
-  prtitle   = 0 !Print dir as title: 0-no, 1-yes
-  prlegend  = 1 !Print input file names to right of plot as legend: 0-no, 1-yes
+  !os = getos()      !1-Linux, 2-MacOS
+  os = 1             !Don't use Mac OS's silly AquaTerm
+  drawlines = 1      !0: no; draw points, 1: yes: draw lines, 2: draw both
+  plhrdrad  = 1      !Draw lines of constant radius in HRD
+  prtitle   = 0      !Print dir as title: 0-no, 1-yes
+  prlegend  = 1      !Print input file names to right of plot as legend: 0-no, 1-yes
   
-  ncolours = 13 !Number of colours used to distinguish tracks.  Default: 13
+  ncolours = 13      !Number of colours used to distinguish tracks.  Default: 13
   colours(1:ncolours) = (/2,3,4,5,6,7,8,9,10,11,12,13,1/)  !Use black as last resort
   !ncolours = 4
   !colours(1:ncolours) = (/15,2,15,4/) !Grey-red-grey-blue
@@ -502,7 +506,7 @@ program plotpltn
      if(os.eq.1) call pgbegin(1,'/xserve',1,1)
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)                !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
-     if(whitebg.eq.1) then     !Create a white background; swap black (ci=0) and white (ci=1)
+     if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
         call pgsci(1)
@@ -514,7 +518,7 @@ program plotpltn
      end if
   end if
   
-  if(whitebg.eq.1.and.plot.ne.8) then     !Create a white background; swap black (ci=0) and white (ci=1)
+  if(white_bg.and.plot.ne.8) then     !Create a white background; swap black (ci=0) and white (ci=1)
      call pgscr(0,1.,1.,1.)  !Repeat this, to make it work for AquaTerm, for which it was designed
      call pgscr(1,0.,0.,0.)
      call pgsci(1)
