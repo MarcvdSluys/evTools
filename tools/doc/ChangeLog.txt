@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   110: AstroFloyd, 22/07/2010
+      - listmod: remove much archaic Fortran
+    
     99: AstroFloyd, 20/07/2010
       - Update listmod: give the output file the model number as name; allow >999 blocks
     

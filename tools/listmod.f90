@@ -1,9 +1,9 @@
 !> \file listmod.f90
-!<
-!
+
 ! AF 2003-12-17
 ! Write an extra 0 at the end of the first line to make the output with the V.2005 code.
-!
+
+
 !   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
@@ -32,8 +32,8 @@ program listmod
   real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
   real(double) :: mhe,mco,mhenv
   real(double) :: dat1(8),dat2(24),dat(99)
-  integer :: i,j,kh,kp,jmod,jb,jin,n
-  integer :: narg,iargc,blk,ans
+  integer :: kh,kp,jmod,jb,jin,nblk,io
+  integer :: narg,iargc,blk,bl,li,ans
   character :: fname*99,findfile*99,outname*99
   logical :: ex
   
@@ -55,24 +55,37 @@ program listmod
   
   
   
-  !***   READ ALL STRUCTURE MODELS IN THE FILE AND DISPLAY MAIN PROPERTIES
+  !***   LIST ALL STRUCTURE MODELS IN THE FILE AND THEIR MAIN PROPERTIES
   
   write(6,*)''
   write(6,'(A)')'  Reading file '//trim(fname)
   write(6,*)''
   open (unit=10,form='formatted',status='old',file=trim(fname))
-3 rewind 10
+3 continue
+  rewind 10
   
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
-  i = 0
+  bl = 1  !Block/model number
   do
-     read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     if(io.lt.0) exit
+     if(io.gt.0) then  !then you may be saving DH as well as H, if this is block 2
+        write(0,'(A,I5,A)')'  Error reading the header line of block',bl,'.  Skipping the rest of the file.'
+        exit
+     end if
+     
      mhe = 0.d0
      mco = 0.d0
-     do j=1,kh
-        read(10,*,err=6,end=10)dat(1:jin)
+     do li=1,kh  !Line/mesh point in the current block/model
+        read(10,*,iostat=io)dat(1:jin)
+        if(io.lt.0) exit
+        if(io.gt.0) then
+           write(0,'(A,2(I5,A))')'  Error reading line',li,' of block',bl,'.  Skipping the rest of the file.'
+           exit
+        end if
+        
         lnf = dat(1)
         lnt = dat(2)
         x16 = dat(3)
@@ -92,7 +105,7 @@ program listmod
         e = dat(18)
         f = dat(19)
         
-        if(j.eq.1) then
+        if(li.eq.1) then
            r1  = exp(lnr)*1.e11/r0
            l1  = l*1.d33/l0
            ts  = exp(lnt)
@@ -101,7 +114,7 @@ program listmod
            hes = x4
            zs  = 1.d0 - x1 - x4
         end if
-        if(j.eq.kh) then
+        if(li.eq.kh) then
            tc  = exp(lnt)
            hc  = x1
            hec = x4
@@ -109,56 +122,67 @@ program listmod
         end if
         if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
-     end do !j
-     if(mod(i,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
+     end do !li
+     
+     if(mod(bl,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
           '        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
-     write(6,9)i,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
-     i = i+1
+     write(6,'(I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)') &
+          bl,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
+     
+     bl = bl+1
   end do 
-  write(6,'(A)')'  EOF not reached, array too small!'
-  n=999
-  goto 12
-5 write(6,'(A35,I3)')'  Error reading first line of block',i
-  goto 10
-6 write(6,'(A36,I3)')'  Error reading second line of block',i
-9 format (I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)
-10 n=i-1
+  
+  nblk = bl-1
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   
-  write(6,'(I5,A)')n,' blocks read.'
-12 if(n.eq.0) goto 999
+  write(6,'(I5,A)')nblk,' blocks read.'
+  
   write(6,*)''
+  if(nblk.eq.0) then
+     close(10)
+     stop
+  end if
+  
   
   
   
   
   !***   CHOOSE STRUCTURE MODEL
-  
-  blk = 1
-20 write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',n,'):  '
-  read*,blk
-  if(blk.eq.0) goto 9999
-  if(blk.lt.1.or.blk.gt.n) goto 20
+
+49 continue  
+  blk = 0
+  do while(blk.lt.1.or.blk.gt.nblk)
+     write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',nblk,'):  '
+     read*,blk
+     if(blk.eq.0) then
+        write(6,*)''
+        stop
+     end if
+  end do
   
   
   !Read file, upto chosen model (blk-1)
   rewind 10
-  do i=1,blk-1
-     read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
-     do j=1,kh
-        read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
-     end do !j
-  end do !i
+  do bl=1,blk-1  !Block/model
+     read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     if(io.ne.0) call error_reading_header(bl)
+     do li=1,kh  !Line/mesh point in model
+        read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        if(io.ne.0) call error_reading_block(li)
+     end do !li
+  end do !bl
   
   
   
   
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   
-  read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin   !jin = # columns
-  read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin   !jin = # columns
+  if(io.ne.0) call error_reading_header(0)
+  read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  if(io.ne.0) call error_reading_block(0)
   
   m1  = lnm*1.d33/m0
   r1  = exp(lnr)*1.e11/r0
@@ -174,8 +198,9 @@ program listmod
   
   mhe = 0.d0
   mco = 0.d0
-  do i=1,kh-1 !Number of Mesh points
-     read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  do li=1,kh-1 !Number of Mesh points
+     read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+     if(io.ne.0) call error_reading_block(li)
      if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
      if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
   end do
@@ -248,19 +273,31 @@ program listmod
   
   !***   FINISH
   
-120 if(n.eq.1) goto 9999
-  write(6,*)''
-  write(6,'(A)')'  You can:'
-  write(6,'(A)')'    0) Quit'
-  write(6,'(A)')'    1) See another block'
-  write(6,'(A)')'    2) Write this model to another file'
-  write(6,*)''
-  write(6,'(A28,$)')'  What do you want to do ?  '
-  read*,ans
+  ans = -1
+  do while(ans.gt.3.or.ans.lt.0)
+     if(nblk.eq.1) then
+        write(6,*)''
+        stop
+     end if
+     
+     write(6,*)''
+     write(6,'(A)')'  You can:'
+     write(6,'(A)')'    0) Quit'
+     write(6,'(A)')'    1) Choose another model'
+     write(6,'(A)')'    2) List all models again and choose another model'
+     write(6,'(A)')'    3) Write this model to another file'
+     write(6,*)''
+     write(6,'(A28,$)')'  What do you want to do ?  '
+     read*,ans
+  end do
   
-  if(ans.gt.2.or.ans.lt.0) goto 120
-  if(ans.eq.1) goto 3
-  if(ans.eq.0) goto 999
+  if(ans.eq.0)  then
+     close(10)
+     write(6,*)''
+     stop
+  end if
+  if(ans.eq.1) goto 49
+  if(ans.eq.2) goto 3
   
   
   
@@ -270,19 +307,22 @@ program listmod
   
   !Read blocks before the desired one:
   rewind 10
-  do i=1,blk-1
-     read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
-     do j=1,kh
-        read(10,*,err=993)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
-     end do !j
-  end do !i
+  do bl=1,blk-1  !Block/model number
+     read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     if(io.ne.0) call error_reading_header(bl)
+     do li=1,kh  !Line/mesh point in model
+        read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        if(io.ne.0) call error_reading_block(li)
+     end do !li
+  end do !bl
   
   
   !Read desired block:
   !Read header line:
-  read(10,*,err=991)dat1,kh,kp,jmod,jb,jin
+  read(10,*,iostat=io)dat1,kh,kp,jmod,jb,jin
+  if(io.ne.0) call error_reading_header(0)
   
-  write(outname,'(I5.6,A4)')jmod,'.mod'
+  write(outname,'(I5.5,A4)')jmod,'.mod'
   inquire(file=trim(outname), exist=ex)
   if(ex) then
      write(6,'(A)')'  '//trim(outname)//' exists.'
@@ -290,16 +330,19 @@ program listmod
      read*,outname
   end if
      
-  open (unit=20,form='formatted',status='new',file=trim(outname),iostat=i)
+  open (unit=20,form='formatted',status='new',file=trim(outname),iostat=io)
+  if(io.ne.0) call quit_program('Error opening output file '//trim(outname)//'.')
+
   
   !Write header line
   write(20,'(1X, 8ES23.15, 6I6)')dat1,kh,kp,jmod,jb,jin,0
   
   !Copy model block:
-  do j=1,kh
-     read(10,*,err=993)dat2
+  do li=1,kh  !Line/mesh point
+     read(10,*,iostat=io)dat2
+     if(io.ne.0) call error_reading_block(li)
      write(20,'(1X, 24ES23.15)')dat2
-  end do !j
+  end do !li
   close(20)
   write(6,'(A)')'  Model written to '//trim(outname)//'.'
   
@@ -307,15 +350,35 @@ program listmod
   
   
   
-  goto 999
-991 write(6,'(A)')'  Error reading first line.'
-  goto 999
-993 write(6,'(A)')'  Error reading second line.'
-  
-999 close(10)
-9999 write(6,*)''
+  close(10)
+  write(6,*)''
 end program listmod
 
 
 
+
+subroutine error_reading_header(b)
+  implicit none
+  integer, intent(in) :: b
+  if(b.eq.0) then
+     write(6,'(A,/)')'  Error reading header line, aborting.'
+  else
+     write(6,'(A,I5,A,/)')'  Error reading header line in block',b,', aborting.'
+  end if
+  close(10)
+  stop
+end subroutine error_reading_header
+
+
+subroutine error_reading_block(l)
+  implicit none
+  integer, intent(in) :: l
+  if(l.eq.0) then
+     write(6,'(A,/)')'  Error reading (the first?) line of the data block, aborting.'
+  else
+     write(6,'(A,I5,A,/)')'  Error reading the data block, line',l,', aborting.'
+  end if
+  close(10)
+  stop
+end subroutine error_reading_block
 
