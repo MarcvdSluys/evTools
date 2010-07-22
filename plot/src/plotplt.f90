@@ -1,26 +1,26 @@
-!>  Plotplt.f90
-!!  
-!!  Plots the data contained in a .plt* file, highlights selected points
-!!  Uses routines from functions.f90, plt_functions.f90
-!!  Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-!!  AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
-!!
-!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!!   
-!!   
-!!   This file is part of the eggleton-plot package.
-!!   
-!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
-!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!!   
-!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!!   
-!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
-!!   <http://www.gnu.org/licenses/>.
+!> \file plotplt.f90  Plots the data contained in a .plt* file, highlights selected points
+
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!   <http://www.gnu.org/licenses/>.
+
+
+
+!> \brief Plot the contents of the plt file 
+!! - Uses routines from functions.f90, plt_functions.f90
+!! - Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
 !<
-
-
 program plotplt
   use kinds
   use constants
@@ -122,7 +122,6 @@ program plotplt
   !Allocate arrays:
   npl = max(nf,nl)
   
-  !> \todo allocate nf iso npl in dat()?
   allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
   allocate(n(npl), strmdls(npl,nmax))
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))

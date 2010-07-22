@@ -1,4 +1,5 @@
 !> \file functions.f90  Shared modules, functions and subroutines for the Eggleton plot package
+!!
 !! For functions and routines that need pgplot, see plotfunctions.f
 !<
 
