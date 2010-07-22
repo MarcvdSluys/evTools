@@ -95,35 +95,35 @@ subroutine setconstants
   pi2      =  0.5d0*pi
   c3rd     =  1.d0/3.d0
   
-  l0       =  3.83d33                               ! Solar luminosity, erg s^-1
-  r0       =  6.9599d10                             ! Solar radius, cm
-  m0       =  1.9891d33                             ! Solar mass, g
+  l0       =  3.83d33                               !Solar luminosity, erg s^-1
+  r0       =  6.9599d10                             !Solar radius, cm
+  m0       =  1.9891d33                             !Solar mass, g
   
-  g        =  6.67259d-8                            ! Newton's constant, cm^3 g^-1 s^-2
-  c        =  2.99792458d10                         ! Speed of light in vacuo, cm s^-1
+  g        =  6.67259d-8                            !Newton's constant, cm^3 g^-1 s^-2
+  c        =  2.99792458d10                         !Speed of light in vacuo, cm s^-1
   
-  day      =  8.64d4                                ! Day, s
-  yr       =  3.15569d7                             ! Year, s
-  km       =  1.d5                                  ! Kilometer, cm
+  day      =  8.64d4                                !Day, s
+  yr       =  3.15569d7                             !Year, s
+  km       =  1.d5                                  !Kilometer, cm
   
-  amu      =  1.6605402d-24                         ! Atomic mass unit; (mass of C12 atom)/12, g
-  m_h      =  1.007825*amu                          ! Mass of a hydrogen atom
-  k_b      =  1.380658d-16                          ! Boltzmann constant, erg/K
-  h_p      =  6.6260755d-27                         ! Planck's constant, erg s
-  h_bar    =  h_p/tpi                               ! Reduced Planck constant, erg s
-  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   ! Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
-  sigma    =  a_rad*c*0.25d0                        ! Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
+  amu      =  1.6605402d-24                         !Atomic mass unit; (mass of C12 atom)/12, g
+  m_h      =  1.007825*amu                          !Mass of a hydrogen atom
+  k_b      =  1.380658d-16                          !Boltzmann constant, erg/K
+  h_p      =  6.6260755d-27                         !Planck's constant, erg s
+  h_bar    =  h_p/tpi                               !Reduced Planck constant, erg s
+  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   !Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
+  sigma    =  a_rad*c*0.25d0                        !Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
-  call get_environment_variable('HOME',homedir)       ! Set homedir  = $HOME (the environment variable)
-  call get_environment_variable('PWD',workdir)        ! Set workdir  = $PWD
-  call get_environment_variable('HOSTNAME',hostname)  ! Set hostname = $HOSTNAME  !Apparently not always exported
-  call get_environment_variable('USER',username)      ! Set username = $USER
-  call get_environment_variable('UID',userid)         ! Set userid   = $UID
+  call get_environment_variable('HOME',homedir)       !Set homedir  = $HOME (the environment variable)
+  call get_environment_variable('PWD',workdir)        !Set workdir  = $PWD
+  call get_environment_variable('HOSTNAME',hostname)  !Set hostname = $HOSTNAME  !Apparently not always exported
+  call get_environment_variable('USER',username)      !Set username = $USER
+  call get_environment_variable('UID',userid)         !Set userid   = $UID
   
-  cursorup = char(27)//'[2A'    ! Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
-  cursordown = char(27)//'[1B'  ! Print this to go down one line (on screen)
-  cursorright = char(27)//'[1C' ! Makes the cursor move right one space
-  cursorleft = char(27)//'[1D'  ! Makes the cursor move left one space
+  cursorup = char(27)//'[2A' !Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
+  cursordown = char(27)//'[1B' !Print this to go down one line (on screen)
+  cursorright = char(27)//'[1C' !Makes the cursor move right one space
+  cursorleft = char(27)//'[1D' !Makes the cursor move left one space
   
 end subroutine setconstants
 !***********************************************************************************************************************************

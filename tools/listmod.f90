@@ -27,9 +27,10 @@ program listmod
   implicit none
   integer :: narg,iargc,blk,ans,nblk
   character :: fname*99,findfile*99
-
+  logical :: save_dh
   
   call setconstants()
+  save_dh = .false.
   
   
   !***   READ COMMAND LINE VARIABLES
@@ -50,7 +51,7 @@ program listmod
   
   !***   LIST ALL STRUCTURE MODELS IN THE FILE AND THEIR MAIN PROPERTIES
 3 continue
-  call list_mod_file(fname,nblk)
+  call list_mod_file(fname,nblk, save_dh)
   
   
   
@@ -69,7 +70,7 @@ program listmod
      end if
   end do
   
-  call print_mod_details(fname,blk)
+  call print_mod_details(fname,blk, save_dh)
   
   
   !***   FINISH
@@ -108,7 +109,7 @@ program listmod
   
   
   !***   COPY MODEL TO DIFFERENT FILE
-  call copy_mod(fname,blk)
+  call copy_mod(fname,blk, save_dh)
   
   
   
@@ -151,13 +152,14 @@ end subroutine error_reading_block
 
 
 !***********************************************************************************************************************************
-subroutine list_mod_file(fname, nblk)
+subroutine list_mod_file(fname, nblk, save_dh)
   use kinds
   use constants
   
   implicit none
   character,intent(in) :: fname*(*)
   integer, intent(out) :: nblk
+  logical, intent(inout) :: save_dh
   
   real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
   real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
@@ -166,9 +168,9 @@ subroutine list_mod_file(fname, nblk)
   real(double) :: dat(99)
   integer :: kh,kp,jmod,jb,jin,io
   integer :: bl,li
+  character :: tmp_str*9
   
-  open (unit=10,form='formatted',status='old',file=trim(fname))
-!3 continue
+  open(unit=10,form='formatted',status='old',file=trim(fname))
   
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
@@ -178,8 +180,16 @@ subroutine list_mod_file(fname, nblk)
      read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      if(io.lt.0) exit
      if(io.gt.0) then  !then you may be saving DH as well as H, if this is block 2
-        write(0,'(A,I5,A)')'  Error reading the header line of block',bl,'.  Skipping the rest of the file.'
-        exit
+        if(.not.save_dh .and. bl.eq.2) then !Then try reading DH as well below, for now, reread the header of model 1
+           rewind(10)
+           write(6,*)cursorup  !Backup one line on screen, to overwrite the line that was already printed
+           bl = 1
+           read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+           save_dh = .true.
+        else
+           write(0,'(A,I5,A)')'  Error reading the header line of block',bl,'.  Skipping the rest of the file.'
+           exit
+        end if
      end if
      
      mhe = 0.d0
@@ -230,6 +240,12 @@ subroutine list_mod_file(fname, nblk)
         if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
      end do !li
      
+     if(save_dh) then  !Read the DH block as well; it has no header, and hence kh lines, not kh+1
+        do li=1,kh
+           read(10,*) tmp_str
+        end do
+     end if
+     
      if(mod(bl,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
           '        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
      write(6,'(I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)') &
@@ -245,7 +261,10 @@ subroutine list_mod_file(fname, nblk)
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   nblk = bl-1
-  write(6,'(I5,A,/)')nblk,' blocks read.'
+  write(6,'(/,I5,A)', advance='no')nblk,' blocks of H'
+  if(save_dh) write(6,'(A)', advance='no')' and DH'
+  write(6,'(A,/)')' read.'
+     
   
   if(nblk.eq.0) stop
   
@@ -255,13 +274,14 @@ end subroutine list_mod_file
 
 
 !***********************************************************************************************************************************
-subroutine print_mod_details(fname,blk)
+subroutine print_mod_details(fname, blk, save_dh)
   use kinds
   use constants
   
   implicit none
   character, intent(in) :: fname*(*)
   integer, intent(in) :: blk
+  logical, intent(in) :: save_dh
   
   real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
   real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
@@ -271,17 +291,26 @@ subroutine print_mod_details(fname,blk)
   real(double) :: mhe,mco,mhenv
   integer :: kh,kp,jmod,jb,jin,io
   integer :: bl,li
+  character :: tmp_str*9
   
   
   !Read file, upto chosen model (blk-1)
-  open (unit=10,form='formatted',status='old',file=trim(fname))
+  open(unit=10,form='formatted',status='old',file=trim(fname))
   do bl=1,blk-1  !Block/model
      read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      if(io.ne.0) call error_reading_header(bl)
+     
      do li=1,kh  !Line/mesh point in model
         read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         if(io.ne.0) call error_reading_block(li)
      end do !li
+     
+     if(save_dh) then  !Read the DH block as well; it has no header, and hence kh lines, not kh+1
+        do li=1,kh
+           read(10,*) tmp_str
+        end do
+     end if
+     
   end do !bl
   
   
@@ -387,11 +416,12 @@ end subroutine print_mod_details
 
 
 !***********************************************************************************************************************************
-subroutine copy_mod(fname,blk)
+subroutine copy_mod(infile, blk, save_dh)
   use kinds
   implicit none
-  character, intent(in) :: fname*(*)
+  character, intent(in) :: infile*(*)
   integer, intent(in) :: blk
+  logical, intent(in) :: save_dh
   
   real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
   real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
@@ -399,11 +429,11 @@ subroutine copy_mod(fname,blk)
   real(double) :: dat1(8),dat2(24)
   integer :: kh,kp,jmod,jb,jin,io
   integer :: bl,li
-  character :: outname*99
+  character :: outfile*99,tmp_str*9
   logical :: ex
   
   !Read blocks before the desired one:
-  open (unit=10,form='formatted',status='old',file=trim(fname))
+  open(unit=10,form='formatted',status='old',file=trim(infile))
   do bl=1,blk-1  !Block/model number
      read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      if(io.ne.0) call error_reading_header(bl)
@@ -411,6 +441,13 @@ subroutine copy_mod(fname,blk)
         read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         if(io.ne.0) call error_reading_block(li)
      end do !li
+     
+     if(save_dh) then  !Read the DH block as well; it has no header, and hence kh lines, not kh+1
+        do li=1,kh
+           read(10,*) tmp_str
+        end do
+     end if
+     
   end do !bl
   
   
@@ -420,30 +457,40 @@ subroutine copy_mod(fname,blk)
   read(10,*,iostat=io)dat1,kh,kp,jmod,jb,jin
   if(io.ne.0) call error_reading_header(0)
   
-  write(outname,'(I5.5,A4)')jmod,'.mod'
-  inquire(file=trim(outname), exist=ex)
+  write(outfile,'(I5.5,A4)')jmod,'.mod'
+  inquire(file=trim(outfile), exist=ex)
   if(ex) then
-     write(6,'(A)')'  '//trim(outname)//' exists.'
+     write(6,'(A)')'  '//trim(outfile)//' exists.'
      write(6,'(A,$)')'  Please enter a different name for the output file: '
-     read*,outname
+     read*,outfile
   end if
      
-  open (unit=20,form='formatted',status='new',file=trim(outname),iostat=io)
-  if(io.ne.0) call quit_program('Error opening output file '//trim(outname)//'.')
+  open (unit=20,form='formatted',status='new',file=trim(outfile),iostat=io)
+  if(io.ne.0) call quit_program('Error opening output file '//trim(outfile)//'.')
 
   
   !Write header line
   write(20,'(1X, 8ES23.15, 6I6)')dat1,kh,kp,jmod,jb,jin,0
   
-  !Copy model block:
+  !Copy model block (H):
   do li=1,kh  !Line/mesh point
      read(10,*,iostat=io)dat2
      if(io.ne.0) call error_reading_block(li)
      write(20,'(1X, 24ES23.15)')dat2
   end do !li
+  
+  !Copy model block (DH):
+  if(save_dh) then
+     do li=1,kh  !Line/mesh point
+        read(10,*,iostat=io)dat2
+        if(io.ne.0) call error_reading_block(li)
+        write(20,'(1X, 24ES23.15)')dat2
+     end do !li
+  end if
+  
   close(10)
   close(20)
-  write(6,'(A)')'  Model written to '//trim(outname)//'.'
+  write(6,'(A)')'  Model written to '//trim(outfile)//'.'
   
   
 end subroutine copy_mod
