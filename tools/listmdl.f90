@@ -27,7 +27,7 @@ program listmdl
   real :: hs,hes,cs,ns,os,nes,mgs,zs
   real :: rhoc,pc,ethc,enuc,encc
   
-  integer i,ii,j,nblk,blk,ans,svblk
+  integer ii,bl,mp,nblk,blk,ans,svblk
   character findfile*99,fname*99
   
   call setconstants()
@@ -49,32 +49,36 @@ program listmdl
   !************************************************************************      
   
   write(6,*)''
-4 write(6,'(A)')'  Reading file '//trim(fname)
-  open (unit=10,form='formatted',status='old',file=trim(fname))
-  rewind 10
+4 continue
+  write(6,'(A)')'  Reading file '//trim(fname)
+  open(unit=10,form='formatted',status='old',file=trim(fname))
   
-  read(10,5,err=11,end=11) nmsh,nv,dov
-5 format (2x,I4,4x,I2,F7.3)
+  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
   write(6,*)''
   write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
-  do ii=1,999
-     if(mod(ii,25).eq.0) then
+  
+  mp = 1  !Silence compiler warnings
+  do bl=1,999
+     if(mod(bl,25).eq.0) then
         write(6,*)''
         write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
              '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
      end if
-     read(10,6,err=12,end=15) nmdl,age
-6    format (1P,I6,1x,E16.9)
+     read(10,'(I6,1x,ES16.9)',err=12,end=15) nmdl,age
+     
+     
      mhe = 0.
      mco = 0.
      vk = 0.
      mm1 = 0.
      be = 0.
      be1 = 0.
-     do j=1,nmsh
-        read(10,7,err=13,end=15)mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
-        if(j.eq.1) then
+     
+     do mp=1,nmsh
+        read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=15) &
+             mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+        if(mp.eq.1) then
            tc  = tt
            hc  = hh
            hec = hhe
@@ -83,7 +87,7 @@ program listmdl
            zc  = 1. - hh - hhe
            rhoc = rrh
         end if
-        if(j.eq.nmsh) then
+        if(mp.eq.nmsh) then
            m1  = mm
            r1  = rr
            l1  = ll
@@ -98,46 +102,56 @@ program listmdl
         if(mco.eq.0.0.and.hhe.gt.0.1) mco = mm
         
         !Calculate V.K. of the envelope
-        if(j.gt.2.and.hh.gt.0.1) then
+        if(mp.gt.2.and.hh.gt.0.1) then
            vk = vk + (mm-mm1)*rr**2
            be = be + g*(mm-mm1)*mm1/rr*5.6847e15 !In 10^40 erg
         end if
-        if(j.gt.2.and.hh.gt.0.001) then
+        if(mp.gt.2.and.hh.gt.0.001) then
            be1 = be1 + g*(mm-mm1)*mm1/rr*5.6847e15 !In 10^40 erg
         end if
         
         mm1 = mm !Remember the previous value
-     end do !do j=1,nmsh
+     end do !do mp=1,nmsh
      
      vk = vk/((m1-mhe)*r1**2)   
-     write(6,9)ii,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk!,be,be1!,bms,p,p1
+     write(6,'(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)') &
+          bl,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk !,be,be1 !,bms,p,p1
      write(20,'(4E11.4)')mhe,be,be1,be/be1
      
-7    format (1P,E13.6,4E11.4,16E11.3)
-     
-  end do !ii
+  end do !bl
   
   
   
-9 format (I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)
-  
-11 write(6,'(A)')'  Error reading first line of file, aborting...'
+11 continue
+  write(6,'(A)')'  Error reading first line of file, aborting...'
   close(10)
-  goto 9999
-12 write(6,'(A)')'  Error reading first line of block, aborting...'
-  close(10)
-  goto 9999
-13 write(*,*)'  Error reading block',i-1,'line',j-1,', aborting...'
-  close(10)
-  goto 9999
-15 close(10)
+  write(6,'(A,/)')'  Program finished'
+  stop
   
-  nblk = ii-1
+12 continue
+  write(6,'(A)')'  Error reading first line of block, aborting...'
+  close(10)
+  write(6,'(A,/)')'  Program finished'
+  stop
+  
+13 continue
+  write(*,*)'  Error reading block',bl-1,'line',mp-1,', aborting...'
+  close(10)
+  write(6,'(A,/)')'  Program finished'
+  stop
+  
+15 continue
+  close(10)
+  
+  nblk = bl-1
   write(6,*)''
   write(*,*)' EOF reached,',nblk,' blocks read.'
   write(6,*)''
   
-  if(nblk.eq.0) goto 9999
+  if(nblk.eq.0) then
+     write(6,'(A,/)')'  Program finished'
+     stop
+  end if
   if(nblk.eq.1) then
      blk = 1 
      goto 25
@@ -152,35 +166,44 @@ program listmdl
   !***   CHOOSE STRUCTURE MODEL
   !************************************************************************      
   
-20 write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
+20 continue
+  write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
   read*,blk
-22 if(blk.eq.0) goto 9999
+22 continue
+  if(blk.eq.0) then
+     write(6,'(A,/)')'  Program finished'
+     stop
+  end if
   if(blk.lt.1.or.blk.gt.nblk) goto 20
   
+  
   !Read file, upto chosen model (blk-1)
-25 open (unit=10,form='formatted',status='old',file=fname)
-  rewind 10
-  read(10,5,err=11,end=11) nmsh,nv,dov
+25 continue
+  open(unit=10,form='formatted',status='old',file=fname)
+  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
   if(blk.eq.1) goto 27
-  do i=1,blk-1
-     read(10,6,err=12,end=12) nmdl,age
-     do j=1,nmsh
-        read(10,7,err=13,end=999) (x, ii=1,21) 
-     end do !j
-  end do !i
+  do bl=1,blk-1
+     read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
+     do mp=1,nmsh
+        read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) (x, ii=1,21) 
+     end do !mp
+  end do !bl
   
   
   !************************************************************************      
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   !************************************************************************      
   
-27 read(10,6,err=12,end=12) nmdl,age
-  read(10,7,err=13,end=999) mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+27 continue
+  read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
+  read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) &
+       mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
   
   if(svblk.eq.1) then
-     write(20,5) nmsh,nv,dov
-     write(20,6) nmdl,age
-     write(20,7) mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+     write(20,'(2x,I4,4x,I2,F7.3)') nmsh,nv,dov
+     write(20,'(I6,1x,ES16.9)') nmdl,age
+     write(20,'(ES13.6,4ES11.4,16ES11.3)') &
+          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
   end if
   
   tc   = tt
@@ -200,9 +223,11 @@ program listmdl
   
   mhe = 0.
   mco = 0.
-  do i=2,nmsh !Number of Mesh points
-     read(10,7,err=13)mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
-     if(svblk.eq.1) write(20,7) mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+  do mp=2,nmsh !Number of Mesh points
+     read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13) &
+          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+     if(svblk.eq.1) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
+          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
      if(mhe.eq.0.0.and.hh.ge.0.1) mhe = mm
      if(mco.eq.0.0.and.hhe.ge.0.1) mco = mm
   end do
@@ -270,7 +295,11 @@ program listmdl
   
   if(svblk.eq.1) close(20)
   svblk = 0 !Don't save the block (anymore)
-120 if(nblk.eq.1) goto 9999
+120 continue
+  if(nblk.eq.1) then
+     write(6,'(A,/)')'  Program finished'
+     stop
+  end if
   write(6,*)''
   write(6,'(A)')' You can:'
   write(6,'(A)')'   0) Quit'
@@ -286,14 +315,15 @@ program listmdl
      open(unit=20,form='formatted',status='replace',file='pltmdl.mdl')
      svblk = 1
   end if
-  if(ans.eq.0) goto 999
+  
   if(ans.eq.1) goto 22
   if(ans.eq.2) goto 20
   if(ans.eq.3) goto 4
   
   
-999 close(10)
-9999 write(6,'(A)')'  Program finished'
-  write(6,*)''
+999 continue
+  close(10)
+  write(6,'(A,/)')'  Program finished'
+  
 end program listmdl
 

@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   114: AstroFloyd, 22/07/2010
+      - listmdl: remove some archaic Fortran pt.1
+   
    112: AstroFloyd, 22/07/2010
       - listmod: automatically recognise whether DH is stored, and, if so,
                  allow to read and copy it
