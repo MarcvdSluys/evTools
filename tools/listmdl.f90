@@ -18,6 +18,7 @@
 program listmdl
   use constants
   implicit none
+  
   real :: age,dov,x,vk,mm1,be,be1
   integer :: nmsh,nv,nmdl
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
@@ -27,18 +28,19 @@ program listmdl
   real :: hs,hes,cs,ns,os,nes,mgs,zs
   real :: rhoc,pc,ethc,enuc,encc
   
-  integer ii,bl,mp,nblk,blk,ans,svblk
-  character findfile*99,fname*99
+  integer ii,bl,mp,nblk,blk,ans,in
+  character findfile*99,infile*99,outfile*99
+logical :: svblk
   
   call setconstants()
   
-  svblk = 0
+  svblk = .false.
   
   if(iargc().eq.1) then
-     call getarg(1,fname)
+     call getarg(1,infile)
   else
-     fname = findfile('*.mdl*') !Search for input file in current dir
-     if(len_trim(fname).le.0) call quit_program('No file found in this directory.')
+     infile = findfile('*.mdl*') !Search for input file in current dir
+     if(len_trim(infile).le.0) call quit_program('No file found in this directory.')
   end if
      
   
@@ -50,8 +52,8 @@ program listmdl
   
   write(6,*)''
 4 continue
-  write(6,'(A)')'  Reading file '//trim(fname)
-  open(unit=10,form='formatted',status='old',file=trim(fname))
+  write(6,'(A)')'  Reading file '//trim(infile)
+  open(unit=10,form='formatted',status='old',file=trim(infile))
   
   read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
   write(6,*)''
@@ -116,7 +118,6 @@ program listmdl
      vk = vk/((m1-mhe)*r1**2)   
      write(6,'(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)') &
           bl,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk !,be,be1 !,bms,p,p1
-     write(20,'(4E11.4)')mhe,be,be1,be/be1
      
   end do !bl
   
@@ -152,11 +153,6 @@ program listmdl
      write(6,'(A,/)')'  Program finished'
      stop
   end if
-  if(nblk.eq.1) then
-     blk = 1 
-     goto 25
-  end if
-  
   
   
   
@@ -167,39 +163,55 @@ program listmdl
   !************************************************************************      
   
 20 continue
-  write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
-  read*,blk
-22 continue
-  if(blk.eq.0) then
-     write(6,'(A,/)')'  Program finished'
-     stop
+  if(nblk.eq.1) then
+     blk = 1 
+  else  
+     
+     blk = 0
+     do while(blk.lt.1.or.blk.gt.nblk)
+        write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
+        read*,blk
+        if(blk.eq.0) then
+           write(6,'(A,/)')'  Program finished'
+           stop
+        end if
+     end do
+     
+     
   end if
-  if(blk.lt.1.or.blk.gt.nblk) goto 20
   
+22 continue
+  
+  open(unit=10,form='formatted',status='old',file=trim(infile))
+  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
   
   !Read file, upto chosen model (blk-1)
-25 continue
-  open(unit=10,form='formatted',status='old',file=fname)
-  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
-  if(blk.eq.1) goto 27
-  do bl=1,blk-1
-     read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
-     do mp=1,nmsh
-        read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) (x, ii=1,21) 
-     end do !mp
-  end do !bl
+  if(blk.ne.1) then
+     do bl=1,blk-1
+        read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
+        do mp=1,nmsh
+           read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) (x, ii=1,21) 
+        end do !mp
+     end do !bl
+  end if
   
   
   !************************************************************************      
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   !************************************************************************      
   
-27 continue
+  ! Read header and mesh point 1:
   read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
   read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) &
        mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
   
-  if(svblk.eq.1) then
+  if(svblk) then
+     ! Create output filename:
+     in = index(trim(infile),'.mdl',.true.)
+     write(outfile,'(A,I5.5,A)')infile(1:in-1)//'_',nmdl,trim(infile(in:))
+     
+     ! Open output file and write header and mesh point 1
+     open(unit=20,form='formatted',status='replace',file=trim(outfile))
      write(20,'(2x,I4,4x,I2,F7.3)') nmsh,nv,dov
      write(20,'(I6,1x,ES16.9)') nmdl,age
      write(20,'(ES13.6,4ES11.4,16ES11.3)') &
@@ -223,14 +235,17 @@ program listmdl
   
   mhe = 0.
   mco = 0.
-  do mp=2,nmsh !Number of Mesh points
+  
+  do mp=2,nmsh ! Number of mesh points
      read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13) &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
-     if(svblk.eq.1) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
+     if(svblk) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
      if(mhe.eq.0.0.and.hh.ge.0.1) mhe = mm
      if(mco.eq.0.0.and.hhe.ge.0.1) mco = mm
   end do
+  
+  close(10)
   
   m1  = mm
   r1  = rr
@@ -255,7 +270,7 @@ program listmdl
   !************************************************************************      
   !***   PRINT MODEL DETAILS
   !************************************************************************      
-  if(svblk.eq.0) then
+  if(.not.svblk) then
      write(6,'(A)')' Properties of this model:'
      write(6,*)''
      write(6,81)nmdl,nmsh,m1,age,zs
@@ -293,32 +308,41 @@ program listmdl
   !***   FINISH
   !************************************************************************      
   
-  if(svblk.eq.1) close(20)
-  svblk = 0 !Don't save the block (anymore)
-120 continue
-  if(nblk.eq.1) then
-     write(6,'(A,/)')'  Program finished'
-     stop
-  end if
-  write(6,*)''
-  write(6,'(A)')' You can:'
-  write(6,'(A)')'   0) Quit'
-  write(6,'(A)')'   1) Save this block'
-  write(6,'(A)')'   2) See another block'
-  write(6,'(A)')'   3) List all blocks again'
-  write(6,*)''
-  write(6,'(A27,$)')' What do you want to do ?  '
-  read*,ans
-  
-  if(ans.gt.3.or.ans.lt.0) goto 120
-  if(ans.eq.1) then 
-     open(unit=20,form='formatted',status='replace',file='pltmdl.mdl')
-     svblk = 1
+  if(svblk) then
+     close(20)
+     write(6,'(A)')' Output model saved in '//trim(outfile)//'.'
+     svblk = .false.  ! Stop saving the model block
   end if
   
-  if(ans.eq.1) goto 22
-  if(ans.eq.2) goto 20
-  if(ans.eq.3) goto 4
+  ans = -1
+  do while(ans.lt.0.or.ans.gt.3)
+     if(nblk.eq.1) then
+        write(6,'(A,/)')'  Program finished'
+        stop
+     end if
+     
+     write(6,*)''
+     write(6,'(A)')' You can:'
+     write(6,'(A)')'   0) Quit'
+     write(6,'(A)')'   1) See another block'
+     write(6,'(A)')'   2) List all blocks again'
+     write(6,'(A)')'   3) Save this block'
+     write(6,*)''
+     write(6,'(A27,$)')' What do you want to do ?  '
+     
+     read*,ans
+  end do
+  
+  select case(ans)
+  case(1)
+     goto 20
+  case(2)
+     goto 4
+  case(3)
+     svblk = .true.
+     goto 22
+  end select
+  
   
   
 999 continue
