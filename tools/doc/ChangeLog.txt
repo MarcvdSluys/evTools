@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   111: AstroFloyd, 22/07/2010
+      - listmod: stick things into subroutines
+   
    110: AstroFloyd, 22/07/2010
       - listmod: remove much archaic Fortran
     

@@ -25,17 +25,9 @@ program listmod
   use kinds
   use constants
   implicit none
-  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
-  real(double) :: mi,pr,phi,phis,e,f
-  real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2,x
-  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
-  real(double) :: mhe,mco,mhenv
-  real(double) :: dat1(8),dat2(24),dat(99)
-  integer :: kh,kp,jmod,jb,jin,nblk,io
-  integer :: narg,iargc,blk,bl,li,ans
-  character :: fname*99,findfile*99,outname*99
-  logical :: ex
+  integer :: narg,iargc,blk,ans,nblk
+  character :: fname*99,findfile*99
+
   
   call setconstants()
   
@@ -49,20 +41,134 @@ program listmod
      write(6,'(A)')'           syntax:  listmod <filename>'
      write(6,*)''
      write(6,'(A)')"  I'll look in the current directory for a *.mod file..."
-     fname=findfile('*.mod')
+     fname = findfile('*.mod')
   end if
+  write(6,'(/,A,/)')'  Reading file '//trim(fname)
   
   
   
   
   !***   LIST ALL STRUCTURE MODELS IN THE FILE AND THEIR MAIN PROPERTIES
+3 continue
+  call list_mod_file(fname,nblk)
+  
+  
+  
+  
+  
+  !***   CHOOSE STRUCTURE MODEL AND PRINT DETAILS
+
+49 continue  
+  blk = 0
+  do while(blk.lt.1.or.blk.gt.nblk)
+     write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',nblk,'):  '
+     read*,blk
+     if(blk.eq.0) then
+        write(6,*)''
+        stop
+     end if
+  end do
+  
+  call print_mod_details(fname,blk)
+  
+  
+  !***   FINISH
+  
+  ans = -1
+  do while(ans.gt.3.or.ans.lt.0)
+     if(nblk.eq.1) then
+        write(6,*)''
+        stop
+     end if
+     
+     write(6,*)''
+     write(6,'(A)')'  You can:'
+     write(6,'(A)')'    0) Quit'
+     write(6,'(A)')'    1) Choose another model'
+     write(6,'(A)')'    2) List all models again and choose another model'
+     write(6,'(A)')'    3) Write this model to another file'
+     write(6,*)''
+     write(6,'(A28,$)')'  What do you want to do ?  '
+     read*,ans
+  end do
+  
+  if(ans.eq.0)  then
+     close(10)
+     write(6,*)''
+     stop
+  end if
+  if(ans.eq.1) goto 49
+  if(ans.eq.2) then
+     close(10)
+     goto 3
+  end if
+  
+  
+  
+  
+  
+  !***   COPY MODEL TO DIFFERENT FILE
+  call copy_mod(fname,blk)
+  
+  
   
   write(6,*)''
-  write(6,'(A)')'  Reading file '//trim(fname)
-  write(6,*)''
+end program listmod
+!***********************************************************************************************************************************
+
+
+
+
+!***********************************************************************************************************************************
+subroutine error_reading_header(b)
+  implicit none
+  integer, intent(in) :: b
+  if(b.eq.0) then
+     write(6,'(A,/)')'  Error reading header line, aborting.'
+  else
+     write(6,'(A,I5,A,/)')'  Error reading header line in block',b,', aborting.'
+  end if
+  close(10)
+  stop
+end subroutine error_reading_header
+!***********************************************************************************************************************************
+
+
+!***********************************************************************************************************************************
+subroutine error_reading_block(l)
+  implicit none
+  integer, intent(in) :: l
+  if(l.eq.0) then
+     write(6,'(A,/)')'  Error reading (the first?) line of the data block, aborting.'
+  else
+     write(6,'(A,I5,A,/)')'  Error reading the data block, line',l,', aborting.'
+  end if
+  close(10)
+  stop
+end subroutine error_reading_block
+!***********************************************************************************************************************************
+
+
+
+!***********************************************************************************************************************************
+subroutine list_mod_file(fname, nblk)
+  use kinds
+  use constants
+  
+  implicit none
+  character,intent(in) :: fname*(*)
+  integer, intent(out) :: nblk
+  
+  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
+  real(double) :: mhe,mco,mi,pr,phi,phis,e,f
+  real(double) :: r1,l1,ts,hs,hes,zs,tc,hc,hec,zc
+  real(double) :: dat(99)
+  integer :: kh,kp,jmod,jb,jin,io
+  integer :: bl,li
+  
   open (unit=10,form='formatted',status='old',file=trim(fname))
-3 continue
-  rewind 10
+!3 continue
   
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
@@ -130,41 +236,45 @@ program listmod
           bl,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
      
      bl = bl+1
+     
   end do 
   
-  nblk = bl-1
+  close(10)
+  
   write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
+  nblk = bl-1
+  write(6,'(I5,A,/)')nblk,' blocks read.'
   
-  write(6,'(I5,A)')nblk,' blocks read.'
+  if(nblk.eq.0) stop
   
-  write(6,*)''
-  if(nblk.eq.0) then
-     close(10)
-     stop
-  end if
-  
-  
-  
-  
-  
-  !***   CHOOSE STRUCTURE MODEL
+end subroutine list_mod_file
+!***********************************************************************************************************************************
 
-49 continue  
-  blk = 0
-  do while(blk.lt.1.or.blk.gt.nblk)
-     write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',nblk,'):  '
-     read*,blk
-     if(blk.eq.0) then
-        write(6,*)''
-        stop
-     end if
-  end do
+
+
+!***********************************************************************************************************************************
+subroutine print_mod_details(fname,blk)
+  use kinds
+  use constants
+  
+  implicit none
+  character, intent(in) :: fname*(*)
+  integer, intent(in) :: blk
+  
+  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
+  real(double) :: mi,pr,phi,phis,e,f
+  real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2,x
+  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
+  real(double) :: mhe,mco,mhenv
+  integer :: kh,kp,jmod,jb,jin,io
+  integer :: bl,li
   
   
   !Read file, upto chosen model (blk-1)
-  rewind 10
+  open (unit=10,form='formatted',status='old',file=trim(fname))
   do bl=1,blk-1  !Block/model
      read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      if(io.ne.0) call error_reading_header(bl)
@@ -204,6 +314,10 @@ program listmod
      if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
      if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
   end do
+  
+  close(10)
+  
+  
   mhenv = m1 - mhe
   
   tc  = exp(lnt)
@@ -267,46 +381,29 @@ program listmod
   
   
   
+end subroutine print_mod_details
+!***********************************************************************************************************************************
+
+
+
+!***********************************************************************************************************************************
+subroutine copy_mod(fname,blk)
+  use kinds
+  implicit none
+  character, intent(in) :: fname*(*)
+  integer, intent(in) :: blk
   
-  
-  
-  
-  !***   FINISH
-  
-  ans = -1
-  do while(ans.gt.3.or.ans.lt.0)
-     if(nblk.eq.1) then
-        write(6,*)''
-        stop
-     end if
-     
-     write(6,*)''
-     write(6,'(A)')'  You can:'
-     write(6,'(A)')'    0) Quit'
-     write(6,'(A)')'    1) Choose another model'
-     write(6,'(A)')'    2) List all models again and choose another model'
-     write(6,'(A)')'    3) Write this model to another file'
-     write(6,*)''
-     write(6,'(A28,$)')'  What do you want to do ?  '
-     read*,ans
-  end do
-  
-  if(ans.eq.0)  then
-     close(10)
-     write(6,*)''
-     stop
-  end if
-  if(ans.eq.1) goto 49
-  if(ans.eq.2) goto 3
-  
-  
-  
-  
-  
-  !***   COPY MODEL TO DIFFERENT FILE
+  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
+  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
+  real(double) :: mi,pr,phi,phis,e,f,x
+  real(double) :: dat1(8),dat2(24)
+  integer :: kh,kp,jmod,jb,jin,io
+  integer :: bl,li
+  character :: outname*99
+  logical :: ex
   
   !Read blocks before the desired one:
-  rewind 10
+  open (unit=10,form='formatted',status='old',file=trim(fname))
   do bl=1,blk-1  !Block/model number
      read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
      if(io.ne.0) call error_reading_header(bl)
@@ -318,6 +415,7 @@ program listmod
   
   
   !Read desired block:
+  
   !Read header line:
   read(10,*,iostat=io)dat1,kh,kp,jmod,jb,jin
   if(io.ne.0) call error_reading_header(0)
@@ -343,42 +441,10 @@ program listmod
      if(io.ne.0) call error_reading_block(li)
      write(20,'(1X, 24ES23.15)')dat2
   end do !li
+  close(10)
   close(20)
   write(6,'(A)')'  Model written to '//trim(outname)//'.'
   
   
-  
-  
-  
-  close(10)
-  write(6,*)''
-end program listmod
-
-
-
-
-subroutine error_reading_header(b)
-  implicit none
-  integer, intent(in) :: b
-  if(b.eq.0) then
-     write(6,'(A,/)')'  Error reading header line, aborting.'
-  else
-     write(6,'(A,I5,A,/)')'  Error reading header line in block',b,', aborting.'
-  end if
-  close(10)
-  stop
-end subroutine error_reading_header
-
-
-subroutine error_reading_block(l)
-  implicit none
-  integer, intent(in) :: l
-  if(l.eq.0) then
-     write(6,'(A,/)')'  Error reading (the first?) line of the data block, aborting.'
-  else
-     write(6,'(A,I5,A,/)')'  Error reading the data block, line',l,', aborting.'
-  end if
-  close(10)
-  stop
-end subroutine error_reading_block
-
+end subroutine copy_mod
+!***********************************************************************************************************************************
