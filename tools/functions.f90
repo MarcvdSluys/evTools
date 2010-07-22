@@ -1,25 +1,25 @@
-!> functions.f90: Shared modules, functions and subroutines for the Eggleton plot package
-!! For functions and routines that need pgplot, see plotfunctions.f
+!> \file functions.f90  Shared modules, functions and subroutines for the Eggleton plot package
 !!
-!!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!!   
-!!   
-!!   This file is part of the eggleton-plot package.
-!!   
-!!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
-!!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!!   
-!!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!!   
-!!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
-!!   <http://www.gnu.org/licenses/>.
+!! For functions and routines that need pgplot, see plotfunctions.f
 !<
 
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!   
+!   
+!   This file is part of the eggleton-plot package.
+!   
+!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+!   by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!   
+!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!   
+!   You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!   <http://www.gnu.org/licenses/>.
+
+
 !***********************************************************************************************************************************
-!> module kinds:
-!! 
-!! Contains the integers double and dbl, which shall be used in (almost) all routines
+!> \brief Contains the integers double and dbl, which shall be used in (almost) all routines
 !! to provide the kind of a (currently double-precision) real variable type.
 !! 
 !! Variables can be declared using "real(double) :: "; constants can be defined as 
@@ -39,6 +39,7 @@ end module kinds
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
+!> \brief Contains data to compute magnitudes and colours from L,T,g
 module ubvdata
   use kinds
   implicit none
@@ -58,29 +59,32 @@ end module ubvdata
 
 
 !***********************************************************************************************************************************
+!> \brief Contains the 'constants' used in the eggletonplot package
 module constants
   use kinds
   implicit none
   save
   integer :: screen_dpi,screen_size_h,screen_size_v
+  integer :: colours(29), ncolours
   real :: scrsz,scrrat
   real(double) :: pi,tpi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
   real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*99,workdir*99,username*99,userID*9,hostname*99
   character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
-  logical :: student_mode
+  logical :: student_mode,white_bg
 end module constants
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
+!> \brief Define the 'constants' in the eggletonplot package
 subroutine setconstants
   use constants
   implicit none
   
   !ThinkPad, Gentoo with 1440x900:
-  !screen_size_h = 1436
+  !screen_size_h = 1435
   !screen_size_v = 860
   
   !Default:
@@ -88,6 +92,7 @@ subroutine setconstants
   screen_size_v = 700   !Vertical screen size (pixels)
   
   screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
+  white_bg = .true.      ! F: black background on screen, T: white
   
   
   pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
@@ -125,6 +130,11 @@ subroutine setconstants
   cursorright = char(27)//'[1C' !Makes the cursor move right one space
   cursorleft = char(27)//'[1D' !Makes the cursor move left one space
   
+  
+  !Line colours:
+  ncolours = 13                                            ! Number of (line) colours used to distinguish tracks.  Default: 13
+  colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  ! Use black as last resort
+  
 end subroutine setconstants
 !***********************************************************************************************************************************
 
@@ -136,11 +146,14 @@ end subroutine setconstants
 
 
 !***********************************************************************************************************************************
+!> \brief Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
+!! \see http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
+!! 
+!! Needs one of:
+!! - UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
+!! - UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
+!<
 subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
-  !Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
-  !  See: http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
-  !  UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
-  !  UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
   
   use kinds
   use ubvdata
@@ -198,11 +211,13 @@ end subroutine lt2ubv
 
 
 !***********************************************************************************************************************************
-function getos() !Determine the operating system type: 1-Linux, 2-MacOSX
+!> \brief Determine the operating system type: 1-Linux, 2-MacOSX
+function getos()
   use constants
   implicit none
   integer :: i,system,getos
   character :: ostype*25
+  
   i = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
   read(16,'(A)')ostype
@@ -214,6 +229,10 @@ end function getos
 
 
 !***********************************************************************************************************************************
+!> \brief Find a file that matches match in the current directory
+!! \param match      Match string
+!! \retval findfile  File name (if found)
+!<
 function findfile(match)
   use constants
   implicit none
@@ -271,15 +290,14 @@ end function findfile
 
 
 !***********************************************************************************************************************************
+!> \brief Find files that match match in the current directory
+!! \param match    Search string to match
+!! \param nff      Maximum number of files to return
+!! \param all      0-select manually from list, 1-always return all files in list
+!! \retval fnames  Array that contains the files found; make sure it has the same length as the array in the calling programme
+!! \retval nf      The actual number of files returned in fnames ( = min(number found, nff))
+!<
 subroutine findfiles(match,nff,all,fnames,nf)  
-  !Input:
-  !  match:   search string to match
-  !  nff:     maximum number of files to return
-  !  all:     0-select manually from list, 1-always return all files in list
-  !Output:
-  !  fnames:  array that contains the files found; make sure it has the same length as the array in the calling programme
-  !  nf:      the actual number of files returned in fnames ( = min(number found, nff))
-  
   use constants
   implicit none
   integer :: i,j,k,fnum,nf,nff,system,all
@@ -360,9 +378,11 @@ end subroutine findfiles
 
 
 !***********************************************************************************************************************************
-subroutine rswap(x,y) !Swap two real numbers
+!> \brief Swap two real numbers
+subroutine rswap(x,y)
   implicit none
-  real :: x,y,z
+  real, intent(inout) :: x,y
+  real :: z
   z = x
   x = y
   y = z
@@ -374,8 +394,13 @@ end subroutine rswap
 
 
 !***********************************************************************************************************************************
-function find_index(v,arr,narr)  !Double precision
-  !Finds index of value v in monotonously increasing or decreasing array arr of length narr
+!> \brief Finds index of value v in monotonously increasing or decreasing array arr of length narr
+!! \param v     Value to match to arr (double)
+!! \param arr   Array to match v to (double)
+!! \param narr  Size of arr (integer)
+!! \retval find_index  Index for value v in array arr (integer)
+!<
+function find_index(v,arr,narr)
   use kinds
   implicit none
   integer :: find_index,narr,i,iLow,iHigh
@@ -402,14 +427,13 @@ end function find_index
 
 
 !***********************************************************************************************************************************
-subroutine locate(arr,narr,v,i)  !Double precision
-  !Input: 
-  !  arr: monotonic array
-  !  narr:  length of arr
-  !  v:  value to look for
-  !  Output:
-  !  i:  returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
-  
+!> \brief 
+!! \param arr   monotonic array (double)
+!! \param narr  length of arr (integer)
+!! \param v     value to look for (double)
+!! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
+!<
+subroutine locate(arr,narr,v,i)
   use kinds
   implicit none
   integer :: i,narr,iLow,iMid,iHigh
@@ -439,13 +463,13 @@ end subroutine locate
 
 
 !***********************************************************************************************************************************
-subroutine locater(rarr,narr,rv,i)  !Single precision
-  !Input: 
-  !  rarr:  monotonic array
-  !  narr:  length of rarr
-  !  rv:    value to look for
-  !  Output:
-  !  i:     returned value, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
+!> \brief Single-precision version of locate()
+!! \param rarr  monotonic array
+!! \param narr  length of rarr
+!! \param rv    value to look for
+!! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
+!<
+subroutine locater(rarr,narr,rv,i)
   
   use kinds
   implicit none
@@ -462,7 +486,8 @@ end subroutine locater
 
 
 !***********************************************************************************************************************************
-subroutine rindex(narr,rarr,indx)  !Return a sorted index indx of array rarr of length n - single precision
+!> \brief Return a sorted index indx of array rarr of length n - single precision interface for dindex
+subroutine rindex(narr,rarr,indx)
   use kinds
   implicit none
   integer :: narr,indx(narr)
@@ -476,7 +501,8 @@ end subroutine rindex
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
-subroutine dindex(narr,arr,ind)  !Return a sorted index ind of array arr of length narr - double precision
+!> \brief Return a sorted index ind of array arr of length narr - double precision
+subroutine dindex(narr,arr,ind)
   use kinds
   implicit none
   integer, parameter :: m=7,nstack=50
@@ -569,7 +595,8 @@ end subroutine dindex
 
 
 !***********************************************************************************************************************************
-subroutine polint(xa,ya,n,x,y,dy)  !Single precision
+!> \brief Interpolate - single precision
+subroutine polint(xa,ya,n,x,y,dy)
   implicit none
   integer, parameter :: nmax=10
   integer :: n
@@ -617,7 +644,8 @@ end subroutine polint
 
 
 !***********************************************************************************************************************************
-subroutine polintd(xa,ya,n,x,y,dy)  !Double precision
+!> \brief Interpolate - double precision
+subroutine polintd(xa,ya,n,x,y,dy)
   use kinds
   implicit none
   integer, parameter :: nmax=10
@@ -666,6 +694,7 @@ end subroutine polintd
 
 
 !***********************************************************************************************************************************
+!> \brief NRF random-number generator
 function ran1(seed)
   implicit none
   integer, parameter :: ia=16807,im=2147483647,iq=127773,ir=2836,ntab=32,ndiv=1+(im-1)/ntab
@@ -705,16 +734,9 @@ end function ran1
 subroutine spline(x,y,n,yp1,ypn,y2)
   use kinds
   implicit none
-  !integer, parameter :: nmax=1000
   integer :: n,i,k
   real(double) :: yp1,ypn,x(n),y(n),y2(n)
   real(double) :: p,qn,sig,un,u(n)
-  
-  !if(n.gt.nmax) then
-  !   write(0,'(/,A)')'  ERROR: spline():  n > nmax'
-  !   write(0,'(A,/)')'  Aborting...'
-  !   stop
-  !end if
   
   if(yp1.gt.0.99d30) then
      y2(1) = 0.
@@ -781,8 +803,9 @@ end subroutine splint
 
 
 
-!********************************************************************************      
-function a2j(m1,m2,a)  !a to Orbital angular momentum
+!***********************************************************************************************************************************
+!> \brief Convert orbital separation to orbital angular momentum
+function a2j(m1,m2,a)
   use kinds
   use constants
   implicit none
@@ -791,8 +814,9 @@ function a2j(m1,m2,a)  !a to Orbital angular momentum
 end function a2j
 !***********************************************************************************************************************************
 
-!********************************************************************************      
-function j2a(m1,m2,j)  !Orbital angular momentum to a
+!***********************************************************************************************************************************
+!> \brief Convert orbital angular momentum to orbital separation
+function j2a(m1,m2,j)
   use kinds
   use constants
   implicit none
@@ -803,8 +827,9 @@ end function j2a
 
 
 
-!********************************************************************************      
-function p2j(m1,m2,p)  !P to Orbital angular momentum, all in cgs units
+!***********************************************************************************************************************************
+!> \brief Convert orbital period to orbital angular momentum, all in cgs units
+function p2j(m1,m2,p)
   use kinds
   use constants
   implicit none
@@ -814,8 +839,9 @@ function p2j(m1,m2,p)  !P to Orbital angular momentum, all in cgs units
 end function p2j
 !***********************************************************************************************************************************
 
-!********************************************************************************      
-function j2p(m1,m2,j)  !Orbital angular momentum to P, all in cgs units
+!***********************************************************************************************************************************
+!> \brief Convert orbital angular momentum to orbital period, all in cgs units
+function j2p(m1,m2,j)
   use kinds
   use constants
   implicit none
@@ -827,8 +853,9 @@ end function j2p
 
 
 
-!********************************************************************************      
-function p2a(mtot,p)  !P, a, mtot in cgs units
+!***********************************************************************************************************************************
+!> \brief Convert orbital period to orbital separation, in cgs units
+function p2a(mtot,p)
   use kinds
   use constants
   implicit none
@@ -837,8 +864,9 @@ function p2a(mtot,p)  !P, a, mtot in cgs units
 end function p2a
 !***********************************************************************************************************************************
 
-!********************************************************************************      
-function a2p(mtot,a)  !P, a, mtot in cgs units
+!***********************************************************************************************************************************
+!> \brief Convert orbital separation to orbital period, in cgs units
+function a2p(mtot,a)
   use kinds
   use constants
   implicit none
@@ -849,7 +877,10 @@ end function a2p
 
 
 !***********************************************************************************************************************************
-function a2rl(m1,m2,a)  !m1 and m2 in the same units, Rl and a in the same units
+!> \brief Convert orbital separation to Roche-lobe radius
+!! m1 and m2 in the same units, Rl and a in the same units
+!<
+function a2rl(m1,m2,a)
   use kinds
   use constants
   implicit none
@@ -862,7 +893,10 @@ end function a2rl
 
 
 !***********************************************************************************************************************************
-function rl2a(m1,m2,rl1)  !m1 and m2 in the same units, Rl and a in the same units
+!> \brief Convert Roche-lobe radius to orbital separation
+!! m1 and m2 in the same units, Rl and a in the same units
+!<
+function rl2a(m1,m2,rl1)
   use kinds
   use constants
   implicit none
@@ -874,7 +908,9 @@ end function rl2a
 
 
 !***********************************************************************************************************************************
-function p2rl(m1,m2,p)  !All in cgs units
+!> \brief Convert orbital period to Roche-lobe radius, all in cgs units
+!<
+function p2rl(m1,m2,p)
   use kinds
   implicit none
   real(double) :: p2rl,m1,m2,p,a,p2a,a2rl
@@ -885,7 +921,9 @@ end function p2rl
 
 
 !***********************************************************************************************************************************
-function rl2p(m1,m2,rl1)  !All in cgs units
+!> \brief Convert Roche-lobe radius to orbital period, all in cgs units
+!<
+function rl2p(m1,m2,rl1)
   use kinds
   implicit none
   real(double) :: rl2p,m1,m2,rl1,a,a2p,rl2a
@@ -898,7 +936,8 @@ end function rl2p
 
 
 !***********************************************************************************************************************************
-subroutine quit_program(message)  !Print a message and quit
+!> \brief Print an exit  message and stop the program
+subroutine quit_program(message)
   implicit none
   character :: message*(*)
   integer :: len
@@ -913,13 +952,17 @@ end subroutine quit_program
 
 
 !***********************************************************************************************************************************
-subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)  !Count the number of points in each bin (1D), taken from analyse_mcmc
-  ! x - input: data, n points
-  ! norm - input: normalise (1) or not (0)
-  ! nbin - input: number of bins
-  ! xmin, xmax - in/output: set xmin=xmax to auto-determine
-  ! xbin, ybin - output: binned data (x, y).  The x values are the left side of the bin!
-  
+!> \brief Bin data in one dimension, by counting data points in each bin
+!! \param n      Size of data array
+!! \param x      Input data array
+!! \param norm   Normalise (1) or not (0)
+!! \param nbin   Number of bins
+!! \param xmin1  Minimum x value (left side of first bin (in/output: set xmin=xmax to auto-determine)
+!! \param xmax1  Maximum x value (right side of last bin (in/output: set xmin=xmax to auto-determine)
+!! \retval xbin  Binned data.  The x values are the left side of the bin!
+!! \retval ybin  Binned data.
+!<  
+subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)
   implicit none
   integer :: i,k,n,nbin,norm
   real :: x(n),xbin(nbin+1),ybin(nbin+1),xmin,xmax,dx,xmin1,xmax1
@@ -960,7 +1003,8 @@ end subroutine bin_data_1d
 
 
 !***********************************************************************************************************************************
-function time_stamp(os)  !Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+!> \brief Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+function time_stamp(os)
   use kinds
   implicit none
   real(double) :: time_stamp
@@ -983,7 +1027,8 @@ end function time_stamp
 
 
 !***********************************************************************************************************************************
-subroutine set_PGPS_title(PSfile,PStitle)  !Set the title in a Postscript file generated by PGPlot
+!> \brief Set the title in a Postscript file generated by PGPlot
+subroutine set_PGPS_title(PSfile,PStitle)
   implicit none
   integer :: status,system
   character :: PSfile*(*),PStitle*(*),tempfile*99
@@ -1018,13 +1063,15 @@ subroutine eggletonplot_settings()
   character :: filename*99
   
   !Define namelist, file name
-  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi
+  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
   filename = trim(homedir)//'/.eggletonplot'
   inquire(file=trim(filename), exist=ex)
   
   u = 10
   
   if(ex) then
+     
+     ! Read the settings file:
      open(unit=u,form='formatted',status='old',action='read',position='rewind',file=trim(filename),iostat=io)
      if(io.ne.0) then
         write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for reading.'
@@ -1036,7 +1083,6 @@ subroutine eggletonplot_settings()
      if(io.eq.0) then
         call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
      else
-        
         write(6,*)
         write(0,'(A)')'  An error occured when reading the settings file '//trim(filename)// &
              ', using default settings.'
@@ -1053,15 +1099,17 @@ subroutine eggletonplot_settings()
      write(6,'(A)')'  please edit it to set your preferences.'
      write(6,*)
      
-     open(unit=u,form='formatted',status='new',action='write',position='rewind',file=trim(filename),iostat=io)
-     if(io.ne.0) then
-        write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
-        return
-     end if
-     write(u, nml=screen_settings, iostat=io)
-     close(u)
-     if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   end if
+  
+  ! Write settings file (do this always, to update in case variables are added):
+  open(unit=u,form='formatted',status='unknown',action='write',position='rewind',file=trim(filename),iostat=io)
+  if(io.ne.0) then
+     write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
+     return
+  end if
+  write(u, nml=screen_settings, iostat=io)
+  close(u)
+  if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
   
   call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
   
