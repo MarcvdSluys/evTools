@@ -1,7 +1,7 @@
 !> \file listmdl.f90  Lists the data contained in a *.mdl? file
 
 
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.
@@ -20,17 +20,8 @@ program listmdl
   use constants
   implicit none
   
-  real :: age,dov,x,vk,mm1,be,be1
-  integer :: nmsh,nv,nmdl
-  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
-  real :: ll,eeth,eenc,eenu,ss,uuint
-  real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
-  real :: hc,hec,cc,nc,oc,nec,mgc,zc
-  real :: hs,hes,cs,ns,os,nes,mgs,zs
-  real :: rhoc,pc,ethc,enuc,encc
-  
-  integer :: ii,bl,mp,nblk,blk,ans,in,io
-  character :: findfile*99,infile*99,outfile*99
+  integer :: nblk,blk,ans
+  character :: findfile*99,infile*99
   logical :: svblk
   
   call setconstants()
@@ -46,13 +37,111 @@ program listmdl
      
   
   
+4 continue
+  call list_mdl_models(infile,nblk)
+  
+  
+  
+  !************************************************************************      
+  !***   CHOOSE STRUCTURE MODEL
+  !************************************************************************      
+  
+20 continue
+  if(nblk.eq.1) then
+     blk = 1 
+  else  
+     
+     blk = 0
+     do while(blk.lt.1.or.blk.gt.nblk)
+        write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
+        read*,blk
+        if(blk.eq.0) then
+           write(6,'(A,/)')'  Program finished'
+           stop
+        end if
+     end do
+     
+     
+  end if
+  
+  
+  
+22 continue
+  call print_mdl_details(infile,blk,svblk)
+  
+  
+  
+  
+  !************************************************************************      
+  !***   FINISH
+  !************************************************************************      
+  
+  ans = -1
+  do while(ans.lt.0.or.ans.gt.3)
+     if(nblk.eq.1) then
+        write(6,'(A,/)')'  Program finished'
+        stop
+     end if
+     
+     write(6,*)''
+     write(6,'(A)')' You can:'
+     write(6,'(A)')'   0) Quit'
+     write(6,'(A)')'   1) See another structure model'
+     write(6,'(A)')'   2) List all models again'
+     write(6,'(A)')'   3) Save this model'
+     write(6,*)''
+     write(6,'(A27,$)')' What do you want to do ?  '
+     
+     read*,ans
+  end do
+  
+  select case(ans)
+  case(1)
+     goto 20
+  case(2)
+     goto 4
+  case(3)
+     svblk = .true.
+     goto 22
+  end select
+  
+  
+  
+  close(10)
+  write(6,'(A,/)')'  Program finished'
+  
+end program listmdl
+!***********************************************************************************************************************************
+
+
+
+
+
+!***********************************************************************************************************************************
+subroutine list_mdl_models(infile,nblk)
+  use constants
+  implicit none
+  
+  character, intent(in) :: infile*99
+  integer, intent(out) :: nblk
+  
+  integer :: nmsh,nv,nmdl
+  integer :: bl,mp,io
+  real :: age,dov,vk,mm1,be,be1
+  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
+  real :: ll,eeth,eenc,eenu,ss,uuint
+  real :: m1,r1,l1,ts,tc,mhe,mco
+  real :: hc,hec,cc,oc,zc
+  real :: hs,hes,cs,os,zs
+  real :: rhoc
+  
   
   !************************************************************************      
   !***   READ ALL STRUCTURE MODELS IN THE FILE AND DISPLAY MAIN PROPERTIES
   !************************************************************************      
   
+  
   write(6,*)''
-4 continue
   write(6,'(A)')'  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
@@ -164,32 +253,36 @@ program listmdl
   end if
   
   
+end subroutine list_mdl_models
+!***********************************************************************************************************************************
+
+
+
+
+
+
+
+
+!***********************************************************************************************************************************
+subroutine print_mdl_details(infile,blk,svblk)
+  use constants
+  implicit none
+  character, intent(in) :: infile*99
+  integer,intent(in) :: blk
+  logical, intent(inout) :: svblk
   
+  real :: age,dov,x
+  integer :: nmsh,nv,nmdl
+  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
+  real :: ll,eeth,eenc,eenu,ss,uuint
+  real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
+  real :: hc,hec,cc,nc,oc,nec,mgc,zc
+  real :: hs,hes,cs,ns,os,nes,mgs,zs
+  real :: rhoc,pc,ethc,enuc,encc
   
+  integer :: ii,bl,mp,in,io
+  character :: outfile*99
   
-  !************************************************************************      
-  !***   CHOOSE STRUCTURE MODEL
-  !************************************************************************      
-  
-20 continue
-  if(nblk.eq.1) then
-     blk = 1 
-  else  
-     
-     blk = 0
-     do while(blk.lt.1.or.blk.gt.nblk)
-        write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
-        read*,blk
-        if(blk.eq.0) then
-           write(6,'(A,/)')'  Program finished'
-           stop
-        end if
-     end do
-     
-     
-  end if
-  
-22 continue
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,dov
@@ -355,55 +448,15 @@ program listmdl
         ',  Ne: ',es10.4,',  Mg: ',es10.4,',  Z: ',es10.4)
   
   
-  
-  
-  
-  
-  
-  
-  !************************************************************************      
-  !***   FINISH
-  !************************************************************************      
-  
   if(svblk) then
      close(20)
      write(6,'(A)')' Output model saved in '//trim(outfile)//'.'
      svblk = .false.  ! Stop saving the model block
   end if
   
-  ans = -1
-  do while(ans.lt.0.or.ans.gt.3)
-     if(nblk.eq.1) then
-        write(6,'(A,/)')'  Program finished'
-        stop
-     end if
-     
-     write(6,*)''
-     write(6,'(A)')' You can:'
-     write(6,'(A)')'   0) Quit'
-     write(6,'(A)')'   1) See another structure model'
-     write(6,'(A)')'   2) List all models again'
-     write(6,'(A)')'   3) Save this model'
-     write(6,*)''
-     write(6,'(A27,$)')' What do you want to do ?  '
-     
-     read*,ans
-  end do
-  
-  select case(ans)
-  case(1)
-     goto 20
-  case(2)
-     goto 4
-  case(3)
-     svblk = .true.
-     goto 22
-  end select
   
   
-  
-  close(10)
-  write(6,'(A,/)')'  Program finished'
-  
-end program listmdl
+end subroutine print_mdl_details
+!***********************************************************************************************************************************
+
 
