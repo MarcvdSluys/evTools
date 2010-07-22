@@ -2,7 +2,7 @@
   ChangeLog for the eggleton-tools tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
-   114-115: AstroFloyd, 22/07/2010
+   114-116: AstroFloyd, 22/07/2010
       - listmdl: remove some archaic Fortran
    
    112: AstroFloyd, 22/07/2010

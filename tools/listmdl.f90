@@ -1,7 +1,6 @@
-! Lists the data contained in a mdl* file
-! Lines are longer than 72 chars, so add --wide (lf) or -132 (ifort) to compile
-! AF
-!
+!> \file listmdl.f90  Lists the data contained in a *.mdl? file
+
+
 !   Copyright 2002-2009 AstroFloyd - astrofloyd.org
 !   
 !   
@@ -15,6 +14,8 @@
 !   
 !   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
+
+!> \brief  Lists the data contained in a *.mdl? file
 program listmdl
   use constants
   implicit none
@@ -28,9 +29,9 @@ program listmdl
   real :: hs,hes,cs,ns,os,nes,mgs,zs
   real :: rhoc,pc,ethc,enuc,encc
   
-  integer ii,bl,mp,nblk,blk,ans,in
-  character findfile*99,infile*99,outfile*99
-logical :: svblk
+  integer :: ii,bl,mp,nblk,blk,ans,in,io
+  character :: findfile*99,infile*99,outfile*99
+  logical :: svblk
   
   call setconstants()
   
@@ -55,19 +56,35 @@ logical :: svblk
   write(6,'(A)')'  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
-  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,dov
+  if(io.ne.0) then
+     write(0,'(A,/)')'1  Error reading first line (header) of the file, aborting...'
+     close(10)
+     stop
+  end if
+
   write(6,*)''
   write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
   
   mp = 1  !Silence compiler warnings
-  do bl=1,999
+  bl = 1
+  block: do 
      if(mod(bl,25).eq.0) then
         write(6,*)''
         write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
              '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
      end if
-     read(10,'(I6,1x,ES16.9)',err=12,end=15) nmdl,age
+     read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
+     if(io.lt.0) then
+        write(0,'(A,I5,A)')'  Model',bl,' seems incomplete, skipping...'
+        exit block !EOF
+     end if
+     if(io.gt.0) then  !Error
+        write(0,'(A,I5,A,/)')'2  Error reading first line (header) of model',bl,', aborting...'
+        close(10)
+        stop
+     end if
      
      
      mhe = 0.
@@ -77,9 +94,20 @@ logical :: svblk
      be = 0.
      be1 = 0.
      
-     do mp=1,nmsh
-        read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=15) &
+     mesh: do mp=1,nmsh
+        read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
              mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+        !print*,bl,mp,io
+        if(io.lt.0) then
+           write(0,'(A,I5,A)')'  Model',bl,' seems incomplete, skipping...'
+           exit block !EOF
+        end if
+        if(io.gt.0) then  !Error
+           write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'
+           close(10)
+           stop
+        end if
+        
         if(mp.eq.1) then
            tc  = tt
            hc  = hh
@@ -113,40 +141,21 @@ logical :: svblk
         end if
         
         mm1 = mm !Remember the previous value
-     end do !do mp=1,nmsh
+     end do mesh !do mp=1,nmsh
      
      vk = vk/((m1-mhe)*r1**2)   
      write(6,'(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)') &
           bl,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk !,be,be1 !,bms,p,p1
      
-  end do !bl
+     bl = bl+1
+  end do block
   
   
-  
-11 continue
-  write(6,'(A)')'  Error reading first line of file, aborting...'
-  close(10)
-  write(6,'(A,/)')'  Program finished'
-  stop
-  
-12 continue
-  write(6,'(A)')'  Error reading first line of block, aborting...'
-  close(10)
-  write(6,'(A,/)')'  Program finished'
-  stop
-  
-13 continue
-  write(*,*)'  Error reading block',bl-1,'line',mp-1,', aborting...'
-  close(10)
-  write(6,'(A,/)')'  Program finished'
-  stop
-  
-15 continue
   close(10)
   
   nblk = bl-1
   write(6,*)''
-  write(*,*)' EOF reached,',nblk,' blocks read.'
+  write(*,*)' EOF reached,',nblk,' structure models read.'
   write(6,*)''
   
   if(nblk.eq.0) then
@@ -183,14 +192,36 @@ logical :: svblk
 22 continue
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
-  read(10,'(2x,I4,4x,I2,F7.3)',err=11,end=11) nmsh,nv,dov
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,dov
+  if(io.ne.0) then
+     write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
+     close(10)
+     stop
+  end if
   
   !Read file, upto chosen model (blk-1)
   if(blk.ne.1) then
      do bl=1,blk-1
-        read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
+        read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
+        if(io.ne.0) then
+           write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
+           close(10)
+           stop
+        end if
+
         do mp=1,nmsh
-           read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) (x, ii=1,21) 
+           read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
+           
+           if(io.ne.0) then  !Error/EOF
+              close(10)
+              if(io.lt.0) then
+                 write(6,'(A,/)')'  Program finished'  !EOF
+              else
+                 write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+              end if
+              stop
+           end if
+           
         end do !mp
      end do !bl
   end if
@@ -200,10 +231,28 @@ logical :: svblk
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   !************************************************************************      
   
-  ! Read header and mesh point 1:
-  read(10,'(I6,1x,ES16.9)',err=12,end=12) nmdl,age
-  read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13,end=999) &
+  ! Read header:
+  read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
+  if(io.ne.0) then
+     write(0,'(A,I5,A,/)')'5  Error reading first line (header) of model',blk,', aborting...'
+     close(10)
+     stop
+  end if
+  
+  ! Read mesh point 1:
+  read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
        mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+  
+  if(io.ne.0) then  !Error/EOF
+     close(10)
+     if(io.lt.0) then
+        write(6,'(A,/)')'  Program finished'  !EOF
+     else
+        write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+     end if
+     stop
+  end if
+  
   
   if(svblk) then
      ! Create output filename:
@@ -237,8 +286,16 @@ logical :: svblk
   mco = 0.
   
   do mp=2,nmsh ! Number of mesh points
-     read(10,'(ES13.6,4ES11.4,16ES11.3)',err=13) &
+     read(10,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+     
+     if(io.ne.0) then  ! EOF/read error
+        close(10)
+        write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'
+        stop
+     end if
+     
+
      if(svblk) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
      if(mhe.eq.0.0.and.hh.ge.0.1) mhe = mm
@@ -324,9 +381,9 @@ logical :: svblk
      write(6,*)''
      write(6,'(A)')' You can:'
      write(6,'(A)')'   0) Quit'
-     write(6,'(A)')'   1) See another block'
-     write(6,'(A)')'   2) List all blocks again'
-     write(6,'(A)')'   3) Save this block'
+     write(6,'(A)')'   1) See another structure model'
+     write(6,'(A)')'   2) List all models again'
+     write(6,'(A)')'   3) Save this model'
      write(6,*)''
      write(6,'(A27,$)')' What do you want to do ?  '
      
@@ -345,7 +402,6 @@ logical :: svblk
   
   
   
-999 continue
   close(10)
   write(6,'(A,/)')'  Program finished'
   
