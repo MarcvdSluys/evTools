@@ -1,7 +1,7 @@
 !dat2plt:  Reads some data file with a stellar-evolution model from some code and saves the data in plt format
 ! taken from listplt, 03/02/2009
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

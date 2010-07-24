@@ -1,6 +1,6 @@
 !Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

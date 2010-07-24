@@ -1,6 +1,6 @@
 ! grid.f, see what a log grid of models in Eggletons code will result in
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

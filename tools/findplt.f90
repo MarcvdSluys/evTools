@@ -3,7 +3,7 @@
 !Line width > 72 chars, so compile with --wide or -extend_source or whatever is needed
 !Needs the file ~/usr/lib/UBVRI.Kur to calculate magnitudes and colours (see line 15)
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

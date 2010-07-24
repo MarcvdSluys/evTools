@@ -1,7 +1,7 @@
 !plt2obs.f:  Convert code output in plt-file to observables (V, U-B, B-V, V-R, R-I)
 !            Based on Kurucz' atmosphere models, needs UBVRI.Kur
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

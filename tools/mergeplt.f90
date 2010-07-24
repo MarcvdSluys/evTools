@@ -2,7 +2,7 @@
 ! This program merges data from the plot output file from Eggletons code, the TWIN version
 ! AF 21-01-2004
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

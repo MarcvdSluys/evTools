@@ -1,6 +1,6 @@
 ! getgrid.f, Find the parameters you need to get a grid with n values between x1 and x2
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

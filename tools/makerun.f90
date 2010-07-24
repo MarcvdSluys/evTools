@@ -1,7 +1,7 @@
 ! Reads, optinally changes and (over!)writes an init.run (fort.23) input file
 ! AF January 21, 2004
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the eggleton-tools package.

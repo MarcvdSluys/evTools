@@ -1,6 +1,6 @@
 !Convert a .plt? file to a .dat file with selected columns
 !
-!   Copyright 2002-2009 AstroFloyd - astrofloyd.org
+!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
 !   This file is part of the twin-tools package.
