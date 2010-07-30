@@ -1,5 +1,7 @@
 !> plotmdl.f90  Plots the data contained in a mdl* file
 
+! AF, 19-05-2005
+
 !   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   

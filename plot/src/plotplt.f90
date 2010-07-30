@@ -1,5 +1,7 @@
 !> \file plotplt.f90  Plots the data contained in a .plt* file, highlights selected points
 
+!  AF, 19-04-2006
+
 !   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   
@@ -792,6 +794,7 @@ program plotplt
      if(drawlines.eq.0) call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),1)
      if(drawlines.ge.1) call pgline(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)))
      if(drawlines.eq.2) call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),20)
+     if(plot.eq.7) call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)  !Draw end of track for auto-update
   end do
   call pgsci(1)
   

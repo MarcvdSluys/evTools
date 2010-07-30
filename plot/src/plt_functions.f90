@@ -162,7 +162,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(139) = 'M\dZAMS\u - M (M\d\(2281)\u)'
   pglabels(140) = '(M\dZAMS\u - M)/M\dZAMS\u'
   
-  defvar(101:140) = 1
+  pglabels(141) = 'GMM\denv\u/R (10\u40\d erg)'
+  
+  defvar(101:141) = 1
   
   
   !Special plots:
@@ -304,6 +306,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(138) = 'dMRmrlk_dMRmr'
   asclabels(139) = 'Mzams-M'
   asclabels(140) = 'Mzams-M_Mzams'
+  
+  asclabels(141) = 'GMM_R'
   
   
   
@@ -550,7 +554,7 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   81: Qconv                                                                            '
   write(6,'(A)')'                                                                                        ' 
   write(6,'(A)')'  Derived variables:                                                                    '
-  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg                    '  
+  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141 GMMenv/R       '  
   write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
   write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
@@ -835,6 +839,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
   dat(139,1:n) = dat(4,1) - dat(4,1:n)                                       !M_zams - M
   dat(140,1:n) = dat(139,1:n)/dat(4,1)                                       !(M_zams - M)/M_zams
+  !dat(140,1:n) = dat(139,1:n)/dat(4,1:n)                                       !(M_zams - M)/M
+  dat(141,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(8,1:n)*r0*1.d40)     !G*M*M_env/R / 1e40
   
   
   !Colours

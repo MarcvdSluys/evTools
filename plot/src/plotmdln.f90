@@ -1,5 +1,7 @@
 !> \file plotmdln.f90   Plots the data contained in star.mdl, for some or all (n) structure models in the file, and for ONE set of variables
 
+! AF, 19-05-2005
+
 !   Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !   
 !   

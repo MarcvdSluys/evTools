@@ -300,13 +300,15 @@ program plotmod
   ymin = ymin - x
   ymax = ymax + x
 
-  hmp = 0
+  hmp = 999
   !      if(vx.eq.1) then
-111 write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',kh,'): '
-  read*,hmp
-  if(hmp.gt.kh) goto 111
-  if(hmp.lt.1) hmp=0
-  !      end if
+  do while(hmp.gt.kh)
+     write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',kh,'): '
+     read*,hmp
+     !if(hmp.gt.kh) goto 111
+     if(hmp.lt.1) hmp=0
+     !      end if
+  end do
   
   !Add block number to plot title:
   write(title,'(A,I6)')trim(title),blk
