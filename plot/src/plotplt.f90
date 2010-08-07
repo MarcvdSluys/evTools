@@ -35,6 +35,8 @@ program plotplt
   integer, allocatable :: n(:), strmdls(:,:),hp(:,:),nhp(:)
   real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
   real(double), allocatable :: dat(:,:,:),datf(:,:)
+  real(double) :: mint,maxt,dt
+  logical :: logt
   
   real :: yy1(nmax),minx,dist,mindist
   real :: x,y,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
@@ -184,8 +186,19 @@ program plotplt
   
   if(vx.eq.201.or.hrd.eq.1) then  !HRD
      hrd = 1
+     pl = 1
+     mint = minval( dat(pl,10,1:n(pl)) )
+     maxt = maxval( dat(pl,10,1:n(pl)) )
+     dt = 2*(maxt-mint)/(maxt+mint)  !Relative dt
+     logt = .true.
+     if(dt.lt.1.0_dbl) logt = .false.  ! No logarithmic axis for small T intervals
+     
      do pl=1,npl
-        xx(pl,1:n(pl)) = real(log10(abs(dat(pl,10,1:n(pl) ))))
+        if(logt) then
+           xx(pl,1:n(pl)) = real(log10(abs(dat(pl,10,1:n(pl) ))))
+        else
+           xx(pl,1:n(pl)) = real(dat(pl,10,1:n(pl) ))
+        end if
         yy(pl,1:n(pl)) = real(log10(abs(dat(pl, 9,1:n(pl) ))))
      end do
      pglx = trim(pglabels(10))
@@ -193,7 +206,8 @@ program plotplt
      asclx = 'HRD'
      ascly = 'HRD'
      vy = 0
-     lgx = 1
+     lgx = 0
+     if(logt) lgx = 1
      lgy = 1
      goto 50
   end if
@@ -770,8 +784,8 @@ program plotplt
   call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   if(nf.eq.1 .and. plot.eq.7) then
      f = 1
-     write(title1,'(A5,ES12.4,3(A,F6.2),A,ES11.3)')'Age:',dat(f,2,n(f)),' M:',dat(f,4,n(f)),' Mhe:',dat(f,5,n(f)), &
-          ' Mco:',dat(f,6,n(f)),' Porb:',dat(f,28,n(f))
+     write(title1,'(A,I5,A,ES11.4,A,ES9.2,3(A,F6.2),A,ES9.2)') 'Model:',nint(dat(f,1,n(f))),',  age:',dat(f,2,n(f)), &
+          ',  dt:',dat(f,3,n(f)),',  M:',dat(f,4,n(f)),',  Mhe:',dat(f,5,n(f)),',  Mco:',dat(f,6,n(f)),',  Porb:',dat(f,28,n(f))
      call pgmtxt('T',0.7,0.5,0.5,trim(title1))
   else if(plot.ne.9) then
      if(nf.eq.1) then

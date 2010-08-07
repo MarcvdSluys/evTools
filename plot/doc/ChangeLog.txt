@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   120: AstroFloyd, 07/08/2010
+     - plotplt:
+       - Don't plot logarithmic Teff axis in HRD for small T ranges
+       - Add more info in title of auto-update plot
+   
    119: AstroFloyd, 30/07/2010
      - Add variable 141 to plotplt: GMMenv/R
      
