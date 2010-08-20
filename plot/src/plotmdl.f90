@@ -25,14 +25,18 @@ program plotmdl
   implicit none
   integer, parameter :: nn=2001,nq=300  !nq: max number of columns
   integer :: nm,nc,nv_der,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,system
-  real(double) :: dat1(nq)
-  real :: dat(nq,nn),age,ver,x
+  real(double) :: dat1(nq),rl2p,rl2a
+  real(double) :: dE,Eorb,Eorbi,a_orb,a_orbi,Porb,alphaCE
+  
+  real :: dat(nq,nn),age
+  real :: ver,x
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
-  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
-  real :: ll,eeth,eenc,eenu,ss,uuint
-  real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
-  real :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
+  
+  real(double) :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
+  real(double) :: ll,eeth,eenc,eenu,ss,uuint
+  real(double) :: m1,m2,r1,l1,ts,tc,mhe,mco,rhoc
+  real(double) :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab
   character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,bla*3
@@ -68,32 +72,9 @@ program plotmdl
   pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
   
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
-  pxns(211:219) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho']
+  pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','Prlof']
+  pxns(221:221) = [character(len=99) :: 'Poace']
   pxns(251:252) = [character(len=99) :: 'Abundances','Nablas']
-  
-  !Axis labels
-  labels = ''
-  labels(1) = 'M (M\d\(2281)\u)'
-  labels(2) = 'R (R\d\(2281)\u)'
-  labels(3) = 'P (dyn cm\u-2\d)'
-  labels(4) = '\gr (g cm\u-3\d)'
-  labels(5) = 'T (K)'
-  labels(6) = 'k (cm\u2\d g\u-1\d)'
-  labels(7) = '\(2266)\dad\u'
-  labels(8) = '\(2266)\drad\u - \(2266)\dad\u:  1 = convection'
-  labels(9) = 'H abundance'
-  labels(10) = 'He abundance'
-  labels(11) = 'C abundance'
-  labels(12) = 'N abundance'
-  labels(13) = 'O abundance'
-  labels(14) = 'Ne abundance'
-  labels(15) = 'Mg abundance'
-  labels(16) = 'L (L\d\(2281)\u)'
-  labels(17) = '\ge\dth\u'
-  labels(18) = '\ge\dnucl\u'
-  labels(19) = '\ge\d\gn\u'
-  labels(20) = 'S (cgs)'
-  labels(21) = 'E\dint\u (erg g\u-1\d)'
   
   !Axis labels, px numbers
   labels = ''
@@ -105,7 +86,7 @@ program plotmdl
   labels(6)  = '\(2266)\dad\u'
   labels(7)  = '\(2266)\dtrue\u'
   labels(8)  = '\(2266)\drad\u - \(2266)\dad\u:  1 = convection'
-  labels(9)  = 'M (M\d\(2281)\u)'
+  labels(9)  = 'm (M\d\(2281)\u)'
   labels(10) = 'H abundance'
   labels(11) = 'He abundance'
   labels(12) = 'C abundance'
@@ -113,7 +94,7 @@ program plotmdl
   labels(14) = 'O abundance'
   labels(15) = 'Ne abundance'
   labels(16) = 'Mg abundance'
-  labels(17) = 'R (R\d\(2281)\u)'
+  labels(17) = 'r (R\d\(2281)\u)'
   labels(18) = 'L (L\d\(2281)\u)'
   labels(19) = '\ge\dth\u'
   labels(20) = '\ge\dnucl\u'
@@ -164,13 +145,17 @@ program plotmdl
   labels(212) = 'n (cm\u-3\d)'
   labels(213) = 'P\drad\u (dyn cm\u-2\d)'
   labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
-  labels(215) = '\(2128) = P\drad\u/P\dgas\u'  !\beta - Prad/Pgas
-  labels(216) = 'dM (M\d\(2281)\u)'          ! Mass of each shell
-  labels(217) = 'E\db,*\u (10\u40\d erg)'    !Binding energy of the star
-  labels(218) = 'E\db,env\u (10\u40\d erg)'  !Binding energy of the envelope
-  labels(219) = 'P/\(2143) (cgs)'  !P/rho
+  labels(215) = '\(2128) = P\drad\u/P\dgas\u'  ! \beta - Prad/Pgas
+  labels(216) = 'dM (M\d\(2281)\u)'            ! Mass of each shell
+  !labels(217) = 'E\db,*\u (10\u40\d erg)'      ! Binding energy of the star
+  !labels(218) = 'E\db,env\u (10\u40\d erg)'    ! Binding energy of the envelope
+  labels(217) = 'E\db,*\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'      ! Binding energy of the star
+  labels(218) = 'E\db,env\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'    ! Binding energy of the envelope
+  labels(219) = 'P/\(2143) (cgs)'              ! P/rho
+  labels(220) = 'P\dr(m)=Rrlof\u (day)'        ! Porb if r(m)=Rrl
+  labels(221) = 'P\dpost-\ga-CE\u (day)'       ! Porb after \alpha CE
   
-  nv_der = 18  !Number of derived variables
+  nv_der = 221 - 200  !Number of derived variables
   
   labels(251) = 'Abundances'
   labels(252) = "\(2266)'s"
@@ -388,25 +373,49 @@ program plotmdl
      dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.e-30)                                  !                    beta = Prad/Pgas
      
      !216-217: binding energy:
-     dat(216,1:nm) = 0.0_dbl
-     dat(217,1:nm) = 0.0_dbl
-     dat(218,1:nm) = 0.0_dbl
+     dat(216,1:nm) = 0.0
+     dat(217,1:nm) = 0.0
+     dat(218,1:nm) = 0.0
      do i=2,nm
         dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
-        dat(217,i) = dat(217,i-1) + dat(207,i)*dat(216,i) * m0*1.d-40                      ! BE of whole star (10^40 erg)
-        if(dat(pxin(10),i).gt.0.1) dat(218,i) = dat(218,i-1) + dat(207,i)*dat(216,i) &
-             * m0*1.d-40                                                                   ! BE of envelope (10^40 erg)
+        !dE = dat(207,i)*dat(216,i) * m0*1.d-40                                            ! BE of the shell (10^40 erg)
+        dE = dat(207,i)*dat(216,i) * m0 / (G*M0**2/R0)                                     ! BE of the shell       (G Mo^2 / Ro)
+        dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
+        if(dat(pxin(10),i).gt.0.1) dat(218,i) = dat(218,i-1) + dE                          ! BE of envelope        (same units)
      end do
      do i=nm-1,1,-1
         if(abs(dat(218,i)).lt.1.d-19) dat(218,i) = dat(218,i+1)                            ! Set the core BE to first non-zero BE
      end do
      
-     dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               !P/rho
+     dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               ! P/rho
      
-     pxnr(211:219) = (/211,212,213,214,215,216,217,218,219/)
+     m1 = dble(dat(pxin(9),nm))                                                            ! Total mass
+     m2 = m1                                                                               ! Total mass
+     r1 = dble(dat(pxin(17),nm))                                                           ! Surface radius
+     dat(220,1) = 0.0
+     do i=2,nm
+        ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
+        dat(220,i) = real(rl2p(dble(dat(pxin(9),i))*M0, m2*M0, dble(dat(pxin(17),i))*R0)/day)                  
+     end do
+     pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
+     
+     alphaCE = 1.0
+     a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb (Ro)
+     !Eorbi = -G*m1*m2*M0**2/(2*a_orbi*R0)                                                 ! Eorb (erg)
+     Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
+     !print*,m1,m2,r1,a_orbi,Eorbi
+     do i=1,nm
+        Eorb = Eorbi + dble(dat(217,nm)) - dble(dat(217,i))/alphaCE                        ! Eorb (G Mo^2 / Ro)
+        !print*,i, Eorbi, dat(218,nm), dat(218,i)/alphaCE,Eorb
+        a_orb = -dble(dat(pxin(9),i))*m2/(2*Eorb)                                          ! a_orb (Ro)
+        call a2p(dble(dat(pxin(9),i)+m2)*M0,a_orb*R0,Porb)                                 ! Porb (s)
+        !if(mod(i,10).eq.0)print*,i,dat(pxin(9),i),Eorb,a_orb,Porb
+        dat(221,i) = real(Porb/day)                                                        ! Porb (day)
+     end do
+     pxnr(221:221) = (/221/)
      
      
-     if(pxin(60).ne.0) then !Brint-Vailasakatralala frequency
+     if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
         dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
      end if
      

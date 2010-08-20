@@ -1,7 +1,12 @@
 
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
-    
+   
+   123: AstroFloyd, 20/08/2010
+     - plotmdl: 
+       - added var 220: post-CE period, based on r(m)=R_rl (M2=M1)
+       - added var 221: post-CE period, based on alpha-CE  (M2=M1)
+       
    122: AstroFloyd, 20/08/2010
      - plotmdl: 
        - moved vars 216-218 to 217-219
