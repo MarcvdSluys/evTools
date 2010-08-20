@@ -1,4 +1,4 @@
-!> plotmdl.f90  Plots the data contained in a mdl* file
+!> \file plotmdl.f90  Plots the data contained in a mdl* file
 
 ! AF, 19-05-2005
 
@@ -36,7 +36,7 @@ program plotmdl
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab
   character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,bla*3
-  character :: labels(nq)*60,lx*60,ly*60,title*100,pxns(0:nq)*99,psname*99
+  character :: labels(nq)*60,lx*60,ly*60,title*99,pxns(0:nq)*99,psname*99
   logical :: ex
   
   !Set constants:
@@ -68,7 +68,7 @@ program plotmdl
   pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
   
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
-  pxns(211:218) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','Ub,*','Ub,env','P/rho']
+  pxns(211:219) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho']
   pxns(251:252) = [character(len=99) :: 'Abundances','Nablas']
   
   !Axis labels
@@ -93,7 +93,7 @@ program plotmdl
   labels(18) = '\ge\dnucl\u'
   labels(19) = '\ge\d\gn\u'
   labels(20) = 'S (cgs)'
-  labels(21) = 'U\dint\u (erg g\u-1\d)'
+  labels(21) = 'E\dint\u (erg g\u-1\d)'
   
   !Axis labels, px numbers
   labels = ''
@@ -122,7 +122,7 @@ program plotmdl
   labels(24) = 'T\dhom\u'
   labels(25) = 'U\dhom\u'
   labels(26) = 'V\dhom\u'
-  labels(27) = 'U\dint\u (erg g\u-1\d)'
+  labels(27) = 'E\dint\u (erg g\u-1\d)'
   labels(28) = 'S (cgs)'
   labels(29) = 'L/L\dedd\u'
   labels(30) = 'wxl'
@@ -156,7 +156,7 @@ program plotmdl
   labels(204) = 'r/R\d*\u'
   labels(205) = 'C/O'
   labels(206) = 'Ne/O'
-  labels(207) = 'U\dgr\u - U\dint\u'
+  labels(207) = 'E\dgr\u + E\dint\u'
   labels(208) = 'mean free path (cm)'
   labels(209) = 'n (cm\u-3\d)'
   labels(210) = 'g (cm s\u-2\d)'
@@ -165,9 +165,10 @@ program plotmdl
   labels(213) = 'P\drad\u (dyn cm\u-2\d)'
   labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
   labels(215) = '\(2128) = P\drad\u/P\dgas\u'  !\beta - Prad/Pgas
-  labels(216) = 'U\db,*\u ()'    !Binding energy of the star
-  labels(217) = 'U\db,env\u ()'  !Binding energy of the envelope
-  labels(218) = 'P/\(2143) (cgs)'  !P/rho
+  labels(216) = 'dM (M\d\(2281)\u)'          ! Mass of each shell
+  labels(217) = 'E\db,*\u (10\u40\d erg)'    !Binding energy of the star
+  labels(218) = 'E\db,env\u (10\u40\d erg)'  !Binding energy of the envelope
+  labels(219) = 'P/\(2143) (cgs)'  !P/rho
   
   nv_der = 18  !Number of derived variables
   
@@ -175,11 +176,11 @@ program plotmdl
   labels(252) = "\(2266)'s"
   
   
-  !Read currend path and use it as plot title
+  !Read current path and use it as plot title
 3 i = system('pwd > tmppwd.txt')
   open(unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind(10)
-  read(10,'(a100)')title
+  read(10,'(A99)')title
   close(10)
   i = system('rm -f tmppwd.txt')
   
@@ -347,8 +348,8 @@ program plotmdl
   end do
   close(10)
   
-  !Add model number to plot title
-  write(title,'(A,I6)')trim(title),mdl
+  !Add file name and model number to plot title
+  write(title,'(A,I6)')trim(title)//'/'//trim(fname),mdl
   
   
   
@@ -370,7 +371,7 @@ program plotmdl
      dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
      dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
      dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
-     dat(207,1:nm) = g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) - dat(pxin(27),1:nm)   !Ugr - Uint
+     dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  !Ugr + Uint  
      dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                             !Mean free path = 1/(rho * kappa)
      if(pxin(31).ne.0) then
         dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
@@ -387,16 +388,22 @@ program plotmdl
      dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.e-30)                                  !                    beta = Prad/Pgas
      
      !216-217: binding energy:
-     dat(216,1) = 0.
-     dat(217,1) = 0.
+     dat(216,1:nm) = 0.0_dbl
+     dat(217,1:nm) = 0.0_dbl
+     dat(218,1:nm) = 0.0_dbl
      do i=2,nm
-        dat(216,i) = dat(216,i-1) + dat(207,i)                                             !BE of whole star
-        if(dat(pxin(10),i).lt.0.1) dat(217,i) = dat(217,i-1) + dat(207,i)                  !Start at core-envelope boundary
+        dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
+        dat(217,i) = dat(217,i-1) + dat(207,i)*dat(216,i) * m0*1.d-40                      ! BE of whole star (10^40 erg)
+        if(dat(pxin(10),i).gt.0.1) dat(218,i) = dat(218,i-1) + dat(207,i)*dat(216,i) &
+             * m0*1.d-40                                                                   ! BE of envelope (10^40 erg)
+     end do
+     do i=nm-1,1,-1
+        if(abs(dat(218,i)).lt.1.d-19) dat(218,i) = dat(218,i+1)                            ! Set the core BE to first non-zero BE
      end do
      
-     dat(218,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               !P/rho
+     dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               !P/rho
      
-     pxnr(211:218) = (/211,212,213,214,215,216,217,218/)
+     pxnr(211:219) = (/211,212,213,214,215,216,217,218,219/)
      
      
      if(pxin(60).ne.0) then !Brint-Vailasakatralala frequency
@@ -644,7 +651,7 @@ program plotmdl
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
   if(log.eq.'y') call pgbox('BCNTS',0.0,0,'BCLNTS',0.0,0)
   if(log.eq.'b') call pgbox('BCLNTS',0.0,0,'BCLNTS',0.0,0)
-  call pgmtxt('T',0.7,0.5,0.5,trim(title(14:)))  !13 to remove /home/user/
+  call pgmtxt('T',0.7,0.5,0.5,'~'//trim(title(12:)))  !13 to remove /home/user/
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.0,0.5,0.5,ly)
   
