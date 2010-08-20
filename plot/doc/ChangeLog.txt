@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
     
+   121: AstroFloyd, 20/08/2010
+     - plotplt:
+       - Redefined var 130: J_spin -> w_spin
+       - Added vars 142-143: Mbin, a_orb
+       - Added vars 144-146: J_orb, J_spin, J_tot
+       - Added vars 147-151: E_orb, E_spin, E_so, E_bind, E_tot
    120: AstroFloyd, 07/08/2010
      - plotplt:
        - Don't plot logarithmic Teff axis in HRD for small T ranges

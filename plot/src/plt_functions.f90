@@ -149,7 +149,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(127) = 'R\drl\u (R\d\(2281)\u)'
   pglabels(128) = 'X\df\u'
   pglabels(129) = 'M.I. (M\d\(2281)\u R\d\(2281)\u\u2\d)'
-  pglabels(130) = 'J\dspin\u (10\u50\d g cm\u2\d s\u-1\d)'
+  pglabels(130) = 'w\dspin\u (s\u-1\d)'
   
   pglabels(131) = '\gr\davg\u (g cm\u-3\d)'
   pglabels(132) = 'Z\dsurf\u'
@@ -163,8 +163,18 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(140) = '(M\dZAMS\u - M)/M\dZAMS\u'
   
   pglabels(141) = 'GMM\denv\u/R (10\u40\d erg)'
+  pglabels(142) = 'M\dbin\u (M\d\(2281)\u)'
+  pglabels(143) = 'a\dorb\u (R\d\(2281)\u)'
+  pglabels(144) = 'J\dorb\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'
+  pglabels(145) = 'J\dspin\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'
+  pglabels(146) = 'J\dtot\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'
+  pglabels(147) = 'E\dorb\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
+  pglabels(148) = 'E\dspin\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
+  pglabels(149) = 'E\dso\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
+  pglabels(150) = 'E\dbind\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
+  pglabels(151) = 'E\dtot\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
   
-  defvar(101:141) = 1
+  defvar(101:151) = 1
   
   
   !Special plots:
@@ -294,7 +304,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(127) = 'Rrl'
   asclabels(128) = 'Xf'
   asclabels(129) = 'M.I.'
-  asclabels(130) = 'Jspin'
+  asclabels(130) = 'wspin'
   
   asclabels(131) = 'avgdens'
   asclabels(132) = 'Zsurf'
@@ -308,6 +318,16 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(140) = 'Mzams-M_Mzams'
   
   asclabels(141) = 'GMM_R'
+  asclabels(142) = 'Mbin'
+  asclabels(143) = 'aorb'
+  asclabels(144) = 'Jorb'
+  asclabels(145) = 'Jspin'
+  asclabels(146) = 'Jtot'
+  asclabels(147) = 'Eorb'
+  asclabels(148) = 'Espin'
+  asclabels(149) = 'Eso'
+  asclabels(150) = 'Ebind'
+  asclabels(151) = 'Etot'
   
   
   
@@ -554,16 +574,16 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   81: Qconv                                                                            '
   write(6,'(A)')'                                                                                        ' 
   write(6,'(A)')'  Derived variables:                                                                    '
-  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141 GMMenv/R       '  
-  write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf                      '  
-  write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t                      '
-  write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit                 '
-  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf                     '
-  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot               '
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like               '
-  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs              '
-  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M                    '
-  write(6,'(A)')'               120: Rossby nr     130: Jspin            140: (Mzams-M)/Mzams            '
+  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R    151: E_tot   '  
+  write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin '  
+  write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      '
+  write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      '
+  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin             '
+  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot       '
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb       '
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin       '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       '
+  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind       '
   write(6,'(A)')'                                                                                        '
   write(6,'(A)')'  Special plots:                                                                        '
   if(nf.eq.1) then
@@ -754,6 +774,45 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !***   CREATE EXTRA PLOT VARIABLES
   !************************************************************************      
   
+  !Colours
+  dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface Z, premature def.
+  do i=1,n
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),  &
+          mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
+     dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
+     dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
+  end do
+  
+  !108-110 undefined
+  
+  
+  dat(117,1:n) = dat(4,1:n) - dat(5,1:n)                                                     !H-envelope mass, premature def.
+  dat(111,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+  !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
+  dat(111,1:n) = max(dat(111,1:n),0.d0)
+  do i=1,n
+     if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
+     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(117,i),dat(15,i),dat(8,i),dat(111,i)
+     !write(99,'(9ES12.4)')dat((/5,8,111/),i)
+  end do
+  
+  
+  z = log10(dat(132,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
+  x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
+  
+  dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
+  dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
+  do i=1,n
+     if(dat(5,i).lt.1.d-6) then
+        dat(112,i) = 0.
+        dat(113,i) = 0.
+     end if
+     !write(6,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
+  end do
+  
+  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
+  dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)            !R/Rzams
+  
   do i=1,n
      dat(116,i) = dat(5,i)-dat(6,i)                              !Intershell mass
   end do
@@ -818,11 +877,11 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
   dat(126,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c126(1:n)/day
   
-  dat(127,1:n) = dat(8,1:n)/dexp(dat(29,1:n))     
+  dat(127,1:n) = dat(8,1:n)/exp(dat(29,1:n))     
   dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
-  !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed:
-  dat(129,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2
-  dat(130,1:n) = dat(129,1:n)*2*pi/(dat(21,1:n)+1.d-30)*(1.d-50*m0*r0*r0/day) !Jspin = I*w in 10^50 g cm^2 s^-1
+  !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed):
+  dat(129,1:n) = 10.d0**dat(22,1:n) * dat(4,1:n)*dat(8,1:n)**2
+  dat(130,1:n) = 2*pi/(dat(21,1:n)*day+1.d-30)                               ! omega_spin (s^-1)
   dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
   dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
   dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
@@ -839,41 +898,27 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
   dat(139,1:n) = dat(4,1) - dat(4,1:n)                                       !M_zams - M
   dat(140,1:n) = dat(139,1:n)/dat(4,1)                                       !(M_zams - M)/M_zams
-  !dat(140,1:n) = dat(139,1:n)/dat(4,1:n)                                       !(M_zams - M)/M
+  !dat(140,1:n) = dat(139,1:n)/dat(4,1:n)                                     !(M_zams - M)/M
   dat(141,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(8,1:n)*r0*1.d40)     !G*M*M_env/R / 1e40
-  
-  
-  !Colours
+  dat(142,1:n) = dat(4,1:n)+dat(40,1:n)                                      ! Mbin (Mo)
   do i=1,n
-     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),  &
-          mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
-     dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
-     dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
+     call p2a(dat(142,i)*M0,dat(28,i)*day,dat(143,i))                        ! a_orb (cm)
   end do
+  dat(143,1:n) = dat(143,1:n)/R0                                             ! a_orb (Ro)
   
-  dat(111,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
-  !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
-  dat(111,1:n) = max(dat(111,1:n),0.d0)
-  do i=1,n
-     if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
-     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(117,i),dat(15,i),dat(8,i),dat(111,i)
-  end do
+  dat(144,1:n) = dat(34,1:n)*1.d50/(G**0.5d0 * M0**1.5d0 * R0**0.5d0)        ! J_orb (G^1/2 Mo^3/2 Ro^1/2)
+  dat(145,1:n) = dat(129,1:n)*dat(130,1:n) &
+       * M0*R0**2 / (G**0.5d0 * M0**1.5d0 * R0**0.5d0)                       ! J_spin = I*w (G^1/2 Mo^3/2 Ro^1/2)
+  dat(146,1:n) = dat(144,1:n) + dat(145,1:n)                                 ! J_tot = J_orb + J_spin (G^1/2 Mo^3/2 Ro^1/2)
   
-  z = log10(dat(132,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
-  x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
+  dat(147,1:n) = dat(4,1:n)*dat(40,1:n)/(2*dat(143,1:n))                     ! E_orb = M1M2/2a  (G Mo^2 / Ro)
+  dat(148,1:n) = 0.5d0*dat(129,1:n)*dat(130,1:n)**2 &
+       * M0*R0**2 / (G * M0**2 / R0)                                         ! E_spin = 1/2 I w^2  (G Mo^2 / Ro)
+  dat(149,1:n) = dat(147,1:n) + dat(148,1:n)                                 ! E_so = E_orb + E_spin (G Mo^2 / Ro)
+  dat(150,1:n) = dat(15,1:n) * 1.d40 / (G * M0**2 / R0)                      ! E_bind (G Mo^2 / Ro)  -  CHECK: use tailored definition
+  dat(151,1:n) = dat(149,1:n) + dat(150,1:n)                                 ! E_tot = E_so + E_bind (G Mo^2 / Ro)
   
-  dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
-  dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
-  do i=1,n
-     if(dat(5,i).lt.1.d-6) then
-        dat(112,i) = 0.
-        dat(113,i) = 0.
-     end if
-     !write(6,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
-  end do
   
-  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
-  dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)            !R/Rzams
   
   
   
@@ -884,7 +929,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                    !Mass transfer
   dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                     !Gravitational waves
   !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)               !Magnetic braking (Actually SO-coupling!)
-  dat(205,1:n) = dsqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
+  dat(205,1:n) = sqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
   dpdt  = 0
   
   !Replace dJ/dt by dP/dt
