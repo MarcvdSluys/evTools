@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   124: AstroFloyd, 21/08/2010
+     - plotmdl: 
+       - create post-CE comparison plot; fixed some comparison-plot issues
+       - list comparison plots in menu, use nrs 300+
+       - added variable names to output file name
+     
    123: AstroFloyd, 20/08/2010
      - plotmdl: 
        - added var 220: post-CE period, based on r(m)=R_rl (M2=M1)

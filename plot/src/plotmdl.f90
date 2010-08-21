@@ -23,8 +23,8 @@ program plotmdl
   use constants
   
   implicit none
-  integer, parameter :: nn=2001,nq=300  !nq: max number of columns
-  integer :: nm,nc,nv_der,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,system
+  integer, parameter :: nn=2001,nq=400  !nq: max number of columns
+  integer :: nm,nc,nv_der,nv_sp,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,system,xwini,pgopen
   real(double) :: dat1(nq),rl2p,rl2a
   real(double) :: dE,Eorb,Eorbi,a_orb,a_orbi,Porb,alphaCE
   
@@ -38,10 +38,10 @@ program plotmdl
   real(double) :: m1,m2,r1,l1,ts,tc,mhe,mco,rhoc
   real(double) :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
   
-  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,ab,nab
-  character findfile*99,fname*99,rng,log,abds(7)*2,nabs(3)*3,bla*3
-  character :: labels(nq)*60,lx*60,ly*60,title*99,pxns(0:nq)*99,psname*99
-  logical :: ex
+  integer i,ii,j,blk,nblk,vx,vy,hmp,plot
+  character findfile*99,fname*99,rng,log,abds(7)*99,nabs(3)*99,CEs(2)*99,bla*3,xwin*19
+  character :: labels(nq)*99,lx*99,ly*99,fx*99,fy*99,title*99,pxns(0:nq)*99,pxfns(0:nq)*99,psname*99
+  logical :: ex, ab,nab,CE
   
   !Set constants:
   call setconstants()
@@ -51,6 +51,7 @@ program plotmdl
   call eggletonplot_settings()
   
   plot = 0
+  xwini = 1  !Number of X window to try first
   log = 'n'
   pxnr = 0
   pxin = 0
@@ -58,9 +59,12 @@ program plotmdl
      pxin(i) = i
   end do
   
-  abds = [character(len=2) :: 'H ','He','C ','N ','O ','Ne','Mg']   !Line labels in abundances plot
-  nabs = [character(len=3) :: 'ad ','rad','tru']   !Line labels in nablas plot
-  nab = 0
+  abds = [character(len=99) :: 'H ','He','C ','N ','O ','Ne','Mg']    ! Line labels in abundances plot
+  nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
+  CEs  = [character(len=99) :: 'RLOF','\ga-CE']                       ! Line labels in CEs plot
+  ab = .false.
+  nab = .false.
+  CE = .false.
   
   !Names of the variables in px
   pxns(0) = ''
@@ -74,7 +78,21 @@ program plotmdl
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
   pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','Prlof']
   pxns(221:221) = [character(len=99) :: 'Poace']
-  pxns(251:252) = [character(len=99) :: 'Abundances','Nablas']
+  pxns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEs']
+  
+  !Names of the variables in px, to be used in output file name (no /.?*)
+  pxfns(0) = ''
+  pxfns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
+  pxfns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
+  pxfns(21:30) = [character(len=99) :: 'Enu','dM','-','Thom','Uhom','Vhom','Uint','S','LLedd','wxl']
+  pxfns(31:40) = [character(len=99) :: 'mu','wt','Nel','NeO','w','MI','phi','Fm','DGOS','-']
+  pxfns(41:50) = [character(len=99) :: '-','LDRK','Enth','V2','FAC','-','-','-','-','Rpp']
+  pxfns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','-','-','-','-','N2']
+  
+  pxfns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','mM','rR','CO','NeO','Ugr-Uint','Mfp','Ndens','g']
+  pxfns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','PrPg','dM','Ubst','Ubenv','Prho','Prlof']
+  pxfns(221:221) = [character(len=99) :: 'Poace']
+  pxfns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEs']
   
   !Axis labels, px numbers
   labels = ''
@@ -157,8 +175,15 @@ program plotmdl
   
   nv_der = 221 - 200  !Number of derived variables
   
-  labels(251) = 'Abundances'
-  labels(252) = "\(2266)'s"
+  
+  
+  !Special plots:
+  labels(301) = 'Abundances'
+  labels(302) = "\(2266)'s"
+  labels(303) = 'P\dorb,post-CE\u (day)'
+  
+  nv_sp = 303 - 300  !Number of special plots
+  
   
   
   !Read current path and use it as plot title
@@ -191,19 +216,22 @@ program plotmdl
   
   io = 0
   read(10,5,iostat=io) nm,nc,ver !Ver used to be overshoot parameter, now file version number (if>1)
+5 format (2x,I4,4x,I2,F7.3)
   if(io.ne.0) then
      write(6,'(A,/)')'  Error reading first line of file, aborting...'
      close(10)
      stop
   end if
   
-  write(6,'(A,I4,A,I3,A)')' Reading',nm,' meshpoints,',nc,' columns of data.'
   if(ver.gt.1.) then
      read(10,*)bla 
   else
-     pxnr(1:21)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
+     nc = 21
+     pxnr(1:nc)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
   end if
-5 format (2x,I4,4x,I2,F7.3)
+  
+  write(6,'(A,I4,A,I3,A)')' Reading',nm,' meshpoints,',nc,' columns of data.'
+  
   write(6,*)''
   write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
@@ -294,7 +322,11 @@ program plotmdl
      close(10)
      stop
   end if
-  if(ver.gt.1.) read(10,'(60I4)')pxnr(1:nc)
+  if(ver.gt.1.) then
+     read(10,'(60I4)')pxnr(1:nc)
+  else
+     nc = 21
+  end if
   do i=1,blk-1
      read(10,6,iostat=io) mdl,age
      if(io.lt.0) exit
@@ -419,7 +451,7 @@ program plotmdl
         dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
      end if
      
-     pxnr(251:252) = (/251,252/) !Abundances, Nablas
+     pxnr(301:303) = (/301,302,303/) !Abundances, Nablas, CEs
   end if !if(plot.eq.0) then
   
   
@@ -445,18 +477,6 @@ program plotmdl
   !Print derived variables, from number 201 on:
   write(6,'(A)')'                                                              '
   write(6,'(A)')'  Derived variables:                                          '
-  !nr = 3 !Number of variable columns
-  !j = 0
-  !do i=201,nq
-  !   if(j.eq.nr) then
-  !      write(6,*)''
-  !      j = 0
-  !   end if
-  !   if(pxnr(i).gt.0) then
-  !      write(6,'(I5,A15,5x)',advance='no')i,': '//pxns(i)
-  !      j = j+1
-  !   end if
-  !end do
   
   nr = 4 !Number of variable columns
   ii = ceiling(real(nv_der)/real(nr)) !Number of rows
@@ -471,6 +491,23 @@ program plotmdl
      write(6,*)
   end do
   
+  !Print special variables, from number 301 on:
+  write(6,'(A)')'                                                              '
+  write(6,'(A)')'  Special plots:                                          '
+  
+  nr = 2 !Number of variable columns
+  ii = ceiling(real(nv_sp)/real(nr)) !Number of rows
+  do i=1,ii
+     do j=0,nr-1
+        if(pxnr(300+i+j*ii).eq.0) then
+           write(6,'(A39)',advance='no')''
+        else
+           write(6,'(I9,A30,5x)',advance='no')300+i+j*ii,': '//pxns(pxnr(300+i+j*ii))
+        end if
+     end do
+     write(6,*)
+  end do
+  
   write(6,*)''
   write(6,*)''
   
@@ -478,7 +515,7 @@ program plotmdl
   
   
 35 write(6,'(A)',advance='no')' Choose the X-axis variable: '
-  ab = 0
+  ab = .false.
   read*,vx
   if(vx.eq.0) goto 9999
   if(pxnr(vx).eq.0) goto 35
@@ -492,23 +529,37 @@ program plotmdl
 37 continue 
   lx = labels(pxnr(vx))
   ly = labels(pxnr(vy))
+  fx = pxfns(pxnr(vx))
+  fy = pxfns(pxnr(vy))
   
   ny = 1
-  if(vy.eq.251.or.ab.eq.1) then
-     ab = 1
+  
+  ! Abundances plot:
+  if(vy.eq.301.or.ab) then
+     ab = .true.
      vy = pxin(10)
      yy(1:7,1:nm) = dat(pxin(10):pxin(16),1:nm)
      ny = 7
   end if
   
-  if(vy.eq.252.or.nab.eq.1) then
-     nab = 1
+  ! Nablas plot:
+  if(vy.eq.302.or.nab) then
+     nab = .true.
      vy = pxin(6)
      yy(1,1:nm) = dat(pxin(6),1:nm)   !Nabla_ad
      yy(2,1:nm) = dat(pxin(202),1:nm) !Nabla_rad
      yy(3,1:nm) = dat(pxin(7),1:nm)   !True Nabla
      print*,pxin(6),pxin(7),pxin(202)
      ny = 3
+  end if
+  
+  ! CE plot:
+  if(vy.eq.303.or.ce) then
+     CE = .true.
+     vy = 220
+     yy(1,1:nm) = dat(220,1:nm)       ! P(r(m)=Rrl)
+     yy(2,1:nm) = dat(221,1:nm)       ! P(post-alphaCE)
+     ny = 2
   end if
   
   xx(1:nm) = dat(vx,1:nm)
@@ -544,7 +595,7 @@ program plotmdl
   ymin = minval(yy(1:ny,1:nm))
   ymax = maxval(yy(1:ny,1:nm))
   
-  if(ab.eq.1.and.(log.eq.'y'.or.log.eq.'b').and.ymin.lt.-6.) ymin = -6.
+  if(ab.and.(log.eq.'y'.or.log.eq.'b').and.ymin.lt.-6.) ymin = -6.
   
   
   
@@ -635,11 +686,30 @@ program plotmdl
   
   !***   PLOT TO SCREEN OR FILE
   
-501 if(plot.eq.8) then
-     call pgbegin(1,'plot_mdl_000.eps/cps',1,1)
-     call pgscf(2)
-  else
-     call pgbegin(1,'2/xserve',1,1)
+501 continue
+  if(plot.eq.8) then !PS file
+     ex = .true.
+     i = 1
+     do while(ex)
+        write(psname,'(A,I3.3,A4)')'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'
+        inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
+        i = i+1
+     end do
+     call pgbegin(1,trim(psname)//'/cps',1,1)
+     !call pgscf(2)
+     call pgslw(2)
+  else ! Screen
+     !call pgbegin(1,'2/xserve',1,1)
+     io = 0
+     do while(io.le.0)
+        write(xwin,'(I3.3,A7)')xwini,'/xserve'
+        io = pgopen(trim(xwin))
+        if(io.le.0) then
+           write(6,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
+           xwini = xwini + 1
+        end if
+     end do
+     
      call pgpap(scrsz,scrrat)
      call pgscf(1)
      if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
@@ -654,7 +724,12 @@ program plotmdl
      end if
   end if
   
-  call pgsvp(0.06,0.96,0.07,0.96)
+  if(ny.eq.1) then
+     call pgsvp(0.06,0.96,0.07,0.96)
+  else                                   ! Multiple lines; need room for legend on right-hand side
+     call pgsvp(0.06,0.93,0.07,0.96)
+  end if
+
   call pgswin(xmin,xmax,ymin,ymax)
   if(log.eq.'n') call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)  !Use logarithmic axes rather than logarithmic variables
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
@@ -662,23 +737,22 @@ program plotmdl
   if(log.eq.'b') call pgbox('BCLNTS',0.0,0,'BCLNTS',0.0,0)
   call pgmtxt('T',0.7,0.5,0.5,'~'//trim(title(12:)))  !13 to remove /home/user/
   call pgmtxt('B',2.4,0.5,0.5,lx)
-  call pgmtxt('L',2.0,0.5,0.5,ly)
-  
-  if(plot.eq.8) call pgslw(2)
+  call pgmtxt('L',2.4,0.5,0.5,ly)
   
   if(vx.ne.201.and.vy.ne.201) then
      do i=1,ny
         call pgsci(colours(mod(i-1,ncolours)+1))
         yy1(1:nm) = yy(i,1:nm)
         call pgline(nm,xx(1:nm),yy1(1:nm))
-        if(ab.eq.1) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,abds(i))
-        if(nab.eq.1) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,nabs(i))
+        if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
+        if(nab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(nabs(i)))
+        if(CE) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(CEs(i)))
      end do
   else
      do i=1,ny 
         call pgsci(mod(i-1,6)+1)
         call pgpoint(nm,xx(1:nm),yy(i,1:nm),1)
-        if(ab.eq.1) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,abds(i))
+        if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
      end do
   end if
   
@@ -700,14 +774,6 @@ program plotmdl
   
   if(plot.eq.8) then
      call pgend
-     ex = .true.
-     i = 1
-     do while(ex)
-        write(psname,'(A9,I3.3,A4)')'plot_mdl_',i,'.eps'
-        inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
-        if(.not.ex) j = system('mv -f plot_mdl_000.eps '//trim(psname))
-        i = i+1
-     end do
      write(6,'(A)')' Plot saved to '//trim(psname)
   end if
   
