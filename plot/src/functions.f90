@@ -95,7 +95,7 @@ subroutine setconstants
   white_bg = .true.      ! F: black background on screen, T: white
   
   
-  pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
+  pi       =  4*atan(1.d0)                          !Pi, area of circle/r^2
   tpi      =  2*pi
   pi2      =  0.5d0*pi
   c3rd     =  1.d0/3.d0
