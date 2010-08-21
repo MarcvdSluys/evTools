@@ -95,7 +95,7 @@ subroutine setconstants
   white_bg = .true.      ! F: black background on screen, T: white
   
   
-  pi       =  4*datan(1.d0)                         !Pi, area of circle/r^2
+  pi       =  4*atan(1.d0)                          !Pi, area of circle/r^2
   tpi      =  2*pi
   pi2      =  0.5d0*pi
   c3rd     =  1.d0/3.d0
@@ -833,8 +833,8 @@ function p2j(m1,m2,p)
   use kinds
   use constants
   implicit none
-  real(double) :: p2j,m1,m2,p,a,p2a
-  a = p2a(m1+m2,p)
+  real(double) :: p2j,m1,m2,p,a
+  call p2a(m1+m2,p,a)
   p2j = m1*m2*sqrt(g*a/(m1+m2))
 end function p2j
 !***********************************************************************************************************************************
@@ -845,9 +845,9 @@ function j2p(m1,m2,j)
   use kinds
   use constants
   implicit none
-  real(double) :: j2p,m1,m2,j,a,a2p
+  real(double) :: j2p,m1,m2,j,a
   a = (j/(m1*m2))**2 * (m1+m2)/g
-  j2p = a2p(m1+m2,a)
+  call a2p(m1+m2,a,j2p)
 end function j2p
 !***********************************************************************************************************************************
 
@@ -855,31 +855,38 @@ end function j2p
 
 !***********************************************************************************************************************************
 !> \brief Convert orbital period to orbital separation, in cgs units
-function p2a(mtot,p)
+!! \param mtot  Total mass of the binary (g)
+!! \param p     Binary period (s)
+!! \retval a    Binary orbital separation (cm)
+subroutine p2a(mtot,p,a)
   use kinds
   use constants
   implicit none
-  real(double) :: p2a,mtot,p
-  p2a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
-end function p2a
+  real(double), intent(in) :: mtot,p
+  real(double), intent(out) :: a
+  a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
+end subroutine p2a
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
 !> \brief Convert orbital separation to orbital period, in cgs units
-function a2p(mtot,a)
+!! \param mtot  Total mass of the binary (g)
+!! \param a     Binary orbital separation (cm)
+!! \retval p    Binary period (s)
+subroutine a2p(mtot,a,p)
   use kinds
   use constants
   implicit none
-  real(double) :: a2p,mtot,a
-  a2p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
-end function a2p
+  real(double), intent(in) :: mtot,a
+  real(double), intent(out) :: p
+  p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
+end subroutine a2p
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital separation to Roche-lobe radius
+!> \brief Convert orbital separation to Roche-lobe radius, using Eggleton (1983)
 !! m1 and m2 in the same units, Rl and a in the same units
-!<
 function a2rl(m1,m2,a)
   use kinds
   use constants
@@ -893,9 +900,8 @@ end function a2rl
 
 
 !***********************************************************************************************************************************
-!> \brief Convert Roche-lobe radius to orbital separation
+!> \brief Convert Roche-lobe radius to orbital separation, using Eggleton (1983)
 !! m1 and m2 in the same units, Rl and a in the same units
-!<
 function rl2a(m1,m2,rl1)
   use kinds
   use constants
@@ -909,12 +915,11 @@ end function rl2a
 
 !***********************************************************************************************************************************
 !> \brief Convert orbital period to Roche-lobe radius, all in cgs units
-!<
 function p2rl(m1,m2,p)
   use kinds
   implicit none
-  real(double) :: p2rl,m1,m2,p,a,p2a,a2rl
-  a = p2a(m1+m2,p)
+  real(double) :: p2rl,m1,m2,p,a,a2rl
+  call p2a(m1+m2,p,a)
   p2rl = a2rl(m1,m2,a)
 end function p2rl
 !***********************************************************************************************************************************
@@ -922,13 +927,12 @@ end function p2rl
 
 !***********************************************************************************************************************************
 !> \brief Convert Roche-lobe radius to orbital period, all in cgs units
-!<
 function rl2p(m1,m2,rl1)
   use kinds
   implicit none
-  real(double) :: rl2p,m1,m2,rl1,a,a2p,rl2a
+  real(double) :: rl2p,m1,m2,rl1,a,rl2a
   a = rl2a(m1,m2,rl1)
-  rl2p = a2p(m1+m2,a)
+  call a2p(m1+m2,a,rl2p)
 end function rl2p
 !***********************************************************************************************************************************
 
