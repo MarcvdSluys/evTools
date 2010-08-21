@@ -30,16 +30,16 @@ BINDIR = ~/usr/bin
 
 STDOBJ = $(OBJDIR)/functions.o $(OBJDIR)/code_version.o
 PLTOBJ = $(OBJDIR)/plotfunctions.o $(OBJDIR)/plt_functions.o
-MDLOBJ = 
+MDLOBJ = $(OBJDIR)/mdl_functions.o
 MODOBJ = 
 
 
 
 #ifort:
 ifeq ($(FORT),ifort)
-   CFLAGS += -I/home/user/usr/include/libAF/ifort
-   LFLAGS += -L/home/user/usr/lib -lAF_ifort
-   STATLIBS += /home/user/usr/lib/libAF_ifort.a
+   CFLAGS += #-I/home/user/usr/include/libAF/ifort
+   LFLAGS += #-L/home/user/usr/lib -lAF_ifort
+   STATLIBS += #/home/user/usr/lib/libAF_ifort.a
 
    #To develop code  (don't mix -check bounds with -O>0!):
    ifeq ($(CHECK),yes)
@@ -76,9 +76,9 @@ endif
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
 ifneq (,$(filter $(FORT),gfortran gfortran-4.5.0))
-   CFLAGS += -I/home/user/usr/include/libAF/gfortran
-   LFLAGS += -L/home/user/usr/lib -lAF_gfortran
-   STATLIBS += /home/user/usr/lib/libAF_gfortran.a
+   CFLAGS += #-I/home/user/usr/include/libAF/gfortran
+   LFLAGS += #-L/home/user/usr/lib -lAF_gfortran
+   STATLIBS += #/home/user/usr/lib/libAF_gfortran.a
 
    ifeq ($(CHECK),yes)
       OPT = -O0
