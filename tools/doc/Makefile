@@ -2,19 +2,19 @@
 
 #No text/space after statements below!
 FORT = gfortran#  Use GNU fortran compiler
-FORT = ifort#     Use Intel fortran compiler
+#FORT = ifort#     Use Intel fortran compiler
 
 
 #ifort:
 ifeq ($(FORT),ifort)
-    #To develop code  (don't mix -check bounds with -O>0!):
+    #To develop code  (don't mix -check with -O>0!):
     CFLAGS = -O0  -vec-report0 -traceback -check all -check noarg_temp_created
 
     #To debug code:
     #CFLAGS = -O0  -vec-report0 -g
 
     #To use optimum run speed
-    CFLAGS = -O2 -vec-report0 -traceback
+    #CFLAGS = -O2 -vec-report0 -traceback
     #CFLAGS = -O3 -vec-report0 -traceback
     #CFLAGS = -O3 -arch SSE4.1 -vec-report0 -traceback
     #CFLAGS = -O3 -arch SSE4.1 -ipo -vec-report0 -traceback
@@ -28,7 +28,7 @@ endif
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
-ifneq (,$(filter $(FORT),gfortran gfortran-4.4.2))
+ifneq (,$(filter $(FORT),gfortran gfortran-4.5.0))
     CFLAGS = -O0
     #CFLAGS = -O2 
     CFLAGS += -Wall
