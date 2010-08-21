@@ -125,7 +125,8 @@ ifeq ($(FORT),nagfor)
 endif
 
 
-LFLAGS = -lpgplot
+LFLAGS = 
+PLOT_LFLAGS = -lpgplot
 
 
 
@@ -141,25 +142,25 @@ exit:
 
 
 plotmdl: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 
 plotmdln: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
 plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
 plotplt: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
 plotplt_r066: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
 
 plotpltn: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 
 plotpltp: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
+	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
 
 
 
