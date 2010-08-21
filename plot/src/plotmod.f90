@@ -1,4 +1,5 @@
-!> \file plotmod.f90  Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
+!> \file plotmod.f90  Reads an input or output structure model file for Eggeltons TWIN code and lists the properties 
+!!                    of each model it contains.
 
 ! One can select a model to plot its contents. Adapted from listmod.f90
 ! AF 2004-08-05

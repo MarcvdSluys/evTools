@@ -1,4 +1,5 @@
-!> \file plotmdln.f90   Plots the data contained in star.mdl, for some or all (n) structure models in the file, and for ONE set of variables
+!> \file plotmdln.f90   Plots the data contained in star.mdl, for some or all (n) structure models in the file, 
+!!                      and for ONE set of variables
 
 ! AF, 19-05-2005
 
@@ -106,7 +107,7 @@ program plotmdln
   write(6,*)''
   write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
-
+  
   do b=1,nbb
      read(10,6,err=12,end=15) mdl(b),age(b)
 6    format (I6,1x,E16.9)
@@ -147,7 +148,6 @@ program plotmdln
      write(6,9)b,mdl(b),nm,age(b),m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs!,bms,p,p1
   end do !b
   
-8 format(2(I5,2x),1PE8.2,2x,2(0PF6.2,2x),2(1PE8.2,2x),3(0PF4.2,2x))
 9 format(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,3f6.3)
   
   write(6,'(A)')'  Arrays are too small !'
@@ -213,13 +213,14 @@ program plotmdln
   goto 30
   write(6,*)''
   write(6,'(I5,A)')nb,' blocks selected:'
-  write(6,'(A)')'  Nr  Model       Age    Mass  Radius   Luminos      Teff       H    He   C+O'
+  write(6,'(A)')'  Nr  Model       Age    Mass  Radius   Luminos      Teff        H     He    C+O'
   do b=1,nb
      write(6,8)blk(b),mdl(blk(b)),age(blk(b)),dat(blk(b),2,nm),    dat(blk(b),3,nm),dat(blk(b),17,nm),dat(blk(b),6,nm),  &
           dat(blk(b),10,1),dat(blk(b),11,1),    dat(blk(b),12,1)+dat(blk(b),14,1)
   end do
   write(6,*)''
-
+8 format(2(I5,2x),1PE8.2,2x,2(0PF6.2,2x),2(1PE8.2,2x),3(0PF5.2,2x))
+  
 
 
 
@@ -258,10 +259,10 @@ program plotmdln
   write(6,*)''
   write(6,'(A)')' 1: Mesh pt'
   write(6,'(A)')' 2: M                                                    '
-  write(6,'(A)')' 3: R       10: H       17: L           24: M/M*	       '
-  write(6,'(A)')' 4: P       11: He      18: Eth         25: R/R*	       '
-  write(6,'(A)')' 5: Rho     12: C       19: Enuc        26: C/O	       '
-  write(6,'(A)')' 6: T       13: N       20: Enu         27: Ne/O	       '
+  write(6,'(A)')' 3: R       10: H       17: L           24: M/M*       '
+  write(6,'(A)')' 4: P       11: He      18: Eth         25: R/R*       '
+  write(6,'(A)')' 5: Rho     12: C       19: Enuc        26: C/O       '
+  write(6,'(A)')' 6: T       13: N       20: Enu         27: Ne/O              '
   write(6,'(A)')' 7: k       14: O       21: S           28: Ne/O change  '
   write(6,'(A)')' 8: Nad     15: Ne      22: Uint                         '
   write(6,'(A)')' 9: Nrad    16: Mg      23: Nrad-Nad                     '

@@ -35,7 +35,7 @@ program plotpltp
   integer :: hrd,dhdt,conv,mdots,tscls,ch
   integer :: plotmode,ps
   character findfile*99, fname*99
-  character*10 :: psname*11
+  character :: psname*11
   character :: rng,log,cnvh
   character :: labels(nvar)*40,lx*40,ly*40,titel*100
   

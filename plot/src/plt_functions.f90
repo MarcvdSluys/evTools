@@ -448,7 +448,7 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   pglabels(88) = 'k\u2\dR\u2\d'
   pglabels(89) = 'M\denv\u'        !M_env
   pglabels(90) = '\(2137)\denv\u'  !lambda_env
-  pglabels(91) = 'Reimers ratio'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  pglabels(91) = 'Reimers ratio'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010,Eq.1
   
   
   
@@ -915,7 +915,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(148,1:n) = 0.5d0*dat(129,1:n)*dat(130,1:n)**2 &
        * M0*R0**2 / (G * M0**2 / R0)                                         ! E_spin = 1/2 I w^2  (G Mo^2 / Ro)
   dat(149,1:n) = dat(147,1:n) + dat(148,1:n)                                 ! E_so = E_orb + E_spin (G Mo^2 / Ro)
-  dat(150,1:n) = dat(15,1:n) * 1.d40 / (G * M0**2 / R0)                      ! E_bind (G Mo^2 / Ro)  -  CHECK: use tailored definition
+  dat(150,1:n) = dat(15,1:n) * 1.d40 / (G * M0**2 / R0)                      ! E_bind (G Mo^2 / Ro) - CHECK: use tailored definition
   dat(151,1:n) = dat(149,1:n) + dat(150,1:n)                                 ! E_tot = E_so + E_bind (G Mo^2 / Ro)
   
   

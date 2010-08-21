@@ -29,8 +29,9 @@ BINDIR = ~/usr/bin
 
 
 STDOBJ = $(OBJDIR)/functions.o $(OBJDIR)/code_version.o
-PLTOBJ = $(OBJDIR)/plotfunctions.o $(OBJDIR)/plt_functions.o
+PLTOBJ = $(OBJDIR)/plt_functions.o
 MDLOBJ = $(OBJDIR)/mdl_functions.o
+PLOTOBJ = $(OBJDIR)/plotfunctions.o 
 MODOBJ = 
 
 
@@ -47,7 +48,7 @@ ifeq ($(FORT),ifort)
       CFLAGS += -check all -check noarg_temp_created
    endif
    ifeq ($(WARN),yes)
-      CFLAGS += -warn all
+      CFLAGS += -warn all -stand f03
    endif
    CFLAGS += -vec-report0 -traceback
    CFLAGS += -module $(MODDIR) -I$(MODDIR)
@@ -139,26 +140,26 @@ exit:
 
 
 
-plotmdl: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+plotmdl: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 
-plotmdln: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+plotmdln: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
 plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 	$(FORT) $(LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
-plotplt: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+plotplt: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
-plotplt_r066: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
+plotplt_r066: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
 
-plotpltn: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
+plotpltn: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 
-plotpltp: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
+plotpltp: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
 
 
 

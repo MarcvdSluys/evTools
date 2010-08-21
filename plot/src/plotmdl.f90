@@ -734,8 +734,7 @@ program plotmdl
   
   
   if(plot.eq.10) then
-     !call identify_closest_model(nq,nn,ny,dat,xx,yy,xmin,xmax,ymin,ymax)
-     call identify_closest_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
+     call identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
      goto 900
   end if
   

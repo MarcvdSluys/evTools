@@ -180,7 +180,7 @@ program plotplt
   end if   !if(plot.ne.6.and.plot.ne.7) then   
   
   
-  npl = nf  !npl is the number of curves that will be plotted.  This can be >1 because nf>1, or because nf=1, but we plot >1 variable
+  npl = nf  !npl is the number of curves that will be plotted. This can be >1 because nf>1, or because nf=1, but we plot >1 variable
   prleg = .false.  !Don't print legenda by default
   if(nf.gt.1) prleg = .true.
   
