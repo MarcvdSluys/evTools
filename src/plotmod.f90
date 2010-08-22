@@ -1,14 +1,16 @@
-!> \file plotmod.f90  Reads an input or output structure model file for Eggeltons TWIN code and lists the properties 
+!> \file plotmod.f90  Reads an input or output structure model file from ev and lists the properties 
 !!                    of each model it contains.
 
-! One can select a model to plot its contents. Adapted from listmod.f90
+
+! One can select a model to plot its contents.
+! Adapted from listmod.f90
 ! AF 2004-08-05
 
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published 
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -46,7 +48,7 @@ program plotmod
   call setconstants()
   write(6,*)
   call print_code_version(6)  !To screen
-  call eggletonplot_settings()
+  call evTools_settings()
   
   plotagain = 0
   x=system('pwd > tmppwd.txt')

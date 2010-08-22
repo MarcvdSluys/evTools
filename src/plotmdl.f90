@@ -5,7 +5,7 @@
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -44,7 +44,7 @@ program plotmdl
   write(6,*)
   call print_code_version(6)  !To screen
   
-  call eggletonplot_settings()
+  call evTools_settings()
   
   plot = 0
   xwini = 1  !Number of X window to try first

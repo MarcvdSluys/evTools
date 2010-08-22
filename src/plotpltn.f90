@@ -1,16 +1,16 @@
-!!>  Plotpltn.f90:
+!> \file plotpltn.f90  Plots the data contained in different star.plt[12]-files into one graph, now replaced by plotplt.f90
 !!
-!!   Plots the data contained in different star.plt*-files into one graph
-!!   This program reads and plots data from the plot output file from Eggletons code, the TWIN version of 2003 or 2005
-!!   This is free-format fortran, so compile with -free (ifort) or --nfix (lf95)  (or rename files to .f90)
-!!   Uses code in functions.f90
-!!   Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
-!!   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
+!!  - this program reads and plots data from the plot output file from ev (the TWIN version of 2003 or 2005)
+!!  - uses code in functions.f90
+!!  - requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+
+
+!   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -46,7 +46,7 @@ program plotpltn
   write(6,*)
   call print_code_version(6)  !To screen
   
-  call eggletonplot_settings()
+  call evTools_settings()
   
   
   !****************************************************************************************************
@@ -226,7 +226,7 @@ program plotpltn
         !write(*,'(I6,9ES20.5)')i,dat(f,4:5,i),dat(f,83,i),dat(f,15,i),dat(f,8,i),dat(f,90,i)
      end do
      
-     !91: Ratio of the two terms in the "Reimers-like" mass-loss prescription in the Eggleton code:
+     !91: Ratio of the two terms in the "Reimers-like" mass-loss prescription in ev:
      do i=1,n(f)
         if(dat(f,15,i).gt.0.d0) dat(f,91,i) = 3.29d-5*dat(f,4,i)/(dat(f,15,i)/1.d10)  !3.29e-5 * (M/Mo) * (Ebind/10^50 erg)^-1
      end do

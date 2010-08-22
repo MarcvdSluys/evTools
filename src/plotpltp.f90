@@ -1,12 +1,12 @@
 !>  Plotpltp: Plots the data contained in star.plt1,2 in different panels
-!!  This program reads and plots data from the plot output file from Eggletons code, the TWIN version
+!!  This program reads and plots data from the plot output file from ev (the TWIN version)
 !!  The idea is to plot np panels with the same horizontal axis and different vertical axes.
 !!  The output is written to ps only.
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

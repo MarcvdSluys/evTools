@@ -3,7 +3,7 @@
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-tools package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -301,7 +301,7 @@ program listplt
   dat(88,1:n) = dat(88,1:n)/day**3
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 + 0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F):
+  !Analytic convective turnover timescale (days), adapted from Eggleton's CFUNCS.F:
   dat(89,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/dat(9,1:n))**c3rd * (dat(8,1:n)/var(1:n))**2.7d0
   
   

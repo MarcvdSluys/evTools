@@ -1,9 +1,9 @@
-! grid.f, see what a log grid of models in Eggletons code will result in
+! grid.f, see what a log grid of models in ev will result in
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-tools package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -23,7 +23,7 @@ program grid
   character :: bla*99
   
   if(command_argument_count().ne.3) then
-     write(*,'(/,A)')'  This program shows what values are used in a grid of models for the Eggleton code'// &
+     write(*,'(/,A)')'  This program shows what values are used in a grid of models for ev'// &
           ' with specified grid settings'
      write(6,'(A,/)')'  syntax:  grid <Xi, dX, n> '
      stop

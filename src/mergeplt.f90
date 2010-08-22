@@ -1,11 +1,11 @@
 ! Merges the data contained in two .plt-files
-! This program merges data from the plot output file from Eggletons code, the TWIN version
+! This program merges data from the plot output file from ev (the TWIN version)
 ! AF 21-01-2004
 !
 !  Copyright 2002-2010 AstroFloyd - astrofloyd.org
 !  
 !  
-!  This file is part of the eggleton-tools package.
+!  This file is part of the evTools package.
 !  
 !  This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 !  the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

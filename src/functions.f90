@@ -1,12 +1,12 @@
-!> \file functions.f90  Shared modules, functions and subroutines for the Eggleton plot package
+!> \file functions.f90  Shared modules, functions and subroutines for the evTools package
 !!
-!! For functions and routines that need pgplot, see plotfunctions.f
-!<
+!! For general functions and routines that need PGPlot, see plotfunctions.f90
+
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,6 +16,7 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.  If not, see 
 ! <http://www.gnu.org/licenses/>.
+
 
 
 !***********************************************************************************************************************************
@@ -59,7 +60,7 @@ end module ubvdata
 
 
 !***********************************************************************************************************************************
-!> \brief Contains the 'constants' used in the eggletonplot package
+!> \brief Contains the 'constants' used in the evTools package
 module constants
   use kinds
   implicit none
@@ -78,7 +79,7 @@ end module constants
 
 
 !***********************************************************************************************************************************
-!> \brief Define the 'constants' in the eggletonplot package
+!> \brief Define the 'constants' in the evTools package
 subroutine setconstants
   use constants
   implicit none
@@ -1058,8 +1059,8 @@ end subroutine set_PGPS_title
 
 
 !***********************************************************************************************************************************
-!> \brief Read/create EggletonPlot settings file
-subroutine eggletonplot_settings()
+!> \brief Read/create evTools settings file
+subroutine evTools_settings()
   use constants
   implicit none
   integer :: io,u
@@ -1068,7 +1069,7 @@ subroutine eggletonplot_settings()
   
   !Define namelist, file name
   namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
-  filename = trim(homedir)//'/.eggletonplot'
+  filename = trim(homedir)//'/.evTools'
   inquire(file=trim(filename), exist=ex)
   
   u = 10
@@ -1117,7 +1118,7 @@ subroutine eggletonplot_settings()
   
   call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
   
-end subroutine eggletonplot_settings
+end subroutine evTools_settings
 !***********************************************************************************************************************************
 
 

@@ -1,12 +1,14 @@
-!> \file plotmdln.f90   Plots the data contained in star.mdl, for some or all (n) structure models in the file, 
+!> \file plotmdln.f90   Plots the data contained in star.mdl[12], for some or all (n) structure models in the file, 
 !!                      and for ONE set of variables
 
+
 ! AF, 19-05-2005
+
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,7 +21,7 @@
 
 
 
-!> Plot the data contained in star.mdl, for some or all (n) structure models in the file, and for ONE set of variables
+!> Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
 program plotmdln  
   use constants
   
@@ -44,7 +46,7 @@ program plotmdln
   write(6,*)
   call print_code_version(6)  !To screen
   
-  call eggletonplot_settings()
+  call evTools_settings()
   
   
   plotagain = 0

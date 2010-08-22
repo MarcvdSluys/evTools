@@ -1,11 +1,11 @@
-!> \file plotplt.f90  Plots the data contained in a .plt* file, highlights selected points
+!> \file plotplt.f90  Plots the data contained in .plt[12] files, highlights selected points
 
 !  AF, 19-04-2006
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,11 +18,11 @@
 
 
 
-!> \brief Plot the contents of the plt file 
+!> \brief Plot the contents of .plt[12] files
 !! - Uses routines from functions.f90, plt_functions.f90
 !! - Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
-!<
+!! \todo put the library path in the settings file
 program plotplt
   use kinds
   use constants
@@ -61,7 +61,7 @@ program plotplt
   write(6,*)
   call print_code_version(6)  !To screen
   
-  call eggletonplot_settings()
+  call evTools_settings()
   
   
   sch = 1.0

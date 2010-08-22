@@ -1,9 +1,9 @@
-!> \file plt_functions.f90  Functions and subroutines for plotplt* in the Eggleton plot package that need pgplot
+!> \file plt_functions.f90  Functions and subroutines for plotplt* in the evTools package that need pgplot
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the eggleton-plot package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
 ! by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -348,7 +348,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   !These were available in plotpltn
   !asclabels() = 'k2R2'
-  !asclabels() = 'Reimersrat'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  !asclabels() = 'Reimersrat'   !Ratio of Reimers-like wind terms in ev - which dominates? - Politano et al. 2010, Eq.1
   !asclabels() = 'ttf'
   !asclabels() = 'LHeLH'
   
@@ -448,7 +448,7 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   pglabels(88) = 'k\u2\dR\u2\d'
   pglabels(89) = 'M\denv\u'        !M_env
   pglabels(90) = '\(2137)\denv\u'  !lambda_env
-  pglabels(91) = 'Reimers ratio'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010,Eq.1
+  pglabels(91) = 'Reimers ratio'   !Ratio of Reimers-like wind terms in ev - which dominates? - Politano et al. 2010,Eq.1
   
   
   
@@ -536,7 +536,7 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   asclabels(88) = 'k2R2'
   asclabels(89) = 'Menv'        !M_env
   asclabels(90) = 'lambda'  !lambda_env
-  asclabels(91) = 'Reimersrat'   !Ratio of Reimers-like wind terms in Eggleton code - which dominates? - Politano et al. 2010, Eq.1
+  asclabels(91) = 'Reimersrat'   !Ratio of Reimers-like wind terms in ev - which dominates? - Politano et al. 2010, Eq.1
   
   
   
@@ -865,7 +865,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 +  0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  !Analytic convective turnover timescale (days), adapted from Eggleton (CFUNCS.F):
+  !Analytic convective turnover timescale (days), adapted from Eggleton's CFUNCS.F:
   dat(123,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  
   dat(123,1:n) = dat(25,1:n)/dat(123,1:n)  !Actual Tet / analitic Tet
   

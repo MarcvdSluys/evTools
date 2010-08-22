@@ -1,9 +1,10 @@
-!Convert a .plt? file to a .dat file with selected columns
-!
+!> \file plt2dat.f90  Convert a .plt[12] file to a .dat file with selected columns
+
+
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
-! This file is part of the twin-tools package.
+! This file is part of the evTools package.
 ! 
 ! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,6 +14,7 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.  
 ! If not, see <http://www.gnu.org/licenses/>.
+
 
 
 program plt2dat
