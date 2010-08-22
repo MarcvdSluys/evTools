@@ -1,4 +1,4 @@
-!> \file listmdl.f90  Lists the data contained in a *.mdl? file
+!> \file listmdl.f90  Lists the data contained in *.mdl[12] files
 
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
@@ -16,7 +16,7 @@
 ! If not, see <http://www.gnu.org/licenses/>.
 
 
-!> \brief  Lists the data contained in a *.mdl? file
+!> \brief  Lists the data contained in *.mdl[12] files
 program listmdl
   use constants
   implicit none

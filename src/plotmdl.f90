@@ -1,4 +1,4 @@
-!> \file plotmdl.f90  Plots the data contained in a mdl* file
+!> \file plotmdl.f90  Plots the data contained in mdl[12] files
 
 ! AF, 19-05-2005
 
@@ -17,29 +17,25 @@
 ! <http://www.gnu.org/licenses/>.
 
 
-!> \brief Plot the data in the *.mdl? output file of ev
+!> \brief Plot the data in the *.mdl[12] output files of ev
 program plotmdl  
   use kinds
   use constants
   use mdl_data
   
   implicit none
-  integer :: nm,nc,nr,mdl,ny,nsel,pxnr(nq),pxin(nq),io,xwini,pgopen
+  integer :: nm,nr,mdl,ny,nsel,io,xwini,pgopen
   real(double) :: dat1(nq),rl2p,rl2a
   real(double) :: dE,Eorb,Eorbi,a_orb,a_orbi,Porb,alphaCE
   
-  real :: dat(nq,nn),age
-  real :: ver,x
+  real :: dat(nq,nn),age,x
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
-  real(double) :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
-  real(double) :: ll,eeth,eenc,eenu,ss,uuint
-  real(double) :: m1,m2,r1,l1,ts,tc,mhe,mco,rhoc
-  real(double) :: hc,hec,cc,oc,zc,hs,hes,cs,os,zs
+  real(double) :: m1,m2,r1
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot
-  character findfile*99,fname*99,rng,log,bla*3,xwin*19
+  character findfile*99,fname*99,rng,log,xwin*19
   character :: lx*99,ly*99,fx*99,fy*99,title*99,psname*99
   logical :: ex, ab,nab,CE
   
@@ -82,101 +78,12 @@ program plotmdl
   
   !***   READ ALL STRUCTURE MODELS IN THE FILE AND DISPLAY MAIN PROPERTIES
   
-  write(6,*)''
-4 write(6,'(A)')' Reading file '//trim(fname)
-  open (unit=10,form='formatted',status='old',action='read',file=fname,iostat=io)
-  if(io.ne.0) then
-     write(6,'(A,/)')'  Error opening file '//trim(fname)//', aborting...'
-     close(10)
-     stop
-  end if
-  rewind 10
+4 continue
+  call list_mdl_models(trim(fname),nblk)
   
-  io = 0
-  read(10,5,iostat=io) nm,nc,ver !Ver used to be overshoot parameter, now file version number (if>1)
-5 format (2x,I4,4x,I2,F7.3)
-  if(io.ne.0) then
-     write(6,'(A,/)')'  Error reading first line of file, aborting...'
-     close(10)
-     stop
-  end if
-  
-  if(ver.gt.1.) then
-     read(10,*)bla 
-  else
-     nc = 21
-     pxnr(1:nc)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
-  end if
-  
-  write(6,'(A,I4,A,I3,A)')' Reading',nm,' meshpoints,',nc,' columns of data.'
-  
-  write(6,*)''
-  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
-       '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
-  do ii=1,999
-     if(mod(ii,25).eq.0) then
-        write(6,*)''
-        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
-             '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
-     end if
-     read(10,6,iostat=io) mdl,age
-     if(io.lt.0) exit
-     if(io.gt.0) then
-        write(6,'(A,/)')'  Error reading first line of block, aborting...'
-        close(10)
-        stop
-     end if
-6    format (I6,1x,E16.9)
-     mhe = 0.
-     mco = 0.
-     do j=1,nm
-        read(10,7,err=13,end=15)mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
-        if(j.eq.1) then
-           tc  = tt
-           hc  = hh
-           hec = hhe
-           cc = ccc
-           oc = oo
-           zc  = 1. - hh - hhe
-           rhoc = rrh
-        end if
-        if(j.eq.nm) then
-           m1  = mm
-           r1  = rr
-           l1  = ll
-           ts  = tt
-           hs  = hh
-           hes = hhe
-           cs = ccc
-           os = oo
-           zs  = 1. - hh - hhe
-        end if
-        if(mhe.eq.0.0.and.hh.gt.0.1) mhe = mm
-        if(mco.eq.0.0.and.hhe.gt.0.1) mco = mm
-        
-     end do !do j=1,nm
-     
-     write(6,9)ii,mdl,nm,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs!,bms,p,p1
-     
-7    format (1P,E13.6,4E11.4,16E11.3)
-     
-  end do !ii
-  goto 15
+6 format (I6,1x,E16.9)
   
   
-9 format (I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,3f6.3)
-  
-13 print*,'  Error reading block',i-1,'line',j-1,', aborting...'
-  close(10)
-  goto 9999
-15 close(10)
-  
-  nblk = ii-1
-  write(6,*)''
-  print*,' EOF reached,',nblk,' blocks read.'
-  write(6,*)''
-  
-  if(nblk.eq.0) goto 9999
   if(nblk.eq.1) then
      blk = 1 
      goto 25
@@ -186,42 +93,21 @@ program plotmdl
   
   
   !***   CHOOSE STRUCTURE MODEL
-20 write(6,'(A47,I3,A3)',advance='no')' Which structure model do you want to plot (1-',nblk,'): '
+20 continue
+  write(6,'(A47,I3,A3)',advance='no')' Which structure model do you want to plot (1-',nblk,'): '
   read*,blk
   if(blk.eq.0) goto 9999
   if(blk.lt.1.or.blk.gt.nblk) goto 20 
   
+  
+  
   !Read file, upto chosen model (blk-1)
-25 open (unit=10,form='formatted',status='old',file=fname)
-  rewind 10
-  read(10,5,iostat=io) nm,nc,ver !Ver used to be overshoot parameter, now file version number (if>1)
-  if(io.ne.0) then
-     write(6,'(A,/)')'  Error reading first line of file, aborting...'
-     close(10)
-     stop
-  end if
-  if(ver.gt.1.) then
-     read(10,'(60I4)')pxnr(1:nc)
-  else
-     nc = 21
-  end if
-  do i=1,blk-1
-     read(10,6,iostat=io) mdl,age
-     if(io.lt.0) exit
-     if(io.gt.0) then
-        write(6,'(A,/)')'  Error reading first line of block, aborting...'
-        close(10)
-        stop
-     end if
-     do j=1,nm
-        read(10,*,iostat=io) bla
-        if(io.ne.0) then
-           print*,'  Error reading block',i-1,'line',j-1,' while reading the blocks before the selected one, aborting...'
-           close(10)
-           stop
-        end if
-     end do !j
-  end do !i
+25 continue
+  
+  
+  ! Open the input file and read the first blk-1 models:
+  call read_first_mdls(fname,blk-1)
+  nm = nmsh
   
   
   !***   READ CHOSEN STRUCTURE MODEL

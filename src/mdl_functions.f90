@@ -28,6 +28,10 @@ module mdl_data
   ! Constants:
   integer, parameter :: nn=2001, nq=400  !nq: max number of columns
   
+  integer :: nc, nmsh, nv
+  integer :: pxnr(nq), pxin(nq)
+  real :: mdlver
+  
   ! Variable labels:
   integer :: nv_der, nv_sp
   character :: pxns(0:nq)*99, pxfns(0:nq)*99, labels(nq)*99
@@ -52,9 +56,9 @@ subroutine list_mdl_models(infile,nblk)
   character, intent(in) :: infile*(*)
   integer, intent(out) :: nblk
   
-  integer :: nmsh,nv,nmdl
+  integer :: nmdl !,nmsh,nv
   integer :: bl,mp,io
-  real :: age,mdlver,vk,mm1,be,be1
+  real :: age,vk,mm1,be,be1
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
@@ -193,61 +197,36 @@ end subroutine list_mdl_models
 
 
 !***********************************************************************************************************************************
+!> \brief  Print the details of model blk in file infile to screen
+!! \param infile  Name of the input file
+!! \param blk     Number of the stellar-structure block to display
+!! \param svblk   Save block or not (in/out)
 subroutine print_mdl_details(infile,blk,svblk)
   use constants
+  use mdl_data
+  
   implicit none
   character, intent(in) :: infile*99
   integer,intent(in) :: blk
   logical, intent(inout) :: svblk
   
-  real :: age,mdlver,x
-  integer :: nmsh,nv,nmdl
+  real :: age
+  integer :: nmdl
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
-  real :: hc,hec,cc,nc,oc,nec,mgc,zc
+  real :: hc,hec,cc,nic,oc,nec,mgc,zc
   real :: hs,hes,cs,ns,os,nes,mgs,zs
   real :: rhoc,pc,ethc,enuc,encc
   
-  integer :: ii,bl,mp,in,io
+  integer :: bl,mp,in,io
   character :: outfile*99
   
-  mp = 1  !Silence compiler warnings
+  mp = 1  ! Silence compiler warnings
   
-  open(unit=10,form='formatted',status='old',file=trim(infile))
-  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver
-  if(io.ne.0) then
-     write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
-     close(10)
-     stop
-  end if
   
-  !Read file, upto chosen model (blk-1)
-  if(blk.ne.1) then
-     do bl=1,blk-1
-        read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
-        if(io.ne.0) then
-           write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
-           close(10)
-           stop
-        end if
-
-        do mp=1,nmsh
-           read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
-           
-           if(io.ne.0) then  !Error/EOF
-              close(10)
-              if(io.lt.0) then
-                 write(6,'(A,/)')'  Program finished'  !EOF
-              else
-                 write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
-              end if
-              stop
-           end if
-           
-        end do !mp
-     end do !bl
-  end if
+  ! Open the input file and read the first blk-1 models:
+  call read_first_mdls(infile,blk-1)
   
   
   !************************************************************************      
@@ -266,7 +245,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
        mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
   
-  if(io.ne.0) then  !Error/EOF
+  if(io.ne.0) then  ! Error/EOF
      close(10)
      if(io.lt.0) then
         write(6,'(A,/)')'  Program finished'  !EOF
@@ -294,7 +273,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   hc   = hh
   hec  = hhe
   cc   = ccc
-  nc   = nnn
+  nic   = nnn
   oc   = oo
   nec  = nne
   mgc  = mmg
@@ -389,6 +368,66 @@ subroutine print_mdl_details(infile,blk,svblk)
 end subroutine print_mdl_details
 !***********************************************************************************************************************************
 
+
+
+!***********************************************************************************************************************************
+!> \brief  Open a .mdl[12] file and read the first blk models 
+!! \param infile   Name of the input file
+!! \param blk      Number of the stellar-structure block to display
+subroutine read_first_mdls(infile,blk)
+  use mdl_data
+  
+  implicit none
+  character, intent(in) :: infile*(*)
+  integer, intent(in) :: blk
+  
+  
+  integer :: io,bl,mp,ii,nmdl
+  real :: x,age
+  
+  open(unit=10,form='formatted',status='old',file=trim(infile))
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver
+  if(io.ne.0) then
+     write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
+     close(10)
+     stop
+  end if
+  
+  if(mdlver.gt.1.) then
+     read(10,'(60I4)')pxnr(1:nc)
+  else
+     nc = 21
+  end if
+  
+  ! Read file, upto chosen model (blk-1)
+  if(blk.ne.1) then
+     do bl=1,blk
+        read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
+        if(io.ne.0) then
+           write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
+           close(10)
+           stop
+        end if
+        
+        do mp=1,nmsh
+           read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
+           
+           if(io.ne.0) then  !Error/EOF
+              close(10)
+              if(io.lt.0) then
+                 write(6,'(A,/)')'  Program finished'  !EOF
+              else
+                 write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+              end if
+              stop
+           end if
+           
+        end do !mp
+     end do !bl
+  end if
+  
+end subroutine read_first_mdls
+!***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
