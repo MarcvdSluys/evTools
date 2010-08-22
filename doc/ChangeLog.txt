@@ -2,7 +2,16 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
-   124: AstroFloyd, 21/08/2010
+   133: AstroFloyd, 21/08/2010
+     - Use the Fortran 2003 standard
+    
+   128-132: AstroFloyd, 21/08/2010
+     - combine code from plot and tools in ../src/
+   
+   125-127: AstroFloyd, 21/08/2010
+     - create mdl_functions; move code from plotmdl to mdl_functions and plotfunctions
+    
+   124: AstroFloyd, 21/08/2010 
      - plotmdl: 
        - create post-CE comparison plot; fixed some comparison-plot issues
        - list comparison plots in menu, use nrs 300+

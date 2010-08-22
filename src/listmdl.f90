@@ -1,18 +1,19 @@
 !> \file listmdl.f90  Lists the data contained in a *.mdl? file
 
 
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 
 !> \brief  Lists the data contained in a *.mdl? file
@@ -28,8 +29,8 @@ program listmdl
   
   svblk = .false.
   
-  if(iargc().eq.1) then
-     call getarg(1,infile)
+  if(command_argument_count().eq.1) then
+     call get_command_argument(1,infile)
   else
      infile = findfile('*.mdl*') !Search for input file in current dir
      if(len_trim(infile).le.0) call quit_program('No file found in this directory.')
@@ -53,7 +54,7 @@ program listmdl
      
      blk = 0
      do while(blk.lt.1.or.blk.gt.nblk)
-        write(6,'(A50,I3,A3,$)')' For which model do you want to print details (1-',nblk,'): '
+        write(6,'(A50,I3,A3)', advance='no')' For which model do you want to print details (1-',nblk,'): '
         read*,blk
         if(blk.eq.0) then
            write(6,'(A,/)')'  Program finished'
@@ -90,7 +91,7 @@ program listmdl
      write(6,'(A)')'   2) List all models again'
      write(6,'(A)')'   3) Save this model'
      write(6,*)''
-     write(6,'(A27,$)')' What do you want to do ?  '
+     write(6,'(A27)', advance='no')' What do you want to do ?  '
      
      read*,ans
   end do
@@ -283,6 +284,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   integer :: ii,bl,mp,in,io
   character :: outfile*99
   
+  mp = 1  !Silence compiler warnings
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,dov
@@ -437,7 +439,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      write(6,*)''
   end if
   
-81 format('  Model:        Model nr:',i5,',    Mesh pts: ',i4,',    Mass:',f7.2,' Mo,    Age: ',es12.6,' yr,    Z ='f7.4)
+81 format('  Model:        Model nr:',i5,',    Mesh pts: ',i4,',    Mass:',f7.2,' Mo,    Age: ',es12.6,' yr,    Z =',f7.4)
 83 format('  Surface:      M   = ',f9.5,' Mo,  R   =',f11.5,' Ro,   L    =  ',es10.4' Lo,   Teff =',f8.0,' K')
 84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3')
 85 format('  Cores:        Mhe = ',f9.5,' Mo,  Mco =',f9.5,' Mo,     Menv =',f9.5,' Mo')

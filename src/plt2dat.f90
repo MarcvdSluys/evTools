@@ -1,25 +1,28 @@
 !Convert a .plt? file to a .dat file with selected columns
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the twin-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the twin-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.  
+! If not, see <http://www.gnu.org/licenses/>.
 
 
 program plt2dat
+  use kinds
   use constants
+  
   implicit none   
   integer, parameter :: nff=200, n=100000,nc=89
   integer :: i,j,nc1,f,nf,fl,sel(99),nsel,io1,io2
-  real*8 :: dat(nc)
+  real(double) :: dat(nc)
   character :: fnames(nff)*99,infile*99,outfile*99
   
   call setconstants()
@@ -86,9 +89,9 @@ program plt2dat
         !Write selected variables:
         do j=1,nsel
            if(sel(j).eq.1) then
-              write(20,'(I6,$)',iostat=io2)nint(dat(1))
+              write(20,'(I6)', advance='no',iostat=io2)nint(dat(1))
            else
-              write(20,'(ES17.9,$)',iostat=io2)dat(sel(j))
+              write(20,'(ES17.9)', advance='no',iostat=io2)dat(sel(j))
            end if
            if(io2.gt.0) then
               write(0,'(A,I4,A,/)')'  Error writing to '//trim(outfile)//', line',i,' aborting...'

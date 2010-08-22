@@ -1,29 +1,32 @@
 ! Reads, optinally changes and (over!)writes an init.run (fort.23) input file
 ! AF January 21, 2004
-!
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 program makerun  
+  use kinds
+  
   implicit none
-  real*8 :: ct1(7),ct2(7),ct3(7)
-  real*8 :: ml1,dml,ql1,dql,xl1,dxl
-  real*8 :: rot,ex
-  real*8 :: sm,dty,age,per,bms,ecc,p1,enc
-  real*8 :: m2
+  real(double) :: ct1(7),ct2(7),ct3(7)
+  real(double) :: ml1,dml,ql1,dql,xl1,dxl
+  real(double) :: rot,ex
+  real(double) :: sm,dty,age,per,bms,ecc,p1,enc
+  real(double) :: m2
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
-  integer :: io,narg,iargc,i,system
+  integer :: io,narg,command_argument_count,i,system
   character :: filei*99,fileo*99,arg*10,bla*500
   
   write(6,*)''
@@ -50,32 +53,32 @@ program makerun
   m2 = 0.5d0*sm
   if(bms.gt.0) m2 = bms-sm
   
-  narg = iargc()
+  narg = command_argument_count()
   if(narg.eq.1) then
-     call getarg(1,arg)
+     call get_command_argument(1,arg)
      read(arg,*)sm
   else if(narg.eq.2) then
-     call getarg(1,arg)
+     call get_command_argument(1,arg)
      read(arg,*)sm
-     call getarg(2,arg)
+     call get_command_argument(2,arg)
      read(arg,*)per
   else if(narg.eq.3) then
-     call getarg(1,arg)
+     call get_command_argument(1,arg)
      read(arg,*)sm
-     call getarg(2,arg)
+     call get_command_argument(2,arg)
      read(arg,*)m2
-     call getarg(3,arg)
+     call get_command_argument(3,arg)
      read(arg,*)per
      write(6,'(A)')'  Synchronising binary...'
      p1 = per
   else if(narg.eq.4) then
-     call getarg(1,arg)
+     call get_command_argument(1,arg)
      read(arg,*)sm
-     call getarg(2,arg)
+     call get_command_argument(2,arg)
      read(arg,*)m2
-     call getarg(3,arg)
+     call get_command_argument(3,arg)
      read(arg,*)per
-     call getarg(4,arg)
+     call get_command_argument(4,arg)
      read(arg,*)p1
   else
      write(6,'(A)')'  Syntax: '

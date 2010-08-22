@@ -2,25 +2,28 @@
 ! This program merges data from the plot output file from Eggletons code, the TWIN version
 ! AF 21-01-2004
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+!  Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!  
+!  
+!  This file is part of the eggleton-tools package.
+!  
+!  This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+!  the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+!  
+!  This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+!  
+!  You should have received a copy of the GNU General Public License along with this code.  If not, see 
+!  <http://www.gnu.org/licenses/>.
 
 program mergeplt      
+  use kinds
+  
   implicit none
   integer, parameter :: nn=30000,nnn=100
-  real*8 :: dat1(nnn,nn),dat2(nnn,nn)
+  real(double) :: dat1(nnn,nn),dat2(nnn,nn)
   !integer :: model1(nn),model2(nn)
-  integer :: narg,iargc
+  integer :: narg,command_argument_count
   
   integer :: i,j,n1,n2,ncols,ncols1,ncols2,ncolsmax
   character :: fin1*99,fin2*99,fout*99
@@ -29,14 +32,14 @@ program mergeplt
   ncolsmax = 89  !Program is not designed to handle more columns
   
   
-  narg = iargc()
+  narg = command_argument_count()
   if(narg.eq.3) then
-     call getarg(1,fin1)
-     call getarg(2,fin2)
-     call getarg(3,fout)
+     call get_command_argument(1,fin1)
+     call get_command_argument(2,fin2)
+     call get_command_argument(3,fout)
   else if(narg.eq.2) then
-     call getarg(1,fin1)
-     call getarg(2,fin2)
+     call get_command_argument(1,fin1)
+     call get_command_argument(2,fin2)
      fout = 'merged.plt1'
      write(6,'(A)')'  No output file name specified, using merged.plt1'
   else

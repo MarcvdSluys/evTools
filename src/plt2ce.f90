@@ -1,22 +1,25 @@
 !Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
-!
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 program plt2ce
+  use kinds
   implicit none   
+  
   integer, parameter :: nff=200, n=100000,nc=89
-  real*8 :: dat(nc),r,l,t,m0,r0
+  real(double) :: dat(nc),r,l,t,m0,r0
   integer :: i,nc1,f,nf,fl
   character :: fnames(nff)*99,fname*99
   

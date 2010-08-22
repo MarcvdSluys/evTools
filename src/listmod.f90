@@ -3,28 +3,29 @@
 ! AF 2003-12-17
 
 
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.  
+! If not, see <http://www.gnu.org/licenses/>.
 
 
 !> Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
-!! One can then select a model to display its contents more precisely and optionally copy the model to a different file to serve as input. 
-!<
+!! One can then select a model to display its contents more precisely and optionally copy the model to a different file to serve as
+!! input.
 program listmod
   use kinds
   use constants
   implicit none
-  integer :: narg,iargc,blk,ans,nblk
+  integer :: narg,command_argument_count,blk,ans,nblk
   character :: fname*99,findfile*99
   logical :: save_dh
   
@@ -33,9 +34,9 @@ program listmod
   
   
   !***   READ COMMAND LINE VARIABLES
-  narg = iargc()
+  narg = command_argument_count()
   if(narg.gt.0) then
-     call getarg(1,fname)
+     call get_command_argument(1,fname)
   else
      write(6,'(A)')'  listmod: lists the contents of a mod-file to screen'
      write(6,'(A)')'           syntax:  listmod <filename>'
@@ -61,7 +62,7 @@ program listmod
 49 continue  
   blk = 0
   do while(blk.lt.1.or.blk.gt.nblk)
-     write(6,'(A,I5,A4,$)')'  For which model do you want to print details (1 -',nblk,'):  '
+     write(6,'(A,I5,A4)', advance='no')'  For which model do you want to print details (1 -',nblk,'):  '
      read*,blk
      if(blk.eq.0) then
         write(6,*)''
@@ -88,7 +89,7 @@ program listmod
      write(6,'(A)')'    2) List all models again and choose another model'
      write(6,'(A)')'    3) Write this model to another file'
      write(6,*)''
-     write(6,'(A28,$)')'  What do you want to do ?  '
+     write(6,'(A28)', advance='no')'  What do you want to do ?  '
      read*,ans
   end do
   
@@ -398,7 +399,7 @@ subroutine print_mod_details(fname, blk, save_dh)
   write(6,88)hs,hes,cs,os,nes,zs
   write(6,89)hc,hec,cc,oc,nec,zc
   
-81 format ('  Model:        Model nr:',i5,',    Mass:',f7.2,' Mo,    Age: ',es10.4,' yr,  Time step:   ',es10.4,' yr,    Z ='f7.4)
+81 format ('  Model:        Model nr:',i5,',    Mass:',f7.2,' Mo,    Age: ',es10.4,' yr,  Time step:   ',es10.4,' yr,    Z =',f7.4)
 82 format ('                Mesh pts: ',i4,',      Kp: ',i6,',       Jin: ',i3',            Binary component:',i2)
 83 format ('  Primary:      M   =',f9.5,' Mo,  R   =',f9.5,' Ro,   L   =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K')
 84 format ('                Mhe =',f9.5,' Mo,  Mco =',f9.5,' Mo,   Menv=',f9.5,' Mo')
@@ -406,8 +407,8 @@ subroutine print_mod_details(fname, blk, save_dh)
 86 format ('  Orbit:        P  =',ES12.5,' d,   a  =',ES12.5,' Ro,   a1 =',ES12.5,' Ro,    a2 =',ES12.5,' Ro,   Rrl1 =',ES12.5, &
         ' Ro,   Rrl2 = ',ES12.5,' Ro')
 87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',ES12.5,' days')
-88 format ('  Composition:  Surface:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',    Z: ',f6.4)
-89 format ('  Composition:     Core:  H: ',f6.4,',   He: ',f6.4,',   C: ',f6.4,',   O: ',f6.4,',   Ne: ',f6.4,',    Z: ',f6.4)
+88 format ('  Composition:  Surface:  H: ',f7.4,',   He: ',f7.4,',   C: ',f7.4,',   O: ',f7.4,',   Ne: ',f7.4,',    Z: ',f7.4)
+89 format ('  Composition:     Core:  H: ',f7.4,',   He: ',f7.4,',   C: ',f7.4,',   O: ',f7.4,',   Ne: ',f7.4,',    Z: ',f7.4)
   
   
   
@@ -468,7 +469,7 @@ subroutine copy_mod(infile, blk, save_dh)
   inquire(file=trim(outfile), exist=ex)
   if(ex) then
      write(6,'(A)')'  '//trim(outfile)//' exists.'
-     write(6,'(A,$)')'  Please enter a different name for the output file: '
+     write(6,'(A)', advance='no')'  Please enter a different name for the output file: '
      read*,outfile
   end if
   

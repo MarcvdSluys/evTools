@@ -1,36 +1,39 @@
 ! getgrid.f, Find the parameters you need to get a grid with n values between x1 and x2
-!
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 program getgrid      
+  use kinds
+  
   implicit none
-  double precision :: x1,x2,dlgx
-  integer :: n,iargc
+  real(double) :: x1,x2,dlgx
+  integer :: n,command_argument_count
   character :: bla*99
   
-  if(iargc().ne.3) then
+  if(command_argument_count().ne.3) then
      write(*,'(/,A)')'  This program returns the parameters you need for a certain grid of N models with values between'// &
           ' X1 and X2 in the Eggleton code'
      write(6,'(A,/)')'  Syntax:  getgrid <X1> <X2> <N>'
      stop
   end if
   
-  call getarg(1,bla)
+  call get_command_argument(1,bla)
   read(bla,*)x1
-  call getarg(2,bla)
+  call get_command_argument(2,bla)
   read(bla,*)x2
-  call getarg(3,bla)
+  call get_command_argument(3,bla)
   read(bla,*)n
   
   dlgx = dlog10(x2/x1)/real(n-1)
@@ -53,8 +56,10 @@ end program getgrid
 
 !Shared with grid.f
 subroutine printgrid(xi1,dx,n)
+  use kinds
+  
   implicit none
-  real*8 :: xi1,xi,dx
+  real(double) :: xi1,xi,dx
   integer :: i,n
   
   xi = xi1

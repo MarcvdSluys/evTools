@@ -4,11 +4,12 @@
 
 !*****************************************************************************************************************************************************
 module initdat_contents
+  use kinds
   save
   
-  real*8 :: eps, del, dh0, wanted_eps
+  real(double) :: eps, del, dh0, wanted_eps
   
-  real*8 :: cdc_ms, cdc_hec, cdc_hes, cdc_dblsh, cdc5
+  real(double) :: cdc_ms, cdc_hec, cdc_hes, cdc_dblsh, cdc5
   
   integer :: ke1, ke2, ke3, kbc, kev, kfn, kl, jh(3)
   integer :: kp_var(40), kp_eqn(40), kp_bc(40)
@@ -20,19 +21,19 @@ module initdat_contents
   
   !integer :: kn, kjn(40)
   
-  real*8 :: ct1, ct2, ct3
-  real*8 :: ct(10)
+  real(double) :: ct1, ct2, ct3
+  real(double) :: ct(10)
   
-  real*8 :: ch, cc, cn, co, cne, cmg, csi, cfe
-  real*8 :: calp, cu, cos, cps, crd, cth, cgrs, ccac, csmc
-  real*8 :: cdsi, cshi, cssi, cesc, cgsf, cfmu, cfc
-  real*8 :: artmix
+  real(double) :: ch, cc, cn, co, cne, cmg, csi, cfe
+  real(double) :: calp, cu, cos, cps, crd, cth, cgrs, ccac, csmc
+  real(double) :: cdsi, cshi, cssi, cesc, cgsf, cfmu, cfc
+  real(double) :: artmix
   
-  real*8 :: cxb, cgr, cea, cet
-  real*8 :: cmt, cms, cml, chl, ctf, clt
-  real*8 :: cmi, cmr, cmj, cmv, cmk, cmnl
-  real*8 :: cpa, cbr, csu, csd, cdf, cgw, cso, cmb
-  real*8 :: cphotontire
+  real(double) :: cxb, cgr, cea, cet
+  real(double) :: cmt, cms, cml, chl, ctf, clt
+  real(double) :: cmi, cmr, cmj, cmv, cmk, cmnl
+  real(double) :: cpa, cbr, csu, csd, cdf, cgw, cso, cmb
+  real(double) :: cphotontire
   
   integer :: convection_scheme
   logical :: use_fudge_control, allow_extension, allow_underrelaxation
@@ -40,11 +41,11 @@ module initdat_contents
   logical :: allow_egenrelaxation, use_previous_mu
   logical :: allow_avmurelaxation, use_quadratic_predictions
   
-  real*8 :: convection_ledoux,smart_mass_loss,climit,enc_parachute
-  real*8 :: multiplier_reimers,multiplier_vasiliadis_wood,multiplier_schroeder,multiplier_wachter,multiplier_achmad
+  real(double) :: convection_ledoux,smart_mass_loss,climit,enc_parachute
+  real(double) :: multiplier_reimers,multiplier_vasiliadis_wood,multiplier_schroeder,multiplier_wachter,multiplier_achmad
   logical :: eos_include_pairproduction, accret_composition!Obsolete?
   
-  real*8 :: off_centre_weight
+  real(double) :: off_centre_weight
   
   integer :: ke1_2, ke2_2, ke3_2, kbc_2, kev_2, kfn_2, kl_2, jh_2(3)
   integer :: kp_var_2(40), kp_eqn_2(40), kp_bc_2(40)
@@ -52,7 +53,7 @@ module initdat_contents
   
   !Not defined in init_dat_settings in stars:
   integer :: kh,nfunc,cmi_mode
-  real*8 :: cdc(10),zscaling_mdot
+  real(double) :: cdc(10),zscaling_mdot
   
   
   
@@ -60,22 +61,22 @@ module initdat_contents
   
   
   !From module "settings" in stars
-  real*8 :: czs
-  real*8 :: initial_ct(10)
-  !real*8 :: cc, cn, co, cne, cmg, csi, cfe
+  real(double) :: czs
+  real(double) :: initial_ct(10)
+  !real(double) :: cc, cn, co, cne, cmg, csi, cfe
   
-  !real*8 :: calp, cu, cos, cps, crd, cth
-  !real*8 :: cxb, cgr
-  !real*8 :: cea, cet
-  !real*8 :: cmt, cms, cmi, cml, chl, ctf, clt
-  !real*8 :: cpa, cbr, csu, csd, cdf, cgw, cso, cmb
+  !real(double) :: calp, cu, cos, cps, crd, cth
+  !real(double) :: cxb, cgr
+  !real(double) :: cea, cet
+  !real(double) :: cmt, cms, cmi, cml, chl, ctf, clt
+  !real(double) :: cpa, cbr, csu, csd, cdf, cgw, cso, cmb
   
   !individual mass loss recipe switches.
-  real*8 :: cmrr,cmvw,cmsc,cmw,cmal
-  real*8 :: cmdotrot_hlw,cmdotrot_mm
+  real(double) :: cmrr,cmvw,cmsc,cmw,cmal
+  real(double) :: cmdotrot_hlw,cmdotrot_mm
   
   !non-conservative mass transfer options
-  real*8 :: cmtel,cmtwl
+  real(double) :: cmtel,cmtwl
   
   
   integer :: kth, kx, ky, kz
@@ -88,31 +89,31 @@ module initdat_contents
   integer :: kr_nucsyn
   
   ! variables derived from settings and never changed
-  real*8 :: clogz
+  real(double) :: clogz
   logical :: rigid_rotation
   
   ! switches for the new "smooth" remesher
   logical :: use_smooth_remesher,relax_loaded_model
   
   ! unused, but the code relies on this being defined:
-  real*8 :: cq1, cq(17) 
+  real(double) :: cq1, cq(17) 
   
   
   
   
   
   !From read_init_dat in bbegin:
-  real*8 :: ch_opac
-  real*8 :: cdc_ems, cdc_hg, cdc_1dup, cdc_rlof, cdc_rlof_reduce, unused1, unused(17)
+  real(double) :: ch_opac
+  real(double) :: cdc_ems, cdc_hg, cdc_1dup, cdc_rlof, cdc_rlof_reduce, unused1, unused(17)
   
-  real*8 :: x1ac, x4ac, x12ac, x14ac, x16ac, x20ac, x24ac
-  real*8 :: xac(7, 2)
+  real(double) :: x1ac, x4ac, x12ac, x14ac, x16ac, x20ac, x24ac
+  real(double) :: xac(7, 2)
   
   
   
   !From module zams_nucleosynthesis_abundances:
-  real*8 :: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13,cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22,cxna22,cxna23,cxmg24,cxmg25,cxmg26
-  real*8 :: cxal26m,cxal27,cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34,cxfe57,cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58,cxni60
+  real(double) :: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13,cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22,cxna22,cxna23,cxmg24,cxmg25,cxmg26
+  real(double) :: cxal26m,cxal27,cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34,cxfe57,cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58,cxni60
   
 end module initdat_contents
 !*****************************************************************************************************************************************************
@@ -124,12 +125,12 @@ program convert_initdat
   character :: infilename*99,outfilename*99
   
   !Read command-line variables:
-  if(iargc().eq.1) then
-     call getarg(1,infilename)
+  if(command_argument_count().eq.1) then
+     call get_command_argument(1,infilename)
      outfilename = trim(infilename)//'.new'
-  else if(iargc().eq.2) then
-     call getarg(1,infilename)
-     call getarg(2,outfilename)
+  else if(command_argument_count().eq.2) then
+     call get_command_argument(1,infilename)
+     call get_command_argument(2,outfilename)
   else
      write(0,'(/,A,/)')'  Syntax:  convert_initdat <old file> [<new file>]'
      stop

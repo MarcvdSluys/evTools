@@ -2,24 +2,27 @@
 !Use this on a grid of models, e.g. to pick out the models that fit V = 10+-1 and B-V = 1.1+-0.1
 !July 2007
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.  
+! If not, see <http://www.gnu.org/licenses/>.
 
 program selplt
   use constants
-  implicit none   
-  integer, parameter :: nn=2000,nff=1000,nvar=210,ndim=2,ncondmax=99               !ndim is the number of dimensions of the conditions array (differen variables, for AND), ncondmax is the max number of conditions (for OR)
-  real*8 :: dat(nvar,nn),dato(nvar,nn),x(ndim),y(ndim,ncondmax),dy(ndim,ncondmax),sumsq,maxtime!,zsurf
+  implicit none
+  ! ndim is the number of dimensions of the conditions array (different variables, for AND), 
+  ! ncondmax is the max number of conditions (for OR)
+  integer, parameter :: nn=2000,nff=1000,nvar=210,ndim=2,ncondmax=99
+  real(double) :: dat(nvar,nn),dato(nvar,nn),x(ndim),y(ndim,ncondmax),dy(ndim,ncondmax),sumsq,maxtime!,zsurf
   integer :: i,j,n,f,nf,sel,cd,d,indx(ndim),ver,dpdt,ncond,ndata,nsel
   character :: fnames(nff)*99,fname*99,labels(nvar)*99
   
@@ -89,7 +92,8 @@ program selplt
      !print*,f,nf,trim(fname)
      if(trim(fname).eq.'selection.plt1') cycle
      
-     call readplt(10,fname,nn,nvar,81,0,dat,n,ver) !unit=10, nc=81, verbose=0   When nn is large, this somehow takes a very long time!!!
+     ! When nn is large, this somehow takes a very long time!!!
+     call readplt(10,fname,nn,nvar,81,0,dat,n,ver)  !unit=10, nc=81, verbose=0
      dato = dat  !Save original data, for output
      
      call changepltvars(nn,nvar,n,dat,labels,dpdt)  !Change (e.g. de-log) and add plot variables
@@ -108,7 +112,8 @@ program selplt
         
         !if(nc.eq.81) 
         !read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=12,end=15) (dat(i,j),i=1,81)  !81 Columns
-        !if(nc.gt.81) read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=12,end=15) (dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
+        !if(nc.gt.81) read(10,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F2.0)',err=12,end=15) &
+        !(dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
         
         !zsurf = 1.d0 - dat(42,j) - dat(43,j)                   !Z_surf = 1 - X - Y
         !call lt2ubv(dat(9,j),dat(10,j),dat(4,j),dlog10(zsurf/2.d-2),dat(81,j),dat(82,j),dat(83,j),dat(84,j),dat(85,j))
@@ -146,11 +151,15 @@ program selplt
         !print*,sel
         
         if(sel.eq.1) then !Write output when ANY of the conditions (OR) holds for ALL (AND) dimensions
-           !if(nc.eq.81) write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dato(1,j)),(dato(i,j),i=2,81)  !81 Columns
+           !if(nc.eq.81) write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dato(1,j)), &
+           !(dato(i,j),i=2,81)  !81 Columns
            !if(nc.ne.81) 
-           !write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6,ES13.5,I2)') nint(dato(1,j)),(dato(i,j),i=2,82),nint(dato(83,j))  !83 Columns, Evert(?) added 82, 83=strmdl flag
-           !write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dat(1,j)),(dat(i,j),i=2,81)  !Just print 81 Columns
-           write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dato(1,j)),(dato(i,j),i=2,81)  !Just print 81 Columns
+           !write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6,ES13.5,I2)') nint(dato(1,j)), &
+           !(dato(i,j),i=2,82),nint(dato(83,j))  !83 Columns, Evert(?) added 82, 83=strmdl flag
+           
+           !Just print 81 Columns:
+           !write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dat(1,j)),(dat(i,j),i=2,81)
+           write(20,'(I6,ES17.9,ES14.6,12ES13.5,7ES12.4,3ES13.5,16ES12.4,39ES13.5,ES14.6)') nint(dato(1,j)),(dato(i,j),i=2,81)
            nsel = nsel + 1
         end if
      end do! m/j=1,n

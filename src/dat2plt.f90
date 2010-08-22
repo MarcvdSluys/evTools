@@ -1,33 +1,37 @@
 !dat2plt:  Reads some data file with a stellar-evolution model from some code and saves the data in plt format
 ! taken from listplt, 03/02/2009
-!
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 
 program dat2plt
+  use kinds
   use constants
+  
   implicit none
   integer, parameter :: nci1=99,nco=89
-  integer :: i,iargc,ioi,ioo,nci,translate(nci1),skipinlines,ci
-  real*8 :: dati(nci1),dato(nco)
+  integer :: i,command_argument_count,ioi,ioo,nci,translate(nci1),skipinlines,ci
+  real(double) :: dati(nci1),dato(nco)
   character :: infile*99,outfile*99,bla
   
   
   !Current settings: for Lev's file, 1/2/2009
   skipinlines = 1 !Skip the first skipinlines from the input file
   nci = 14  !Number of input columns
-  translate(1:nci) = (/1,2,4, 56,57,58,59,60,61, 13,11,8,9,10/)  !Contains the target column number in the plt file for each column in the input file
+  ! Contains the target column number in the plt file for each column in the input file:
+  translate(1:nci) = (/1,2,4, 56,57,58,59,60,61, 13,11,8,9,10/)
   
   !  1: model      16: Lh         28: Porb      34: Horb    
   !  2: t          17: Lhe        29: FLR       35: dHorb/dt
@@ -66,8 +70,8 @@ program dat2plt
   !***   READ COMMAND LINE VARIABLES
   !************************************************************************
   
-  if(iargc().eq.1) then
-     call getarg(1,infile)
+  if(command_argument_count().eq.1) then
+     call get_command_argument(1,infile)
   else
      write(6,'(/,A)')'  dat2plt:   convert the stellar-evolution output of a different code to the plt format of the Eggleton code'
      write(6,'(A,/)')'  syntax:    dat2plt <filename>'

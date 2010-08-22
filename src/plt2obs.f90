@@ -1,26 +1,29 @@
-!plt2obs.f:  Convert code output in plt-file to observables (V, U-B, B-V, V-R, R-I)
+! plt2obs.f:  Convert code output in plt-file to observables (V, U-B, B-V, V-R, R-I)
 !            Based on Kurucz' atmosphere models, needs UBVRI.Kur
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.  
+! If not, see <http://www.gnu.org/licenses/>.
 
 program plt2obs
+  use kinds
   use constants
   use ubvdata
+  
   implicit none
   integer, parameter :: nn=30000,nc=81,nff=100
-  real*8 :: tm,m,mc,z,zmod,mbol,bc,mv,umb,bmv,vmr,rmi
-  real*8 :: logt,logl,logr,dat(nc,nn)
+  real(double) :: tm,m,mc,z,zmod,mbol,bc,mv,umb,bmv,vmr,rmi
+  real(double) :: logt,logl,logr,dat(nc,nn)
   integer :: i,j,n,ncols,fnl,nf,f,io
   character :: fname*99,fnames(nff)*99,oname*55,ans,tmpstr*10
   
@@ -136,7 +139,7 @@ program plt2obs
      zmod = 1.d0 - dat(42,1) - dat(43,1)
      if(abs(log10(zmod/z)).gt.1.d-2) then
         write(6,'(A)')' There seems to be a difference between the metalicity of the model and the code.'
-        write(6,'(A23,F8.5,A3,F8.5,A12,$)')' Should I change Z from',z,'to',zmod,'?  (y/n):  '
+        write(6,'(A23,F8.5,A3,F8.5,A12)', advance='no')' Should I change Z from',z,'to',zmod,'?  (y/n):  '
         read*,ans
         if(ans.eq.'y'.or.ans.eq.'Y') z = zmod
      end if

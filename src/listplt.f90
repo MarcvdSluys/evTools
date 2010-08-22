@@ -1,29 +1,31 @@
 ! Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.  
+! If not, see <http://www.gnu.org/licenses/>.
 
 program listplt
   use kinds
   use constants
   use ubvdata
+  
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81
   real(double), parameter :: c8th=0.125_dbl
-  real*8 :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
-  real*8 :: c82(nn),c85a,c85b,c92(nn),mbol,bc
+  real(double) :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
+  real(double) :: c82(nn),c85a,c85b,c92(nn),mbol,bc
   
-  integer :: i,io,j,n,ans,ncols,narg,iargc
+  integer :: i,io,j,n,ans,ncols,narg,command_argument_count
   character :: findfile*99, fname*99,labels(nnn)*99,tmpstr*10
   
   call setconstants()
@@ -140,9 +142,9 @@ program listplt
   !***   READ COMMAND LINE VARIABLES
   !************************************************************************
   
-  narg = iargc()
+  narg = command_argument_count()
   if(narg.eq.1) then
-     call getarg(1,fname)
+     call get_command_argument(1,fname)
   else
      write(6,'(A)')'listplt: lists the contents of a plt-file to screen'
      write(6,'(A)')'    syntax:  listplt <filename>'
@@ -264,9 +266,9 @@ program listplt
   
   
   dat(75,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr          !KH timescale
-  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.e-30)          !Gravitational waves
-  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.e-30)             !Magnetic braking (Actually SO-coupling!)
-  dat(78,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.e-30)         !Mass transfer
+  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)          !Gravitational waves
+  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)             !Magnetic braking (Actually SO-coupling!)
+  dat(78,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)         !Mass transfer
   dat(79,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10              !Nuclear evolution timescale
   dat(80,1:n) = dat(79,1:n)
   
@@ -349,7 +351,7 @@ program listplt
   
   
 61 write(6,*)''
-  write(6,'(A,$)')'  Which line would you like to see (0 = quit):  '
+  write(6,'(A)', advance='no')'  Which line would you like to see (0 = quit):  '
   read*,ans
   if(ans.gt.n.or.ans.lt.0) goto 61
   if(ans.eq.0) goto 9999
@@ -398,7 +400,7 @@ program listplt
   goto 9999
   
   
-  !*************************************************************************************************************************************************
+  !*********************************************************************************************************************************
   
   
   

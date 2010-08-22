@@ -3,26 +3,29 @@
 !Line width > 72 chars, so compile with --wide or -extend_source or whatever is needed
 !Needs the file ~/usr/lib/UBVRI.Kur to calculate magnitudes and colours (see line 15)
 !
-!   Copyright 2002-2010 AstroFloyd - astrofloyd.org
-!   
-!   
-!   This file is part of the eggleton-tools package.
-!   
-!   This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-!   
-!   This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-!   
-!   You should have received a copy of the GNU General Public License along with this code.  If not, see <http://www.gnu.org/licenses/>.
+! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! 
+! 
+! This file is part of the eggleton-tools package.
+! 
+! This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+! 
+! This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+! 
+! You should have received a copy of the GNU General Public License along with this code.
+! If not, see <http://www.gnu.org/licenses/>.
 
 program findplt
+  use kinds
   use constants
   use ubvdata
+  
   implicit none
   integer, parameter :: nn=30000,nnn=100,ny=18
-  real*8 :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
-  integer :: i,j,ncols,prmdl,succ,narg,iargc,iin,iout,glt,io
+  real(double) :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
+  integer :: i,j,ncols,prmdl,succ,narg,command_argument_count,iin,iout,glt,io
   character :: findfile*99,fname*99,arg*99,tmpstr*10
   
   call setconstants()
@@ -41,7 +44,7 @@ program findplt
   
   
   !Read the filename from the command line if any, search the current directory otherwise
-  narg = iargc()
+  narg = command_argument_count()
   iout = 0
   if(narg.lt.3.or.narg.gt.4) then
      write(6,'(A)')'Usage:  FINDPLT  <file.plt> <variable> <value> [<output>]'
@@ -74,18 +77,18 @@ program findplt
      
      fname = findfile('*.plt*')
      
-     write(6,'(A27,$)')'Give the variable (1-99): '
+     write(6,'(A27)', advance='no')'Give the variable (1-99): '
      read*,iin
-     write(6,'(A17,$)')'Give the value: '
+     write(6,'(A17)', advance='no')'Give the value: '
      read*,xfind
   else
-     call getarg(1,fname)
-     call getarg(2,arg)
+     call get_command_argument(1,fname)
+     call get_command_argument(2,arg)
      read(arg,*)iin
-     call getarg(3,arg)
+     call get_command_argument(3,arg)
      read(arg,*)xfind
      if(narg.eq.4) then
-        call getarg(4,arg)
+        call get_command_argument(4,arg)
         read(arg,*)iout
      end if
   end if
@@ -100,7 +103,7 @@ program findplt
   !print*,ncols,'columns'
   
   succ = 0
-  glt = 1               !glt determines whether we search the first model where:  x(iin) < xfind (glt=1),   or  x(iin) > xfind (glt=2)
+  glt = 1            ! glt determines whether we search the first model where:  x(iin) < xfind (glt=1),   or  x(iin) > xfind (glt=2)
   
   do j=1,nn
      !read(10,10,err=11,end=15) x(1:ncols)
@@ -166,9 +169,11 @@ end program findplt
 
 !************************************************************************      
 subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
+  use kinds
+  
   implicit none
   integer :: i,n,iin,iout
-  real*8 :: x(n)
+  real(double) :: x(n)
   
   if(iout.eq.0) then
      write(6,*)''
@@ -194,7 +199,7 @@ subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
   
   if(1.eq.2) then 
      write(6,*)''
-     write(6,'(F8.4,ES12.5,$)')x((/4,2/))
+     write(6,'(F8.4,ES12.5)', advance='no')x((/4,2/))
   end if
   
 end subroutine printmodel
