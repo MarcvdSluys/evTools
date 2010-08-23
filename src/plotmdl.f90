@@ -28,8 +28,8 @@ program plotmdl
   real(double) :: dat1(nq),rl2p,rl2a
   real(double) :: dE,Eorb,Eorbi,a_orb,a_orbi,Porb,alphaCE
   
-  real :: dat(nq,nn),age,x
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
+  real(double) :: dat(nq,nn),age
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
   real(double) :: m1,m2,r1
@@ -119,11 +119,11 @@ program plotmdl
   end if
   do j=1,nm
      read(10,*,iostat=io) (dat1(i),i=1,nc)  !Gfortran reports a read error when the number is smaller or larger than the accuracy
-     dat(1:nc,j) = real(dat1(1:nc))
+     dat(1:nc,j) = dat1(1:nc)
      if(io.ne.0) then
         print*,'  Error reading line',j-1,' of the selected block, aborting...'
         close(10)
-        print*,dat(1:nc,j)
+        print*,real(dat1(1:nc))
         stop
      end if
   end do
@@ -143,7 +143,7 @@ program plotmdl
      end do
      
      do i=1,nm
-        dat(201,i) = real(i)
+        dat(201,i) = dble(i)
      end do
      dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
      !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
@@ -153,7 +153,7 @@ program plotmdl
      dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
      dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
      dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  !Ugr + Uint  
-     dat(208,1:nm) = 1.0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                             !Mean free path = 1/(rho * kappa)
+     dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            !Mean free path = 1/(rho * kappa)
      if(pxin(31).ne.0) then
         dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
         pxnr(209) = 209
@@ -162,22 +162,22 @@ program plotmdl
      pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
      
      !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
-     dat(211,1:nm) = 2. / (1 + 3*dat(9,1:nm) + 0.5*dat(10,1:nm))
-     dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       !Particle density       n = rho/(mu*m_H)
-     dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             !                   P_rad = aT^4/3
-     dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         !                   P_gas = nkT
-     dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.e-30)                                  !                    beta = Prad/Pgas
+     dat(211,1:nm) = 2.d0 / (1.d0 + 3*dat(9,1:nm) + 0.5d0*dat(10,1:nm))
+     dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       ! Particle density       n = rho/(mu*m_H)
+     dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             ! P_rad = aT^4/3
+     dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         ! P_gas = nkT
+     dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.d-30)                                  ! beta = Prad/Pgas
      
      !216-217: binding energy:
-     dat(216,1:nm) = 0.0
-     dat(217,1:nm) = 0.0
-     dat(218,1:nm) = 0.0
+     dat(216,1:nm) = 0.0d0
+     dat(217,1:nm) = 0.0d0
+     dat(218,1:nm) = 0.0d0
      do i=2,nm
         dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
         !dE = dat(207,i)*dat(216,i) * m0*1.d-40                                            ! BE of the shell (10^40 erg)
         dE = dat(207,i)*dat(216,i) * m0 / (G*M0**2/R0)                                     ! BE of the shell       (G Mo^2 / Ro)
         dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
-        if(dat(pxin(10),i).gt.0.1) dat(218,i) = dat(218,i-1) + dE                          ! BE of envelope        (same units)
+        if(dat(pxin(10),i).gt.0.1d0) dat(218,i) = dat(218,i-1) + dE                        ! BE of envelope        (same units)
      end do
      do i=nm-1,1,-1
         if(abs(dat(218,i)).lt.1.d-19) dat(218,i) = dat(218,i+1)                            ! Set the core BE to first non-zero BE
@@ -185,13 +185,13 @@ program plotmdl
      
      dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               ! P/rho
      
-     m1 = dble(dat(pxin(9),nm))                                                            ! Total mass
+     m1 = dat(pxin(9),nm)                                                                  ! Total mass
      m2 = m1                                                                               ! Total mass
-     r1 = dble(dat(pxin(17),nm))                                                           ! Surface radius
-     dat(220,1) = 0.0
+     r1 = dat(pxin(17),nm)                                                                 ! Surface radius
+     dat(220,1) = 0.d0
      do i=2,nm
         ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
-        dat(220,i) = real(rl2p(dble(dat(pxin(9),i))*M0, m2*M0, dble(dat(pxin(17),i))*R0)/day)                  
+        dat(220,i) = rl2p(dat(pxin(9),i)*M0, m2*M0, dat(pxin(17),i)*R0)/day                  
      end do
      pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
      
@@ -201,12 +201,12 @@ program plotmdl
      Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
      !print*,m1,m2,r1,a_orbi,Eorbi
      do i=1,nm
-        Eorb = Eorbi + dble(dat(217,nm)) - dble(dat(217,i))/alphaCE                        ! Eorb (G Mo^2 / Ro)
+        Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
         !print*,i, Eorbi, dat(218,nm), dat(218,i)/alphaCE,Eorb
-        a_orb = -dble(dat(pxin(9),i))*m2/(2*Eorb)                                          ! a_orb (Ro)
-        call a2p(dble(dat(pxin(9),i)+m2)*M0,a_orb*R0,Porb)                                 ! Porb (s)
+        a_orb = -dat(pxin(9),i)*m2/(2*Eorb)                                                ! a_orb (Ro)
+        call a2p((dat(pxin(9),i)+m2)*M0,a_orb*R0,Porb)                                     ! Porb (s)
         !if(mod(i,10).eq.0)print*,i,dat(pxin(9),i),Eorb,a_orb,Porb
-        dat(221,i) = real(Porb/day)                                                        ! Porb (day)
+        dat(221,i) = Porb/day                                                              ! Porb (day)
      end do
      pxnr(221:221) = (/221/)
      
@@ -302,7 +302,7 @@ program plotmdl
   if(vy.eq.301.or.ab) then
      ab = .true.
      vy = pxin(10)
-     yy(1:7,1:nm) = dat(pxin(10):pxin(16),1:nm)
+     yy(1:7,1:nm) = real(dat(pxin(10):pxin(16),1:nm))
      ny = 7
   end if
   
@@ -310,9 +310,9 @@ program plotmdl
   if(vy.eq.302.or.nab) then
      nab = .true.
      vy = pxin(6)
-     yy(1,1:nm) = dat(pxin(6),1:nm)   !Nabla_ad
-     yy(2,1:nm) = dat(pxin(202),1:nm) !Nabla_rad
-     yy(3,1:nm) = dat(pxin(7),1:nm)   !True Nabla
+     yy(1,1:nm) = real(dat(pxin(6),1:nm))    ! Nabla_ad
+     yy(2,1:nm) = real(dat(pxin(202),1:nm))  ! Nabla_rad
+     yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
      print*,pxin(6),pxin(7),pxin(202)
      ny = 3
   end if
@@ -321,13 +321,13 @@ program plotmdl
   if(vy.eq.303.or.ce) then
      CE = .true.
      vy = 220
-     yy(1,1:nm) = dat(220,1:nm)       ! P(r(m)=Rrl)
-     yy(2,1:nm) = dat(221,1:nm)       ! P(post-alphaCE)
+     yy(1,1:nm) = real(dat(220,1:nm))        ! P(r(m)=Rrl)
+     yy(2,1:nm) = real(dat(221,1:nm))        ! P(post-alphaCE)
      ny = 2
   end if
   
-  xx(1:nm) = dat(vx,1:nm)
-  yy(1,1:nm) = dat(vy,1:nm)
+  xx(1:nm) = real(dat(vx,1:nm))
+  yy(1,1:nm) = real(dat(vy,1:nm))
   
   
   

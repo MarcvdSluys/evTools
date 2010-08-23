@@ -1099,9 +1099,13 @@ subroutine evTools_settings()
   else
      
      write(6,*)
-     write(6,'(A)')'  No settings file found.'
-     write(6,'(A)')'  Creating '//trim(filename)//' with default settings,'
-     write(6,'(A)')'  please edit it to set your preferences.'
+     write(6,'(A)')'############################################################'
+     write(6,'(A)')'#                                                          #'
+     write(6,'(A)')'#   No evTools settings file found.                        #'
+     write(6,'(A)')'#   Creating '//trim(filename)//' with default settings,   #'
+     write(6,'(A)')'#   please edit it to set your preferences.                #'
+     write(6,'(A)')'#                                                          #'
+     write(6,'(A)')'############################################################'
      write(6,*)
      
   end if
