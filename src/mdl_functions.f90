@@ -28,7 +28,7 @@ module mdl_data
   ! Constants:
   integer, parameter :: nn=2001, nq=400  !nq: max number of columns
   
-  integer :: nc, nmsh, nv
+  integer :: nc, nmsh, nv, nm
   integer :: pxnr(nq), pxin(nq)
   real :: mdlver
   
@@ -43,7 +43,104 @@ end module mdl_data
 
 
 
+!***********************************************************************************************************************************
+!> \brief  Compute secondary variables from the primary variables in a .mdl[12] file
+!! \param  dat  Data array (in/out)
+subroutine compute_mdl_variables(dat)
+  use kinds
+  use constants
+  use mdl_data
+  
+  implicit none
+  real(double), intent(inout) :: dat(nq,nm)
+  integer :: i
+  real(double) :: rl2p,rl2a
+  real(double) :: m1,m2,r1, dE,Eorb,Eorbi, a_orb,a_orbi, Porb,alphaCE
+  
+  !Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
+  do i=1,nc
+     if(pxnr(i).gt.0) pxin(pxnr(i)) = i
+  end do
+  
+  do i=1,nm
+     dat(201,i) = dble(i)
+  end do
+  dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
+  !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
+  dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
+  dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     !M/M*
+  dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
+  dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
+  dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
+  dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  !Ugr + Uint  
+  dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            !Mean free path = 1/(rho * kappa)
+  if(pxin(31).ne.0) then
+     dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
+     pxnr(209) = 209
+  end if
+  dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
+  pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
+  
+  !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
+  dat(211,1:nm) = 2.d0 / (1.d0 + 3*dat(9,1:nm) + 0.5d0*dat(10,1:nm))
+  dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       ! Particle density       n = rho/(mu*m_H)
+  dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             ! P_rad = aT^4/3
+  dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         ! P_gas = nkT
+  dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.d-30)                                  ! beta = Prad/Pgas
+  
+  !216-217: binding energy:
+  dat(216,1:nm) = 0.0d0
+  dat(217,1:nm) = 0.0d0
+  dat(218,1:nm) = 0.0d0
+  do i=2,nm
+     dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
+     !dE = dat(207,i)*dat(216,i) * m0*1.d-40                                            ! BE of the shell (10^40 erg)
+     dE = dat(207,i)*dat(216,i) * m0 / (G*M0**2/R0)                                     ! BE of the shell       (G Mo^2 / Ro)
+     dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
+     if(dat(pxin(10),i).gt.0.1d0) dat(218,i) = dat(218,i-1) + dE                        ! BE of envelope        (same units)
+  end do
+  do i=nm-1,1,-1
+     if(abs(dat(218,i)).lt.1.d-19) dat(218,i) = dat(218,i+1)                            ! Set the core BE to first non-zero BE
+  end do
+  
+  dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               ! P/rho
+  
+  m1 = dat(pxin(9),nm)                                                                  ! Total mass
+  m2 = m1                                                                               ! Total mass
+  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
+  dat(220,1) = 0.d0
+  do i=2,nm
+     ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
+     dat(220,i) = rl2p(dat(pxin(9),i)*M0, m2*M0, dat(pxin(17),i)*R0)/day                  
+  end do
+  pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
+  
+  alphaCE = 1.0
+  a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb (Ro)
+  !Eorbi = -G*m1*m2*M0**2/(2*a_orbi*R0)                                                 ! Eorb (erg)
+  Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
+  !print*,m1,m2,r1,a_orbi,Eorbi
+  do i=1,nm
+     Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
+     !print*,i, Eorbi, dat(218,nm), dat(218,i)/alphaCE,Eorb
+     a_orb = -dat(pxin(9),i)*m2/(2*Eorb)                                                ! a_orb (Ro)
+     call a2p((dat(pxin(9),i)+m2)*M0,a_orb*R0,Porb)                                     ! Porb (s)
+     !if(mod(i,10).eq.0)print*,i,dat(pxin(9),i),Eorb,a_orb,Porb
+     dat(221,i) = Porb/day                                                              ! Porb (day)
+  end do
+  pxnr(221:221) = (/221/)
+  
+  
+  if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
+     dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
+  end if
+  
+  pxnr(301:303) = (/301,302,303/) !Abundances, Nablas, CEs
+end subroutine compute_mdl_variables
+!***********************************************************************************************************************************
 
+
+  
 !***********************************************************************************************************************************
 !> \brief  Read all structure models in the file and display main properties
 !! \param infile  Name of the .mdl[12] input file
@@ -56,7 +153,7 @@ subroutine list_mdl_models(infile,nblk)
   character, intent(in) :: infile*(*)
   integer, intent(out) :: nblk
   
-  integer :: nmdl !,nmsh,nv
+  integer :: nmdl
   integer :: bl,mp,io
   real :: age,vk,mm1,be,be1
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
@@ -219,7 +316,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   real :: hs,hes,cs,ns,os,nes,mgs,zs
   real :: rhoc,pc,ethc,enuc,encc
   
-  integer :: bl,mp,in,io
+  integer :: mp,in,io
   character :: outfile*99
   
   mp = 1  ! Silence compiler warnings
@@ -250,7 +347,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      if(io.lt.0) then
         write(6,'(A,/)')'  Program finished'  !EOF
      else
-        write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+        write(0,'(A,2(I5,A),/)')'  Error reading model',blk,'line',mp-1,', aborting...'  ! Read error
      end if
      stop
   end if
@@ -293,7 +390,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      
      if(io.ne.0) then  ! EOF/read error
         close(10)
-        write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'
+        write(0,'(A,2(I5,A),/)')'  Error reading model',blk,'line',mp-1,', aborting...'
         stop
      end if
      

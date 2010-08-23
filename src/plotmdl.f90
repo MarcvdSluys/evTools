@@ -24,20 +24,18 @@ program plotmdl
   use mdl_data
   
   implicit none
-  integer :: nm,nr,mdl,ny,nsel,io,xwini,pgopen
-  real(double) :: dat1(nq),rl2p,rl2a
-  real(double) :: dE,Eorb,Eorbi,a_orb,a_orbi,Porb,alphaCE
+  integer :: nr,mdl,ny,nsel,io,xwini,pgopen
+  real(double) :: dat1(nq)
   
   real(double) :: dat(nq,nn),age
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
-  real(double) :: m1,m2,r1
-  
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot
   character findfile*99,fname*99,rng,log,xwin*19
   character :: lx*99,ly*99,fx*99,fy*99,title*99,psname*99
   logical :: ex, ab,nab,CE
+  
   
   !Set constants:
   call setconstants()
@@ -136,93 +134,15 @@ program plotmdl
   
   
   !***   COMPUTE ADDITIONAL PLOT VARIABLES
-  if(plot.eq.0) then
-     !Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
-     do i=1,nc
-        if(pxnr(i).gt.0) pxin(pxnr(i)) = i
-     end do
-     
-     do i=1,nm
-        dat(201,i) = dble(i)
-     end do
-     dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
-     !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
-     dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
-     dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     !M/M*
-     dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
-     dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
-     dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
-     dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  !Ugr + Uint  
-     dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            !Mean free path = 1/(rho * kappa)
-     if(pxin(31).ne.0) then
-        dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
-        pxnr(209) = 209
-     end if
-     dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
-     pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
-     
-     !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
-     dat(211,1:nm) = 2.d0 / (1.d0 + 3*dat(9,1:nm) + 0.5d0*dat(10,1:nm))
-     dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       ! Particle density       n = rho/(mu*m_H)
-     dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             ! P_rad = aT^4/3
-     dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         ! P_gas = nkT
-     dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.d-30)                                  ! beta = Prad/Pgas
-     
-     !216-217: binding energy:
-     dat(216,1:nm) = 0.0d0
-     dat(217,1:nm) = 0.0d0
-     dat(218,1:nm) = 0.0d0
-     do i=2,nm
-        dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
-        !dE = dat(207,i)*dat(216,i) * m0*1.d-40                                            ! BE of the shell (10^40 erg)
-        dE = dat(207,i)*dat(216,i) * m0 / (G*M0**2/R0)                                     ! BE of the shell       (G Mo^2 / Ro)
-        dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
-        if(dat(pxin(10),i).gt.0.1d0) dat(218,i) = dat(218,i-1) + dE                        ! BE of envelope        (same units)
-     end do
-     do i=nm-1,1,-1
-        if(abs(dat(218,i)).lt.1.d-19) dat(218,i) = dat(218,i+1)                            ! Set the core BE to first non-zero BE
-     end do
-     
-     dat(219,1:nm) = dat(3,1:nm)/dat(4,1:nm)                                               ! P/rho
-     
-     m1 = dat(pxin(9),nm)                                                                  ! Total mass
-     m2 = m1                                                                               ! Total mass
-     r1 = dat(pxin(17),nm)                                                                 ! Surface radius
-     dat(220,1) = 0.d0
-     do i=2,nm
-        ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
-        dat(220,i) = rl2p(dat(pxin(9),i)*M0, m2*M0, dat(pxin(17),i)*R0)/day                  
-     end do
-     pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
-     
-     alphaCE = 1.0
-     a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb (Ro)
-     !Eorbi = -G*m1*m2*M0**2/(2*a_orbi*R0)                                                 ! Eorb (erg)
-     Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
-     !print*,m1,m2,r1,a_orbi,Eorbi
-     do i=1,nm
-        Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
-        !print*,i, Eorbi, dat(218,nm), dat(218,i)/alphaCE,Eorb
-        a_orb = -dat(pxin(9),i)*m2/(2*Eorb)                                                ! a_orb (Ro)
-        call a2p((dat(pxin(9),i)+m2)*M0,a_orb*R0,Porb)                                     ! Porb (s)
-        !if(mod(i,10).eq.0)print*,i,dat(pxin(9),i),Eorb,a_orb,Porb
-        dat(221,i) = Porb/day                                                              ! Porb (day)
-     end do
-     pxnr(221:221) = (/221/)
-     
-     
-     if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
-        dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
-     end if
-     
-     pxnr(301:303) = (/301,302,303/) !Abundances, Nablas, CEs
-  end if !if(plot.eq.0) then
+  if(plot.eq.0) call compute_mdl_variables(dat)
+  
   
   
   
   !***   CHOOSE PLOT VARIABLES
 32 continue   
   write(6,*)''
+  
   
   nr = 4 !Number of variable columns
   ii = ceiling(real(nc)/real(nr)) !Number of rows
@@ -237,6 +157,7 @@ program plotmdl
      end do
      write(6,*)
   end do
+  
   
   !Print derived variables, from number 201 on:
   write(6,'(A)')'                                                              '
@@ -254,6 +175,7 @@ program plotmdl
      end do
      write(6,*)
   end do
+  
   
   !Print special variables, from number 301 on:
   write(6,'(A)')'                                                              '
@@ -278,16 +200,29 @@ program plotmdl
   
   
   
-35 write(6,'(A)',advance='no')' Choose the X-axis variable: '
   ab = .false.
-  read*,vx
-  if(vx.eq.0) goto 9999
-  if(pxnr(vx).eq.0) goto 35
   
-36 write(6,'(A)',advance='no')' Choose the Y-axis variable: '
-  read*,vy
-  if(vy.eq.0) goto 9999
-  if(pxnr(vy).eq.0) goto 36
+  vx = nq
+  do while (pxnr(vx).le.0)
+     write(6,'(A)',advance='no')' Choose the X-axis variable: '
+     read*,vx
+     vx = min(max(vx,0),nq)
+     if(vx.eq.0) then
+        write(6,'(A,/)')' Program finished'
+        stop
+     end if
+  end do
+  
+  vy = nq
+  do while (pxnr(vy).le.0)
+     write(6,'(A)',advance='no')' Choose the Y-axis variable: '
+     read*,vy
+     vy = min(max(vy,0),nq)
+     if(vy.eq.0) then
+        write(6,'(A,/)')' Program finished'
+        stop
+     end if
+  end do
   
   
 37 continue 
@@ -297,6 +232,10 @@ program plotmdl
   fy = pxfns(pxnr(vy))
   
   ny = 1
+  
+  
+  
+  ! *** SPECIAL PLOTS:
   
   ! Abundances plot:
   if(vy.eq.301.or.ab) then

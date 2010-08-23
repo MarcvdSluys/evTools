@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   138: AstroFloyd, 23/08/2010
+     - plotmdl:  compute secondary variables in new routine compute_mdl_variables()
+   
    137: AstroFloyd, 23/08/2010
      - plotmdl: make array dat() of type double
      
