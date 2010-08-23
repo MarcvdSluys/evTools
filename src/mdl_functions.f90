@@ -35,7 +35,7 @@ module mdl_data
   ! Variable labels:
   integer :: nv_der, nv_sp
   character :: pxns(0:nq)*99, pxfns(0:nq)*99, labels(nq)*99
-  character :: abds(7)*99, nabs(3)*99, CEs(2)*99
+  character :: abds(7)*99, nabs(3)*99, CEs(3)*99
 end module mdl_data
 !***********************************************************************************************************************************
 
@@ -55,7 +55,9 @@ subroutine compute_mdl_variables(dat)
   real(double), intent(inout) :: dat(nq,nm)
   integer :: i,j
   real(double) :: rl2a
-  real(double) :: m1,m2,r1,Mbin, dE,Eorb,Eorbi, a_orb,a_orbi, Porb, Jorb, alphaCE
+  real(double) :: m1,m1i,m2,r1, Mbin,Mbini, Mc
+  real(double) :: dE,Eorb,Eorbi, a_orb,a_orbi, Porb, Jorb,Jorbi, alphaCE,gammaCE
+  
   
   !Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
   do i=1,nc
@@ -109,13 +111,10 @@ subroutine compute_mdl_variables(dat)
   
   ! *** COMMON ENVELOPES ***
   
+  ! r(m) = Rrl:
   m1 = dat(pxin(9),nm)                                                                  ! Total mass
   m2 = m1                                                                               ! Total mass
-  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
-  dat(220,1) = 0.d0
-  dat(221,1) = 0.d0
-  dat(222,1) = 0.d0
-  dat(223,1) = 0.d0
+  dat(220:223,:) = 0.d0
   do i=2,nm
      ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
      !Porb = rl2p(dat(pxin(9),i)*M0, m2*M0, dat(pxin(17),i)*R0)/day
@@ -134,11 +133,15 @@ subroutine compute_mdl_variables(dat)
   pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
   
   
-  
+  ! alpha-CE:
   alphaCE = 1.0
+  m1 = dat(pxin(9),nm)                                                                  ! Total mass
+  m2 = m1                                                                               ! Total mass
+  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
   a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb (Ro)
   Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
-  do i=1,nm
+  dat(224:227,:) = 0.d0
+  do i=2,nm
      m1 = dat(pxin(9),i)
      Mbin = m1+m2
      Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
@@ -153,14 +156,50 @@ subroutine compute_mdl_variables(dat)
      dat(227,i) = Jorb
   end do
   
-  !Make sure dat(220-227,1) are not 0:
+  
+  ! gamma-CE:
+  gammaCE = 1.5
+  m1 = dat(pxin(9),nm)                                                                  ! Total mass
+  m1i = m1
+  m2 = m1                                                                               ! Total mass
+  Mbini = m1i+m2
+  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
+  a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb,i (Ro)
+  Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
+  Jorbi = m1*m2*sqrt(a_orbi/Mbini)                                                      ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
+  dat(228:231,:) = 0.d0
+  do i=2,nm
+     m1 = dat(pxin(9),i)
+     Mbin = m1+m2
+     Jorb = Jorbi * (1.d0 - gammaCE*(m1i-m1)/Mbini)
+     a_orb = Mbin * (Jorb/(m1*m2))**2                                                   ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
+     call a2p(Mbin*M0,a_orb*R0,Porb)                                                    ! Porb (s)
+     Porb = Porb/day                                                                    ! Porb (day)
+     Eorb = m1*m2/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
+     !Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)  FOR ALPHA_CE !!!
+     
+     dat(228,i) = a_orb
+     dat(229,i) = Porb
+     dat(230,i) = Eorb
+     dat(231,i) = Jorb
+  end do
+  
+  !Get a minimum core mass: X<1.e-10
+  do i=nm,1,-1
+     !if(dat(pxin(10),i).gt.0.1) Mc = dat(pxin(9),i)
+     if(dat(pxin(10),i).gt.1.d-10) Mc = dat(pxin(9),i)
+  end do
+  
+  !Make sure dat(220-231,1) are not 0:
   do i=nm-1,1,-1
-     do j=220,227
-        if(dat(j,i).eq.0.d0) dat(j,i) = dat(j,i+1)
+     do j=220,231
+        !if(dat(j,i).eq.0.d0) dat(j,i) = dat(j,i+1)
+        if(dat(pxin(9),i).lt.Mc) dat(j,i) = dat(j,i+1)  ! Stop at the core-envelope boundary
      end do
   end do
   
-  pxnr(221:227) = (/221,222,223,224,225,226,227/)
+  pxnr(221:230) = (/221,222,223,224,225,226,227,228,229,230/)
+  pxnr(231:231) = (/231/)
   
   
   if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
@@ -570,7 +609,7 @@ subroutine set_mdl_labels
   
   abds = [character(len=99) :: 'H ','He','C ','N ','O ','Ne','Mg']    ! Line labels in abundances plot
   nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
-  CEs  = [character(len=99) :: 'RLOF','\ga-CE']                       ! Line labels in CEs plot
+  CEs  = [character(len=99) :: 'RLOF','\ga-CE','\gg-CE']              ! Line labels in CEs plot
   
   !Names of the variables in px
   pxns(0) = ''
@@ -583,7 +622,8 @@ subroutine set_mdl_labels
   
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
   pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','a_rlof']
-  pxns(221:227) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace']
+  pxns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
+  pxns(231:231) = [character(len=99) :: 'Jgce']
   pxns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEPs']
   
   !Names of the variables in px, to be used in output file name (no /.?*)
@@ -597,7 +637,8 @@ subroutine set_mdl_labels
   
   pxfns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','mM','rR','CO','NeO','Ugr-Uint','Mfp','Ndens','g']
   pxfns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','PrPg','dM','Ubst','Ubenv','Prho','arlof']
-  pxfns(221:227) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace']
+  pxfns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
+  pxfns(231:231) = [character(len=99) :: 'Jgce']
   pxfns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEPs']
   
   !Axis labels, px numbers
@@ -680,14 +721,19 @@ subroutine set_mdl_labels
   labels(220) = 'a\dr(m)=Rrlof\u (R\d\(2281)\u)'                                           ! a_orb if r(m)=Rrl
   labels(221) = 'P\dr(m)=Rrlof\u (day)'                                                    ! Porb if r(m)=Rrl
   labels(222) = 'E\dr(m)=Rrlof\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'                        ! Eorb if r(m)=Rrl
-  labels(223) = 'J\dr(m)=Rrlof\u (G\u1/2\dM\d\(2281)\u\u3/2\d/R\d\(2281)\u\u1/2\d)'        ! Jorb if r(m)=Rrl
+  labels(223) = 'J\dr(m)=Rrlof\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'         ! Jorb if r(m)=Rrl
   
   labels(224) = 'a\dpost-\ga-CE\u (R\d\(2281)\u)'                                          ! a_orb after \alpha CE
   labels(225) = 'P\dpost-\ga-CE\u (day)'                                                   ! Porb after \alpha CE
   labels(226) = 'E\dpost-\ga-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'                       ! Eorb after \alpha CE
-  labels(227) = 'J\dpost-\ga-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\d/R\d\(2281)\u\u1/2\d)'       ! Jorb after \alpha CE
+  labels(227) = 'J\dpost-\ga-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'        ! Jorb after \alpha CE
   
-  nv_der = 227 - 200  !Number of derived variables
+  labels(228) = 'a\dpost-\gg-CE\u (R\d\(2281)\u)'                                          ! a_orb after \gamma CE
+  labels(229) = 'P\dpost-\gg-CE\u (day)'                                                   ! Porb after \gamma CE
+  labels(230) = 'E\dpost-\gg-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'                       ! Eorb after \gamma CE
+  labels(231) = 'J\dpost-\gg-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'        ! Jorb after \gamma CE
+  
+  nv_der = 231 - 200  !Number of derived variables
   
   
   

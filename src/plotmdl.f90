@@ -260,8 +260,9 @@ program plotmdl
      CE = .true.
      vy = 221
      yy(1,1:nm) = real(dat(221,1:nm))        ! P(r(m)=Rrl)
-     yy(2,1:nm) = real(dat(225,1:nm))        ! P(post-alphaCE)
-     ny = 2
+     yy(2,1:nm) = real(dat(225,1:nm))        ! P(post-alpha-CE)
+     yy(3,1:nm) = real(dat(229,1:nm))        ! P(post-gamma-CE)
+     ny = 3
   end if
   
   xx(1:nm) = real(dat(vx,1:nm))

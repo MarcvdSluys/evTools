@@ -6,7 +6,6 @@
 
 # No text/space after statements below!
 FORT = gfortran#  Use GNU fortran compiler >=4.4
-FORT = gfortran-4.5.0#  Use GNU fortran compiler 4.5
 #FORT = ifort#     Use Intel fortran compiler
 #FORT = nagfor#
 
@@ -77,7 +76,7 @@ endif
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifeq ($(FORT),gfortran)
-ifneq (,$(filter $(FORT),gfortran gfortran-4.5.0))
+ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
    CFLAGS += #-I/home/AstroFloyd/usr/include/libAF/gfortran
    LFLAGS += #-L/home/AstroFloyd/usr/lib -lAF_gfortran
    STATLIBS += #/home/AstroFloyd/usr/lib/libAF_gfortran.a
@@ -237,7 +236,7 @@ $(SRCDIR)/code_version.f90: code_version    #code_version is PHONY and always ou
 	@echo "        ', compiled on '//trim(compile_date)//' with '//trim(compiler)//' '//trim(compiler_flags)" >> $(SRCDIR)/code_version.f90
 	@echo 'end subroutine print_code_version' >> $(SRCDIR)/code_version.f90
 	@touch -d "1 Jan 2001" $(SRCDIR)/code_version.f90  #Make it old, so that this file is not a reason to relink
-
+	@echo -e "Using Fortran compiler "`which $(FORT)`
 
 
 clean:

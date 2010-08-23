@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   140: AstroFloyd, 23/08/2010
+     - plotmdl: added variables 127-131 for gamma-CE
+     
    139: AstroFloyd, 23/08/2010
      - plotmdl: 
        - variables 220-223: a,P,E,J orb for r(m)=Rrl
