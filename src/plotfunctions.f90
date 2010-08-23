@@ -455,16 +455,14 @@ end subroutine pltconvection
 
 !***********************************************************************************************************************************
 !> \brief  Find the model in a .mdl[12] file closest to a selected point in a graph
-subroutine identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
+subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy,xmin,xmax,ymin,ymax)
   implicit none
-  integer, intent(in) :: nn,ny!,nq
-  real, intent(in) :: xx(nn),yy(10,nn)  
-  !real, intent(in) :: dat(nq,nn)
+  integer, intent(in) :: nn,nx,ny
+  real, intent(in) :: xx(10,nn),yy(10,nn)  
   
-  integer :: iy,iy0,i,i0,nsel,col
+  integer :: ix,iy,ix0,iy0,i,i0,nsel,col
   real :: dist,mindist
   real :: xmin,xmax,ymin,ymax,dx,dy,xsel(4),ysel(4)
-  !real :: d(nq)
   
   character :: hlbls*5
   
@@ -476,25 +474,29 @@ subroutine identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
   call pgsci(1)
   call pgolin(1,nsel,xsel,ysel,2)
   
+  ix0 = 1
   iy0 = 1
   
   
   dx = abs(xmax-xmin)
   dy = abs(ymax-ymin)
   mindist = huge(mindist)
-  do iy=1,ny
-     do i=1,nn
-        dist = (abs(xsel(1)-xx(i))/dx)**2 + (abs(ysel(1)-yy(iy,i))/dy)**2
-        if(dist.lt.mindist) then
-           i0 = i
-           iy0 = iy
-           mindist = dist
-        end if
+  do ix=1,nx
+     do iy=1,ny
+        do i=1,nn
+           dist = (abs(xsel(1)-xx(ix,i))/dx)**2 + (abs(ysel(1)-yy(iy,i))/dy)**2
+           if(dist.lt.mindist) then
+              i0 = i
+              ix0 = ix
+              iy0 = iy
+              mindist = dist
+           end if
+        end do
      end do
   end do
   write(6,*)''
   write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-  write(6,'(A,ES12.4,A,ES12.4,A,I5)')' Closest model:     x =',xx(i0),',  y =',yy(iy0,i0),  &
+  write(6,'(A,ES12.4,A,ES12.4,A,I5)')' Closest model:     x =',xx(ix0,i0),',  y =',yy(iy0,i0),  &
        ',  model =',i0
   
   !Copied from plotplt:
@@ -526,9 +528,9 @@ subroutine identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
   !col = colours(mod(iy0-1,ncolours)+1)  !2,3,...,ncolours,1,2,...
   call pgsci(col)
   
-  call pgpoint(1,xx(i0),yy(iy0,i0),2)
+  call pgpoint(1,xx(ix0,i0),yy(iy0,i0),2)
   write(hlbls,'(I5)')i0
-  call pgptxt(xx(i0),yy(iy0,i0),0.,0.,hlbls)
+  call pgptxt(xx(ix0,i0),yy(iy0,i0),0.,0.,hlbls)
   
   call pgsci(1)
   

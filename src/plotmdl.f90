@@ -24,17 +24,17 @@ program plotmdl
   use mdl_data
   
   implicit none
-  integer :: nr,mdl,ny,nsel,io,xwini,pgopen
+  integer :: nr,mdl,nx,ny,nsel,io,xwini,pgopen
   real(double) :: dat1(nq)
   
   real(double) :: dat(nq,nn),age
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
-  real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
+  real :: xx(10,nn),yy(10,nn),xx1(nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
   character findfile*99,fname*99,rng,log,xwin*19
   character :: lx*99,ly*99,fx*99,fy*99,title*99,psname*99
-  logical :: ex, ab,nab,CE
+  logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
   !Set constants:
@@ -199,7 +199,11 @@ program plotmdl
   
   ab = .false.
   nab = .false.
-  CE = .false.
+  PCEy = .false.
+  ECEx = .false.
+  JCEx = .false.
+  ECEy = .false.
+  JCEy = .false.
   
   
   vx = nq
@@ -231,7 +235,14 @@ program plotmdl
   fx = pxfns(pxnr(vx))
   fy = pxfns(pxnr(vy))
   
+  nx = 1
   ny = 1
+  
+  
+  do i=1,10
+     xx(i,1:nm) = real(dat(vx,1:nm))
+     yy(i,1:nm) = real(dat(vy,1:nm))
+  end do
   
   
   ! *** SPECIAL PLOTS:
@@ -256,8 +267,8 @@ program plotmdl
   end if
   
   ! CE Porb plot:
-  if(vy.eq.303.or.ce) then
-     CE = .true.
+  if(vy.eq.303.or.PCEy) then
+     PCEy = .true.
      vy = 221
      yy(1,1:nm) = real(dat(221,1:nm))        ! P(r(m)=Rrl)
      yy(2,1:nm) = real(dat(225,1:nm))        ! P(post-alpha-CE)
@@ -265,8 +276,46 @@ program plotmdl
      ny = 3
   end if
   
-  xx(1:nm) = real(dat(vx,1:nm))
-  yy(1,1:nm) = real(dat(vy,1:nm))
+  
+  ! CE Eorb plot:
+  if(vx.eq.304.or.ECEx) then
+     ECEx = .true.
+     vx = 222
+     xx(1,1:nm) = real(dat(222,1:nm))        ! E(r(m)=Rrl)
+     xx(2,1:nm) = real(dat(226,1:nm))        ! E(post-alpha-CE)
+     xx(3,1:nm) = real(dat(230,1:nm))        ! E(post-gamma-CE)
+     nx = 3
+  end if
+  if(vy.eq.304.or.ECEy) then
+     ECEy = .true.
+     vy = 222
+     yy(1,1:nm) = real(dat(222,1:nm))        ! E(r(m)=Rrl)
+     yy(2,1:nm) = real(dat(226,1:nm))        ! E(post-alpha-CE)
+     yy(3,1:nm) = real(dat(230,1:nm))        ! E(post-gamma-CE)
+     ny = 3
+  end if
+  
+  ! CE Jorb plot:
+  if(vx.eq.305.or.JCEx) then
+     JCEx = .true.
+     vx = 223
+     xx(1,1:nm) = real(dat(223,1:nm))        ! J(r(m)=Rrl)
+     xx(2,1:nm) = real(dat(227,1:nm))        ! J(post-alpha-CE)
+     xx(3,1:nm) = real(dat(231,1:nm))        ! J(post-gamma-CE)
+     nx = 3
+  end if
+  if(vy.eq.305.or.JCEy) then
+     JCEy = .true.
+     vy = 223
+     yy(1,1:nm) = real(dat(223,1:nm))        ! J(r(m)=Rrl)
+     yy(2,1:nm) = real(dat(227,1:nm))        ! J(post-alpha-CE)
+     yy(3,1:nm) = real(dat(231,1:nm))        ! J(post-gamma-CE)
+     ny = 3
+  end if
+  
+  
+  if(nx.ne.1.and.nx.ne.xy) write(0,'(A)')" The number of X variables is different from the number of Y variables (nx!=ny).  '// &
+       'I'll proceed, but the results may be inconsistent."
   
   
   
@@ -283,18 +332,20 @@ program plotmdl
   if(log.eq.'N') log='n'
   
   if(log.eq.'x'.or.log.eq.'b') then
-     if(xx(1).eq.0.) xx(1) = xx(2)
-     xx(1:nm) = log10(abs(xx(1:nm))+1.e-20)
+     do i=1,nx
+        if(xx(i,1).eq.0.d0) xx(i,1) = xx(i,2)
+     end do
+     xx(1:nx,1:nm) = log10(abs(xx(1:nx,1:nm))+1.e-20)
   end if
   if(log.eq.'y'.or.log.eq.'b') then
      do i=1,ny
-        if(yy(i,1).eq.0.) yy(i,1) = yy(i,2)
+        if(yy(i,1).eq.0.d0) yy(i,1) = yy(i,2)
      end do
      yy(1:ny,1:nm) = log10(abs(yy(1:ny,1:nm))+1.e-20)
   end if
   
-  xmin = minval(xx(1:nm))
-  xmax = maxval(xx(1:nm))
+  xmin = minval(xx(1:nx,1:nm))
+  xmax = maxval(xx(1:nx,1:nm))
   ymin = minval(yy(1:ny,1:nm))
   ymax = maxval(yy(1:ny,1:nm))
   
@@ -399,6 +450,7 @@ program plotmdl
         i = i+1
      end do
      call pgbegin(1,trim(psname)//'/cps',1,1)
+     call pgpap(11.0,0.70) !Make it fit on letter paper
      call pgslw(2)
   else ! Screen
      io = 0
@@ -424,12 +476,12 @@ program plotmdl
      end if
   end if
   
-  if(ny.eq.1) then
+  if(nx*ny.eq.1) then
      call pgsvp(0.06,0.96,0.07,0.96)
-  else                                   ! Multiple lines; need room for legend on right-hand side
-     call pgsvp(0.06,0.93,0.07,0.96)
+  else
+     call pgsvp(0.06,0.92,0.07,0.96)     ! Multiple lines; need room for legend on right-hand side
   end if
-
+  
   call pgswin(xmin,xmax,ymin,ymax)
   if(log.eq.'n') call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)  !Use logarithmic axes rather than logarithmic variables
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
@@ -439,42 +491,35 @@ program plotmdl
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.4,0.5,0.5,ly)
   
-  if(vx.ne.201.and.vy.ne.201) then
-     do i=1,ny
-        col = colours(mod(i-1,ncolours)+1)
+  do i=1,ny
+     col = colours(mod(i-1,ncolours)+1)
+     call pgsci(col)
+     xx1(1:nm) = xx(i,1:nm)  !CHECK: only for nx=1 or nx=ny
+     yy1(1:nm) = yy(i,1:nm)
+     
+     select case(plotstyle)
+     case(1)
+        call pgline(nm,xx1(1:nm),yy1(1:nm))
+     case(2)
+        call pgpoint(nm,xx1(1:nm),yy1(1:nm),1)
+     case(3)
+        call pgline(nm,xx1(1:nm),yy1(1:nm))
+        call pgsci(1)
+        call pgpoint(nm,xx1(1:nm),yy1(1:nm),20)
         call pgsci(col)
-        yy1(1:nm) = yy(i,1:nm)
-        
-        select case(plotstyle)
-        case(1)
-           call pgline(nm,xx(1:nm),yy1(1:nm))
-        case(2)
-           call pgpoint(nm,xx(1:nm),yy1(1:nm),1)
-        case(3)
-           call pgline(nm,xx(1:nm),yy1(1:nm))
-           call pgsci(1)
-           call pgpoint(nm,xx(1:nm),yy1(1:nm),20)
-           call pgsci(col)
-        end select
-        
-        if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
-        if(nab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(nabs(i)))
-        if(CE) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(CEs(i)))
-     end do
-  else
-     do i=1,ny 
-        col = mod(i-1,6)+1
-        call pgsci(col)
-        call pgpoint(nm,xx(1:nm),yy(i,1:nm),1)
-        if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
-     end do
-  end if
+     end select
+     
+     if(ab)  call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
+     if(nab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(nabs(i)))
+     if(PCEy.or.ECEx.or.JCEx.or.ECEy.or.JCEy) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(CEs(i)))
+  end do
+  
   
   call pgsch(1.5)
   call pgsci(8)
   if(hmp.ne.0) then
      do i=1,ny
-        call pgpoint(1,xx(hmp),yy(i,hmp),2)
+        call pgpoint(1,xx(1,hmp),yy(i,hmp),2)
      end do
   end if
   call pgsci(1)
@@ -572,7 +617,7 @@ program plotmdl
   
   
   if(plot.eq.10) then
-     call identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
+     call identify_closest_mdl_model(nn,nx,ny,xx,yy,xmin,xmax,ymin,ymax)
      goto 900
   end if
   

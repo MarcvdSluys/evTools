@@ -206,7 +206,7 @@ subroutine compute_mdl_variables(dat)
      dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
   end if
   
-  pxnr(301:303) = (/301,302,303/) !Abundances, Nablas, CEs
+  pxnr(301:305) = (/301,302,303,304,305/) !Abundances, Nablas, CEs
   
 end subroutine compute_mdl_variables
 !***********************************************************************************************************************************
@@ -609,7 +609,7 @@ subroutine set_mdl_labels
   
   abds = [character(len=99) :: 'H ','He','C ','N ','O ','Ne','Mg']    ! Line labels in abundances plot
   nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
-  CEs  = [character(len=99) :: 'RLOF','\ga-CE','\gg-CE']              ! Line labels in CEs plot
+  CEs  = [character(len=99) :: 'r=R\drl\u','\ga-CE','\gg-CE']              ! Line labels in CEs plot
   
   !Names of the variables in px
   pxns(0) = ''
@@ -624,7 +624,7 @@ subroutine set_mdl_labels
   pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','a_rlof']
   pxns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
   pxns(231:231) = [character(len=99) :: 'Jgce']
-  pxns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEPs']
+  pxns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','CEEs','CEJs']
   
   !Names of the variables in px, to be used in output file name (no /.?*)
   pxfns(0) = ''
@@ -639,7 +639,7 @@ subroutine set_mdl_labels
   pxfns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','PrPg','dM','Ubst','Ubenv','Prho','arlof']
   pxfns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
   pxfns(231:231) = [character(len=99) :: 'Jgce']
-  pxfns(301:303) = [character(len=99) :: 'Abundances','Nablas','CEPs']
+  pxfns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','EEPs','JEPs']
   
   !Axis labels, px numbers
   labels = ''
@@ -741,8 +741,10 @@ subroutine set_mdl_labels
   labels(301) = 'Abundances'
   labels(302) = "\(2266)'s"
   labels(303) = 'P\dorb,post-CE\u (day)'
+  labels(304) = 'E\dorb,post-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'
+  labels(305) = 'J\dorb,post-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'
   
-  nv_sp = 303 - 300  !Number of special plots
+  nv_sp = 305 - 300  !Number of special plots
   
 end subroutine set_mdl_labels
 !***********************************************************************************************************************************

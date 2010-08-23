@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   141: AstroFloyd, 23/08/2010
+     - plotmdl: 
+       - allow graphs with different x-variables (nx=1 or nx=ny only)
+       - added special plots 304,305 for E,J_post-ce
+       
    140: AstroFloyd, 23/08/2010
      - plotmdl: added variables 127-131 for gamma-CE
      
