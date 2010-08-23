@@ -1,4 +1,5 @@
-!> \file selplt.f90  From a .plt? file, or a series of plot files, select the models that fulfill certain conditions and write them to a new file
+!> \file selplt.f90  From a .plt[12] file, or a series of plot files, select the models that fulfill certain conditions.
+!!  and write them to a new file.
 !!  Use this on a grid of models, e.g. to pick out the models that fit V = 10+-1 and B-V = 1.1+-0.1
 
 ! AF, July 2007

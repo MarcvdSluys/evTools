@@ -2,8 +2,15 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   139: AstroFloyd, 23/08/2010
+     - plotmdl: 
+       - variables 220-223: a,P,E,J orb for r(m)=Rrl
+       - variables 224-227: a,P,E,J orb for alpha-CE
+       - allow plot styles: lines, dots or both
+     - plotplt: make plot styles compatible with plotmdl
+     
    138: AstroFloyd, 23/08/2010
-     - plotmdl:  compute secondary variables in new routine compute_mdl_variables()
+     - plotmdl: compute secondary variables in new routine compute_mdl_variables()
    
    137: AstroFloyd, 23/08/2010
      - plotmdl: make array dat() of type double

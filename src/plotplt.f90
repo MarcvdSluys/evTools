@@ -42,7 +42,7 @@ program plotplt
   real :: x,y,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
-  integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,drawlines,version,verbose
+  integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
   integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,wait,lums,lgx,lgy,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
@@ -67,8 +67,8 @@ program plotplt
   sch = 1.0
   
   !os = getos() !1-Linux, 2-MacOS
-  os = 1       !Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
-  drawlines = 1 !0: no; draw points, 1: yes: draw lines, 2: draw both
+  os = 1        ! Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
+  plotstyle = 1 ! 1: draw lines, 2: draw dots, 3: draw both
   
   !Remove 'uninitialised' compiler warnings:
   hrd   = 0
@@ -739,7 +739,6 @@ program plotplt
      if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
-        call pgsci(1)
         call pgsci(0)
         call pgsvp(0.,1.,0.,1.)
         call pgswin(-1.,1.,-1.,1.)
@@ -805,9 +804,17 @@ program plotplt
      call pgsci(col)
      !if(npl.eq.1) call pgsci(2)
      yy1(1:n(pl)) = yy(pl,1:n(pl))
-     if(drawlines.eq.0) call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),1)
-     if(drawlines.ge.1) call pgline(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)))
-     if(drawlines.eq.2) call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),20)
+     select case(plotstyle)
+     case(1) 
+        call pgline(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)))
+     case(2) 
+        call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),1)
+     case(3)
+        call pgline(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)))
+        call pgsci(1)
+        call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),20)
+     call pgsci(col)
+     end select
      if(plot.eq.7) call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)  !Draw end of track for auto-update
   end do
   call pgsci(1)
@@ -1081,18 +1088,18 @@ program plotplt
      goto 900
   end if
   
-  if(plot.eq.11) then !Toggle between drawing points, lines or both
+  if(plot.eq.11) then  ! Toggle between drawing lines, dots, or both
      ansi=-1
      do while(ansi.lt.0.or.ansi.gt.3)
         write(6,'(A)')'  You can plot:'
         write(6,'(A)')'  0: keep the current choice'
-        write(6,'(A)')'  1: dots'
-        write(6,'(A)')'  2: lines'
+        write(6,'(A)')'  1: lines'
+        write(6,'(A)')'  2: dots'
         write(6,'(A)')'  3: both'
         write(6,'(A)', advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
-     if(ansi.gt.0) drawlines = ansi-1 !0-2
+     if(ansi.gt.0) plotstyle = ansi !1-3
      goto 501
   end if
   

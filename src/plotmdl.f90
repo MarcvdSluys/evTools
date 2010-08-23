@@ -31,7 +31,7 @@ program plotmdl
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
   real :: xx(nn),yy(10,nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
-  integer i,ii,j,blk,nblk,vx,vy,hmp,plot
+  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
   character findfile*99,fname*99,rng,log,xwin*19
   character :: lx*99,ly*99,fx*99,fy*99,title*99,psname*99
   logical :: ex, ab,nab,CE
@@ -45,6 +45,7 @@ program plotmdl
   call evTools_settings()
   
   plot = 0
+  plotstyle = 1
   xwini = 1  !Number of X window to try first
   log = 'n'
   pxnr = 0
@@ -53,10 +54,6 @@ program plotmdl
      pxin(i) = i
   end do
   
-  
-  ab = .false.
-  nab = .false.
-  CE = .false.
   
   ! Define variable labels:
   call set_mdl_labels()
@@ -201,6 +198,9 @@ program plotmdl
   
   
   ab = .false.
+  nab = .false.
+  CE = .false.
+  
   
   vx = nq
   do while (pxnr(vx).le.0)
@@ -234,7 +234,6 @@ program plotmdl
   ny = 1
   
   
-  
   ! *** SPECIAL PLOTS:
   
   ! Abundances plot:
@@ -256,12 +255,12 @@ program plotmdl
      ny = 3
   end if
   
-  ! CE plot:
+  ! CE Porb plot:
   if(vy.eq.303.or.ce) then
      CE = .true.
-     vy = 220
-     yy(1,1:nm) = real(dat(220,1:nm))        ! P(r(m)=Rrl)
-     yy(2,1:nm) = real(dat(221,1:nm))        ! P(post-alphaCE)
+     vy = 221
+     yy(1,1:nm) = real(dat(221,1:nm))        ! P(r(m)=Rrl)
+     yy(2,1:nm) = real(dat(225,1:nm))        ! P(post-alphaCE)
      ny = 2
   end if
   
@@ -399,10 +398,8 @@ program plotmdl
         i = i+1
      end do
      call pgbegin(1,trim(psname)//'/cps',1,1)
-     !call pgscf(2)
      call pgslw(2)
   else ! Screen
-     !call pgbegin(1,'2/xserve',1,1)
      io = 0
      do while(io.le.0)
         write(xwin,'(I3.3,A7)')xwini,'/xserve'
@@ -416,9 +413,8 @@ program plotmdl
      call pgpap(scrsz,scrrat)
      call pgscf(1)
      if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
+        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm
         call pgscr(1,0.,0.,0.)
-        call pgsci(1)
         call pgsci(0)
         call pgsvp(0.,1.,0.,1.)
         call pgswin(-1.,1.,-1.,1.)
@@ -444,16 +440,30 @@ program plotmdl
   
   if(vx.ne.201.and.vy.ne.201) then
      do i=1,ny
-        call pgsci(colours(mod(i-1,ncolours)+1))
+        col = colours(mod(i-1,ncolours)+1)
+        call pgsci(col)
         yy1(1:nm) = yy(i,1:nm)
-        call pgline(nm,xx(1:nm),yy1(1:nm))
+        
+        select case(plotstyle)
+        case(1)
+           call pgline(nm,xx(1:nm),yy1(1:nm))
+        case(2)
+           call pgpoint(nm,xx(1:nm),yy1(1:nm),1)
+        case(3)
+           call pgline(nm,xx(1:nm),yy1(1:nm))
+           call pgsci(1)
+           call pgpoint(nm,xx(1:nm),yy1(1:nm),20)
+           call pgsci(col)
+        end select
+        
         if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
         if(nab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(nabs(i)))
         if(CE) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(CEs(i)))
      end do
   else
      do i=1,ny 
-        call pgsci(mod(i-1,6)+1)
+        col = mod(i-1,6)+1
+        call pgsci(col)
         call pgpoint(nm,xx(1:nm),yy(i,1:nm),1)
         if(ab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
      end do
@@ -508,11 +518,12 @@ program plotmdl
      write(6,'(A)')'  8) save plot as postscript'
      write(6,'(A)')'  '
      write(6,'(A)')' 10) identify a point in the graph'
+     write(6,'(A)')' 11) toggle drawing lines/points'
   end if !if(plot.ne.9) then
   write(6,*)''
   write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot
-  if(plot.lt.0 .or. plot.gt.8.and.plot.ne.10) goto 900
+  if(plot.lt.0 .or. plot.eq.9 .or. plot.gt.11) goto 900
   
   if(plot.ne.4.and.plot.ne.10) call pgend
   if(plot.eq.1) goto 32
@@ -523,7 +534,8 @@ program plotmdl
   if(plot.eq.8) goto 501
   
   if(plot.eq.4) then  !Select region
-941  call pgsci(1)
+941  continue
+     call pgsci(1)
      xsel = 0.
      ysel = 0.
      write(6,'(A)')' Select 2-4 corner points with your left mouse button and press "x" to finish'
@@ -562,6 +574,22 @@ program plotmdl
      call identify_closest_mdl_model(nn,ny,xx,yy,xmin,xmax,ymin,ymax)
      goto 900
   end if
+  
+  if(plot.eq.11) then !Toggle between drawing points, lines or both
+     ansi=-1
+     do while(ansi.lt.0.or.ansi.gt.3)
+        write(6,'(A)')'  You can plot:'
+        write(6,'(A)')'  0: keep the current choice'
+        write(6,'(A)')'  1: lines'
+        write(6,'(A)')'  2: dots'
+        write(6,'(A)')'  3: both'
+        write(6,'(A)', advance='no')'  What would you like to plot?  '
+        read*,ansi
+     end do
+     if(ansi.gt.0) plotstyle = ansi !1-3
+     goto 501
+  end if
+  
   
 9999 continue
   write(6,'(A,/)')' Program finished'
