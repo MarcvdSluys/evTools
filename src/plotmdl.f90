@@ -314,8 +314,8 @@ program plotmdl
   end if
   
   
-  if(nx.ne.1.and.nx.ne.xy) write(0,'(A)')" The number of X variables is different from the number of Y variables (nx!=ny).  '// &
-       'I'll proceed, but the results may be inconsistent."
+  if(nx.ne.1.and.nx.ne.ny) write(0,'(/,A,/)')' The number of X variables is different from the number of Y variables (nx!=ny).'// &
+       "  I'll proceed, but the results may be inconsistent."
   
   
   

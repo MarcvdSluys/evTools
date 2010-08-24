@@ -55,7 +55,7 @@ subroutine compute_mdl_variables(dat)
   real(double), intent(inout) :: dat(nq,nm)
   integer :: i,j
   real(double) :: rl2a
-  real(double) :: m1,m1i,m2,r1, Mbin,Mbini, Mc
+  real(double) :: m1,m1i,m2i,r1i, Mbin,Mbini, Mc
   real(double) :: dE,Eorb,Eorbi, a_orb,a_orbi, Porb, Jorb,Jorbi, alphaCE,gammaCE
   
   
@@ -111,20 +111,34 @@ subroutine compute_mdl_variables(dat)
   
   ! *** COMMON ENVELOPES ***
   
+  
+  m1i = dat(pxin(9),nm)                                                                  ! (Initial) total mass of star 1
+  m2i = m1i                                                                              ! (Initial) total mass of star 2
+  if(1.eq.2) then
+     m2i = 0.25                                                                          ! CHECK: using custom M2
+     write(0,'(/,A,/)')'  *** Warning: using custom value for M2 ***'
+  end if
+  Mbini = m1i+m2i                                                                        ! (Initial) binary mass
+  r1i = dat(pxin(17),nm)                                                                 ! (Initial) surface radius of star 1
+  
+  a_orbi = rl2a(m1i,m2i,r1i)                                                             ! a_orb (Ro)
+  Eorbi = -m1i*m2i/(2*a_orbi)                                                            ! Eorb (G Mo^2 / Ro)
+  Jorbi = m1i*m2i*sqrt(a_orbi/Mbini)                                                     ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
+  
+  alphaCE = 1.d0
+  gammaCE = 1.5d0
+  
+  
   ! r(m) = Rrl:
-  m1 = dat(pxin(9),nm)                                                                  ! Total mass
-  m2 = m1                                                                               ! Total mass
   dat(220:223,:) = 0.d0
   do i=2,nm
-     ! Porb (day) if M1=m, M2=M1, r(m)=Rrl:
-     !Porb = rl2p(dat(pxin(9),i)*M0, m2*M0, dat(pxin(17),i)*R0)/day
      m1 = dat(pxin(9),i)
-     Mbin = m1+m2
-     a_orb = rl2a( m1, m2, dat(pxin(17),i) )                                            ! a_orb (Ro)
-     call a2p( Mbin*M0, a_orb*R0, Porb)                                                 ! Porb (s)
-     Porb = Porb/day                                                                    ! Porb (day)
-     Eorb = m1*m2/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
-     Jorb = m1*m2*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
+     Mbin = m1+m2i
+     a_orb = rl2a( m1, m2i, dat(pxin(17),i) )                                            ! a_orb (Ro)
+     call a2p( Mbin*M0, a_orb*R0, Porb)                                                  ! Porb (s)
+     Porb = Porb/day                                                                     ! Porb (day)
+     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
+     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
      dat(220,i) = a_orb
      dat(221,i) = Porb
      dat(222,i) = Eorb
@@ -134,21 +148,15 @@ subroutine compute_mdl_variables(dat)
   
   
   ! alpha-CE:
-  alphaCE = 1.0
-  m1 = dat(pxin(9),nm)                                                                  ! Total mass
-  m2 = m1                                                                               ! Total mass
-  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
-  a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb (Ro)
-  Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
   dat(224:227,:) = 0.d0
   do i=2,nm
      m1 = dat(pxin(9),i)
-     Mbin = m1+m2
+     Mbin = m1+m2i
      Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
-     a_orb = -m1*m2/(2*Eorb)                                                            ! a_orb (Ro)
+     a_orb = -m1*m2i/(2*Eorb)                                                            ! a_orb (Ro)
      call a2p(Mbin*M0,a_orb*R0,Porb)                                                    ! Porb (s)
      Porb = Porb/day                                                                    ! Porb (day)
-     Jorb = m1*m2*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
+     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
      
      dat(224,i) = a_orb
      dat(225,i) = Porb
@@ -158,24 +166,15 @@ subroutine compute_mdl_variables(dat)
   
   
   ! gamma-CE:
-  gammaCE = 1.5
-  m1 = dat(pxin(9),nm)                                                                  ! Total mass
-  m1i = m1
-  m2 = m1                                                                               ! Total mass
-  Mbini = m1i+m2
-  r1 = dat(pxin(17),nm)                                                                 ! Surface radius
-  a_orbi = rl2a(m1,m2,r1)                                                               ! a_orb,i (Ro)
-  Eorbi = -m1*m2/(2*a_orbi)                                                             ! Eorb (G Mo^2 / Ro)
-  Jorbi = m1*m2*sqrt(a_orbi/Mbini)                                                      ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
   dat(228:231,:) = 0.d0
   do i=2,nm
      m1 = dat(pxin(9),i)
-     Mbin = m1+m2
+     Mbin = m1+m2i
      Jorb = Jorbi * (1.d0 - gammaCE*(m1i-m1)/Mbini)
-     a_orb = Mbin * (Jorb/(m1*m2))**2                                                   ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
+     a_orb = Mbin * (Jorb/(m1*m2i))**2                                                   ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
      call a2p(Mbin*M0,a_orb*R0,Porb)                                                    ! Porb (s)
      Porb = Porb/day                                                                    ! Porb (day)
-     Eorb = m1*m2/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
+     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
      !Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)  FOR ALPHA_CE !!!
      
      dat(228,i) = a_orb
@@ -609,7 +608,7 @@ subroutine set_mdl_labels
   
   abds = [character(len=99) :: 'H ','He','C ','N ','O ','Ne','Mg']    ! Line labels in abundances plot
   nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
-  CEs  = [character(len=99) :: 'r=R\drl\u','\ga-CE','\gg-CE']              ! Line labels in CEs plot
+  CEs  = [character(len=99) :: 'r=R\drl\u','\ga-CE','\gg-CE']         ! Line labels in CEs plot
   
   !Names of the variables in px
   pxns(0) = ''
