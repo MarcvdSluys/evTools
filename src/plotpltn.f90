@@ -2,7 +2,7 @@
 !!
 !!  - this program reads and plots data from the plot output file from ev (the TWIN version of 2003 or 2005)
 !!  - uses code in functions.f90
-!!  - requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!!  - requires the file <libdir>/UBVRI.Kur to calculate colours
 
 
 !   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
@@ -80,14 +80,14 @@ program plotpltn
   
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr
      read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   lgx = 0

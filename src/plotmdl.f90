@@ -446,11 +446,11 @@ program plotmdl
      i = 1
      do while(ex)
         write(psname,'(A,I3.3,A4)')'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'
-        inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
+        inquire(file=trim(psname), exist=ex)  ! Check whether the file already exists; ex is True or False
         i = i+1
      end do
      call pgbegin(1,trim(psname)//'/cps',1,1)
-     call pgpap(11.0,0.70) !Make it fit on letter paper
+     call pgpap(10.5,0.68)                    ! Make it fit on letter paper
      call pgslw(2)
   else ! Screen
      io = 0
@@ -465,8 +465,8 @@ program plotmdl
      
      call pgpap(scrsz,scrrat)
      call pgscf(1)
-     if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm
+     if(white_bg) then                         ! Create a white background; swap black (ci=0) and white (ci=1)
+        call pgscr(0,1.,1.,1.)                 ! For some reason, this needs to be repeated for AquaTerm
         call pgscr(1,0.,0.,0.)
         call pgsci(0)
         call pgsvp(0.,1.,0.,1.)
@@ -479,7 +479,7 @@ program plotmdl
   if(nx*ny.eq.1) then
      call pgsvp(0.06,0.96,0.07,0.96)
   else
-     call pgsvp(0.06,0.92,0.07,0.96)     ! Multiple lines; need room for legend on right-hand side
+     call pgsvp(0.06,0.92,0.07,0.96)          ! Multiple lines; need room for legend on right-hand side
   end if
   
   call pgswin(xmin,xmax,ymin,ymax)

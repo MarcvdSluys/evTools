@@ -1,5 +1,6 @@
-! Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
+!> \file listplt.f90  Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
 !
+
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
@@ -13,6 +14,7 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.  
 ! If not, see <http://www.gnu.org/licenses/>.
+
 
 program listplt
   use kinds
@@ -29,17 +31,16 @@ program listplt
   character :: findfile*99, fname*99,labels(nnn)*99,tmpstr*10
   
   call setconstants()
-  print*,c3rd
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr
      read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   labels = ''

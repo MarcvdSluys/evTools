@@ -20,9 +20,8 @@
 
 !> \brief Plot the contents of .plt[12] files
 !! - Uses routines from functions.f90, plt_functions.f90
-!! - Requires the file ~/usr/lib/UBVRI.Kur to calculate colours
+!! - Requires the file <libdir>/UBVRI.Kur to calculate colours
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
-!! \todo put the library path in the settings file
 program plotplt
   use kinds
   use constants
@@ -80,14 +79,14 @@ program plotplt
   pl0 = 1
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr
      read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   
@@ -711,7 +710,7 @@ program plotplt
         stop
      end if
      
-     call pgpap(11.0,0.70) !Make it fit on letter
+     call pgpap(10.5,0.68) !Make it fit on letter paper
      !call pgpap(10.,1.)  !Talk, plot
      !call pgpap(30.,0.33)  !Talk, plot
      

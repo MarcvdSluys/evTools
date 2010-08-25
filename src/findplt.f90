@@ -1,8 +1,10 @@
-!Findplt.f:  cloned from findp.f
-!Reads plt file and displays properties of the interpolated model with a certain value for a certain variable
-!Line width > 72 chars, so compile with --wide or -extend_source or whatever is needed
-!Needs the file ~/usr/lib/UBVRI.Kur to calculate magnitudes and colours (see line 15)
-!
+!> \file findplt.f90  Reads .plt[12] files and displays properties of the interpolated model 
+!! with a certain value for a certain variable
+
+! cloned from findp.f
+! Needs the file <libdir>/UBVRI.Kur to calculate magnitudes and colours (see below)
+
+
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
 ! 
@@ -16,6 +18,7 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
+
 
 program findplt
   use kinds
@@ -32,14 +35,14 @@ program findplt
   
   
   !Read atmosphere-model data
-  open(unit=10, file=trim(homedir)//'/usr/lib/UBVRI.Kur',status='old',action='read',iostat=io)
+  open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr
      read(10,*)tmpstr
      read(10,*)ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file ~/usr/lib/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   

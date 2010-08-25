@@ -65,10 +65,9 @@ end subroutine plotlinesofconstantradius
 
 
 !***********************************************************************
-!> \brief Plot the zams; use ~/bin/lib/zams_z0_02.plt
-!!It would be nice to not only plot a HRD, but any parameter
+!> \brief Plot the zams; use <libdir>/zams_z0_02.plt
+!! It would be nice to not only plot a HRD, but any parameter
 !! \todo Write a routine to read a plt file first, then use it here
-!<
 subroutine plotzams()
   implicit none
   
