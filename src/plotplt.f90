@@ -1,5 +1,5 @@
 !> \file plotplt.f90  Plots the data contained in .plt[12] files, highlights selected points
-
+!
 !  AF, 19-04-2006
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
@@ -393,14 +393,12 @@ program plotplt
   ymax = -huge(ymax)
   do pl=1,npl
      if(excly(pl).eq.1) cycle
-     !ymin = min(minval(yy(pl,1:n(pl))),ymin)
-     !ymax = max(maxval(yy(pl,1:n(pl))),ymax)
      if(lgy.eq.0) then
-        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.1.e-20),ymin)
-        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt.1.e20),ymax)
+        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-huge(ymin)), ymin)
+        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt. huge(ymax)), ymax)
      else
-        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-20.),ymin)
-        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt.20.),ymax)
+        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-log10(huge(ymin))), ymin)
+        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt. log10(huge(ymin))), ymax)
      end if
   end do
   
@@ -416,20 +414,20 @@ program plotplt
      if(ymax.gt.1.e12.and.lgy.eq.0) ymax = 1.e12
      if(ymax.gt.12..and.lgy.eq.1) ymax = 12.
   end if
-
+  
   if(lums.eq.1.and.lgy.eq.1) ymin = max(ymin,ymax-10.)
   
   if(conv.eq.1) ymin = 0.d0
   
   
   
-  !Limit ranges for logged axes like Mdot
+  ! Limit ranges for logged axes like Mdot:
   if(lgx.eq.1) then
-     if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
+     !if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.  ! Mdot
   end if
   if(lgy.eq.1) then
-     if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
-     if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.
+     !if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.  ! Mdot
+     !if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.  ! Mdots
      if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
         if(ymin.lt.-18..and.dpdt.eq.0) ymin = -18.
         if(ymin.lt.-15..and.dpdt.eq.1) ymin = -15.
@@ -814,6 +812,7 @@ program plotplt
         call pgpoint(n(pl),xx(pl,1:n(pl)),yy1(1:n(pl)),20)
      call pgsci(col)
      end select
+     
      if(plot.eq.7) call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)  !Draw end of track for auto-update
   end do
   call pgsci(1)

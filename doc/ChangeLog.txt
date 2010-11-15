@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   144: AstroFloyd, 15/11/2010
+     - plotplt: fix automatic plot limits 1.e-20 should have been -1.e20 -> -huge
+     - findplt: use command-line arguments only; print syntax and exit otherwise
+   
    143: AstroFloyd, 25/08/2010
      - added global variable libdir and read it from settings file
      

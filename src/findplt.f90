@@ -29,7 +29,7 @@ program findplt
   integer, parameter :: nn=30000,nnn=100,ny=18
   real(double) :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
   integer :: i,j,ncols,prmdl,succ,narg,command_argument_count,iin,iout,glt,io
-  character :: findfile*99,fname*99,arg*99,tmpstr*10
+  character :: fname*99,arg*99,tmpstr*10
   
   call setconstants()
   
@@ -45,46 +45,10 @@ program findplt
      write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
-  
   !Read the filename from the command line if any, search the current directory otherwise
   narg = command_argument_count()
   iout = 0
-  if(narg.lt.3.or.narg.gt.4) then
-     write(6,'(A)')'Usage:  FINDPLT  <file.plt> <variable> <value> [<output>]'
-     write(6,'(A)')'        findplt finds every instant where <variable> becomes <value>, using interpolation'
-     write(6,'(A)')'        <output>: -1: all variables, 0: (default) selection of variables, >0: variable number <output>'
-     write(6,'(A)')''
-     write(6,'(A)')'<variable>:                                                              '
-     write(6,'(A)')'  1: model        16: Lh           28: Porb        34: Horb              '
-     write(6,'(A)')'  2: t            17: Lhe          29: FLR         35: dHorb/dt          '
-     write(6,'(A)')'  3: dt           18: Lc           30: F1          36: dHgw/dt           '
-     write(6,'(A)')'  4: M            19: Lnu          31: dM          37: dHwml/dt          '
-     write(6,'(A)')'  5: Mhe          20: Lth          32: dMwind      38: dHmb/dt           '
-     write(6,'(A)')'  6: Mco          21: Prot         33: dMmt        39: dHmtr/dt          '
-     write(6,'(A)')'  7: Mone         22: VK2                          40: Mcomp             '
-     write(6,'(A)')'  8: log R        23: Rcz                          41: e                 '
-     write(6,'(A)')'  9: log L        24: dRcz                                               '
-     write(6,'(A)')' 10: log Teff     25: Tet                                                '
-     write(6,'(A)')' 11: log Tc       26: Ralv                                               '
-     write(6,'(A)')' 12: log Tmax     27: Bp                 H  He   C   N   O  Ne  Mg       '
-     write(6,'(A)')' 13: log Rhoc                    Surf:  42  43  44  45  46  47  48       '
-     write(6,'(A)')' 14: log RhoTm                   Tmax:  49  50  51  52  53  54  55       '
-     write(6,'(A)')' 15: Ub,env                      Core:  56  57  58  59  60  61  62       '
-     write(6,'(A)')'                                                                         ' 
-     write(6,'(A)')' 91: V   92: U-B   93: B-V   94: V-I   95: I-R   96: U-V   97: V-R       '
-     write(6,'(A)')' 99: Zsurf                                                               '
-     write(6,'(A)')'                                                                         '
-     write(6,'(A)')'<value>: value to find for <variable>                                    '
-     write(6,'(A)')'                                                                         ' 
-     write(6,'(A)')'                                                                         '
-     
-     fname = findfile('*.plt*')
-     
-     write(6,'(A27)', advance='no')'Give the variable (1-99): '
-     read*,iin
-     write(6,'(A17)', advance='no')'Give the value: '
-     read*,xfind
-  else
+  if(narg.eq.3.or.narg.eq.4) then
      call get_command_argument(1,fname)
      call get_command_argument(2,arg)
      read(arg,*)iin
@@ -94,8 +58,37 @@ program findplt
         call get_command_argument(4,arg)
         read(arg,*)iout
      end if
+  else
+     write(6,'(A)')'                                                                           ' 
+     write(6,'(A)')'  Syntax:  FINDPLT  <file.plt> <variable> <value> [<output>]'
+     write(6,'(A)')'           findplt finds every instant where <variable> becomes <value>, using interpolation'
+     write(6,'(A)')'           <output>: -1: all variables, 0: (default) selection of variables, >0: variable number <output>'
+     write(6,'(A)')'  '
+     write(6,'(A)')'  <variable>:                                                              '
+     write(6,'(A)')'    1: model        16: Lh           28: Porb        34: Horb              '
+     write(6,'(A)')'    2: t            17: Lhe          29: FLR         35: dHorb/dt          '
+     write(6,'(A)')'    3: dt           18: Lc           30: F1          36: dHgw/dt           '
+     write(6,'(A)')'    4: M            19: Lnu          31: dM          37: dHwml/dt          '
+     write(6,'(A)')'    5: Mhe          20: Lth          32: dMwind      38: dHmb/dt           '
+     write(6,'(A)')'    6: Mco          21: Prot         33: dMmt        39: dHmtr/dt          '
+     write(6,'(A)')'    7: Mone         22: VK2                          40: Mcomp             '
+     write(6,'(A)')'    8: log R        23: Rcz                          41: e                 '
+     write(6,'(A)')'    9: log L        24: dRcz                                               '
+     write(6,'(A)')'   10: log Teff     25: Tet                                                '
+     write(6,'(A)')'   11: log Tc       26: Ralv                                               '
+     write(6,'(A)')'   12: log Tmax     27: Bp                 H  He   C   N   O  Ne  Mg       '
+     write(6,'(A)')'   13: log Rhoc                    Surf:  42  43  44  45  46  47  48       '
+     write(6,'(A)')'   14: log RhoTm                   Tmax:  49  50  51  52  53  54  55       '
+     write(6,'(A)')'   15: Ub,env                      Core:  56  57  58  59  60  61  62       '
+     write(6,'(A)')'                                                                           ' 
+     write(6,'(A)')'   91: V   92: U-B   93: B-V   94: V-I   95: I-R   96: U-V   97: V-R       '
+     write(6,'(A)')'   99: Zsurf                                                               '
+     write(6,'(A)')'                                                                           '
+     write(6,'(A)')'  <value>: value to find for <variable>                                    '
+     write(6,'(A)')'                                                                           ' 
+     
+     stop
   end if
-  
   
   if(fname(1:3).eq.'   ') goto 9999
   
