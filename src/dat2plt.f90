@@ -24,7 +24,7 @@ program dat2plt
   integer, parameter :: nci1=99,nco=89
   integer :: i,command_argument_count,ioi,ioo,nci,translate(nci1),skipinlines,ci
   real(double) :: dati(nci1),dato(nco)
-  character :: infile*99,outfile*99,bla
+  character :: infile*(99),outfile*(99),bla
   
   
   !Current settings: for Lev's file, 1/2/2009

@@ -34,8 +34,8 @@ module mdl_data
   
   ! Variable labels:
   integer :: nv_der, nv_sp
-  character :: pxns(0:nq)*99, pxfns(0:nq)*99, labels(nq)*99
-  character :: abds(7)*99, nabs(3)*99, CEs(3)*99
+  character :: pxns(0:nq)*(99), pxfns(0:nq)*(99), labels(nq)*(99)
+  character :: abds(7)*(99), nabs(3)*(99), CEs(3)*(99)
 end module mdl_data
 !***********************************************************************************************************************************
 
@@ -59,7 +59,7 @@ subroutine compute_mdl_variables(dat)
   real(double) :: dE,Eorb,Eorbi, a_orb,a_orbi, Porb, Jorb,Jorbi, alphaCE,gammaCE
   
   
-  !Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
+  ! Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
   do i=1,nc
      if(pxnr(i).gt.0) pxin(pxnr(i)) = i
   end do
@@ -152,10 +152,10 @@ subroutine compute_mdl_variables(dat)
   do i=2,nm
      m1 = dat(pxin(9),i)
      Mbin = m1+m2i
-     Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)
+     Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                     ! Eorb (G Mo^2 / Ro)
      a_orb = -m1*m2i/(2*Eorb)                                                            ! a_orb (Ro)
-     call a2p(Mbin*M0,a_orb*R0,Porb)                                                    ! Porb (s)
-     Porb = Porb/day                                                                    ! Porb (day)
+     call a2p(Mbin*M0,a_orb*R0,Porb)                                                     ! Porb (s)
+     Porb = Porb/day                                                                     ! Porb (day)
      Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
      
      dat(224,i) = a_orb
@@ -172,8 +172,8 @@ subroutine compute_mdl_variables(dat)
      Mbin = m1+m2i
      Jorb = Jorbi * (1.d0 - gammaCE*(m1i-m1)/Mbini)
      a_orb = Mbin * (Jorb/(m1*m2i))**2                                                   ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
-     call a2p(Mbin*M0,a_orb*R0,Porb)                                                    ! Porb (s)
-     Porb = Porb/day                                                                    ! Porb (day)
+     call a2p(Mbin*M0,a_orb*R0,Porb)                                                     ! Porb (s)
+     Porb = Porb/day                                                                     ! Porb (day)
      Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
      !Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)  FOR ALPHA_CE !!!
      
@@ -183,13 +183,14 @@ subroutine compute_mdl_variables(dat)
      dat(231,i) = Jorb
   end do
   
-  !Get a minimum core mass: X<1.e-10
+  ! Get a minimum core mass: X<1.e-10:
+  Mc = 0.d0
   do i=nm,1,-1
      !if(dat(pxin(10),i).gt.0.1) Mc = dat(pxin(9),i)
      if(dat(pxin(10),i).gt.1.d-10) Mc = dat(pxin(9),i)
   end do
   
-  !Make sure dat(220-231,1) are not 0:
+  ! Make sure dat(220-231,1) are not 0:
   do i=nm-1,1,-1
      do j=220,231
         !if(dat(j,i).eq.0.d0) dat(j,i) = dat(j,i+1)
@@ -205,7 +206,7 @@ subroutine compute_mdl_variables(dat)
      dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
   end if
   
-  pxnr(301:305) = (/301,302,303,304,305/) !Abundances, Nablas, CEs
+  pxnr(301:305) = (/301,302,303,304,305/)  ! Abundances, Nablas, CEs
   
 end subroutine compute_mdl_variables
 !***********************************************************************************************************************************
@@ -231,7 +232,7 @@ subroutine list_mdl_models(infile,nblk)
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
   real :: hc,hec,cc,oc,zc, hs,hes,cs,os,zs
-  character :: tmpstr*3
+  character :: tmpstr*(3)
   
   
   
@@ -374,7 +375,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   use mdl_data
   
   implicit none
-  character, intent(in) :: infile*99
+  character, intent(in) :: infile*(99)
   integer,intent(in) :: blk
   logical, intent(inout) :: svblk
   
@@ -388,7 +389,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   real :: rhoc,pc,ethc,enuc,encc
   
   integer :: mp,in,io
-  character :: outfile*99
+  character :: outfile*(99)
   
   mp = 1  ! Silence compiler warnings
   
@@ -515,7 +516,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   end if
   
 81 format('  Model:        Model nr:',i5,',    Mesh pts: ',i4,',    Mass:',f7.2,' Mo,    Age: ',es12.6,' yr,    Z =',f7.4)
-83 format('  Surface:      M   = ',f9.5,' Mo,  R   =',f11.5,' Ro,   L    =  ',es10.4' Lo,   Teff =',f8.0,' K')
+83 format('  Surface:      M   = ',f9.5,' Mo,  R   =',f11.5,' Ro,   L    =  ',es10.4,' Lo,   Teff =',f8.0,' K')
 84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3')
 85 format('  Cores:        Mhe = ',f9.5,' Mo,  Mco =',f9.5,' Mo,     Menv =',f9.5,' Mo')
   
@@ -551,7 +552,7 @@ subroutine read_first_mdls(infile,blk)
   
   integer :: io,bl,mp,nmdl !,ii
   real :: age !,x
-  character :: tmpstr*3
+  character :: tmpstr*(3)
   
   
   open(unit=10,form='formatted',status='old',file=trim(infile))

@@ -28,7 +28,7 @@ program listplt
   real(double) :: c82(nn),c85a,c85b,c92(nn),mbol,bc
   
   integer :: i,io,j,n,ans,ncols,narg,command_argument_count
-  character :: findfile*99, fname*99,labels(nnn)*99,tmpstr*10
+  character :: findfile*(99), fname*(99),labels(nnn)*(99),tmpstr*(10)
   
   call setconstants()
   

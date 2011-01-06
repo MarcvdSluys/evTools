@@ -38,7 +38,7 @@
 subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   implicit none
   integer :: nf,nvar,defvar(0:nvar)
-  character :: pglabels(nvar)*99,asclabels(nvar)*99
+  character :: pglabels(nvar)*(99),asclabels(nvar)*(99)
   
   defvar = 0
   
@@ -719,7 +719,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real(double) :: dat(nvar,nn),var(nn),dpdj(nn)
   real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0
-  character :: labels(nvar)*99
+  character :: labels(nvar)*(99)
   
   !de-log some variables
   do i=4,nvar

@@ -34,10 +34,10 @@ program plotpltp
   integer :: i,j,n,vx,vy,plotagain,ncols
   integer :: hrd,dhdt,conv,mdots,tscls,ch
   integer :: plotmode,ps
-  character findfile*99, fname*99
-  character :: psname*11
+  character findfile*(99), fname*(99)
+  character :: psname*(11)
   character :: rng,log,cnvh
-  character :: labels(nvar)*40,lx*40,ly*40,titel*100
+  character :: labels(nvar)*(40),lx*(40),ly*(40),titel*(100)
   
   !Set constants:
   call setconstants()

@@ -37,13 +37,13 @@ program plotmod
   real(double) :: mhe,mco
   integer :: i,j,kh,kp,jmod,jb,jin,n
   integer :: narg,blk
-  character :: fname*99,findfile*99
+  character :: fname*(99),findfile*(99)
   
   real :: dat(nc,nm),dat1(nc,nm)
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
   integer :: vx,vy,hmp,plotagain
   character :: log,ans
-  character :: labels(nc)*60,lx*60,ly*60,title*100
+  character :: labels(nc)*(60),lx*(60),ly*(60),title*(100)
   
   call setconstants()
   write(6,*)

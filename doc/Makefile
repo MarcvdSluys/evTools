@@ -10,8 +10,9 @@ FORT = gfortran#  Use GNU fortran compiler >=4.4
 #FORT = nagfor#
 
 WARN = yes#    # compile with compile-time warnings
-CHECK = yes#   # compile with run-time checks
+#CHECK = yes#   # compile with run-time checks
 #DEBUG = yes#   # compile with debug options
+F2003 = yes#   #compile with Fortran 2003 standard
 
 
 #General:
@@ -47,9 +48,15 @@ ifeq ($(FORT),ifort)
       OPT = -O0
       CFLAGS += -check all -check noarg_temp_created
    endif
+
    ifeq ($(WARN),yes)
       CFLAGS += -warn all -stand f03
    endif
+
+   ifeq ($(F2003),yes)
+      CFLAGS += -stand f03 -diag-disable 6894
+   endif
+
    CFLAGS += -vec-report0 -traceback
    CFLAGS += -module $(MODDIR) -I$(MODDIR)
 
@@ -75,30 +82,40 @@ endif
 
 
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
-#ifeq ($(FORT),gfortran)
-ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
+#ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
+ifeq ($(FORT),gfortran)
    CFLAGS += #-I/home/AstroFloyd/usr/include/libAF/gfortran
    LFLAGS += #-L/home/AstroFloyd/usr/lib -lAF_gfortran
    STATLIBS += #/home/AstroFloyd/usr/lib/libAF_gfortran.a
 
+   CFLAGS += -fwhole-file
+
    ifeq ($(CHECK),yes)
       OPT = -O0
-      ifeq ($(FORT),gfortran-4.5.0)
-         CFLAGS += -fcheck=all
-      else
-         CFLAGS += -fbounds-check
-      endif
+      #CFLAGS += -fbounds-check
+      CFLAGS += -fcheck=all
       #CFLAGS += -fcheck-array-temporaries  #Doesn't seem to work...
       CFLAGS += -fbacktrace
    endif
+
+
    ifeq ($(WARN),yes)
-      CFLAGS += -Wall
+      CFLAGS += -Wall -Wextra
+      CFLAGS += -Werror
+      CFLAGS += -Wcharacter-truncation -Wunderflow
       CFLAGS += -fmax-errors=10
       ifeq ($(FORT),gfortran-4.5.0)
          CFLAGS += -fwhole-file
          #CFLAGS += -fwhole-program
       endif
    endif
+
+   ifeq ($(F2003),yes)
+      CFLAGS += -std=f2008 -fall-intrinsics -pedantic
+   else
+      CFLAGS += -ffree-line-length-none
+   endif
+
    #To debug code:
    ifeq ($(DEBUG),yes)
       OPT = -O0
@@ -226,11 +243,11 @@ $(SRCDIR)/code_version.f90: code_version    #code_version is PHONY and always ou
 	@echo 'subroutine print_code_version(unit)' >> $(SRCDIR)/code_version.f90
 	@echo '   implicit none' >> $(SRCDIR)/code_version.f90
 	@echo '   integer, intent(in) :: unit' >> $(SRCDIR)/code_version.f90
-	@echo "   character :: svn_revision*99 = '"`svnversion`"'" >> $(SRCDIR)/code_version.f90
-	@echo "   character :: compile_date*99 = '"`date`"'" >> $(SRCDIR)/code_version.f90
-	@echo "   character :: compiler*99 = '$(FORT)'" >> $(SRCDIR)/code_version.f90
-	@echo "   character :: compiler_flags*99 = '$(OPT)'" >> $(SRCDIR)/code_version.f90
-	@echo "   character :: program_name*99" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: svn_revision*(99) = '"`svnversion`"'" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: compile_date*(99) = '"`date`"'" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: compiler*(99) = '$(FORT)'" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: compiler_flags*(99) = '$(OPT)'" >> $(SRCDIR)/code_version.f90
+	@echo "   character :: program_name*(99)" >> $(SRCDIR)/code_version.f90
 	@echo "   call get_command_argument(0,program_name)" >> $(SRCDIR)/code_version.f90
 	@echo "   write(unit,'(A)')' '//trim(program_name)//', svn revision '//trim(svn_revision)// &" >> $(SRCDIR)/code_version.f90
 	@echo "        ', compiled on '//trim(compile_date)//' with '//trim(compiler)//' '//trim(compiler_flags)" >> $(SRCDIR)/code_version.f90

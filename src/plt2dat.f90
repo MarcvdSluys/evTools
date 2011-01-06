@@ -25,7 +25,7 @@ program plt2dat
   integer, parameter :: nff=200, n=100000,nc=89
   integer :: i,j,nc1,f,nf,fl,sel(99),nsel,io1,io2
   real(double) :: dat(nc)
-  character :: fnames(nff)*99,infile*99,outfile*99
+  character :: fnames(nff)*(99),infile*(99),outfile*(99)
   
   call setconstants()
   

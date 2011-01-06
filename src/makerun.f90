@@ -27,7 +27,7 @@ program makerun
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
   integer :: io,narg,command_argument_count,i,system
-  character :: filei*99,fileo*99,arg*10,bla*500
+  character :: filei*(99),fileo*(99),arg*(10),bla*(500)
   
   write(6,*)''
   filei = 'init.run'

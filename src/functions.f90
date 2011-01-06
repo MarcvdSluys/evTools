@@ -20,31 +20,34 @@
 
 
 !***********************************************************************************************************************************
-!> \brief Contains the integers double and dbl, which shall be used in (almost) all routines
+!> \brief  Contains the integers double and dbl, which shall be used in (almost) all routines
 !! to provide the kind of a (currently double-precision) real variable type.
 !! 
 !! Variables can be declared using "real(double) :: "; constants can be defined as 
 !! e.g. "x = 3.0_dbl".
-!< 
+
 module kinds
    implicit none
    
-   !Integer, double precision:
+   ! Integer, double precision:
    integer, parameter :: long = selected_int_kind(18)
    
-   !Real, double precision:
+   ! Real, double precision:
    integer, parameter :: double = selected_real_kind(15,307)  !Precision = 15, range = 307
    integer, parameter :: dbl = selected_real_kind(15,307)     !Precision = 15, range = 307
    
 end module kinds
 !***********************************************************************************************************************************
 
+
 !***********************************************************************************************************************************
-!> \brief Contains data to compute magnitudes and colours from L,T,g
+!> \brief  Contains data to compute magnitudes and colours from L,T,g
+
 module ubvdata
   use kinds
   implicit none
   save
+  
   integer, parameter :: nzgr=9,ntgr=61,nggr=11
   real(double) :: zgr(nzgr),tgr(ntgr),ggr(nggr),ubv(8,nggr,ntgr,nzgr)
   
@@ -55,70 +58,75 @@ module ubvdata
        100.d0,105.d0,110.d0,115.d0,120.d0,125.d0,130.d0,140.d0,150.d0,160.d0,170.d0,180.d0,190.d0,  &
        200.d0,210.d0,220.d0,230.d0,240.d0,250.d0,260.d0,270.d0,280.d0,290.d0,300.d0,  &
        310.d0,320.d0,330.d0,340.d0,350.d0,375.d0,400.d0,425.d0,450.d0,475.d0,500.d0/
+  
 end module ubvdata
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> \brief Contains the 'constants' used in the evTools package
+!> \brief  Contains the 'constants' used in the evTools package
+
 module constants
   use kinds
   implicit none
   save
+  
   integer :: screen_dpi,screen_size_h,screen_size_v
   integer :: colours(29), ncolours
   real :: scrsz,scrrat
   real(double) :: pi,tpi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
   real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
-  character :: homedir*99,workdir*99,libdir*99,username*99,userID*9,hostname*99
-  character :: cursorup*4,cursordown*4,cursorright*4,cursorleft*4 !Cursor movement
+  character :: homedir*(99),workdir*(99),libdir*(99),username*(99),userID*(9),hostname*(99)
+  character :: cursorup*(4),cursordown*(4),cursorright*(4),cursorleft*(4) !Cursor movement
   logical :: student_mode,white_bg
+  
 end module constants
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> \brief Define the 'constants' in the evTools package
+!> \brief  Define the 'constants' in the evTools package
+
 subroutine setconstants
   use constants
   implicit none
   
-  !ThinkPad, Gentoo with 1440x900:
-  !screen_size_h = 1435
-  !screen_size_v = 860
+  ! ThinkPad, Gentoo with 1440x900:
+  ! screen_size_h = 1435
+  ! screen_size_v = 860
   
-  !Default:
-  screen_size_h = 1000  !Horizontal screen size (pixels)
-  screen_size_v = 700   !Vertical screen size (pixels)
+  ! Default:
+  screen_size_h = 1000   ! Horizontal screen size (pixels)
+  screen_size_v = 700    ! Vertical screen size (pixels)
   
   screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
   white_bg = .true.      ! F: black background on screen, T: white
   
   
-  pi       =  4*atan(1.d0)                          !Pi, area of circle/r^2
+  pi       =  4*atan(1.d0)                            ! Pi, area of circle/r^2
   tpi      =  2*pi
   pi2      =  0.5d0*pi
   c3rd     =  1.d0/3.d0
   
-  l0       =  3.83d33                               ! Solar luminosity, erg s^-1
-  r0       =  6.9599d10                             ! Solar radius, cm
-  m0       =  1.9891d33                             ! Solar mass, g
+  l0       =  3.83d33                                 ! Solar luminosity, erg s^-1
+  r0       =  6.9599d10                               ! Solar radius, cm
+  m0       =  1.9891d33                               ! Solar mass, g
   
-  g        =  6.67259d-8                            ! Newton's constant, cm^3 g^-1 s^-2
-  c        =  2.99792458d10                         ! Speed of light in vacuo, cm s^-1
+  g        =  6.67259d-8                              ! Newton's constant, cm^3 g^-1 s^-2
+  c        =  2.99792458d10                           ! Speed of light in vacuo, cm s^-1
   
-  day      =  8.64d4                                ! Day, s
-  yr       =  3.15569d7                             ! Year, s
-  km       =  1.d5                                  ! Kilometer, cm
+  day      =  8.64d4                                  ! Day, s
+  yr       =  3.15569d7                               ! Year, s
+  km       =  1.d5                                    ! Kilometer, cm
   
-  amu      =  1.6605402d-24                         ! Atomic mass unit; (mass of C12 atom)/12, g
-  m_h      =  1.007825*amu                          ! Mass of a hydrogen atom
-  k_b      =  1.380658d-16                          ! Boltzmann constant, erg/K
-  h_p      =  6.6260755d-27                         ! Planck's constant, erg s
-  h_bar    =  h_p/tpi                               ! Reduced Planck constant, erg s
-  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0   ! Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
-  sigma    =  a_rad*c*0.25d0                        ! Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
+  amu      =  1.6605402d-24                           ! Atomic mass unit; (mass of C12 atom)/12, g
+  m_h      =  1.007825*amu                            ! Mass of a hydrogen atom
+  k_b      =  1.380658d-16                            ! Boltzmann constant, erg/K
+  h_p      =  6.6260755d-27                           ! Planck's constant, erg s
+  h_bar    =  h_p/tpi                                 ! Reduced Planck constant, erg s
+  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0     ! Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
+  sigma    =  a_rad*c*0.25d0                          ! Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
   call get_environment_variable('HOME',homedir)       ! Set homedir  = $HOME (the environment variable)
   call get_environment_variable('PWD',workdir)        ! Set workdir  = $PWD
@@ -148,13 +156,13 @@ end subroutine setconstants
 
 
 !***********************************************************************************************************************************
-!> \brief Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
+!> \brief  Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
 !! \see http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
 !! 
 !! Needs one of:
 !! - UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
 !! - UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
-!<
+
 subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   
   use kinds
@@ -213,12 +221,12 @@ end subroutine lt2ubv
 
 
 !***********************************************************************************************************************************
-!> \brief Determine the operating system type: 1-Linux, 2-MacOSX
+!> \brief  Determine the operating system type: 1-Linux, 2-MacOSX
 function getos()
   use constants
   implicit none
   integer :: i,system,getos
-  character :: ostype*25
+  character :: ostype*(25)
   
   i = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
@@ -231,16 +239,16 @@ end function getos
 
 
 !***********************************************************************************************************************************
-!> \brief Find a file that matches match in the current directory
+!> \brief  Find a file that matches match in the current directory
 !! \param match      Match string
 !! \retval findfile  File name (if found)
-!<
+
 function findfile(match)
   use constants
   implicit none
   integer, parameter :: maxfile=1000
   integer :: i,k,fnum,system
-  character :: match*(*),names(maxfile)*99,findfile*99,fname*99,tempfile*99
+  character :: match*(*),names(maxfile)*(99),findfile*(99),fname*(99),tempfile*(99)
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -292,18 +300,18 @@ end function findfile
 
 
 !***********************************************************************************************************************************
-!> \brief Find files that match match in the current directory
+!> \brief  Find files that match match in the current directory
 !! \param match    Search string to match
 !! \param nff      Maximum number of files to return
 !! \param all      0-select manually from list, 1-always return all files in list
 !! \retval fnames  Array that contains the files found; make sure it has the same length as the array in the calling programme
 !! \retval nf      The actual number of files returned in fnames ( = min(number found, nff))
-!<
+
 subroutine findfiles(match,nff,all,fnames,nf)  
   use constants
   implicit none
   integer :: i,j,k,fnum,nf,nff,system,all
-  character :: match*(*),names(nff)*99,fnames(nff)*99,tempfile*99
+  character :: match*(*),names(nff)*(99),fnames(nff)*(99),tempfile*(99)
   
   if(len_trim(homedir).eq.99) then
      write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -380,7 +388,7 @@ end subroutine findfiles
 
 
 !***********************************************************************************************************************************
-!> \brief Swap two real numbers
+!> \brief  Swap two real numbers
 subroutine rswap(x,y)
   implicit none
   real, intent(inout) :: x,y
@@ -396,12 +404,12 @@ end subroutine rswap
 
 
 !***********************************************************************************************************************************
-!> \brief Finds index of value v in monotonously increasing or decreasing array arr of length narr
+!> \brief  Finds index of value v in monotonously increasing or decreasing array arr of length narr
 !! \param v     Value to match to arr (double)
 !! \param arr   Array to match v to (double)
 !! \param narr  Size of arr (integer)
 !! \retval find_index  Index for value v in array arr (integer)
-!<
+
 function find_index(v,arr,narr)
   use kinds
   implicit none
@@ -429,12 +437,12 @@ end function find_index
 
 
 !***********************************************************************************************************************************
-!> \brief 
+!> \brief  
 !! \param arr   monotonic array (double)
 !! \param narr  length of arr (integer)
 !! \param v     value to look for (double)
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
-!<
+
 subroutine locate(arr,narr,v,i)
   use kinds
   implicit none
@@ -465,12 +473,12 @@ end subroutine locate
 
 
 !***********************************************************************************************************************************
-!> \brief Single-precision version of locate()
+!> \brief  Single-precision version of locate()
 !! \param rarr  monotonic array
 !! \param narr  length of rarr
 !! \param rv    value to look for
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
-!<
+
 subroutine locater(rarr,narr,rv,i)
   
   use kinds
@@ -488,7 +496,7 @@ end subroutine locater
 
 
 !***********************************************************************************************************************************
-!> \brief Return a sorted index indx of array rarr of length n - single precision interface for dindex
+!> \brief  Return a sorted index indx of array rarr of length n - single precision interface for dindex
 subroutine rindex(narr,rarr,indx)
   use kinds
   implicit none
@@ -503,7 +511,7 @@ end subroutine rindex
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
-!> \brief Return a sorted index ind of array arr of length narr - double precision
+!> \brief  Return a sorted index ind of array arr of length narr - double precision
 subroutine dindex(narr,arr,ind)
   use kinds
   implicit none
@@ -597,7 +605,7 @@ end subroutine dindex
 
 
 !***********************************************************************************************************************************
-!> \brief Interpolate - single precision
+!> \brief  Interpolate - single precision
 subroutine polint(xa,ya,n,x,y,dy)
   implicit none
   integer, parameter :: nmax=10
@@ -646,7 +654,7 @@ end subroutine polint
 
 
 !***********************************************************************************************************************************
-!> \brief Interpolate - double precision
+!> \brief  Interpolate - double precision
 subroutine polintd(xa,ya,n,x,y,dy)
   use kinds
   implicit none
@@ -696,7 +704,7 @@ end subroutine polintd
 
 
 !***********************************************************************************************************************************
-!> \brief NRF random-number generator
+!> \brief  NRF random-number generator
 function ran1(seed)
   implicit none
   integer, parameter :: ia=16807,im=2147483647,iq=127773,ir=2836,ntab=32,ndiv=1+(im-1)/ntab
@@ -806,7 +814,7 @@ end subroutine splint
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital separation to orbital angular momentum
+!> \brief  Convert orbital separation to orbital angular momentum
 function a2j(m1,m2,a)
   use kinds
   use constants
@@ -817,7 +825,7 @@ end function a2j
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital angular momentum to orbital separation
+!> \brief  Convert orbital angular momentum to orbital separation
 function j2a(m1,m2,j)
   use kinds
   use constants
@@ -830,7 +838,7 @@ end function j2a
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital period to orbital angular momentum, all in cgs units
+!> \brief  Convert orbital period to orbital angular momentum, all in cgs units
 function p2j(m1,m2,p)
   use kinds
   use constants
@@ -842,7 +850,7 @@ end function p2j
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital angular momentum to orbital period, all in cgs units
+!> \brief  Convert orbital angular momentum to orbital period, all in cgs units
 function j2p(m1,m2,j)
   use kinds
   use constants
@@ -856,7 +864,7 @@ end function j2p
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital period to orbital separation, in cgs units
+!> \brief  Convert orbital period to orbital separation, in cgs units
 !! \param mtot  Total mass of the binary (g)
 !! \param p     Binary period (s)
 !! \retval a    Binary orbital separation (cm)
@@ -871,7 +879,7 @@ end subroutine p2a
 !***********************************************************************************************************************************
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital separation to orbital period, in cgs units
+!> \brief  Convert orbital separation to orbital period, in cgs units
 !! \param mtot  Total mass of the binary (g)
 !! \param a     Binary orbital separation (cm)
 !! \retval p    Binary period (s)
@@ -887,7 +895,7 @@ end subroutine a2p
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital separation to Roche-lobe radius, using Eggleton (1983)
+!> \brief  Convert orbital separation to Roche-lobe radius, using Eggleton (1983)
 !! m1 and m2 in the same units, Rl and a in the same units
 function a2rl(m1,m2,a)
   use kinds
@@ -902,7 +910,7 @@ end function a2rl
 
 
 !***********************************************************************************************************************************
-!> \brief Convert Roche-lobe radius to orbital separation, using Eggleton (1983)
+!> \brief  Convert Roche-lobe radius to orbital separation, using Eggleton (1983)
 !! m1 and m2 in the same units, Rl and a in the same units
 function rl2a(m1,m2,rl1)
   use kinds
@@ -916,7 +924,7 @@ end function rl2a
 
 
 !***********************************************************************************************************************************
-!> \brief Convert orbital period to Roche-lobe radius, all in cgs units
+!> \brief  Convert orbital period to Roche-lobe radius, all in cgs units
 function p2rl(m1,m2,p)
   use kinds
   implicit none
@@ -928,7 +936,7 @@ end function p2rl
 
 
 !***********************************************************************************************************************************
-!> \brief Convert Roche-lobe radius to orbital period, all in cgs units
+!> \brief  Convert Roche-lobe radius to orbital period, all in cgs units
 function rl2p(m1,m2,rl1)
   use kinds
   implicit none
@@ -942,7 +950,7 @@ end function rl2p
 
 
 !***********************************************************************************************************************************
-!> \brief Print an exit  message and stop the program
+!> \brief  Print an exit  message and stop the program
 subroutine quit_program(message)
   implicit none
   character :: message*(*)
@@ -958,7 +966,7 @@ end subroutine quit_program
 
 
 !***********************************************************************************************************************************
-!> \brief Bin data in one dimension, by counting data points in each bin
+!> \brief  Bin data in one dimension, by counting data points in each bin
 !! \param n      Size of data array
 !! \param x      Input data array
 !! \param norm   Normalise (1) or not (0)
@@ -967,7 +975,7 @@ end subroutine quit_program
 !! \param xmax1  Maximum x value (right side of last bin (in/output: set xmin=xmax to auto-determine)
 !! \retval xbin  Binned data.  The x values are the left side of the bin!
 !! \retval ybin  Binned data.
-!<  
+ 
 subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)
   implicit none
   integer :: i,k,n,nbin,norm
@@ -1009,13 +1017,13 @@ end subroutine bin_data_1d
 
 
 !***********************************************************************************************************************************
-!> \brief Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+!> \brief  Get time stamp in seconds since 1970-01-01 00:00:00 UTC
 function time_stamp(os)
   use kinds
   implicit none
   real(double) :: time_stamp
   integer :: os,i,system
-  character :: fname*99
+  character :: fname*(99)
   
   fname = './.analysemcmc_time_stamp'  !gfortran doesn't want to read from ~ for some reason
   if(os.eq.2) then !MacOS
@@ -1033,11 +1041,11 @@ end function time_stamp
 
 
 !***********************************************************************************************************************************
-!> \brief Set the title in a Postscript file generated by PGPlot
+!> \brief  Set the title in a Postscript file generated by PGPlot
 subroutine set_PGPS_title(PSfile,PStitle)
   implicit none
   integer :: status,system
-  character :: PSfile*(*),PStitle*(*),tempfile*99
+  character :: PSfile*(*),PStitle*(*),tempfile*(99)
   
   tempfile = 'temp_PGPS_file.eps'
   
@@ -1060,13 +1068,13 @@ end subroutine set_PGPS_title
 
 
 !***********************************************************************************************************************************
-!> \brief Read/create evTools settings file
+!> \brief  Read/create evTools settings file
 subroutine evTools_settings()
   use constants
   implicit none
   integer :: io,u
   logical :: ex
-  character :: filename*99
+  character :: filename*(99)
   
   !Define namelist, file name
   namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
@@ -1132,7 +1140,7 @@ end subroutine evTools_settings
 
 
 !***********************************************************************************************************************************
-!> Convert PGPlot x,y dimensions to paper size and ratio for bitmap
+!> \brief  Convert PGPlot x,y dimensions to paper size and ratio for bitmap
 subroutine pgxy2szrat_bitmap(x,y,size,ratio)
   implicit none
   integer, intent(in) :: x,y
@@ -1146,7 +1154,7 @@ end subroutine pgxy2szrat_bitmap
 
 
 !***********************************************************************************************************************************
-!> Convert PGPlot x,y dimensions to paper size and ratio for bitmap
+!> \brief  Convert PGPlot x,y dimensions to paper size and ratio for bitmap
 subroutine pgszrat2xy_bitmap(size,ratio,x,y)
   implicit none
   real, intent(in) :: size,ratio
@@ -1161,13 +1169,13 @@ end subroutine pgszrat2xy_bitmap
 
 
 !***********************************************************************************************************************************
-!> Convert x,y screen dimensions to PGPlot paper size and ratio for a screen
+!> \brief  Convert x,y screen dimensions to PGPlot paper size and ratio for a screen
 !! \param horiz   Horizontal screen size (pixels) (int)
 !! \param vert    Vertical screen size (pixels) (int)
 !! \param dpi     Screen resolution in dots per inch (int)
 !! \retval size   PGPlot screen size (real)
 !! \retval ratio  PGPlot screen ratio (real)
-!<
+
 subroutine pgxy2szrat_screen(horiz,vert, dpi, size,ratio)
   implicit none
   integer, intent(in) :: horiz,vert,dpi
@@ -1181,13 +1189,13 @@ end subroutine pgxy2szrat_screen
 
 
 !***********************************************************************************************************************************
-!> Convert PGPlot paper size and ratio to screen dimensions
+!> \brief  Convert PGPlot paper size and ratio to screen dimensions
 !! \param size    PGPlot screen size (real)
 !! \param ratio   PGPlot screen ratio (real)
 !! \param dpi     Screen resolution in dots per inch (int)
 !! \retval horiz  Horizontal screen size (pixels) (int)
 !! \retval vert   Vertical screen size (pixels) (int)
-!<
+
 subroutine pgszrat2xy_screen(size,ratio, dpi, horiz,vert)
   implicit none
   real, intent(in) :: size,ratio

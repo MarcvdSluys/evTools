@@ -1,4 +1,4 @@
-!>  \file plotfunctions.f90  Functions and subroutines for the evTools package that need pgplot
+!> \file plotfunctions.f90  Functions and subroutines for the evTools package that need pgplot
 
 ! Copyright 2002-2010 AstroFloyd - astrofloyd.org
 ! 
@@ -24,7 +24,7 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
   integer :: logri
   real :: x,xmin,xmax,y,ymin,ymax,logr,dlogr,cst
   real :: r1,r2,dr,x2(2),y2(2)
-  character :: str*99
+  character :: str*(99)
   
   call pgsls(4)
   cst = log10(real(4*pi*sigma * r0**2/l0))
@@ -65,7 +65,7 @@ end subroutine plotlinesofconstantradius
 
 
 !***********************************************************************
-!> \brief Plot the zams; use <libdir>/zams_z0_02.plt
+!> \brief Plot the zams; use [libdir]/zams_z0_02.plt
 !! It would be nice to not only plot a HRD, but any parameter
 !! \todo Write a routine to read a plt file first, then use it here
 subroutine plotzams()
@@ -96,7 +96,7 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
   real :: ymin,ymax,ch0
   character :: hlp,hlbl
-  character :: hlbls*5
+  character :: hlbls*(5)
   
   
   plconv = 1  !Plot convection
@@ -463,7 +463,7 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy,xmin,xmax,ymin,ymax)
   real :: dist,mindist
   real :: xmin,xmax,ymin,ymax,dx,dy,xsel(4),ysel(4)
   
-  character :: hlbls*5
+  character :: hlbls*(5)
   
   !Identify closest model
   xsel = 0.

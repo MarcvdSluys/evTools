@@ -27,7 +27,7 @@ program plt2obs
   real(double) :: tm,m,mc,z,zmod,mbol,bc,mv,umb,bmv,vmr,rmi
   real(double) :: logt,logl,logr,dat(nc,nn)
   integer :: i,j,n,ncols,fnl,nf,f,io
-  character :: fname*99,fnames(nff)*99,oname*55,ans,tmpstr*10
+  character :: fname*(99),fnames(nff)*(99),oname*(55),ans,tmpstr*(10)
   
   call setconstants()
   

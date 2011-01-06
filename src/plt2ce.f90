@@ -21,7 +21,7 @@ program plt2ce
   integer, parameter :: nff=200, n=100000,nc=89
   real(double) :: dat(nc),r,l,t,m0,r0
   integer :: i,nc1,f,nf,fl
-  character :: fnames(nff)*99,fname*99
+  character :: fnames(nff)*(99),fname*(99)
   
   m0 = 1.9891d33
   r0 = 6.9599d10

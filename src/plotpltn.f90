@@ -37,8 +37,8 @@ program plotpltn
   integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
-  character :: fnames(nff)*99,fname*99,psname*99,tmpstr*10,boxx*19,boxy*19
-  character :: rng,log,pglabels(100)*99,pglx*99,pgly*99,asclabels(100)*99,asclx*99,ascly*99,title*100,pstitle*99
+  character :: fnames(nff)*(99),fname*(99),psname*(99),tmpstr*(10),boxx*(19),boxy*(19)
+  character :: rng,log,pglabels(100)*(99),pglx*(99),pgly*(99),asclabels(100)*(99),asclx*(99),ascly*(99),title*(100),pstitle*(99)
   logical :: ex
   
   !Set constants:

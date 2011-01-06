@@ -20,7 +20,7 @@ program grid
   implicit none
   real(double) :: xi,dx
   integer :: n,command_argument_count
-  character :: bla*99
+  character :: bla*(99)
   
   if(command_argument_count().ne.3) then
      write(*,'(/,A)')'  This program shows what values are used in a grid of models for ev'// &

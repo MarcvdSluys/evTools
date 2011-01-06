@@ -28,7 +28,7 @@ program selplt
   integer, parameter :: nn=2000,nff=1000,nvar=210,ndim=2,ncondmax=99
   real(double) :: dat(nvar,nn),dato(nvar,nn),x(ndim),y(ndim,ncondmax),dy(ndim,ncondmax),sumsq,maxtime!,zsurf
   integer :: i,j,n,f,nf,sel,cd,d,indx(ndim),ver,dpdt,ncond,ndata,nsel
-  character :: fnames(nff)*99,fname*99,labels(nvar)*99
+  character :: fnames(nff)*(99),fname*(99),labels(nvar)*(99)
   
   call setconstants()
   

@@ -32,8 +32,8 @@ program plotmdl
   real :: xx(10,nn),yy(10,nn),xx1(nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
-  character findfile*99,fname*99,rng,log,xwin*19
-  character :: lx*99,ly*99,fx*99,fy*99,title*99,psname*99
+  character findfile*(99),fname*(99),rng,log,xwin*(19)
+  character :: lx*(99),ly*(99),fx*(99),fy*(99),title*(99),psname*(99)
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   

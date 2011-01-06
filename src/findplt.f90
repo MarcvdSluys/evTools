@@ -26,10 +26,10 @@ program findplt
   use ubvdata
   
   implicit none
-  integer, parameter :: nn=30000,nnn=100,ny=18
+  integer, parameter :: nn=30000,nnn=100
   real(double) :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
   integer :: i,j,ncols,prmdl,succ,narg,command_argument_count,iin,iout,glt,io
-  character :: fname*99,arg*99,tmpstr*10
+  character :: fname*(99),arg*(99),tmpstr*(10)
   
   call setconstants()
   

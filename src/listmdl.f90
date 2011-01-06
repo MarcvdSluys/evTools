@@ -22,7 +22,7 @@ program listmdl
   implicit none
   
   integer :: nblk,blk,ans
-  character :: findfile*99,infile*99
+  character :: findfile*(99),infile*(99)
   logical :: svblk
   
   call setconstants()

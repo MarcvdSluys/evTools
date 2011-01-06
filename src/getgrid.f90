@@ -20,7 +20,7 @@ program getgrid
   implicit none
   real(double) :: x1,x2,dlgx
   integer :: n,command_argument_count
-  character :: bla*99
+  character :: bla*(99)
   
   if(command_argument_count().ne.3) then
      write(*,'(/,A)')'  This program returns the parameters you need for a certain grid of N models with values between'// &

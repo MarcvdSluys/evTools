@@ -26,7 +26,7 @@ program mergeplt
   integer :: narg,command_argument_count
   
   integer :: i,j,n1,n2,ncols,ncols1,ncols2,ncolsmax
-  character :: fin1*99,fin2*99,fout*99
+  character :: fin1*(99),fin2*(99),fout*(99)
   
   
   ncolsmax = 89  !Program is not designed to handle more columns

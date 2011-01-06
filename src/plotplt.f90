@@ -20,7 +20,7 @@
 
 !> \brief Plot the contents of .plt[12] files
 !! - Uses routines from functions.f90, plt_functions.f90
-!! - Requires the file <libdir>/UBVRI.Kur to calculate colours
+!! - Requires the file [libdir]/UBVRI.Kur to calculate colours
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
 program plotplt
   use kinds
@@ -48,11 +48,11 @@ program plotplt
   integer :: col,lng
   real :: sch
   
-  character :: fname*99,fnames(nfmax)*99,psname*99
-  character :: rng,log,hlp,hlp1,hlbl,hlbls*5,leglbl(29)*29
-  character :: xwin*19,tmpstr,boxx*19,boxy*19
-  character :: pglabels(nvar)*99,asclabels(nvar)*99,pglx*99,pgly*99,title*99,title1*99
-  character :: pstitle*99,asclx*99,ascly*99
+  character :: fname*(99),fnames(nfmax)*(99),psname*(99)
+  character :: rng,log,hlp,hlp1,hlbl,hlbls*(5),leglbl(29)*(29)
+  character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
+  character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
+  character :: pstitle*(99),asclx*(99),ascly*(99)
   logical :: ex,prleg
   
   !Set constants:

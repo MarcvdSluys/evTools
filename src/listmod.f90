@@ -26,7 +26,7 @@ program listmod
   use constants
   implicit none
   integer :: narg,command_argument_count,blk,ans,nblk
-  character :: fname*99,findfile*99
+  character :: fname*(99),findfile*(99)
   logical :: save_dh
   
   call setconstants()
@@ -173,7 +173,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
   real(double) :: dat(99)
   integer :: kh,kp,jmod,jb,jin,jf, io
   integer :: bl,li
-  character :: tmp_str*9
+  character :: tmp_str*(9)
   
   open(unit=10,form='formatted',status='old',file=trim(fname))
   
@@ -295,7 +295,7 @@ subroutine print_mod_details(fname, blk, save_dh)
   real(double) :: mhe,mco,mhenv
   integer :: kh,kp,jmod,jb,jin,jf, io
   integer :: bl,li
-  character :: tmp_str*9
+  character :: tmp_str*(9)
   
   
   !Read file, upto chosen model (blk-1)
@@ -400,10 +400,10 @@ subroutine print_mod_details(fname, blk, save_dh)
   write(6,89)hc,hec,cc,oc,nec,zc
   
 81 format ('  Model:        Model nr:',i5,',    Mass:',f7.2,' Mo,    Age: ',es10.4,' yr,  Time step:   ',es10.4,' yr,    Z =',f7.4)
-82 format ('                Mesh pts: ',i4,',      Kp: ',i6,',       Jin: ',i3',            Binary component:',i2)
-83 format ('  Primary:      M   =',f9.5,' Mo,  R   =',f9.5,' Ro,   L   =  ',es10.4' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K')
+82 format ('                Mesh pts: ',i4,',      Kp: ',i6,',       Jin: ',i3,',            Binary component:',i2)
+83 format ('  Primary:      M   =',f9.5,' Mo,  R   =',f9.5,' Ro,   L   =  ',es10.4,' Lo,  Tc =  ',es10.4,' K,   Teff =',f8.0,' K')
 84 format ('                Mhe =',f9.5,' Mo,  Mco =',f9.5,' Mo,   Menv=',f9.5,' Mo')
-85 format ('  Binary:       M1  =',f9.5,' Mo,  M2  =',f9.5,' Mo,   Mb  =',f9.4' Mo,     q1 =',f9.5,',        q2   =',f9.5)
+85 format ('  Binary:       M1  =',f9.5,' Mo,  M2  =',f9.5,' Mo,   Mb  =',f9.4,' Mo,     q1 =',f9.5,',        q2   =',f9.5)
 86 format ('  Orbit:        P  =',ES12.5,' d,   a  =',ES12.5,' Ro,   a1 =',ES12.5,' Ro,    a2 =',ES12.5,' Ro,   Rrl1 =',ES12.5, &
         ' Ro,   Rrl2 = ',ES12.5,' Ro')
 87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',ES12.5,' days')
@@ -436,7 +436,7 @@ subroutine copy_mod(infile, blk, save_dh)
   real(double) :: dat1(8),dat2(99)
   integer :: kh,kp,jmod,jb,jin,jf, io
   integer :: bl,li
-  character :: outfile*99,tmp_str*9
+  character :: outfile*(99),tmp_str*(9)
   logical :: ex
   
   !Read blocks before the desired one:
