@@ -1,7 +1,9 @@
-! Reads, optinally changes and (over!)writes an init.run (fort.23) input file
-! AF January 21, 2004
+!> \file makerun.f90  Reads, optinally changes and (over!)writes an init.run (fort.23) input file
+!!
+!! January 21, 2004
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -15,6 +17,10 @@
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
 
+
+!***********************************************************************************************************************************
+!> \brief  Reads, optinally changes and (over!)writes an init.run (fort.23) input file
+
 program makerun  
   use kinds
   
@@ -26,7 +32,7 @@ program makerun
   real(double) :: m2
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
-  integer :: io,narg,command_argument_count,i,system
+  integer :: io,narg,command_argument_count,system,status
   character :: filei*(99),fileo*(99),arg*(10),bla*(500)
   
   write(6,*)''
@@ -117,7 +123,7 @@ program makerun
   close(10)
   close(20)
   
-  i = system('mv -f '//trim(fileo)//' '//trim(filei))
+  status = system('mv -f '//trim(fileo)//' '//trim(filei))
   
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
@@ -148,3 +154,5 @@ program makerun
   stop
   
 end program makerun
+!***********************************************************************************************************************************
+

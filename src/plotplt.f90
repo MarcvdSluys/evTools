@@ -2,7 +2,7 @@
 !
 !  AF, 19-04-2006
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -18,10 +18,14 @@
 
 
 
+!***********************************************************************************************************************************
 !> \brief Plot the contents of .plt[12] files
+!!
 !! - Uses routines from functions.f90, plt_functions.f90
 !! - Requires the file [libdir]/UBVRI.Kur to calculate colours
+!!
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
+
 program plotplt
   use kinds
   use constants
@@ -37,8 +41,9 @@ program plotplt
   real(double) :: mint,maxt,dt
   logical :: logt
   
+  integer :: system, status
   real :: yy1(nmax),minx,dist,mindist
-  real :: x,y,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
+  real :: x,y,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
@@ -49,11 +54,11 @@ program plotplt
   real :: sch
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
-  character :: rng,log,hlp,hlp1,hlbl,hlbls*(5),leglbl(29)*(29)
+  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(29)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99)
-  logical :: ex,prleg
+  logical :: ex,prleg, hlp,hlbl
   
   !Set constants:
   call setconstants()
@@ -91,12 +96,12 @@ program plotplt
   
   
   !Read current path and use it as plot title
-  x=system('pwd > '//trim(homedir)//'/tmppwd.txt')
+  status = system('pwd > '//trim(homedir)//'/tmppwd.txt')
   open(unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
-  x=system('rm '//trim(homedir)//'/tmppwd.txt')
+  status = system('rm '//trim(homedir)//'/tmppwd.txt')
   do i=10,99
      if(title(i:i).ne.' ') nt = i
   end do
@@ -151,6 +156,7 @@ program plotplt
      dat(f,:,:) = datf(:,:)
      n(f) = nfi
   end do
+  deallocate(datf)
   
   
   !************************************************************************      
@@ -578,14 +584,13 @@ program plotplt
      write(6,*)''
      nhp = 0
      hp = 0
-     hlbl = 'n'
-     hlp = 'n'
+     hlp = .false.
+     hlbl = .false.
      write(6,'(A47)', advance='no')' Do you want to highlight model points (y/n) ? '
-     read*,hlp
-     if(hlp.eq.'Y') hlp='y'
-     if(hlp.eq.'N') hlp='n'
+     read*,ans
+     if(ans.eq.'Y' .or. ans.eq.'y') hlp = .true.
      
-     if(hlp.eq.'y') then
+     if(hlp) then
         hlp1 = 's'
         if(nf.eq.1) then
            write(6,'(A)', advance='no')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
@@ -640,16 +645,15 @@ program plotplt
         
         write(6,*)''     
         write(6,'(A43)', advance='no')' Do you want to label these points (y/n) ? '
-        read*,hlbl
-        if(hlbl.eq.'Y') hlbl='y'
-        if(hlbl.eq.'N') hlbl='n'
+        read*,ans
+        if(ans.eq.'Y' .or. ans.eq.'y') hlbl=.true.
         
-     end if !if(hlp.eq.'y') then
+     end if !if(hlp) then
   end if !if(plot.lt.2.or.plot.eq.8) then
   
   
   !Redetermine which structure models were saved after rereading file:
-  if(plot.eq.6.or.plot.eq.7.and.hlp.eq.'y'.and.hlp1.eq.'s') then
+  if(plot.eq.6.or.plot.eq.7.and.hlp.and.hlp1.eq.'s') then
      !Use saved structure models, store them in hp()
      !write(6,'(/,A)')'      Nr    Line   Model'
      i = 0
@@ -821,13 +825,13 @@ program plotplt
   !Highlight points:
   call pgsch(1.5*sch)
   call pgsci(2)
-  if(hlp.eq.'y') then
+  if(hlp) then
      do pl=1,npl
         col = colours(mod(pl-1,ncolours)+1)
         call pgsci(col)
         call pgpoint(nhp(pl),xx(pl,hp(pl,1:nhp(pl))),yy(pl,hp(pl,1:nhp(pl))),2)
         
-        if(hlbl.eq.'y') then
+        if(hlbl) then
            call pgsch(0.7*sch)
            do i=1,nhp(pl)
               write(hlbls,'(I5)')nint(dat(pl,1,hp(pl,i)))
@@ -835,7 +839,7 @@ program plotplt
            end do
            call pgsch(sch)
            call pgsci(1)
-        end if !if(hlbl.eq.'y') then
+        end if !if(hlbl) then
         
      end do !pl
   end if
@@ -874,8 +878,8 @@ program plotplt
      pl = 1
      
      !Convection plot - replots axes at the end:
-     !call pltconvection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
-     call pltconvection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
+     !call plt_convection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
+     call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
      call pgsci(2)
   end if
   
@@ -927,7 +931,7 @@ program plotplt
         if(vx.eq.201) write(psname,'(A,I3.3,A)')'plot_plt__HRD_',i,'.eps'
         inquire(file=trim(psname), exist=ex)                                                 !Check whether the file already exists
         if(.not.ex) then
-           j = system('mv -f plot_plt_000.eps '//trim(psname))
+           status = system('mv -f plot_plt_000.eps '//trim(psname))
            call set_PGPS_title(trim(psname),trim(pstitle))
         end if
         i = i+1
@@ -1104,8 +1108,9 @@ program plotplt
   
 9999 continue
   write(6,'(/,A,/)')' Program finished.'
+  
 end program plotplt
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 

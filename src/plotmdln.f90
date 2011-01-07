@@ -5,7 +5,7 @@
 ! AF, 19-05-2005
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -29,14 +29,14 @@ program plotmdln
   integer, parameter :: nn=1000,nq=30,nbb=500
   integer :: nm,nv,mdl(nbb),nblk,nsel
   real :: dat(nbb,nq,nn),age(nbb),dov,x,xx(nbb,nn),yy(nbb,nn)
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4)
   real :: m1,r1,l1,ts,tc,mhe,mco
   real :: hc,hec,cc,oc,zc
   real :: hs,hes,cs,os,zs
   real :: rhoc
 
-  integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax
+  integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax,system,status
   character findfile*(99),fname*(99),rng,log,mdlnr*(5)
   character :: labels(nq)*(60),lx*(50),ly*(50),title*(100)
   
@@ -83,12 +83,13 @@ program plotmdln
 
 
   !Read currend path and use it as plot title
-3 x=system('pwd > tmppwd.txt')
+3 continue
+  status = system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  x=system('rm tmppwd.txt')
+  status = system('rm tmppwd.txt')
 
   !Search for input file in current dir
   fname=findfile('*.mdl*')

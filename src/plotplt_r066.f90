@@ -5,7 +5,7 @@
 !Uses PGPLOT window 1 to plot to
 !AF, 19-04-2006. Works for ifort on MacOS, 11-10-2006.
 !
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -28,20 +28,20 @@ program plotplt
   integer,parameter :: nn=30000,nvar=210,nc=81,nl=10
   real(double) :: dat(nvar,nn),d(nvar)
   real :: xx(nn),yy(nl,nn),yy1(nn),minx,miny(nl),dist,mindist
-  real :: x,system,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
+  real :: x,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: i,i0,j,j0,n,vx,vy,plot,ny,excly(nl),drawlines,ver,verbose
   integer :: hrd,dhdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,hp(1000),nhp,wait,lums,lgx,lgy,nsel,os,whitebg,strmdls(nn)
-  integer :: ansi,xwini,pgopen
+  integer :: ansi,xwini,pgopen,system,status
   integer :: colours(29),ncolours,col
   real :: sch
   character :: findfile*99,fname*99,psname*99
-  character :: rng,log,hlp,hlp1,hlbl,hlbls*5,leglbl(29)*29
+  character :: ans,rng,log,hlp1,hlbls*5,leglbl(29)*29
   character :: xwin*19,tmpstr,boxx*19,boxy*19
   character :: labels(nvar)*99,lx*99,ly*99,title*99,title1*99
-  logical :: ex,prleg
+  logical :: ex,prleg, hlp,hlbl
   
   !Set constants:
   call setconstants()
@@ -74,12 +74,12 @@ program plotplt
   call getpltlabels(nvar,labels)                                                                  !Get the labels for the plot axes
   
   !Read current path and use it as plot title
-  x=system('pwd > '//trim(homedir)//'/tmppwd.txt')
+  status = system('pwd > '//trim(homedir)//'/tmppwd.txt')
   open(unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
-  x=system('rm '//trim(homedir)//'/tmppwd.txt')
+  status = system('rm '//trim(homedir)//'/tmppwd.txt')
   do i=10,99
      if(title(i:i).ne.' ') nt = i
   end do
@@ -146,8 +146,8 @@ program plotplt
   ny = 1
   if(vx.eq.201.or.hrd.eq.1) then  !HRD
      hrd = 1
-     xx = real(dlog10(abs(dat(10,1:nn))))
-     yy(1,1:n) = real(dlog10(abs(dat(9,1:nn))))
+     xx = real(log10(abs(dat(10,1:nn))))
+     yy(1,1:n) = real(log10(abs(dat(9,1:nn))))
      lx = trim(labels(10))
      ly = trim(labels(9))
      vy = 0
@@ -472,14 +472,13 @@ program plotplt
   
   if(plot.lt.2.or.plot.eq.8) then 
      write(6,*)''
-     hlbl = 'n'
-     hlp = 'n'
+     hlp = .false.
+     hlbl = .false.
      write(6,'(A47)', advance='no')' Do you want to highlight model points (y/n) ? '
-     read*,hlp
-     if(hlp.eq.'Y') hlp='y'
-     if(hlp.eq.'N') hlp='n'
+     read*,ans
+     if(ans.eq.'Y' .or. ans.eq.'y') hlp = .true.
      
-     if(hlp.eq.'y') then
+     if(hlp) then
         hlp1 = 'm'
         write(6,'(A)', advance='no')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
         read*,hlp1
@@ -518,7 +517,7 @@ program plotplt
            write(6,'(A)')'      Nr   Model    Line'
            do i=1,nhp
               call locate(dat(1,1:n),n,dble(hp(i)),j)
-              if(dabs(dat(1,j+1)-dble(hp(i))).lt.dabs(dat(1,j)-dble(hp(i)))) j = j+1
+              if(abs(dat(1,j+1)-dble(hp(i))).lt.abs(dat(1,j)-dble(hp(i)))) j = j+1
               if(j.gt.n) j = n
               write(6,'(3I8)')i,hp(i),j
               hp(i) = j
@@ -527,16 +526,15 @@ program plotplt
         
         write(6,*)''     
         write(6,'(A43)', advance='no')' Do you want to label these points (y/n) ? '
-        read*,hlbl
-        if(hlbl.eq.'Y') hlbl='y'
-        if(hlbl.eq.'N') hlbl='n'
+        read*,ans
+        if(ans.eq.'Y' .or. ans.eq.'y') hlbl=.true.
         
-     end if !if(hlp.eq.'y') then
+     end if !if(hlp) then
   end if !if(plot.lt.2.or.plot.eq.8) then
   
   
   !Redetermine which structure models were saved after rereading file:
-  if(plot.eq.6.or.plot.eq.7.and.hlp.eq.'y'.and.hlp1.eq.'s') then
+  if(plot.eq.6.or.plot.eq.7.and.hlp.and.hlp1.eq.'s') then
      !Use saved structure models, store them in hp()
      !write(6,'(/,A)')'      Nr    Line   Model'
      i = 0
@@ -684,8 +682,8 @@ program plotplt
   !Highlight points:
   call pgsch(1.5*sch)
   call pgsci(2)
-  if(hlp.eq.'y') call pgpoint(nhp,xx(hp(1:nhp)),yy(1,hp(1:nhp)),2)
-  if(hlbl.eq.'y') then
+  if(hlp) call pgpoint(nhp,xx(hp(1:nhp)),yy(1,hp(1:nhp)),2)
+  if(hlbl) then
      call pgsch(0.7*sch)
      do i=1,nhp
         write(hlbls,'(I5)')nint(dat(1,hp(i)))
@@ -693,7 +691,7 @@ program plotplt
      end do
      call pgsch(sch)
      call pgsci(1)
-  end if !if(hlbl.eq.'y') then
+  end if !if(hlbl) then
   
   
   !Print legenda:
@@ -713,7 +711,7 @@ program plotplt
   
   if(conv.eq.1) then
      call pgsci(1)
-     call pltconvection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
+     call plt_convection(nn,nvar,n,nl,dat,xx,yy,ymin,ymax,nhp,hp,hlp,hlbl)   !Convection plot - replots axes at the end
      call pgsci(2)
   end if
   
@@ -893,7 +891,7 @@ program plotplt
      write(6,*)''
      !From listplt
      write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
-     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
+     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
      write(6,*)''
      
      call pgsci(2)

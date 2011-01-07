@@ -2,7 +2,7 @@
 
 ! AF, 19-05-2005
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -617,7 +617,7 @@ program plotmdl
   
   
   if(plot.eq.10) then
-     call identify_closest_mdl_model(nn,nx,ny,xx,yy,xmin,xmax,ymin,ymax)
+     call identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
      goto 900
   end if
   

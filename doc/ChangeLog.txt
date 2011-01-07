@@ -2,6 +2,14 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   146: AstroFloyd, 07/01/2011
+     - Updated copyright to 2011
+     - Updated (Doxygen) comments: file and routine titles everywhere(?)
+     - Removed old Fortran intrinsics (dlog)
+     - Use integer system(), and with status=
+     - In plotplt, made hlp,hlbl logical iso character (y/n)
+     - Added intent()
+          
    145: AstroFloyd, 06/01/2011
      - Updated code to compile with gfortran 4.5, F2008 standard
      - Updated Makefile

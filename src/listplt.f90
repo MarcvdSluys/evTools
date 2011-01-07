@@ -1,7 +1,7 @@
 !> \file listplt.f90  Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
 !
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -284,8 +284,8 @@ program listplt
   
   dat(85,1) = 0.d0
   do i=2,n
-     c85a = dabs(dat(8,i)-dat(8,i-1))+1.d-30    !dR
-     c85b = dabs(dat(2,i)-dat(2,i-1))+1.d-30    !dt
+     c85a = abs(dat(8,i)-dat(8,i-1))+1.d-30    !dR
+     c85b = abs(dat(2,i)-dat(2,i-1))+1.d-30    !dt
      dat(85,i) = dat(8,i)/(c85a/c85b)   !R/(dR/dt)
   end do
   
@@ -314,7 +314,7 @@ program listplt
   !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
   dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c92(1:n)/day
   
-  dat(93,1:n) = dat(8,1:n)/dexp(dat(29,1:n))    
+  dat(93,1:n) = dat(8,1:n)/exp(dat(29,1:n))    
   dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                                !Xf := 2Xc + Yc + 1
   !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed:
   dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2
@@ -325,7 +325,7 @@ program listplt
   
   !Colours
   do i=1,n
-     call lt2ubv(dlog10(dat(9,i)),dlog10(dat(10,i)),dat(4,i),dlog10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i),dat(103,i), &
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(98,i)/2.d-2),mbol,bc,dat(101,i),dat(102,i),dat(103,i), &
           dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)  ! (U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)  ! (V-I) = (V-R) + (R-I)
@@ -347,7 +347,7 @@ program listplt
              '     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
      end if
      write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63), &
-          d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),dabs(d(31)),d(40)
+          d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
   end do
   
   

@@ -5,7 +5,7 @@
 ! AF, July 2007
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -120,13 +120,13 @@ program selplt
         !(dat(i,j),i=1,83)  !83 Columns, Evert(?) added 82, 83=strmdl flag
         
         !zsurf = 1.d0 - dat(42,j) - dat(43,j)                   !Z_surf = 1 - X - Y
-        !call lt2ubv(dat(9,j),dat(10,j),dat(4,j),dlog10(zsurf/2.d-2),dat(81,j),dat(82,j),dat(83,j),dat(84,j),dat(85,j))
+        !call lt2ubv(dat(9,j),dat(10,j),dat(4,j),log10(zsurf/2.d-2),dat(81,j),dat(82,j),dat(83,j),dat(84,j),dat(85,j))
         !dat(86,j) = dat(82,j)+dat(83,j)  ! (U-V) = (U-B) + (B-V)
         !dat(87,j) = dat(84,j)+dat(85,j)  ! (V-I) = (V-R) + (R-I)
         
         
         !x = (/10.d0**dat(indx(1),j),dat(indx(2),j)/)  !Teff and log(L)
-        x = (/dat(indx(1),j),dlog10(dat(indx(2),j))/)  !Teff and log(L)
+        x = (/dat(indx(1),j),log10(dat(indx(2),j))/)  !Teff and log(L)
         !print*,j,x
         
         
@@ -136,7 +136,7 @@ program selplt
         !do cd=1,ncond
         !   dsel = 0
         !   do d=1,ndim
-        !      if(dabs(x(d)-y(d,cd)).lt.dy(d,cd)) dsel = dsel+1 
+        !      if(abs(x(d)-y(d,cd)).lt.dy(d,cd)) dsel = dsel+1 
         !   end do
         !   if(dsel.eq.ndim) sel = 1 !Then the condition applies for all dimensions (square)
         !end do

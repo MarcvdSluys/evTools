@@ -1,8 +1,9 @@
-! Merges the data contained in two .plt-files
-! This program merges data from the plot output file from ev (the TWIN version)
-! AF 21-01-2004
-!
-!  Copyright 2002-2010 AstroFloyd - astrofloyd.org
+!> \file mergeplt.f90  Merges the data contained in two .plt-files
+!!
+!! AF 21-01-2004
+
+
+!  Copyright 2002-2011 AstroFloyd - astrofloyd.org
 !  
 !  
 !  This file is part of the evTools package.
@@ -15,6 +16,11 @@
 !  
 !  You should have received a copy of the GNU General Public License along with this code.  If not, see 
 !  <http://www.gnu.org/licenses/>.
+
+
+
+!***********************************************************************************************************************************
+!> \brief  This program merges data from the plt output file from ev
 
 program mergeplt      
   use kinds
@@ -151,5 +157,7 @@ program mergeplt
   
   write(*,'(A)')'  Program finished'
 9999 write(*,*)''
+  
 end program mergeplt
+!***********************************************************************************************************************************
 

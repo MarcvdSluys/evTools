@@ -1,7 +1,7 @@
 !> \file nagfor.f90  Provide some redirection/dummy routines for NAG Fortran
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

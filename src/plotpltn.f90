@@ -7,7 +7,7 @@
 
 !   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -34,7 +34,7 @@ program plotpltn
   real :: xx(nff,nn),yy(nff,nn),xx1(nn),yy1(nn),minx(nff),miny(nff)
   real :: xmin,xmax,dx,ymin,ymax,dy
   real ::xsel(4),ysel(4)
-  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system
+  integer :: io,col,lgx,lgy,nsel,exclx(nff),excly(nff),os,strmdls(nn),system,status
   
   integer i,j,nf,f,n(nff),vx,vy,hrd,plot,ncols,l,drawlines,ansi,plhrdrad,prtitle,prlegend
   character :: fnames(nff)*(99),fname*(99),psname*(99),tmpstr*(10),boxx*(19),boxy*(19)
@@ -95,12 +95,12 @@ program plotpltn
   
   call set_plotpltn_labels(pglabels,asclabels,100)
   
-  i = system('pwd > tmppwd.txt')
+  status = system('pwd > tmppwd.txt')
   open(unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  i = system('rm tmppwd.txt')
+  status = system('rm tmppwd.txt')
 
   plot = 0
 5 nf = command_argument_count()
@@ -208,7 +208,7 @@ program plotpltn
      
      !Colours
      do i=1,n(f)
-        call lt2ubv(dlog10(dat(f,9,i)),dlog10(dat(f,10,i)),dat(f,4,i),dlog10(dat(f,75,i)/2.d-2),mbol,bc,dat(f,81,i),dat(f,82,i),  &
+        call lt2ubv(log10(dat(f,9,i)),log10(dat(f,10,i)),dat(f,4,i),log10(dat(f,75,i)/2.d-2),mbol,bc,dat(f,81,i),dat(f,82,i),  &
              dat(f,83,i),dat(f,84,i),dat(f,85,i))
         dat(f,86,i) = dat(f,82,i)+dat(f,83,i)  !(U-V) = (U-B) + (B-V)
         dat(f,87,i) = dat(f,84,i)+dat(f,85,i)  !(V-I) = (V-R) + (R-I)
@@ -219,10 +219,10 @@ program plotpltn
      dat(f,89,1:n(f)) = dat(f,4,1:n(f)) - dat(f,5,1:n(f))                         !H-envelope mass
      !lambda_env = G*M*M_env/(Ubind*R):
      dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)
-     !dat(f,90,1:n(f)) = dabs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ubind changes sign
+     !dat(f,90,1:n(f)) = abs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ubind changes sign
      dat(f,90,1:n(f)) = max(dat(f,90,1:n(f)),0.d0)
      do i=1,n(f)
-        if(dabs(dat(f,5,i)).lt.1.d-29) dat(f,90,i) = 0.d0  !If there's no He core mass, there's no lambda
+        if(abs(dat(f,5,i)).lt.1.d-29) dat(f,90,i) = 0.d0  !If there's no He core mass, there's no lambda
         !write(*,'(I6,9ES20.5)')i,dat(f,4:5,i),dat(f,83,i),dat(f,15,i),dat(f,8,i),dat(f,90,i)
      end do
      
@@ -361,8 +361,8 @@ program plotpltn
      lgy = 1
      
      do f=1,nf
-        xx(f,1:n(f)) = real(dlog10(abs(dat(f,vx,1:n(f)))))
-        yy(f,1:n(f)) = real(dlog10(abs(dat(f,vy,1:n(f)))))
+        xx(f,1:n(f)) = real(log10(abs(dat(f,vx,1:n(f)))))
+        yy(f,1:n(f)) = real(log10(abs(dat(f,vy,1:n(f)))))
      end do
   end if
   
@@ -614,7 +614,7 @@ program plotpltn
         if(hrd.ge.1) write(psname,'(A,I3.3,A)')'plot_pltn__HRD_',i,'.eps'
         inquire(file=trim(psname), exist=ex) !Check whether the file already exists; ex is True or False
         if(.not.ex) then
-           j = system('mv -f plot_pltn_000.eps '//trim(psname))
+           status = system('mv -f plot_pltn_000.eps '//trim(psname))
            call set_PGPS_title(trim(psname),trim(pstitle))
         end if
         i = i+1

@@ -1,6 +1,7 @@
-! getgrid.f, Find the parameters you need to get a grid with n values between x1 and x2
+!> \file getgrid.f90  Find the parameters you need to get a grid with n values between x1 and x2
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -14,7 +15,11 @@
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
 
-program getgrid      
+
+!***********************************************************************************************************************************
+!> \brief  Find the parameters you need to get a grid with n values between x1 and x2
+
+program getgrid
   use kinds
   
   implicit none
@@ -36,25 +41,30 @@ program getgrid
   call get_command_argument(3,bla)
   read(bla,*)n
   
-  dlgx = dlog10(x2/x1)/real(n-1)
+  dlgx = log10(x2/x1)/real(n-1)
   
-  write(6,'(/,A,2ES11.3,I5)')'  Start at first value:  ',dlog10(x1),dlgx,n
-  write(6,'(A,2ES11.3,I5,/)')'  Start at second value: ',dlog10(x1)+dlgx,dlgx,n-1
+  write(6,'(/,A,2ES11.3,I5)')'  Start at first value:  ',log10(x1),dlgx,n
+  write(6,'(A,2ES11.3,I5,/)')'  Start at second value: ',log10(x1)+dlgx,dlgx,n-1
   
   write(*,*)
-  call printgrid(dlog10(x1),dlgx,n)
+  call printgrid(log10(x1),dlgx,n)
   write(*,*)
   
-  write(6,'(/,A,2ES11.3,I5)')'  Intermediate grid:     ',dlog10(x1)+dlgx/2.,dlgx,n-1
+  write(6,'(/,A,2ES11.3,I5)')'  Intermediate grid:     ',log10(x1)+dlgx/2.,dlgx,n-1
   write(*,*)
-  call printgrid(dlog10(x1)+dlgx/2.,dlgx,n-1)
+  call printgrid(log10(x1)+dlgx/2.,dlgx,n-1)
   write(*,*)
   
 end program getgrid
+!***********************************************************************************************************************************
 
 
 
-!Shared with grid.f
+!***********************************************************************************************************************************
+!> \brief  Print the masses, mass ratios or periods in a grid
+!!
+!! \note  Shared with grid.f90
+
 subroutine printgrid(xi1,dx,n)
   use kinds
   
@@ -70,3 +80,4 @@ subroutine printgrid(xi1,dx,n)
   end do
   
 end subroutine printgrid
+!***********************************************************************************************************************************

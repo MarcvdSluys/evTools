@@ -1,6 +1,7 @@
-!Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
+!> \file plt2ce.f90  Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -13,6 +14,10 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
+
+
+!***********************************************************************************************************************************
+!> \brief  Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
 
 program plt2ce
   use kinds
@@ -65,7 +70,8 @@ program plt2ce
      close(20)
   end do  !f
   
-end program
+end program plt2ce
+!***********************************************************************************************************************************
 
 
 

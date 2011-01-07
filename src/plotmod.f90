@@ -7,7 +7,7 @@
 ! AF 2004-08-05
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -40,8 +40,8 @@ program plotmod
   character :: fname*(99),findfile*(99)
   
   real :: dat(nc,nm),dat1(nc,nm)
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,system
-  integer :: vx,vy,hmp,plotagain
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
+  integer :: vx,vy,hmp,plotagain,system,status
   character :: log,ans
   character :: labels(nc)*(60),lx*(60),ly*(60),title*(100)
   
@@ -51,12 +51,12 @@ program plotmod
   call evTools_settings()
   
   plotagain = 0
-  x=system('pwd > tmppwd.txt')
+  status = system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  x=system('rm tmppwd.txt')
+  status = system('rm tmppwd.txt')
 
   
   narg = command_argument_count()

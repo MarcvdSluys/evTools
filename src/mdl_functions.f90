@@ -2,7 +2,7 @@
 
 ! AF, 21-08-2010
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -26,7 +26,7 @@ module mdl_data
   save
   
   ! Constants:
-  integer, parameter :: nn=2001, nq=400  !nq: max number of columns
+  integer, parameter :: nn=2001, nq=400  ! nn: max number of lines, nq: max number of columns
   
   integer :: nc, nmsh, nv, nm
   integer :: pxnr(nq), pxin(nq)

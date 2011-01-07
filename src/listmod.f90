@@ -1,9 +1,9 @@
-!> \file listmod.f90
+!> \file listmod.f90  List the contents of a .mod file to screen
+!!
+!! AF 2003-12-17
 
-! AF 2003-12-17
 
-
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -18,9 +18,11 @@
 ! If not, see <http://www.gnu.org/licenses/>.
 
 
-!> Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
+!***********************************************************************************************************************************
+!> \brief  Reads an input or output structure model file for Eggeltons TWIN code and lists the properties of each model it contains.
 !! One can then select a model to display its contents more precisely and optionally copy the model to a different file to serve as
 !! input.
+
 program listmod
   use kinds
   use constants
@@ -370,8 +372,8 @@ subroutine print_mod_details(fname, blk, save_dh)
   a1  = a *m2/bms
   a2  = a *m1/bms
   
-  rl1 = a*(0.49*q1**(2.d0/3.)/(0.6d0*q1**(2.d0/3.)+ dlog(1.d0+q1**(1.d0/3.))))
-  rl2 = a*(0.49*q2**(2.d0/3.)/(0.6d0*q2**(2.d0/3.)+ dlog(1.d0+q2**(1.d0/3.))))
+  rl1 = a*(0.49*q1**(2.d0/3.)/(0.6d0*q1**(2.d0/3.) + log(1.d0+q1**(1.d0/3.))))
+  rl2 = a*(0.49*q2**(2.d0/3.)/(0.6d0*q2**(2.d0/3.) + log(1.d0+q2**(1.d0/3.))))
   
   
   
@@ -420,12 +422,14 @@ end subroutine print_mod_details
 
 
 !***********************************************************************************************************************************
-!> Copy a structure model from a .mod file (H or H and DH) to a new file
-!! \note 99 columns max
+!> \brief Copy a structure model from a .mod file (H or H and DH) to a new file
+!!
 !! \param infile   Name of the input (.mod) file
 !! \param blk      Number of the structure-model block in the file to copy
 !! \param save_dh  DH is saved along H if true
-!<
+!!
+!! \note 99 columns max
+
 subroutine copy_mod(infile, blk, save_dh)
   use kinds
   implicit none

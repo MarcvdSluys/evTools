@@ -5,7 +5,7 @@
 ! Needs the file <libdir>/UBVRI.Kur to calculate magnitudes and colours (see below)
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -109,7 +109,7 @@ program findplt
      
      !Calculate colours/magnitude
      x(99) = 1.d0 - x(42) - x(43)                       !Z_surf = 1 - X - Y
-     call lt2ubv(x(9),x(10),x(4),dlog10(x(99)/2.d-2),mbol,bc,x(91),x(92),x(93),x(94),x(95))
+     call lt2ubv(x(9),x(10),x(4),log10(x(99)/2.d-2),mbol,bc,x(91),x(92),x(93),x(94),x(95))
      x(96) = x(92)+x(93)  ! (U-V) = (U-B) + (B-V)
      x(97) = x(94)+x(95)  ! (V-I) = (V-R) + (R-I)
      

@@ -1,6 +1,7 @@
-! grid.f, see what a log grid of models in ev will result in
+!> \file grid.f90  See what a log grid of models in ev will result in
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -13,6 +14,11 @@
 ! 
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
+
+
+
+!***********************************************************************************************************************************
+!> \brief  See what a log grid of models in ev will result in
 
 program grid      
   use kinds
@@ -49,9 +55,15 @@ program grid
   write(*,*)
 
 end program grid
+!***********************************************************************************************************************************
 
 
-!Shared with getgrid.f
+
+!***********************************************************************************************************************************
+!> \brief  Print the masses, mass ratios or periods in a grid
+!!
+!! \note  Shared with getgrid.f90
+
 subroutine printgrid(xi1,dx,n)
   use kinds
   
@@ -67,3 +79,4 @@ subroutine printgrid(xi1,dx,n)
   end do
   
 end subroutine printgrid
+!***********************************************************************************************************************************

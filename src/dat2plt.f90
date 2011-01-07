@@ -1,7 +1,8 @@
-!dat2plt:  Reads some data file with a stellar-evolution model from some code and saves the data in plt format
-! taken from listplt, 03/02/2009
+!> \file dat2plt.f90  Reads some data file with a stellar-evolution model from some other code and saves the data in plt format
+!!
+!! - taken from listplt, 03/02/2009
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -15,6 +16,11 @@
 ! You should have received a copy of the GNU General Public License along with this code.
 ! If not, see <http://www.gnu.org/licenses/>.
 
+
+
+!***********************************************************************************************************************************
+!> \brief  Read some data file with a stellar-evolution model from some other code and save the data in plt format for plotting 
+!!         with evTools
 
 program dat2plt
   use kinds
@@ -146,5 +152,6 @@ program dat2plt
   
   
   write(6,'(A,I5,A,I5,A,/)')'  Read',i-1+skipinlines,' input lines, wrote',i,' output lines'
+  
 end program dat2plt
-
+!***********************************************************************************************************************************

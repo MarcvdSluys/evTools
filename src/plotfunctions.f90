@@ -1,6 +1,6 @@
 !> \file plotfunctions.f90  Functions and subroutines for the evTools package that need pgplot
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -16,22 +16,28 @@
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !> \brief Plot lines of constant R on HRD (plotplt*)
-subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
+!!
+!! \param ltmin  Minimum logT in HRD
+!! \param ltmax  Maximum logT in HRD
+!! \param llmin  Minimum logL in HRD
+!! \param llmax  Maximum logL in HRD
+
+subroutine plotlinesofconstantradius(ltmin,ltmax,llmin,llmax)
   use constants
   implicit none
   integer :: logri
-  real :: x,xmin,xmax,y,ymin,ymax,logr,dlogr,cst
-  real :: r1,r2,dr,x2(2),y2(2)
+  real, intent(in) :: ltmin,ltmax,llmin,llmax
+  real :: x,y,logr,dlogr,cst, r1,r2,dr,x2(2),y2(2)
   character :: str*(99)
   
   call pgsls(4)
-  cst = log10(real(4*pi*sigma * r0**2/l0))
+  cst = real(log10(4*pi*sigma * r0**2/l0))
   dlogr = 1.
   
-  r1 = (ymin - cst - 4*xmin)/2.  !logR in lower-left  corner
-  r2 = (ymax - cst - 4*xmax)/2.  !logR in upper-right corner
+  r1 = (llmin - cst - 4*ltmin)/2.  ! logR in lower-left  corner
+  r2 = (llmax - cst - 4*ltmax)/2.  ! logR in upper-right corner
   dr = r2-r1
   if(floor(dr).lt.4) dlogr = dlogr/2.
   
@@ -50,29 +56,33 @@ subroutine plotlinesofconstantradius(xmin,xmax,ymin,ymax)
      x2 = (/2.,6./)
      y2 = cst+2*logr+4*(/2.,6./)
      call pgline(2,x2,y2)
-     x = xmin - (xmax-xmin)*0.015
-     y = cst+2*logr+4*xmin
-     if(y.gt.ymax) then
-        x = (ymax - (cst+2*logr))*0.25
-        y = ymax + (ymax-ymin)*0.01
+     x = ltmin - (ltmax-ltmin)*0.015
+     y = cst+2*logr+4*ltmin
+     if(y.gt.llmax) then
+        x = (llmax - (cst+2*logr))*0.25
+        y = llmax + (llmax-llmin)*0.01
      end if
      if(logr.ge.-3.and.logr.lt.4. .and. logr.gt.r1+0.5*dlogr.and.logr.lt.r2-0.5*dlogr) call pgptxt(x,y,0.,0.,trim(str))
   end do
   call pgsls(1)
+  
 end subroutine plotlinesofconstantradius
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
-!***********************************************************************
-!> \brief Plot the zams; use [libdir]/zams_z0_02.plt
+!***********************************************************************************************************************************
+!> \brief PLANNED!!! Plot the zams; use [libdir]/zams_z0_02.plt
+!! 
 !! It would be nice to not only plot a HRD, but any parameter
+!! 
 !! \todo Write a routine to read a plt file first, then use it here
+
 subroutine plotzams()
   implicit none
   
 end subroutine plotzams
-!***********************************************************************
+!***********************************************************************************************************************************
 
 
 
@@ -84,18 +94,38 @@ end subroutine plotzams
 
 
 
-!***********************************************************************
+!***********************************************************************************************************************************
 !> \brief Make a convection plot from the data in a *.plt? file
-subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
+!!
+!! \param  nmax  Maximum number of model (track) points
+!! \param  nvar  Number of variables in the data array
+!! \param  n     Number of model points
+!!
+!! \param  dat   Model data for nvar variables and nmax model points
+!! \param  vx    ID of x variable
+!! \param  ymin  Minimum of vertical plot range
+!! \param  ymax  Maximum of vertical plot range
+!!
+!! \param  nhp   Number of highlighted points
+!! \param  hp    Highlighted points (model number(?))
+!! \param  hlp   Highlight points?
+!! \param  hlbl  Label highlight points?
+!!
+!! \todo  
+!!  - don't pass all nvar variables, but only those needed?
+!!  - do I need all nmax rows, or should n do?
+
+subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   use kinds
   implicit none
-  integer :: nmax,nvar,n, nhp,hp(1000),vx
+  integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
+  real(double), intent(inout) :: dat(nvar,nmax)  ! Can be modified at nuclear burning
+  real, intent(in) :: ymin,ymax
+  logical, intent(in) :: hlp,hlbl
   integer :: i,j,ci0,lw0
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
-  real(double) :: dat(nvar,nmax)
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
-  real :: ymin,ymax,ch0
-  character :: hlp,hlbl
+  real :: ch0
   character :: hlbls*(5)
   
   
@@ -306,8 +336,8 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
         ibold = 0
         do i=2,n
            do j=80,76,-1
-              !If upper and lower boundary are equal, remove them:
-              if(dabs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)
+              ! If upper and lower boundary are equal, remove them:   (this is the only point where we modify dat())
+              if(abs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)
            end do
            ib = 80
            do j=80,75,-1
@@ -384,14 +414,14 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
         end do   !do i=2,n
         
         
-        if(hlp.eq.'y') then
+        if(hlp) then
            call pgsch(0.7)
            do i=1,nhp
               xx2 = (/xx(hp(i)),xx(hp(i))/)
               yy2 = (/ymin,ymax/)
               call pgline(2,xx2,yy2)
               write(hlbls,'(I5)')nint(dat(1,hp(i)))
-              if(hlbl.eq.'y') call pgtext(xx(hp(i)),y(hp(i)),hlbls)
+              if(hlbl) call pgtext(xx(hp(i)),y(hp(i)),hlbls)
            end do
         end if
      end if !If plnuc.eq.1
@@ -444,7 +474,7 @@ subroutine pltconvection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   !Replot axes:
   call pgbox('BCTS',0.0,0,'BCTS',0.0,0)
   
-end subroutine pltconvection
+end subroutine plt_convection
 !***********************************************************************************************************************************
 
 
@@ -453,15 +483,27 @@ end subroutine pltconvection
 
 
 !***********************************************************************************************************************************
-!> \brief  Find the model in a .mdl[12] file closest to a selected point in a graph
-subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy,xmin,xmax,ymin,ymax)
+!> \brief  Select a point in a mdl graph and find the model in the .mdl[12] file closest to it
+!!
+!! \param nn    Maximum number of lines in a model
+!! \param nx    Number of x variables
+!! \param ny    Number of y variables
+!! \param xx    X variable values
+!! \param yy    Y variable values
+!!
+!! \param xmin  Minimum value on horizontal axis
+!! \param xmax  Maximum value on horizontal axis
+!! \param ymin  Minimum value on vertical axis
+!! \param ymax  Maximum value on vertical axis
+
+subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   implicit none
   integer, intent(in) :: nn,nx,ny
-  real, intent(in) :: xx(10,nn),yy(10,nn)  
+  real, intent(in) :: xx(10,nn),yy(10,nn), xmin,xmax,ymin,ymax
   
   integer :: ix,iy,ix0,iy0,i,i0,nsel,col
   real :: dist,mindist
-  real :: xmin,xmax,ymin,ymax,dx,dy,xsel(4),ysel(4)
+  real :: dx,dy,xsel(4),ysel(4)
   
   character :: hlbls*(5)
   

@@ -3,7 +3,7 @@
 !!  The idea is to plot np panels with the same horizontal axis and different vertical axes.
 !!  The output is written to ps only.
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -25,11 +25,11 @@ program plotpltp
   integer, parameter :: nn=30000, nvar=100
   real(double) :: dat(nvar,nn)
   real :: xx(nn),yy(nn)
-  real :: x,system,xmin,xmax,ymin,ymax,ymin0,ymax0
+  real :: x,xmin,xmax,ymin,ymax,ymin0,ymax0
   real :: px(5000),py(5000)
   real :: pi,sigma,l0,m0,r0,g,day,yr
   real :: p1,p2,p3,p4
-  integer :: model,p,np
+  integer :: model,p,np,system,status
   
   integer :: i,j,n,vx,vy,plotagain,ncols
   integer :: hrd,dhdt,conv,mdots,tscls,ch
@@ -37,7 +37,7 @@ program plotpltp
   character findfile*(99), fname*(99)
   character :: psname*(11)
   character :: rng,log,cnvh
-  character :: labels(nvar)*(40),lx*(40),ly*(40),titel*(100)
+  character :: labels(nvar)*(40),lx*(40),ly*(40),title*(100)
   
   !Set constants:
   call setconstants()
@@ -51,7 +51,7 @@ program plotpltp
   
   
   
-  pi        =       4.d0*datan(1.d0)
+  pi        =       4.d0*atan(1.d0)
   sigma     =       5.67051d-5
   l0        =       3.83d33
   r0        =       6.9599d10
@@ -131,12 +131,12 @@ program plotpltp
   labels(73) = '\gt (yr)'
   labels(81) = 'Q\dconv\u'
   
-  x=system('pwd > tmppwd.txt')
+  status = system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
-  read(10,'(a100)')titel
+  read(10,'(a100)')title
   close(10)
-  x=system('rm tmppwd.txt')
+  status = system('rm tmppwd.txt')
   
 5 plotagain = 0
   fname = findfile('*.plt*') !Match string
@@ -315,7 +315,7 @@ program plotpltp
         do i=36,39
            if(dat(i,1).le.0.) dat(i,1) = dat(i,2)
         end do
-        dat(36:39,1:n) = dlog10(abs(dat(36:39,1:n))+1.d-30)
+        dat(36:39,1:n) = log10(abs(dat(36:39,1:n))+1.d-30)
         ymin = minval(dat(36:39,1:n))
         ymax = maxval(dat(36:39,1:n))
      end if
@@ -324,7 +324,7 @@ program plotpltp
         do i=72,77
            if(dat(i,1).le.0.) dat(i,1) = dat(i,2)
         end do
-        dat(72:77,1:n) = dlog10(abs(dat(72:77,1:n))+1.d-30)
+        dat(72:77,1:n) = log10(abs(dat(72:77,1:n))+1.d-30)
         ymin = minval(dat(72:77,1:n))
         ymax = maxval(dat(72:77,1:n))
      end if
@@ -473,7 +473,7 @@ program plotpltp
      call pgswin(xmin,xmax,ymin,ymax)
      if(p.ne.np) call pgbox('BCTS',0.0,0,'BCNTS',0.0,0)
      if(p.eq.np) call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)
-     if(p.eq.1)  call pgmtxt('T',0.2,0.5,0.5,titel(13:100))
+     if(p.eq.1)  call pgmtxt('T',0.2,0.5,0.5,title(13:100))
      if(p.eq.np) call pgmtxt('B',2.2,0.5,0.5,lx)
      call pgmtxt('L',2.2,0.5,0.5,ly)
      

@@ -3,7 +3,7 @@
 !! For general functions and routines that need PGPlot, see plotfunctions.f90
 
 
-! Copyright 2002-2010 AstroFloyd - astrofloyd.org
+! Copyright 2002-2011 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -88,7 +88,7 @@ end module constants
 !***********************************************************************************************************************************
 !> \brief  Define the 'constants' in the evTools package
 
-subroutine setconstants
+subroutine setconstants()
   use constants
   implicit none
   
@@ -141,7 +141,7 @@ subroutine setconstants
   cursorleft = char(27)//'[1D'       ! Makes the cursor move left one space
   
   
-  !Line colours:
+  ! Line colours:
   ncolours = 13                                            ! Number of (line) colours used to distinguish tracks.  Default: 13
   colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  ! Use black as last resort
   
@@ -156,32 +156,45 @@ end subroutine setconstants
 
 
 !***********************************************************************************************************************************
-!> \brief  Computes values of Mv, U-B, B-V and V-I for given log L, log T, mass and log(Z/0.02)
+!> \brief  Computes values of Mv, U-B, B-V and V-I for a star with given log L, log T, mass and log(Z/0.02)
+!!
+!! \param  logl   10-log of the stellar luminosity/Lo
+!! \param  logt   10-log of the effective temperature/K
+!! \param  mass   stellar mass (Mo)
+!! \param  logz   10-log of Z/0.02
+!! \retval mbol   Bolometric magnitude
+!! \retval bolc   Bolometric correction
+!! \retval mv     Visual absolute magnitude
+!! \retval uminb  Colour U-B
+!! \retval bminv  Colour B-V
+!! \retval vminr  Colour V-I
+!! \retval rmini  Colour R-I
+!!
 !! \see http://vizier.cfa.harvard.edu/viz-bin/ftp-index?/ftp/cats/J/MNRAS/298/525/evgrid
 !! 
 !! Needs one of:
 !! - UBVRI.Kur:  table of synthetic BC and UBVRI colours, from Kurucz model atmospheres (1992, IAU Symp 149, p.225)
 !! - UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
 
-subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
-  
+subroutine lt2ubv(logl,logt,mass,logz,  mbol,bolc,mv,uminb,bminv,vminr,rmini)
   use kinds
   use ubvdata
-  
   implicit none
+  real(double), intent(in) :: logl,logt,mass,logz
+  real(double), intent(out) :: mbol,bolc,mv,uminb,bminv,vminr,rmini
+  
   real(double), parameter :: gconst=-10.6071d0
   integer :: k,ig,it,iz,find_index
   real(double) :: cm(5),ltgr(ntgr)
-  real(double) :: logl,logt,mass,logz,mv,uminb,bminv,vminr,rmini
-  real(double) :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2,mbol,bolc
+  real(double) :: logm,logg,dg1,dg2,dt1,dt2,dz1,dz2
   external find_index
   
   logm = log10(mass)
   logg = logm + 4*logt - logl + gconst
   ltgr = log10(tgr*100)
   
-  !Find indices of log Z, log g and log T to interpolate between.
-  !don't allow extrapolation outside log Z and log g grid.
+  ! Find indices of log Z, log g and log T to interpolate between.
+  ! don't allow extrapolation outside log Z and log g grid.
   ig = find_index(logg,ggr,nggr)
   it = find_index(logt,ltgr,ntgr)
   iz = find_index(logz,zgr,nzgr)
@@ -206,7 +219,7 @@ subroutine lt2ubv(logl,logt,mass,logz,mbol,bolc,mv,uminb,bminv,vminr,rmini)
   end do
   
   !mbol = 4.75 - 2.5*logl
-  mbol = 4.741 - 2.5*logl  !AF: 4.74 = -2.5*log10(l0) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
+  mbol = 4.741 - 2.5*logl  ! AF: 4.74 = -2.5*log10(l0) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
   bolc = cm(1)
   mv = mbol - bolc
   uminb = cm(2)
@@ -222,33 +235,37 @@ end subroutine lt2ubv
 
 !***********************************************************************************************************************************
 !> \brief  Determine the operating system type: 1-Linux, 2-MacOSX
+
 function getos()
   use constants
   implicit none
-  integer :: i,system,getos
+  integer :: status,system,getos
   character :: ostype*(25)
   
-  i = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
+  status = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
   read(16,'(A)')ostype
   close(16, status = 'delete')
   getos = 1 !Linux
   if(ostype(1:5).eq.'Darwi') getos = 2 !MacOSX
+  
 end function getos
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
 !> \brief  Find a file that matches match in the current directory
+!!
 !! \param match      Match string
 !! \retval findfile  File name (if found)
 
 function findfile(match)
   use constants
   implicit none
+  character, intent(in) :: match*(*)
   integer, parameter :: maxfile=1000
-  integer :: i,k,fnum,system
-  character :: match*(*),names(maxfile)*(99),findfile*(99),fname*(99),tempfile*(99)
+  integer :: i,k,fnum, system,status
+  character :: names(maxfile)*(99),findfile*(99),fname*(99),tempfile*(99)
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -257,7 +274,7 @@ function findfile(match)
   
   tempfile = trim(homedir)//'/.findfile.tmp'
   !Shell command to list all the files with the search string and pipe them to a temporary file:
-  i = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  
+  status = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  
   
   k=0
   names = ''
@@ -301,17 +318,22 @@ end function findfile
 
 !***********************************************************************************************************************************
 !> \brief  Find files that match match in the current directory
+!!
 !! \param match    Search string to match
 !! \param nff      Maximum number of files to return
 !! \param all      0-select manually from list, 1-always return all files in list
 !! \retval fnames  Array that contains the files found; make sure it has the same length as the array in the calling programme
 !! \retval nf      The actual number of files returned in fnames ( = min(number found, nff))
 
-subroutine findfiles(match,nff,all,fnames,nf)  
+subroutine findfiles(match,nff,all, fnames,nf)  
   use constants
   implicit none
-  integer :: i,j,k,fnum,nf,nff,system,all
-  character :: match*(*),names(nff)*(99),fnames(nff)*(99),tempfile*(99)
+  character, intent(in) :: match*(*)
+  integer, intent(in) :: nff,all
+  character, intent(out) :: fnames(nff)*(99)
+  integer, intent(out) :: nf
+  integer :: i,j,k,fnum,system,status
+  character :: names(nff)*(99),tempfile*(99)
   
   if(len_trim(homedir).eq.99) then
      write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
@@ -320,7 +342,7 @@ subroutine findfiles(match,nff,all,fnames,nf)
   
   tempfile = trim(homedir)//'/.findfile.tmp'
   !Shell command to list all the files with the search string and pipe them to a temporary file:
-  i = system('ls '//trim(match)//' > '//trim(tempfile))
+  status = system('ls '//trim(match)//' > '//trim(tempfile))
   
   do i=1,nff
      names(i)='                                                                                                   '
@@ -389,13 +411,19 @@ end subroutine findfiles
 
 !***********************************************************************************************************************************
 !> \brief  Swap two real numbers
+!!
+!! \param x  Real number 1
+!! \param y  Real number 2
+
 subroutine rswap(x,y)
   implicit none
   real, intent(inout) :: x,y
   real :: z
+  
   z = x
   x = y
   y = z
+  
 end subroutine rswap
 !***********************************************************************************************************************************
 
@@ -405,6 +433,7 @@ end subroutine rswap
 
 !***********************************************************************************************************************************
 !> \brief  Finds index of value v in monotonously increasing or decreasing array arr of length narr
+!!
 !! \param v     Value to match to arr (double)
 !! \param arr   Array to match v to (double)
 !! \param narr  Size of arr (integer)
@@ -413,8 +442,10 @@ end subroutine rswap
 function find_index(v,arr,narr)
   use kinds
   implicit none
-  integer :: find_index,narr,i,iLow,iHigh
-  real(double) :: v,arr(narr),range
+  integer, intent(in) :: narr
+  real(double), intent(in) :: v,arr(narr)
+  integer :: find_index,i,iLow,iHigh
+  real(double) :: range
   
   range = arr(narr) - arr(1)
   iLow = 1
@@ -430,6 +461,7 @@ function find_index(v,arr,narr)
   end do
   
   find_index = iHigh
+  
 end function find_index
 !***********************************************************************************************************************************
 
@@ -437,17 +469,20 @@ end function find_index
 
 
 !***********************************************************************************************************************************
-!> \brief  
+!> \brief  Locate the index of array arr such that v lies between arr(i) and arr(i+1)
+!!
 !! \param arr   monotonic array (double)
 !! \param narr  length of arr (integer)
 !! \param v     value to look for (double)
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
 
-subroutine locate(arr,narr,v,i)
+subroutine locate(arr,narr,v, i)
   use kinds
   implicit none
-  integer :: i,narr,iLow,iMid,iHigh
-  real(double) :: v,arr(narr)
+  integer, intent(in) :: narr
+  real(double), intent(in) :: v,arr(narr)
+  integer, intent(out) :: i
+  integer :: iLow,iMid,iHigh
   
   iLow = 0
   iHigh = narr+1
@@ -473,7 +508,8 @@ end subroutine locate
 
 
 !***********************************************************************************************************************************
-!> \brief  Single-precision version of locate()
+!> \brief  Single-precision wrapper for of locate()
+!!
 !! \param rarr  monotonic array
 !! \param narr  length of rarr
 !! \param rv    value to look for
@@ -483,41 +519,34 @@ subroutine locater(rarr,narr,rv,i)
   
   use kinds
   implicit none
-  integer :: i,narr
-  real :: rv,rarr(narr)
+  integer, intent(in) :: narr
+  real, intent(in) :: rarr(narr), rv
+  integer, intent(out) :: i
   real(double) :: dv,darr(narr)
   
   darr = dble(rarr)
   dv  = dble(rv)
-  call locate(darr,narr,dv,i)  !i will be returned to the calling routine
+  call locate(darr,narr,dv,i)  ! i will be returned to the calling routine
   
 end subroutine locater
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> \brief  Return a sorted index indx of array rarr of length n - single precision interface for dindex
-subroutine rindex(narr,rarr,indx)
-  use kinds
-  implicit none
-  integer :: narr,indx(narr)
-  real :: rarr(narr)
-  real(double) :: darr(narr)
-  
-  darr = dble(rarr)
-  call dindex(narr,darr,indx)  !Call the double-precision routine
-  
-end subroutine rindex
-!***********************************************************************************************************************************
-
-!***********************************************************************************************************************************
 !> \brief  Return a sorted index ind of array arr of length narr - double precision
+!!
+!! \param  narr  Number of elements in array arr
+!! \param  arr   Data array
+!! \retval ind   Array with sorted indices
+
 subroutine dindex(narr,arr,ind)
   use kinds
   implicit none
+  integer, intent(in) :: narr
+  real(double), intent(in) :: arr(narr)
+  integer, intent(out) :: ind(narr)
   integer, parameter :: m=7,nstack=50
-  integer :: narr,ind(narr)
-  real(double) :: arr(narr),a
+  real(double) :: a
   integer :: i,indxt,ir,itemp,j,jstack,k,l,istack(nstack)
   
   do j=1,narr
@@ -599,18 +628,51 @@ subroutine dindex(narr,arr,ind)
   end if
   
   goto 1
+  
 end subroutine dindex
 !***********************************************************************************************************************************
+
+
+!***********************************************************************************************************************************
+!> \brief  Return a sorted index indx of array rarr of length n - single precision wrapper for dindex()
+!!
+!! \param  narr  Number of elements in array arr
+!! \param  rarr  Data array
+!! \retval indx  Array with sorted indices
+
+subroutine rindex(narr,rarr, indx)
+  use kinds
+  implicit none
+  integer, intent(in) :: narr
+  real, intent(in) :: rarr(narr)
+  integer, intent(out) :: indx(narr)
+  real(double) :: darr(narr)
+  
+  darr = dble(rarr)
+  call dindex(narr,darr, indx)  ! Call the double-precision routine and return indx to calling routine
+  
+end subroutine rindex
+!***********************************************************************************************************************************
+
 
 
 
 !***********************************************************************************************************************************
 !> \brief  Interpolate - single precision
-subroutine polint(xa,ya,n,x,y,dy)
+!!
+!! \param  xa  Array (n)
+!! \param  ya  Array (n)
+!! \param  n   Size of xa, ya
+!! \param  x   x
+!! \retval y   y
+!! \retval dy  dy
+
+subroutine polint(xa,ya,n,x, y,dy)
   implicit none
+  integer, intent(in) :: n
+  real, intent(in) :: xa(n),ya(n), x
+  real, intent(out) :: y,dy
   integer, parameter :: nmax=10
-  integer :: n
-  real :: dy,x,y,xa(n),ya(n)
   integer :: i,m,ns
   real :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
   
@@ -655,12 +717,21 @@ end subroutine polint
 
 !***********************************************************************************************************************************
 !> \brief  Interpolate - double precision
-subroutine polintd(xa,ya,n,x,y,dy)
+!!
+!! \param  xa  Array (n)
+!! \param  ya  Array (n)
+!! \param  n   Size of xa, ya
+!! \param  x   x
+!! \retval y   y
+!! \retval dy  dy
+
+subroutine polintd(xa,ya,n,x, y,dy)
   use kinds
   implicit none
+  integer, intent(in) :: n
+  real(double), intent(in) :: xa(n),ya(n), x
+  real(double), intent(out) :: y,dy
   integer, parameter :: nmax=10
-  integer :: n
-  real(double) :: dy,x,y,xa(n),ya(n)
   integer :: i,m,ns
   real(double) :: den,dif,dift,ho,hp,w,c(nmax),d(nmax)
   
@@ -683,7 +754,7 @@ subroutine polintd(xa,ya,n,x,y,dy)
         hp = xa(i+m)-x
         w = c(i+1)-d(i)
         den = ho-hp
-        if(den.eq.0.d0) write(0,'(A)')'  *** Warning:  Failure in polint  ***'
+        if(den.eq.0.d0) write(0,'(A)')'  *** Warning:  Failure in polintd  ***'
         den = w/den
         d(i) = hp*den
         c(i) = ho*den
@@ -705,11 +776,15 @@ end subroutine polintd
 
 !***********************************************************************************************************************************
 !> \brief  NRF random-number generator
+!!
+!! \param seed  Seed (I/O)
+
 function ran1(seed)
   implicit none
+  integer, intent(inout) :: seed
   integer, parameter :: ia=16807,im=2147483647,iq=127773,ir=2836,ntab=32,ndiv=1+(im-1)/ntab
-  real, parameter :: am=1./im, eps=1.2e-7, rnmx=1.-eps
-  integer :: j,k,iv(ntab),iy,seed
+  real, parameter :: am=1.0/im, eps=1.2e-7, rnmx=1.0-eps
+  integer :: j,k,iv(ntab),iy
   real :: ran1
   
   save iv,iy
@@ -741,6 +816,8 @@ end function ran1
 
 
 !***********************************************************************************************************************************
+!> \brief  Spline interpolation
+
 subroutine spline(x,y,n,yp1,ypn,y2)
   use kinds
   implicit none
@@ -781,6 +858,8 @@ end subroutine spline
 
 
 !***********************************************************************************************************************************
+!> \brief  Spline interpolation
+
 subroutine splint(xa,ya,y2a,n,x,y)
   use kinds
   implicit none
@@ -815,23 +894,42 @@ end subroutine splint
 
 !***********************************************************************************************************************************
 !> \brief  Convert orbital separation to orbital angular momentum
+!!
+!! \param  m1    Mass 1 (Mo)
+!! \param  m2    Mass 2 (Mo)
+!! \param  a     Orbital separation (Ro)
+!! \retval a2j   Orbital angular momentum (cgs)
+
 function a2j(m1,m2,a)
   use kinds
   use constants
   implicit none
-  real(double) :: a2j,m1,m2,a
-  a2j = m1*m2*dsqrt(g*a*r0/(m1+m2)*m0**3)!*m0**1.5d0
+  real(double), intent(in) :: m1,m2,a
+  real(double) :: a2j
+  
+  a2j = m1*m2*sqrt(g*a*r0/(m1+m2)*m0**3)
+
 end function a2j
 !***********************************************************************************************************************************
 
+
 !***********************************************************************************************************************************
 !> \brief  Convert orbital angular momentum to orbital separation
+!!
+!! \param  m1    Mass 1 (Mo)
+!! \param  m2    Mass 2 (Mo)
+!! \param  j     Orbital angular momentum (cgs)
+!! \retval j2a   Orbital separation (Ro)
+
 function j2a(m1,m2,j)
   use kinds
   use constants
   implicit none
-  real(double) :: j2a,m1,m2,j
+  real(double), intent(in) :: m1,m2,j
+  real(double) :: j2a
+  
   j2a = (j/(m1*m2))**2 * (m1+m2)/(g*m0**3)/r0
+
 end function j2a
 !***********************************************************************************************************************************
 
@@ -839,25 +937,44 @@ end function j2a
 
 !***********************************************************************************************************************************
 !> \brief  Convert orbital period to orbital angular momentum, all in cgs units
+!!
+!! \param  m1    Mass 1 (g)
+!! \param  m2    Mass 2 (g)
+!! \param  p     Orbital period (s)
+!! \retval p2j   Orbital angular momentum (cgs)
+
 function p2j(m1,m2,p)
   use kinds
   use constants
   implicit none
-  real(double) :: p2j,m1,m2,p,a
+  real(double), intent(in) :: m1,m2,p
+  real(double) :: p2j,a
+  
   call p2a(m1+m2,p,a)
   p2j = m1*m2*sqrt(g*a/(m1+m2))
+  
 end function p2j
 !***********************************************************************************************************************************
 
+
 !***********************************************************************************************************************************
 !> \brief  Convert orbital angular momentum to orbital period, all in cgs units
+!!
+!! \param  m1   Mass 1 (g)
+!! \param  m2   Mass 2 (g)
+!! \param  j    Orbital angular momentum (cgs)
+!! \retval j2p  Orbital period (s)
+
 function j2p(m1,m2,j)
   use kinds
   use constants
   implicit none
-  real(double) :: j2p,m1,m2,j,a
+  real(double), intent(in) :: m1,m2,j
+  real(double) :: j2p,a
+  
   a = (j/(m1*m2))**2 * (m1+m2)/g
   call a2p(m1+m2,a,j2p)
+  
 end function j2p
 !***********************************************************************************************************************************
 
@@ -865,45 +982,62 @@ end function j2p
 
 !***********************************************************************************************************************************
 !> \brief  Convert orbital period to orbital separation, in cgs units
+!!
 !! \param mtot  Total mass of the binary (g)
 !! \param p     Binary period (s)
 !! \retval a    Binary orbital separation (cm)
+
 subroutine p2a(mtot,p,a)
   use kinds
   use constants
   implicit none
   real(double), intent(in) :: mtot,p
   real(double), intent(out) :: a
+  
   a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
+  
 end subroutine p2a
 !***********************************************************************************************************************************
 
+
 !***********************************************************************************************************************************
 !> \brief  Convert orbital separation to orbital period, in cgs units
-!! \param mtot  Total mass of the binary (g)
-!! \param a     Binary orbital separation (cm)
-!! \retval p    Binary period (s)
+!!
+!! \param  mtot  Total mass of the binary (g)
+!! \param  a     Binary orbital separation (cm)
+!! \retval p     Binary period (s)
+
 subroutine a2p(mtot,a,p)
   use kinds
   use constants
   implicit none
   real(double), intent(in) :: mtot,a
   real(double), intent(out) :: p
+  
   p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
+  
 end subroutine a2p
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
-!> \brief  Convert orbital separation to Roche-lobe radius, using Eggleton (1983)
-!! m1 and m2 in the same units, Rl and a in the same units
+!> \brief  Compute Roche-lobe radius, using Eggleton (1983)
+!!
+!! \param  m1    Mass 1 (arbitrary unit)
+!! \param  m2    Mass 2 (same unit as m1)
+!! \param  a     Orbital separation (arbitrary unit)
+!! \retval a2rl  Roche-lobe radius of star 1 (same unit as a)
+
 function a2rl(m1,m2,a)
   use kinds
   use constants
   implicit none
-  real(double) :: a2rl,q,m1,m2,a
+  real(double), intent(in) :: m1,m2,a
+  real(double) :: a2rl,q
+  
   q = m1/m2
   a2rl = a / (0.6d0*q**(2*c3rd) + log(1.d0 + q**c3rd)) * (0.49d0*q**(2*c3rd))
+  
 end function a2rl
 !***********************************************************************************************************************************
 
@@ -911,38 +1045,64 @@ end function a2rl
 
 !***********************************************************************************************************************************
 !> \brief  Convert Roche-lobe radius to orbital separation, using Eggleton (1983)
-!! m1 and m2 in the same units, Rl and a in the same units
+!!
+!! \param  m1    Mass 1 (arbitrary unit)
+!! \param  m2    Mass 2 (same unit as m1)
+!! \param  rl1   Roche-lobe radius of star 1 (arbitrary unit)
+!! \retval rl2a  Orbital separation (same unit as rl1)
+
 function rl2a(m1,m2,rl1)
   use kinds
   use constants
   implicit none
-  real(double) :: rl2a,q,m1,m2,rl1
+  real(double), intent(in) :: m1,m2,rl1
+  real(double) :: rl2a,q
+  
   q = m1/m2
   rl2a = rl1/(0.49d0*q**(2*c3rd)/(0.6d0*q**(2*c3rd) + log(1.d0+q**c3rd)))
+  
 end function rl2a
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
 !> \brief  Convert orbital period to Roche-lobe radius, all in cgs units
+!!
+!! \param  m1    Mass 1 (g)
+!! \param  m2    Mass 2 (g)
+!! \param  p     Orbital period (s)
+!! \retval p2rl  Roche-lobe radius of star 1 (cm)
+
 function p2rl(m1,m2,p)
   use kinds
   implicit none
-  real(double) :: p2rl,m1,m2,p,a,a2rl
+  real(double), intent(in) :: m1,m2,p
+  real(double) :: p2rl,a,a2rl
+  
   call p2a(m1+m2,p,a)
   p2rl = a2rl(m1,m2,a)
+  
 end function p2rl
 !***********************************************************************************************************************************
 
 
 !***********************************************************************************************************************************
 !> \brief  Convert Roche-lobe radius to orbital period, all in cgs units
+!!
+!! \param  m1    Mass 1 (g)
+!! \param  m2    Mass 2 (g)
+!! \param  rl1   Roche-lobe radius of star 1 (cm)
+!! \retval rl2p  Orbital period (s)
+
 function rl2p(m1,m2,rl1)
   use kinds
   implicit none
-  real(double) :: rl2p,m1,m2,rl1,a,rl2a
+  real(double), intent(in) :: m1,m2,rl1
+  real(double) :: rl2p,a,rl2a
+  
   a = rl2a(m1,m2,rl1)
   call a2p(m1+m2,a,rl2p)
+  
 end function rl2p
 !***********************************************************************************************************************************
 
@@ -951,15 +1111,19 @@ end function rl2p
 
 !***********************************************************************************************************************************
 !> \brief  Print an exit  message and stop the program
+!!
+!! \param message  Exit message
+
 subroutine quit_program(message)
   implicit none
-  character :: message*(*)
+  character, intent(in) :: message*(*)
   integer :: len
   
   len = len_trim(message)
-  if(len.ge.1.and.len.le.199) write(0,'(/,A)')'  '//trim(message)
+  if(len.ge.1) write(0,'(/,A)')'  '//trim(message)
   write(0,'(A,/)')'  Aborting...'
   stop
+  
 end subroutine quit_program
 !***********************************************************************************************************************************
 
@@ -967,27 +1131,32 @@ end subroutine quit_program
 
 !***********************************************************************************************************************************
 !> \brief  Bin data in one dimension, by counting data points in each bin
-!! \param n      Size of data array
-!! \param x      Input data array
-!! \param norm   Normalise (1) or not (0)
-!! \param nbin   Number of bins
-!! \param xmin1  Minimum x value (left side of first bin (in/output: set xmin=xmax to auto-determine)
-!! \param xmax1  Maximum x value (right side of last bin (in/output: set xmin=xmax to auto-determine)
-!! \retval xbin  Binned data.  The x values are the left side of the bin!
-!! \retval ybin  Binned data.
+!!
+!! \param  n      Size of data array
+!! \param  x      Input data array
+!! \param  norm   Normalise (1) or not (0)
+!! \param  nbin   Number of bins
+!! \param  xmin1  Minimum x value (left side of first bin (I/O: set xmin=xmax to auto-determine)
+!! \param  xmax1  Maximum x value (right side of last bin (I/O: set xmin=xmax to auto-determine)
+!! \retval xbin   Binned data.  The x values are the left side of the bin!
+!! \retval ybin   Binned data.
  
-subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)
+subroutine bin_data_1d(n,x,norm,nbin, xmin1,xmax1, xbin,ybin)
   implicit none
-  integer :: i,k,n,nbin,norm
-  real :: x(n),xbin(nbin+1),ybin(nbin+1),xmin,xmax,dx,xmin1,xmax1
+  integer, intent(in) :: n,nbin,norm
+  real, intent(in) :: x(n)
+  real, intent(inout) :: xmin1,xmax1
+  real, intent(out) :: xbin(nbin+1),ybin(nbin+1)
+  integer :: i,k
+  real :: xmin,xmax,dx
   
   xmin = xmin1
   xmax = xmax1
   
-  if(abs((xmin-xmax)/(xmax+1.e-30)).lt.1.e-20) then  !Autodetermine
+  if(abs((xmin-xmax)/(xmax+1.e-30)).lt.1.e-20) then  ! Autodetermine
      xmin = minval(x(1:n))
      xmax = maxval(x(1:n))
-     xmin1 = xmin                                    !And return new values
+     xmin1 = xmin                                    ! And return new values
      xmax1 = xmax
   end if
   dx = abs(xmax - xmin)/real(nbin)
@@ -1003,7 +1172,7 @@ subroutine bin_data_1d(n,x,norm,nbin,xmin1,xmax1,xbin,ybin)
         if(x(i).ge.xbin(k)) then
            if(x(i).lt.xbin(k+1)) then
               ybin(k) = ybin(k) + 1.
-              exit !If point i fits in this bin, don't try the others
+              exit  ! If point i fits in this bin, don't try the others
            end if
         end if
      end do !k (bin)
@@ -1018,23 +1187,29 @@ end subroutine bin_data_1d
 
 !***********************************************************************************************************************************
 !> \brief  Get time stamp in seconds since 1970-01-01 00:00:00 UTC
+!!
+!! \param os  Operating system: 1-Linux, 2-BSD/MacOS
+
 function time_stamp(os)
   use kinds
   implicit none
+  integer, intent(in) :: os
   real(double) :: time_stamp
-  integer :: os,i,system
+  integer :: status,system
   character :: fname*(99)
   
   fname = './.analysemcmc_time_stamp'  !gfortran doesn't want to read from ~ for some reason
-  if(os.eq.2) then !MacOS
-     i = system('date +%s >& '//trim(fname)) !%N for fractional seconds doesn't work on MacOS!!! (But it does with GNU date)
-  else !GNU/Linux, default
-     i = system('date +%s.%N >& '//trim(fname))
+  if(os.eq.2) then  ! MacOS
+     status = system('date +%s >& '//trim(fname)) !%N for fractional seconds doesn't work on MacOS!!! (But it does with GNU date)
+  else  ! GNU/Linux, default
+     status = system('date +%s.%N >& '//trim(fname))
   end if
+  
   open(unit=9,status='old',file=trim(fname))
   read(9,*)time_stamp
   close(9)
-  i = system('rm -f '//trim(fname))
+  status = system('rm -f '//trim(fname))
+  
 end function time_stamp
 !***********************************************************************************************************************************
 
@@ -1042,10 +1217,15 @@ end function time_stamp
 
 !***********************************************************************************************************************************
 !> \brief  Set the title in a Postscript file generated by PGPlot
+!!
+!! \param PSfile   Name of the PS file
+!! \param PStitle  Title for the PS file
+
 subroutine set_PGPS_title(PSfile,PStitle)
   implicit none
+  character, intent(in) :: PSfile*(*),PStitle*(*)
   integer :: status,system
-  character :: PSfile*(*),PStitle*(*),tempfile*(99)
+  character :: tempfile*(99)
   
   tempfile = 'temp_PGPS_file.eps'
   
@@ -1068,7 +1248,8 @@ end subroutine set_PGPS_title
 
 
 !***********************************************************************************************************************************
-!> \brief  Read/create evTools settings file
+!> \brief  Read/create evTools settings file ~/.evTools
+
 subroutine evTools_settings()
   use constants
   implicit none
@@ -1076,7 +1257,7 @@ subroutine evTools_settings()
   logical :: ex
   character :: filename*(99)
   
-  !Define namelist, file name
+  ! Define namelist, file name:
   namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
   namelist /local_settings/ libdir
   filename = trim(homedir)//'/.evTools'
@@ -1141,7 +1322,13 @@ end subroutine evTools_settings
 
 !***********************************************************************************************************************************
 !> \brief  Convert PGPlot x,y dimensions to paper size and ratio for bitmap
-subroutine pgxy2szrat_bitmap(x,y,size,ratio)
+!!
+!! \param  x      Horizontal plot size in pixels
+!! \param  y      Vertical plot size in pixels
+!! \retval size   PGPlot plot size
+!! \retval ratio  PGPlot plot ratio
+
+subroutine pgxy2szrat_bitmap(x,y, size,ratio)
   implicit none
   integer, intent(in) :: x,y
   real, intent(out) :: size,ratio
@@ -1155,6 +1342,12 @@ end subroutine pgxy2szrat_bitmap
 
 !***********************************************************************************************************************************
 !> \brief  Convert PGPlot x,y dimensions to paper size and ratio for bitmap
+!!
+!! \param  size   PGPlot plot size
+!! \param  ratio  PGPlot plot ratio
+!! \retval x      Horizontal plot size in pixels
+!! \retval y      Vertical plot size in pixels
+
 subroutine pgszrat2xy_bitmap(size,ratio,x,y)
   implicit none
   real, intent(in) :: size,ratio
@@ -1170,11 +1363,12 @@ end subroutine pgszrat2xy_bitmap
 
 !***********************************************************************************************************************************
 !> \brief  Convert x,y screen dimensions to PGPlot paper size and ratio for a screen
-!! \param horiz   Horizontal screen size (pixels) (int)
-!! \param vert    Vertical screen size (pixels) (int)
-!! \param dpi     Screen resolution in dots per inch (int)
-!! \retval size   PGPlot screen size (real)
-!! \retval ratio  PGPlot screen ratio (real)
+!!
+!! \param horiz   Horizontal screen size (pixels)
+!! \param vert    Vertical screen size (pixels)
+!! \param dpi     Screen resolution in dots per inch
+!! \retval size   PGPlot screen size
+!! \retval ratio  PGPlot screen ratio
 
 subroutine pgxy2szrat_screen(horiz,vert, dpi, size,ratio)
   implicit none
@@ -1190,11 +1384,12 @@ end subroutine pgxy2szrat_screen
 
 !***********************************************************************************************************************************
 !> \brief  Convert PGPlot paper size and ratio to screen dimensions
-!! \param size    PGPlot screen size (real)
-!! \param ratio   PGPlot screen ratio (real)
-!! \param dpi     Screen resolution in dots per inch (int)
-!! \retval horiz  Horizontal screen size (pixels) (int)
-!! \retval vert   Vertical screen size (pixels) (int)
+!!
+!! \param size    PGPlot screen size
+!! \param ratio   PGPlot screen ratio
+!! \param dpi     Screen resolution in dots per inch
+!! \retval horiz  Horizontal screen size (pixels)
+!! \retval vert   Vertical screen size (pixels)
 
 subroutine pgszrat2xy_screen(size,ratio, dpi, horiz,vert)
   implicit none
