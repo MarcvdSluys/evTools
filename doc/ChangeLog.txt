@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   147: AstroFloyd, 07/01/2011
+     - Move unused (NRF) code from functions.f90 to unused_code.f90
+     
    146: AstroFloyd, 07/01/2011
      - Updated copyright to 2011
      - Updated (Doxygen) comments: file and routine titles everywhere(?)
