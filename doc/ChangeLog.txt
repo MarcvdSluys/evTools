@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   148: AstroFloyd, 09/01/2011
+     - Added CMake files
+     - plotpltp: use constants
+   
    147: AstroFloyd, 07/01/2011
      - Move unused (NRF) code from functions.f90 to unused_code.f90
      

@@ -20,6 +20,7 @@
 
 program plotpltp      
   use kinds
+  use constants
   
   implicit none
   integer, parameter :: nn=30000, nvar=100
@@ -27,7 +28,6 @@ program plotpltp
   real :: xx(nn),yy(nn)
   real :: x,xmin,xmax,ymin,ymax,ymin0,ymax0
   real :: px(5000),py(5000)
-  real :: pi,sigma,l0,m0,r0,g,day,yr
   real :: p1,p2,p3,p4
   integer :: model,p,np,system,status
   
@@ -48,17 +48,6 @@ program plotpltp
   psname            = 'plot_plt.ps'                         ! Name of the output file
   plotmode          = 1        ! 0 - plot all graphs on 1 sheet only,  1 - as 0, but plots each graph on an additional sheet as well
   ps                = 0                                     ! 0 - plot to screen, 1 - plot to postscript file(s).
-  
-  
-  
-  pi        =       4.d0*atan(1.d0)
-  sigma     =       5.67051d-5
-  l0        =       3.83d33
-  r0        =       6.9599d10
-  m0        =       1.9891d33
-  g         =       6.67259d-8
-  day       =       8.64d4
-  yr        =       3.15569d7
   
   
   !Remove 'uninitialised' compiler warnings:
