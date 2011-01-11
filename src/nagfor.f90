@@ -23,7 +23,7 @@ function system(str)
    implicit none
    character, intent(in) :: str*(*)
    integer :: system
-   character :: dummystr*99
+   character :: dummystr*(99)
    dummystr = trim(str)
    system = 0
 end function system

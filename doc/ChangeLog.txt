@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   149: AstroFloyd, 11/01/2011
+     - Updated CMake files for release: 
+       - added option to switch off code_version generation
+       - remove plotpltn/p
+       - add installation
+     - Updated nagfor file
+     
    148: AstroFloyd, 09/01/2011
      - Added CMake files
      - plotpltp: use constants

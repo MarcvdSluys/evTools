@@ -9,7 +9,9 @@ set(MOD_FLAGS "${INCLUDE_FLAGS}" )
 get_filename_component( Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME )
 
 
-# Specific options per compiler:
+######################################################################################################################################################
+#  Specific options per compiler:
+######################################################################################################################################################
 if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   
   #set( CMAKE_Fortran_FLAGS_ALL "-std=f2008 -fall-intrinsics -pedantic" )               # v.4.4
@@ -49,6 +51,41 @@ if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   endif( WANT_LIBRARY )
   
   
+  # Package-specific flags:
+  set( PACKAGE_FLAGS "" )
+  
+  
+  ####################################################################################################################################################
+elseif( Fortran_COMPILER_NAME MATCHES "g95" )
+  
+  
+  set( CMAKE_Fortran_FLAGS "" )
+  set( CMAKE_Fortran_FLAGS_RELEASE "-O2" )
+  set( CMAKE_Fortran_FLAGS_DEBUG "-O0 -g" )
+  
+  if( WANT_CHECKS )
+    set( CHECK_FLAGS "-O0 -fbounds-check -ftrace=full" )
+  else( WANT_CHECKS )
+    set( CHECK_FLAGS "-O2 -fshort-circuit" )
+  endif( WANT_CHECKS )
+  
+  if( WANT_WARNINGS )
+    #set( WARN_FLAGS "-std=f2003 -Wall -Wobsolescent -Wunused-parameter -Wunused-internal-procs -Wunused-types -Wmissing-intent" )
+    #set( WARN_FLAGS "-std=f2003 -Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
+    set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
+    #set( WARN_FLAGS "-std=2003 ${WARN_FLAGS}" )
+  endif( WANT_WARNINGS )
+  
+  if( WANT_LIBRARY )
+    set( LIB_FLAGS "-fPIC -g" )
+  endif( WANT_LIBRARY )
+  
+  
+  # Package-specific flags:
+  set( PACKAGE_FLAGS "" )
+  
+  
+  ####################################################################################################################################################
 elseif( Fortran_COMPILER_NAME MATCHES "ifort" )
   
   
@@ -95,31 +132,11 @@ elseif( Fortran_COMPILER_NAME MATCHES "ifort" )
   endif( WANT_LIBRARY )
   
   
-elseif( Fortran_COMPILER_NAME MATCHES "g95" )
+  # Package-specific flags:
+  set( PACKAGE_FLAGS "" )
   
   
-  set( CMAKE_Fortran_FLAGS "" )
-  set( CMAKE_Fortran_FLAGS_RELEASE "-O2" )
-  set( CMAKE_Fortran_FLAGS_DEBUG "-O0 -g" )
-  
-  if( WANT_CHECKS )
-    set( CHECK_FLAGS "-O0 -fbounds-check -ftrace=full" )
-  else( WANT_CHECKS )
-    set( CHECK_FLAGS "-O2 -fshort-circuit" )
-  endif( WANT_CHECKS )
-  
-  if( WANT_WARNINGS )
-    #set( WARN_FLAGS "-std=f2003 -Wall -Wobsolescent -Wunused-parameter -Wunused-internal-procs -Wunused-types -Wmissing-intent" )
-    #set( WARN_FLAGS "-std=f2003 -Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
-    set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
-    #set( WARN_FLAGS "-std=2003 ${WARN_FLAGS}" )
-  endif( WANT_WARNINGS )
-  
-  if( WANT_LIBRARY )
-    set( LIB_FLAGS "-fPIC -g" )
-  endif( WANT_LIBRARY )
-  
-  
+  ####################################################################################################################################################
 else( Fortran_COMPILER_NAME MATCHES "gfortran" )
   
   
@@ -131,11 +148,22 @@ else( Fortran_COMPILER_NAME MATCHES "gfortran" )
   set( CMAKE_Fortran_FLAGS_DEBUG "-O0 -g" )
   
   
+  # Package-specific flags:
+  set( PACKAGE_FLAGS "" )
+  
+  
 endif( Fortran_COMPILER_NAME MATCHES "gfortran" )
+######################################################################################################################################################
 
 
 
-set( USER_FLAGS "${LIB_FLAGS} ${CHECK_FLAGS} ${WARN_FLAGS} ${SSE_FLAGS} ${IPO_FLAGS} ${OPENMP_FLAGS} ${STATIC_FLAGS} ${MOD_FLAGS}" )
+
+
+######################################################################################################################################################
+#  Put everything together:
+######################################################################################################################################################
+
+set( USER_FLAGS "${LIB_FLAGS} ${CHECK_FLAGS} ${WARN_FLAGS} ${SSE_FLAGS} ${IPO_FLAGS} ${OPENMP_FLAGS} ${STATIC_FLAGS} ${MOD_FLAGS} ${PACKAGE_FLAGS}" )
 
 set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS_ALL} ${CMAKE_Fortran_FLAGS} ${USER_FLAGS}" )
 set( CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_ALL} ${CMAKE_Fortran_FLAGS_RELEASE} ${USER_FLAGS}" )
@@ -144,7 +172,10 @@ set( CMAKE_Fortran_FLAGS_RELWITHDEBINFO "${CMAKE_Fortran_FLAGS_RELEASE} -g" )
 
 
 
-# Report what's going on:
+
+######################################################################################################################################################
+#  Report what's going on:
+######################################################################################################################################################
 
 message( STATUS "Using Fortran compiler: " ${Fortran_COMPILER_NAME} " (" ${CMAKE_Fortran_COMPILER}")" )
 
@@ -159,4 +190,6 @@ if( WANT_LIBRARY )
 endif( WANT_LIBRARY )
 
 message( STATUS "Compiler flags used:  ${CMAKE_Fortran_FLAGS}" )
+
+
 
