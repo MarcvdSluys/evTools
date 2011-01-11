@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   150: AstroFloyd, 11/01/2011
+     - Updated Doxyfile
+     
    149: AstroFloyd, 11/01/2011
      - Updated CMake files for release: 
        - added option to switch off code_version generation
