@@ -47,7 +47,7 @@ program plotplt
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
-  integer :: hrd,djdt,conv,mdots,tscls,ch,dpdt,sabs,tabs,cabs,io
+  integer :: hrd,djdt,conv,tscls,ch,dpdt,sabs,tabs,cabs,io
   integer :: nt,wait,lums,lgx,lgy,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: col,lng
@@ -176,7 +176,6 @@ program plotplt
      hrd   = 0
      djdt  = 0
      conv  = 0
-     mdots = 0
      tscls = 0
      lums  = 0
      sabs  = 0
@@ -218,12 +217,13 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   write(6,'(A)', advance='no')'  Choose the Y-axis variable: '
+36   continue
+     write(6,'(A)', advance='no')'  Choose the Y-axis variable: '
      read*,vy
      if(vy.eq.0) goto 9999
      if(vy.lt.0) goto 36
      if(defvar(vy).eq.0) goto 36
-     if(vy.eq.201) goto 36   !Can't take HRD as y-variable
+     if(vy.eq.201) goto 36   ! Can't take HRD as y-variable
   end if   !if(plot.lt.2) then   
   
   
@@ -253,10 +253,17 @@ program plotplt
         prleg = .true.
      end if
      if(vy.eq.222) then !Mdots
-        mdots = 1
         npl = 3
         yy(1:3,1:nmax) = real(dat(f,31:33,1:nmax))
         leglbl(1:3) = (/'dM\dtot\u ','dM\dwind\u','dM\dMT\u  '/)
+        prleg = .true.
+     end if
+     if(vy.eq.223) then ! Winds
+        npl = 3
+        yy(1,1:nmax) = real(dat(f,32,1:nmax))
+        yy(2,1:nmax) = real(dat(f,136,1:nmax))
+        yy(3,1:nmax) = real(dat(f,137,1:nmax))
+        leglbl(1:3) = (/'dM\dwind\u','dM\dR\u   ','dM\dRlk\u '/)
         prleg = .true.
      end if
      if(vy.eq.211) then !Timescales

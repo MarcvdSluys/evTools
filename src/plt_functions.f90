@@ -195,7 +195,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
      
      pglabels(221) = 'dJ\dorb\u/dt'
      pglabels(222) = 'dM/dt (M\d\(2281)\u/yr)'
-     defvar(221:222) = 1
+     pglabels(223) = 'dM/dt (M\d\(2281)\u/yr)'
+     defvar(221:223) = 1
   end if
   
   
@@ -342,6 +343,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   asclabels(221) = 'dJdts'
   asclabels(222) = 'Mdots'
+  asclabels(223) = 'Winds'
   !asclabels(22) = ''
   
   
@@ -589,7 +591,7 @@ subroutine printpltvarlist(nf)
   if(nf.eq.1) then
      write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
      write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
-     write(6,'(A)')'                           213: Surface abundances                                      '
+     write(6,'(A)')'                           213: Surface abundances    223: Winds                        '
      write(6,'(A)')'                           214: Tmax abundances                                         '
      write(6,'(A)')'                           215: Core abundances                                         '
   else
@@ -718,7 +720,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   implicit none
   integer :: nn,nvar,n,dpdt, i,j,j0,ib
   real(double) :: dat(nvar,nn),var(nn),dpdj(nn)
-  real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0
+  real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0, Zsurf(nn),Menv(nn)
   character :: labels(nvar)*(99)
   
   !de-log some variables
@@ -774,10 +776,12 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !***   CREATE EXTRA PLOT VARIABLES
   !************************************************************************      
   
-  !Colours
-  dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface Z, premature def.
+  ! Z_surf = 1 - X - Y:  surface Z
+  Zsurf(1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)
+  
+  ! 101-107: Colours:
   do i=1,n
-     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(dat(132,i)/2.d-2),  &
+     call lt2ubv(log10(dat(9,i)),log10(dat(10,i)),dat(4,i),log10(Zsurf(i)/2.d-2),  &
           mbol,bc,dat(101,i),dat(102,i), dat(103,i),dat(104,i),dat(105,i))
      dat(106,i) = dat(102,i)+dat(103,i)                                     !(U-V) = (U-B) + (B-V)
      dat(107,i) = dat(104,i)+dat(105,i)                                     !(V-I) = (V-R) + (R-I)
@@ -786,20 +790,25 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !108-110 undefined
   
   
-  dat(117,1:n) = dat(4,1:n) - dat(5,1:n)                                                     !H-envelope mass, premature def.
-  dat(111,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)  !lambda_env = G*M*M_env/(Ubind*R)
+  ! H-envelope mass, premature def.:
+  Menv(1:n) = dat(4,1:n) - dat(5,1:n)
+  
+  ! 111: lambda_env = G*M*M_env/(Ubind*R):
+  dat(111,1:n) = g*dat(4,1:n)*Menv(1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)
   !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
   dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
      if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
-     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),dat(117,i),dat(15,i),dat(8,i),dat(111,i)
+     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),Menv(i),dat(15,i),dat(8,i),dat(111,i)
      !write(99,'(9ES12.4)')dat((/5,8,111/),i)
   end do
   
   
-  z = log10(dat(132,1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
+  z = log10(Zsurf(1)/0.02)  !Use the surface Z of the first model as 'the' metallicity
   x = 0.30406 + 0.0805*z + 0.0897*z*z + 0.0878*z**3 + 0.0222*z**4
   
+  ! 112: 
+  ! 113: 
   dat(112,1:n) = (1.67 - x + 2*(dat(5,1:n)/(dat(4,1:n)+1.d-30))**5)/2.13
   dat(113,1:n) = dat(4,1:n)/(dat(112,1:n)+1.d-30)
   do i=1,n
@@ -810,31 +819,42 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      !write(6,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
   end do
   
-  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km  !Vrot = 2piR/P -> km/s
-  dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)            !R/Rzams
+  ! 114: Vrot = 2piR/P -> km/s:
+  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km
   
+  ! 115: R/Rzams:
+  dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)
+  
+  ! 116: Intershell mass:
   do i=1,n
-     dat(116,i) = dat(5,i)-dat(6,i)                              !Intershell mass
+     dat(116,i) = dat(5,i)-dat(6,i)
   end do
-  dat(117,1:n) = dat(4,1:n) - dat(5,1:n)                         !H-envelope mass
+  
+  ! 117: H-envelope mass:
+  dat(117,1:n) = Menv(1:n)
+  
+  ! 118: Convective core boundary:
   do i=1,n
      dat(118,i) = 0.d0
-     if(dat(64,i).lt.0.d0) dat(118,i) = abs(dat(64,i))          !Convective core boundary
+     if(dat(64,i).lt.0.d0) dat(118,i) = abs(dat(64,i))
   end do
   
+  ! 119: R/(dR/dt):
   dat(119,1) = 0.d0
   do i=2,n
      c119a = abs(dat(8,i)-dat(8,i-1))+1.d-30                    !dR
      c119b = abs(dat(2,i)-dat(2,i-1))+1.d-30                    !dt
-     dat(119,i) = dat(8,i)/(c119a/c119b)                           !R/(dR/dt)
+     dat(119,i) = dat(8,i)/(c119a/c119b)                        !R/(dR/dt)
   end do
   
-  !Rossby number = Prot/Tet:
+  ! 120: Rossby number = Prot/Tet:
   dat(120,1:n) = dat(21,1:n)/(dat(25,1:n)+1.d-30)
-  !Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d:
+  
+  ! 121: Critical Prot (Pc) for saturated MB (=2pi/omega_c): Pc_sun~2.5d, Tet_sun~13.8d:
   dat(121,1:n) = 2.5d0/13.8d0 * dat(25,1:n)
   
-  do i=1,n                                             !Saturated MB - Sills et al, 2000ApJ.534.335
+  ! 122: Saturated MB - Sills et al, 2000ApJ.534.335:
+  do i=1,n
      dat(122,i) = 2.7e-3*(2*pi/dat(21,i))*(2*pi/dat(121,i))**2* dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(21,i).gt.dat(121,i)) dat(122,i) = 2.7e-3* (2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(81,i).lt.0.02)  dat(122,i) = dat(122,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
@@ -844,7 +864,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(122,1:n) = dat(122,1:n)/day**3
   
   
-  !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983:
+  ! Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983:
   dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50
   do i=1,n
      if(dat(81,i).lt.0.02)  dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
@@ -852,90 +872,162 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      if(dat(81,i).gt.1.d0-1.d-9)  dat(38,i) = 0.d0  !No MB for fully convective star
   end do !i
   
-  dat(37,1:n) = dat(122,1:n)                                     !Take Sills MB in stead of Wind AML
-  !dat(38,1:n) = dat(122,1:n)                                    !Take Sills in stead of Rappaport MB
+  ! 37: Take Sills MB in stead of Wind AML:
+  dat(37,1:n) = dat(122,1:n)
+  
+  ! 38: Take Sills in stead of Rappaport MB:
+  !dat(38,1:n) = dat(122,1:n)
   
   !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
   dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)
   
-  !Replace AML due to non-conservative MT by 'negative AML' due to MT
-  !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, 
-  !  in case of no wind: use dat(31) instead of dat(33):
+  ! 39: Replace AML due to non-conservative MT by 'negative AML' due to MT
+  !     dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, 
+  !     in case of no wind: use dat(31) instead of dat(33):
   !dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr* **(1.d0/3.d0)/1.d50
   
   
-  var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 +  0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
-  !Analytic convective turnover timescale (days), adapted from Eggleton's CFUNCS.F:
+  
+  ! ~Hyashi track radius:  
+  var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 +  0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0
+  
+  ! 123: Analytic convective turnover timescale (days), adapted from Eggleton's CFUNCS.F:
   dat(123,1:n) = 28.437d0*(dat(8,1:n)**2*dat(4,1:n)/ dat(9,1:n))**(1.d0/3.d0) * (dat(8,1:n)/var(1:n))**2.7  
   dat(123,1:n) = dat(25,1:n)/dat(123,1:n)  !Actual Tet / analitic Tet
   
-  dat(124,1:n) = dat(2,1:n) - dat(2,1) !t-t0
-  dat(125,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
+  ! 124: t-t0:
+  dat(124,1:n) = dat(2,1:n) - dat(2,1)
+  
+  ! 125: (Ne/O)cen/(Ne/O)surf:
+  dat(125,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))
+  
   
   c126(1:n)    = 2*pi*(256.d0/5.d0)**(3.d0/8.d0) * g**(5.d0/8.d0)/c**(15.d0/8.d0) *  &
        (dat(5,1:n)*1.4)**(3.d0/8.d0) * m0**(5.d0/8.d0) / (dat(5,1:n)+1.4)**(1.d0/8.d0)
-  !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
+  
+  ! 126: Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
   dat(126,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3.d0/8.d0)*c126(1:n)/day
   
+  ! 127: Roche-lobe radius:
   dat(127,1:n) = dat(8,1:n)/exp(dat(29,1:n))     
-  dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                            !Xf := 2Xc + Yc + 1
-  !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed):
+  
+  ! 128: Xf := 2Xc + Yc + 1:
+  dat(128,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.
+  
+  ! 129: M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed):
   dat(129,1:n) = 10.d0**dat(22,1:n) * dat(4,1:n)*dat(8,1:n)**2
-  dat(130,1:n) = 2*pi/(dat(21,1:n)*day+1.d-30)                               ! omega_spin (s^-1)
-  dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)                !Average Rho
-  dat(132,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y:  surface metallicity
-  dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)                   !t - t_final, avoid by setting dat(,1) = dat(,2)
   
-  !dat(134,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day             !Critical (Keplerian) omega
-  dat(134,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day         !Critical (Keplerian) rotation period
-  dat(134,1:n) = dat(21,1:n)/(dat(134,1:n)+1.d-30)                           !Prot/Pcrit
+  ! 130: omega_spin (s^-1):
+  dat(130,1:n) = 2*pi/(dat(21,1:n)*day+1.d-30)
   
-  dat(135,1:n) = G*dat(4,1:n)*M0/((dat(8,1:n)*R0)**2+1.d-30)                 !g_surf = GM/R^2 (cgs)
+  ! 131: Average Rho:
+  dat(131,1:n) = dat(4,1:n)*m0/(4/3.d0*pi*(dat(8,1:n)*r0)**3)
+  
+  ! 132: Zsurf = 1 - X - Y; surface metallicity:
+  dat(132,1:n) = Zsurf(1:n)
+  
+  ! 133: t - t_final, avoid by setting dat(,1) = dat(,2):
+  dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)
+  
+  ! 134: Critical (Keplerian) omega:
+  !dat(134,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day
+  
+  ! 134: Critical (Keplerian) rotation period:
+  dat(134,1:n) = 2*pi*sqrt((dat(8,1:n)*r0)**3/(g*dat(4,1:n)*m0))/day
+  
+  ! 134: Pcrit -> Prot/Pcrit:
+  dat(134,1:n) = dat(21,1:n)/(dat(134,1:n)+1.d-30)
+  
+  ! 135: g_surf = GM/R^2 (cgs):  
+  dat(135,1:n) = G*dat(4,1:n)*M0/((dat(8,1:n)*R0)**2+1.d-30)
   g0 = G*M0/R0**2
-  dat(136,1:n) = 4.d-13*dat(9,1:n)/(dat(135,1:n)/g0*dat(4,1:n))              !Reimers wind = 4e-13*(L/Lo)/((g/g0)*(R/Ro))  (Mo/yr)
-  dat(137,1:n) = min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), &   !Reimers-like wind: min of
-       9.61e-10*dat(9,1:n))                                  !  3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr
-  dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)                          !Reimers-like wind / Reimers wind
-  dat(139,1:n) = dat(4,1) - dat(4,1:n)                                       !M_zams - M
-  dat(140,1:n) = dat(139,1:n)/dat(4,1)                                       !(M_zams - M)/M_zams
-  !dat(140,1:n) = dat(139,1:n)/dat(4,1:n)                                     !(M_zams - M)/M
-  dat(141,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(8,1:n)*r0*1.d40)     !G*M*M_env/R / 1e40
-  dat(142,1:n) = dat(4,1:n)+dat(40,1:n)                                      ! Mbin (Mo)
+  
+  ! 136: Reimers wind = 4e-13*(L/Lo)/((g/g0)*(R/Ro))  (Mo/yr):
+  dat(136,1:n) = 4.d-13*dat(9,1:n)/(dat(135,1:n)/g0*dat(4,1:n))
+  
+  
+  ! 137: Reimers-like wind: 0.2 x min of 3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr:
+  dat(137,1:n) = 0.2*min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), 9.61e-10*dat(9,1:n))
+  
+  ! 138: Reimers-like wind / Reimers wind:
+  dat(138,1:n) = dat(137,1:n)/(dat(136,1:n)+1.d-30)
+  
+  ! 139: M_zams - M:
+  dat(139,1:n) = dat(4,1) - dat(4,1:n)
+  
+  ! 140: (M_zams - M)/M_zams:
+  dat(140,1:n) = dat(139,1:n)/dat(4,1)
+  
+  ! 140: (M_zams - M)/M:
+  !dat(140,1:n) = dat(139,1:n)/dat(4,1:n)
+  
+  ! 141: G*M*M_env/R / 1e40:
+  dat(141,1:n) = g*dat(4,1:n)*dat(117,1:n)*m0**2 / (dat(8,1:n)*r0*1.d40)
+  
+  ! 142: Mbin (Mo):
+  dat(142,1:n) = dat(4,1:n)+dat(40,1:n)
+  
+  ! 143: a_orb (Ro):
   do i=1,n
-     call p2a(dat(142,i)*M0,dat(28,i)*day,dat(143,i))                        ! a_orb (cm)
+     call p2a(dat(142,i)*M0,dat(28,i)*day,dat(143,i))  ! a_orb (cm)
   end do
-  dat(143,1:n) = dat(143,1:n)/R0                                             ! a_orb (Ro)
+  dat(143,1:n) = dat(143,1:n)/R0                       ! cm -> Ro
   
-  dat(144,1:n) = dat(34,1:n)*1.d50/(G**0.5d0 * M0**1.5d0 * R0**0.5d0)        ! J_orb (G^1/2 Mo^3/2 Ro^1/2)
-  dat(145,1:n) = dat(129,1:n)*dat(130,1:n) &
-       * M0*R0**2 / (G**0.5d0 * M0**1.5d0 * R0**0.5d0)                       ! J_spin = I*w (G^1/2 Mo^3/2 Ro^1/2)
-  dat(146,1:n) = dat(144,1:n) + dat(145,1:n)                                 ! J_tot = J_orb + J_spin (G^1/2 Mo^3/2 Ro^1/2)
+  ! 144: J_orb (G^1/2 Mo^3/2 Ro^1/2):
+  dat(144,1:n) = dat(34,1:n)*1.d50/(G**0.5d0 * M0**1.5d0 * R0**0.5d0)
   
-  dat(147,1:n) = dat(4,1:n)*dat(40,1:n)/(2*dat(143,1:n))                     ! E_orb = M1M2/2a  (G Mo^2 / Ro)
-  dat(148,1:n) = 0.5d0*dat(129,1:n)*dat(130,1:n)**2 &
-       * M0*R0**2 / (G * M0**2 / R0)                                         ! E_spin = 1/2 I w^2  (G Mo^2 / Ro)
-  dat(149,1:n) = dat(147,1:n) + dat(148,1:n)                                 ! E_so = E_orb + E_spin (G Mo^2 / Ro)
-  dat(150,1:n) = dat(15,1:n) * 1.d40 / (G * M0**2 / R0)                      ! E_bind (G Mo^2 / Ro) - CHECK: use tailored definition
-  dat(151,1:n) = dat(149,1:n) + dat(150,1:n)                                 ! E_tot = E_so + E_bind (G Mo^2 / Ro)
+  ! 145: J_spin = I*w (G^1/2 Mo^3/2 Ro^1/2):
+  dat(145,1:n) = dat(129,1:n)*dat(130,1:n) * M0*R0**2 / (G**0.5d0 * M0**1.5d0 * R0**0.5d0)
+  
+  ! 146: J_tot = J_orb + J_spin (G^1/2 Mo^3/2 Ro^1/2):
+  dat(146,1:n) = dat(144,1:n) + dat(145,1:n)
+  
+  ! 147: E_orb = M1M2/2a  (G Mo^2 / Ro):
+  dat(147,1:n) = dat(4,1:n)*dat(40,1:n)/(2*dat(143,1:n))
+  
+  ! 148: E_spin = 1/2 I w^2  (G Mo^2 / Ro):
+  dat(148,1:n) = 0.5d0*dat(129,1:n)*dat(130,1:n)**2 * M0*R0**2 / (G * M0**2 / R0)
+  
+  ! 149: E_so = E_orb + E_spin (G Mo^2 / Ro):  
+  dat(149,1:n) = dat(147,1:n) + dat(148,1:n)
+  
+  ! 150: E_bind (G Mo^2 / Ro) - CHECK: use tailored definition
+  dat(150,1:n) = dat(15,1:n) * 1.d40 / (G * M0**2 / R0)
+  
+  ! 151: E_tot = E_so + E_bind (G Mo^2 / Ro):
+  dat(151,1:n) = dat(149,1:n) + dat(150,1:n)
   
   
   
   
   
   
-  !Timescales
-  dat(201,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10                 !Nuclear evolution timescale
-  dat(202,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr   !KH timescale
-  dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                    !Mass transfer
-  dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                     !Gravitational waves
-  !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)               !Magnetic braking (Actually SO-coupling!)
-  dat(205,1:n) = sqrt(dat(8,1:n)**3/(g*dat(4,1:n)))                        !Dynamical: t ~ sqrt(R^3/(G*M))
+  !*** Timescales:
+  
+  ! 201: Nuclear evolution timescale: 
+  dat(201,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.d10
+  
+  ! 202: KH timescale:
+  dat(202,1:n) = g*dat(4,1:n)**2*m0*m0 / (dat(8,1:n)*r0*dat(9,1:n)*l0)/yr
+  
+  ! 203: Mass transfer:
+  dat(203,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)
+  
+  ! 204: Gravitational waves:
+  dat(204,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)
+  
+  ! 205: Magnetic braking (Actually SO-coupling!):
+  !dat(205,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)
+  
+  ! 205 Dynamical: t ~ sqrt(R^3/(G*M)):
+  dat(205,1:n) = sqrt(dat(8,1:n)**3/(g*dat(4,1:n)))
   dpdt  = 0
   
-  !Replace dJ/dt by dP/dt
-  !35 = H_orb,  36 = H_gw, 37 = H_wml, 38 = H_s-o, 39 = H_mtr
+  
+  ! Replace dJ/dt by dP/dt:
+  ! 35 = H_orb,  36 = H_gw, 37 = H_wml, 38 = H_s-o, 39 = H_mtr
   if(1.eq.2) then
-     !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
+     ! dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
      dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0)*(2.d0*pi* (dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g)) **(1.d0/3.d0)
      do i=35,39
         dat(i,1:n) = dat(i,1:n)*dpdj(1:n)*1.d50+1.d-30
@@ -949,7 +1041,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dpdt = 1
   end if
   
-  !Replace dP/dt by timescales 
+  ! Replace dP/dt by timescales:
   if(1.eq.1) then
      do i=35,39
         dat(i,1:n) = dat(28,1:n)*day/dat(i,1:n)/yr
@@ -963,6 +1055,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      dpdt = 2
   end if
   
+  
 end subroutine changepltvars
 !***********************************************************************************************************************************
+
 

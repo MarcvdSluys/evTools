@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   152: AstroFloyd, 22/03/2011
+     - plotplt: added variable 223: Winds
+     - plt_functions: clean up/comment
+     
    150: AstroFloyd, 11/01/2011
      - Updated Doxyfile
      
