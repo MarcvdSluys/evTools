@@ -196,7 +196,7 @@ program plotpltn
      do i=8,14
         dat(f,i,1:n(f)) = 10**dat(f,i,1:n(f))
      end do
-     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40                                         !Ubind in 10^40 erg
+     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40                                         !Ebind in 10^40 erg
      dat(f,71,1:n(f)) = dat(f,5,1:n(f)) - dat(f,6,1:n(f))                                  !Mhe-CO: intershell mass
      dat(f,72,1:n(f)) = dat(f,22,1:n(f))*dat(f,4,1:n(f))*dat(f,8,1:n(f))**2                !Moment of inertia
      dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3)             !Average Rho
@@ -217,9 +217,9 @@ program plotpltn
      dat(f,88,1:n(f)) = dat(f,8,1:n(f))**2*dat(f,22,1:n(f))  !k^2*R^2
      
      dat(f,89,1:n(f)) = dat(f,4,1:n(f)) - dat(f,5,1:n(f))                         !H-envelope mass
-     !lambda_env = G*M*M_env/(Ubind*R):
+     !lambda_env = G*M*M_env/(Ebind*R):
      dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)
-     !dat(f,90,1:n(f)) = abs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ubind changes sign
+     !dat(f,90,1:n(f)) = abs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ebind changes sign
      dat(f,90,1:n(f)) = max(dat(f,90,1:n(f)),0.d0)
      do i=1,n(f)
         if(abs(dat(f,5,i)).lt.1.d-29) dat(f,90,i) = 0.d0  !If there's no He core mass, there's no lambda
@@ -248,7 +248,7 @@ program plotpltn
      write(6,*)''
      write(6,'(A70)')'  Variables:                                   0: Quit                '
      write(6,'(A70)')'                                                                      '
-     write(6,'(A70)')'  1: model      15: Ubind      28: Porb       34: Horb                '
+     write(6,'(A70)')'  1: model      15: Ebind      28: Porb       34: Horb                '
      write(6,'(A70)')'  2: t          16: Lh         29: FLR        35: dHorb/dt            '
      write(6,'(A70)')'  3: dt         17: Lhe        30: F1         36: dHgw/dt             '
      write(6,'(A70)')'  4: M          18: Lc         31: dM         37: dHwml/dt            '

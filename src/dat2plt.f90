@@ -53,7 +53,7 @@ program dat2plt
   ! 12: Tmax       27: Bp          H  He   C   N   O  Ne  Mg
   ! 13: Rhoc                Surf  42  43  44  45  46  47  48
   ! 14: RhoTm               Tmax  49  50  51  52  53  54  55
-  ! 15: Ubind               Core  56  57  58  59  60  61  62
+  ! 15: Ebind               Core  56  57  58  59  60  61  62
   !                                                          
   !                                                         
   ! 81: Qconv          86: Rossby nr                          

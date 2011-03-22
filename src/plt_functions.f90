@@ -57,7 +57,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(12) = 'T\dmax\u (K)'
   pglabels(13) = '\gr\dc\u (g cm\u-3\d)'
   pglabels(14) = '\gr\dTmax\u (g cm\u-3\d)'
-  pglabels(15) = 'U\dbind,env\u (10\u40\d erg)'
+  pglabels(15) = 'E\dbind,env\u (10\u40\d erg)'
   pglabels(16) = 'L\dH\u (L\d\(2281)\u)'
   pglabels(17) = 'L\dHe\u (L\d\(2281)\u)'
   pglabels(18) = 'L\dC\u (L\d\(2281)\u)'
@@ -115,8 +115,19 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   
   pglabels(81) = 'Q\dconv\u'
+  pglabels(82) = 'P\dc\u (cgs)'
+  pglabels(83) = 'P\drot,c\u (s)'
+  pglabels(84) = 'E\dbind,env,grav\u (10\u40\d erg)'
+  pglabels(85) = 'E\dbind,env,int\u (10\u40\d erg)'
+  pglabels(86) = 'E\dbind,env,recom\u (10\u40\d erg)'
+  pglabels(87) = 'E\dbind,env,H2ass\u (10\u40\d erg)'
+  pglabels(88) = 'S\dc\u (erg g\u-1\d K\u-1\d)'
+  pglabels(89) = 'S\dT=1e5K\u (erg g\u-1\d K\u-1\d)'
+  pglabels(90) = 'R\dHe\u (R\d\(2281)\u)'
+  pglabels(91) = 'R\dCO\u (R\d\(2281)\u)'
+  pglabels(92) = 'STRMDL'
   
-  defvar(81) = 1
+  defvar(81:92) = 1
   
   
   !Derived variables:
@@ -273,7 +284,17 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(62) = 'Mgcentr'
   
   asclabels(81) = 'Qconv'
-  
+  asclabels(82) = 'Pc'
+  asclabels(83) = 'Protc'
+  asclabels(84) = 'Ebind_grav'
+  asclabels(85) = 'Ebind_int'
+  asclabels(86) = 'Ebind_recom'
+  asclabels(87) = 'Ebind_H2ass'
+  asclabels(88) = 'Sc'
+  asclabels(89) = 'S1e5K'
+  asclabels(90) = 'Rhe'
+  asclabels(91) = 'Rco'
+  asclabels(92) = 'STRMDL'
   
   
   asclabels(101) = 'V'
@@ -382,7 +403,7 @@ subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   pglabels(12) = 'T\dmax\u (K)'
   pglabels(13) = '\gr\dc\u (g cm\u-3\d)'
   pglabels(14) = '\gr\dTmax\u (g cm\u-3\d)'
-  pglabels(15) = 'U\dbind,env\u (erg)'
+  pglabels(15) = 'E\dbind,env\u (erg)'
   pglabels(16) = 'L\dH\u (L\d\(2281)\u)'
   pglabels(17) = 'L\dHe\u (L\d\(2281)\u)'
   pglabels(18) = 'L\dC\u (L\d\(2281)\u)'
@@ -571,9 +592,13 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
   write(6,'(A)')'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
   write(6,'(A)')'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
-  write(6,'(A)')'   15: Ub,env                      Core:  56  57  58  59  60  61  62   215              '
+  write(6,'(A)')'   15: Ebind,env                   Core:  56  57  58  59  60  61  62   215              '
   write(6,'(A)')'                                                                                        ' 
-  write(6,'(A)')'   81: Qconv                                                                            '
+  write(6,'(A)')'   81: Qconv        86: Eb,recom     91: Rco                                            '
+  write(6,'(A)')'   82: Pc           87: Eb,H2ass     92: STRMDL                                         ' 
+  write(6,'(A)')'   83: Prot,c       88: Sc                                                              '
+  write(6,'(A)')'   84: Eb,grav      89: S1e5K                                                           '
+  write(6,'(A)')'   85: Eb,int       90: Rhe                                                             '
   write(6,'(A)')'                                                                                        ' 
   write(6,'(A)')'  Derived variables:                                                                    '
   write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R    151: E_tot   '  
@@ -605,7 +630,7 @@ end subroutine printpltvarlist
 
 
 !***********************************************************************************************************************************
-!> \brief Read the *.plt? file fname from unit u and return its length and the contents
+!> \brief Read the *.plt[12] file fname from unit u and return its length and the contents
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use kinds
   use constants
@@ -617,95 +642,33 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   
   nc1 = nc !Get rid of 'unused' message
   
-  !*** Old output format (2003)
+  !*** Unformatted:
   dat = 0.d0
-  !version = 2003
   version = 2005  !Can no longer distinguish if unformatted read
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
-  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)') &
-  !'  WARNING: Number of colums in this file does not match that of the program: ',nc
   do j=1,nn
-     !read(u,10,err=12,end=11) (dat(i,j),i=1,ncols)
      read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
      if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
   end do
-!10 format(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6,E12.5) !Can read upto 82 columns
-  write(6,'(A)')'  End of file reached, arrays too small!'
+  write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
   close(u)
-  goto 15
+  n = j-1   !Number of models in the file
+  return
   
 11 if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
   close(u)
-  goto 15
+  n = j-1   !Number of models in the file
+  return
   
 12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading file, line',j
   close(u)
-  if(j.lt.3) goto 19
+  if(j.lt.3) call quit_program('Error reading input file')
   if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
-15 continue
-  !if(verbose.eq.1) write(6,*)''
   
   n = j-1   !Number of models in the file
-  goto 29
-  
-  
-  
-  !*** New output format (2005)
-19 continue
-  !Erase the output from trying the first format
-  if(verbose.eq.1) then
-     do i=1,2
-        write(6,'(A)')cursorup
-        write(6,'(A150)')''
-        write(6,'(A)')cursorup
-     end do
-     write(6,'(A)')'  I will try the new output format...'
-  end if
-  dat = 0.d0
-  version = 2005
-  open(unit=u,form='formatted',status='old',file=trim(fname))
-  rewind u
-  read(u,*)ncols
-  if(verbose.eq.1) write(6,'(A,I4,A)')'  Found',ncols,' columns.'
-  !if(verbose.eq.1.and.ncols.ne.nc) write(6,'(A,I4)') &
-  !'  WARNING: Number of colums in this file does not match that of the program: ',nc
-  if(ncols.eq.81) then
-     do j=1,nn
-        read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,81)  !81 Columns
-        if(j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
-     end do
-  end if
-  if(ncols.gt.81) then
-     do j=1,nn
-        !83 Columns, Evert(?) added 82, 83=strmdl flag:
-        read(u,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,16E12.4,39E13.5,E14.6,ES13.5,F5.1)',err=22,end=21) (dat(i,j),i=1,83)
-        if(j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
-     end do
-  end if
-  write(6,'(A)')'  End of file reached, arrays too small!'
-  close(u)
-  goto 25
-  
-21 if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
-  close(u)
-  goto 25
-  
-22 write(6,'(A,I6)')'  Error reading file, aborting at line',j
-  if(j.lt.3) then
-     write(6,'(/,A,/)')' Program finished.'
-     stop
-  end if
-  write(6,'(A)')"  I'll skip the rest of the file and use the first part."
-  close(u)
-25 continue
-  !if(verbose.eq.1) write(6,*)''
-  
-  n = j-1   !Number of models in the file
-  
-29 continue
   
 end subroutine readplt
 !***********************************************************************************************************************************
@@ -764,7 +727,10 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !************************************************************************      
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
-  dat(15,:) = dat(15,:)*m0*1.d-40                               !Ubind in 10^40 ergs
+  
+  !Ebind in 10^40 ergs:
+  dat(15,:) = dat(15,:)*m0*1.d-40                               ! Total envelope BE
+  dat(84:87,:) = dat(84:87,:)*m0*1.d-40                         ! Envelope BE terms
   
   !Abundances: limit them to >10^-10
   !isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
@@ -793,9 +759,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   ! H-envelope mass, premature def.:
   Menv(1:n) = dat(4,1:n) - dat(5,1:n)
   
-  ! 111: lambda_env = G*M*M_env/(Ubind*R):
+  ! 111: lambda_env = G*M*M_env/(Ebind*R):
   dat(111,1:n) = g*dat(4,1:n)*Menv(1:n)*m0**2 / (dat(15,1:n)*dat(8,1:n)*r0*1.d40+1.d-30)
-  !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ubind changes sign
+  !dat(111,1:n) = abs(dat(111,1:n))    !This 'hides' the fact that Ebind changes sign
   dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
      if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
@@ -946,7 +912,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(136,1:n) = 4.d-13*dat(9,1:n)/(dat(135,1:n)/g0*dat(4,1:n))
   
   
-  ! 137: Reimers-like wind: 0.2 x min of 3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ubind) and 9.61e-10 (L/Lo), in Mo/yr:
+  ! 137: Reimers-like wind: 0.2 x min of 3.16e-14*(M/Mo)(L/Lo)(10^50erg/Ebind) and 9.61e-10 (L/Lo), in Mo/yr:
   dat(137,1:n) = 0.2*min( 3.16e-14*dat(4,1:n)*dat(9,1:n)/(dat(15,1:n)*1.d-10+1.d-30), 9.61e-10*dat(9,1:n))
   
   ! 138: Reimers-like wind / Reimers wind:

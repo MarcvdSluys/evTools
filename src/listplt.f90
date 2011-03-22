@@ -58,7 +58,7 @@ program listplt
   labels(12) = 'Tmax (K)'
   labels(13) = 'Rhoc'
   labels(14) = 'Rho_Tmx'
-  labels(15) = 'Ubind'
+  labels(15) = 'Ebind'
   labels(16) = 'LH (Lo)'
   labels(17) = 'LHe (Lo)'
   labels(18) = 'LC (Lo)'
@@ -238,7 +238,7 @@ program listplt
   dat(12,1:n) = 10**dat(12,1:n)
   dat(13,1:n) = 10**dat(13,1:n)
   dat(14,1:n) = 10**dat(14,1:n)
-  dat(15,1:n) = dat(15,1:n)*m0  !One would like to print Ubind in erg, not erg/m0
+  dat(15,1:n) = dat(15,1:n)*m0  !One would like to print Ebind in erg, not erg/m0
   
   
   
@@ -422,7 +422,7 @@ program listplt
   write(6,'(A)')' 12: Tmax       27: Bp          H  He   C   N   O  Ne  Mg'
   write(6,'(A)')' 13: Rhoc                Surf  42  43  44  45  46  47  48'
   write(6,'(A)')' 14: RhoTm               Tmax  49  50  51  52  53  54  55'
-  write(6,'(A)')' 15: Ubind               Core  56  57  58  59  60  61  62'
+  write(6,'(A)')' 15: Ebind               Core  56  57  58  59  60  61  62'
   write(6,'(A)')'                                                         ' 
   write(6,'(A)')'                                                         '
   write(6,'(A)')' 81: Qconv          86: Rossby nr                        '  

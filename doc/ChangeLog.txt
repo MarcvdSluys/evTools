@@ -2,6 +2,13 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   153: AstroFloyd, 22/03/2011
+     - Added the 9 new plotting variables that are in the plt[12] file since yesterday 
+       (Rev.1373) + 2 older ones:
+       - 82-83: Pc; Prot,c; 84-87: BE terms, 88-89: Sc; S@T=1e5K; 90-91: Rhe; Rco, 92: STRMDL
+     - Always read .plt[12] files unformatted
+     - Use Ebind rather than Ubind consistently
+     
    152: AstroFloyd, 22/03/2011
      - plotplt: added variable 223: Winds
      - plt_functions: clean up/comment
