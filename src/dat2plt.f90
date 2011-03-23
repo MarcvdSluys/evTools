@@ -31,13 +31,24 @@ program dat2plt
   integer :: i,command_argument_count,ioi,ioo,nci,translate(nci1),skipinlines,ci
   real(double) :: dati(nci1),dato(nco)
   character :: infile*(99),outfile*(99),bla
+  integer :: logvar(nci1), delogvar(nci1)
   
+  logvar = 0
+  delogvar = 0
   
-  !Current settings: for Lev's file, 1/2/2009
-  skipinlines = 1 !Skip the first skipinlines from the input file
-  nci = 14  !Number of input columns
+  !Lev's file, 1/2/2009:
+  !skipinlines = 1 !Skip the first skipinlines from the input file
+  !nci = 14  !Number of input columns
+  !! Contains the target column number in the plt file for each column in the input file:
+  !translate(1:nci) = (/1,2,4, 56,57,58,59,60,61, 13,11,8,9,10/)
+  
+  !Michal Dominik's file, 22/3/2011:
+  skipinlines = 0 !Skip the first skipinlines from the input file
+  nci = 2  !Number of input columns
   ! Contains the target column number in the plt file for each column in the input file:
-  translate(1:nci) = (/1,2,4, 56,57,58,59,60,61, 13,11,8,9,10/)
+  translate(1:nci) = (/4,8/)
+  logvar(1:nci)    = (/0,1/)
+  
   
   !  1: model      16: Lh         28: Porb      34: Horb    
   !  2: t          17: Lhe        29: FLR       35: dHorb/dt
@@ -141,7 +152,13 @@ program dat2plt
      end if
      
      do ci=1,nci
-        dato(translate(ci)) = dati(ci)
+        if(logvar(ci).eq.1) then
+           dato(translate(ci)) = log10(dati(ci))
+        else if(delogvar(ci).eq.1) then
+           dato(translate(ci)) = 10.d0**(dati(ci))
+        else
+           dato(translate(ci)) = dati(ci)
+        end if
      end do
      
      write(20,'(I6,ES17.9,ES14.6,12ES13.5,6ES12.4,3ES13.5,17ES12.4,39ES13.5,ES14.6,ES13.5,F5.1,6ES13.5)')nint(dato(1)),dato(2:nco)

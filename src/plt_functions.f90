@@ -644,23 +644,24 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   
   !*** Unformatted:
   dat = 0.d0
-  version = 2005  !Can no longer distinguish if unformatted read
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*)ncols
   if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
+  version = 2005   ! Can no longer distinguish with unformatted read
+  if(ncols.eq.83.or.ncols.eq.92) version = 2011  ! Latest version 
   do j=1,nn
      read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
      if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
   end do
   write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
   close(u)
-  n = j-1   !Number of models in the file
+  n = j-1   ! Number of models in the file
   return
   
 11 if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
   close(u)
-  n = j-1   !Number of models in the file
+  n = j-1   ! Number of models in the file
   return
   
 12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading file, line',j
@@ -668,7 +669,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   if(j.lt.3) call quit_program('Error reading input file')
   if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
   
-  n = j-1   !Number of models in the file
+  n = j-1   ! Number of models in the file
   
 end subroutine readplt
 !***********************************************************************************************************************************

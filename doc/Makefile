@@ -174,9 +174,6 @@ plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 plotplt: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
-plotplt_r066: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt_r066 $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt_r066.o
-
 plotpltn: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
 
@@ -252,7 +249,7 @@ $(SRCDIR)/code_version.f90: code_version    #code_version is PHONY and always ou
 	@echo "   write(unit,'(A)')' '//trim(program_name)//', svn revision '//trim(svn_revision)// &" >> $(SRCDIR)/code_version.f90
 	@echo "        ', compiled on '//trim(compile_date)//' with '//trim(compiler)//' '//trim(compiler_flags)" >> $(SRCDIR)/code_version.f90
 	@echo 'end subroutine print_code_version' >> $(SRCDIR)/code_version.f90
-	@touch -d "1 Jan 2001" $(SRCDIR)/code_version.f90  #Make it old, so that this file is not a reason to relink
+	@touch -d "1 Jan 2001" $(SRCDIR)/code_version.f90  #Make it old, so that this file is not a reason to relink - this only works if binaries are in current dir, i.e. binary name == target name.  Now, you just don't recompile this source file. Even then, if you don't recompile/relink, you won't get the correct compiler/date
 	@echo -e "Using Fortran compiler "`which $(FORT)`
 
 

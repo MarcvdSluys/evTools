@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   154: AstroFloyd, 23/03/2011
+     - Minor updates
+     
    153: AstroFloyd, 22/03/2011
      - Added the 9 new plotting variables that are in the plt[12] file since yesterday 
        (Rev.1373) + 2 older ones:

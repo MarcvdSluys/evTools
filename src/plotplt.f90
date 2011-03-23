@@ -151,8 +151,9 @@ program plotplt
   do f=1,nf
      if(verbose.eq.1) write(6,'(A)', advance='no')' Reading file '//trim(fnames(f))//':'
      call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  !Use unit 10
-     if(version.eq.2005) strmdls(f,:) = nint(datf(83,:)) !Structure model was saved (1) or not (0)
-     call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)  !Change (e.g. de-log) and add plot variables
+     if(version.eq.2005) strmdls(f,:) = nint(datf(83,:))   ! Structure model was saved (1) or not (0)
+     if(version.ge.2011) strmdls(f,:) = nint(datf(92,:))   ! Structure model was saved (1) or not (0)
+     call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)  ! Change (e.g. de-log) and add plot variables
      dat(f,:,:) = datf(:,:)
      n(f) = nfi
   end do
@@ -606,7 +607,7 @@ program plotplt
            if(hlp1.eq.'M') hlp1='m'
         end if
         
-        !Use saved structure models, store them in hp()
+        ! Use saved structure models, store them in hp()
         if(hlp1.eq.'s') then
            do pl=1,npl
               write(6,'(/,A)')'      Nr    Line   Model'
