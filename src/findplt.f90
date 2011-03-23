@@ -20,6 +20,9 @@
 ! If not, see <http://www.gnu.org/licenses/>.
 
 
+!***********************************************************************************************************************************
+!> \brief  Find the model with the closest value for a specified variable, interpolate, and return the values of the other variables
+
 program findplt
   use kinds
   use constants
@@ -90,7 +93,7 @@ program findplt
      stop
   end if
   
-  if(fname(1:3).eq.'   ') goto 9999
+  if(fname(1:3).eq.'   ') stop
   
   open(unit=10,form='formatted',status='old',file=fname)
   rewind 10
@@ -145,31 +148,38 @@ program findplt
   
   if(succ.eq.0) then
      !write(6,'(A)')' Value not found, aborting... '
-     !goto 9999
+     !stop
      write(6,*)''
      write(6,'(A)')' *** Value not found, printing last model ***'
      call printmodel(nnn,x,iin,iout)
-     goto 9999
+     stop
   end if
   
   
   if(1.eq.2) write(6,'(ES12.5)')x(2)
   
   
-9999 continue
 end program findplt
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 
 
-!************************************************************************      
-subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
+!***********************************************************************************************************************************
+!> \brief  Prints a selected (interpolated) model
+!!
+!! \param n     Size of data array
+!! \param x     Data array
+!! \param iin   Variable number to print if iout>0
+!! \param iout  0: print standard selection, <0: print all variables, >0: print variables iin and iout
+
+subroutine printmodel(n,x,iin,iout)
   use kinds
   
   implicit none
-  integer :: i,n,iin,iout
-  real(double) :: x(n)
+  integer, intent(in) :: n,iin,iout
+  real(double), intent(in) :: x(n)
+  integer :: i
   
   if(iout.eq.0) then
      write(6,*)''
@@ -199,7 +209,7 @@ subroutine printmodel(n,x,iin,iout)  !Prints a selected (interpolated) model
   end if
   
 end subroutine printmodel
-!************************************************************************      
+!***********************************************************************************************************************************
 
 
 

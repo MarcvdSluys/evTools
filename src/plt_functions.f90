@@ -35,10 +35,18 @@
 
 !***********************************************************************************************************************************
 !> \brief Provides the labels for the plot axes of a *.plt? file in plotplt
+!! 
+!! \param  nf         Number of input files
+!! \param  nvar       Number of variables
+!! \retval pglabels   PGPlot labels
+!! \retval asclabels  ASCII labels
+!! \retval defvar     Variable is defined (1) or not (0)
+
 subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   implicit none
-  integer :: nf,nvar,defvar(0:nvar)
-  character :: pglabels(nvar)*(99),asclabels(nvar)*(99)
+  integer, intent(in) :: nf,nvar
+  integer, intent(out) :: defvar(0:nvar)
+  character, intent(out) :: pglabels(nvar)*(99),asclabels(nvar)*(99)
   
   defvar = 0
   
@@ -384,10 +392,15 @@ end subroutine getpltlabels
 
 !***********************************************************************************************************************************
 !> \brief Provides the labels for the plot axes of a *.plt? file in plotpltn (obsolescent)
+!! 
+!! \retval pglabels   PGPlot labels
+!! \retval asclabels  ASCII labels
+!! \param  maxi       Size of the arrays
+
 subroutine set_plotpltn_labels(pglabels,asclabels,maxi)
   implicit none
-  integer :: maxi
-  character :: pglabels(maxi)*(*),asclabels(maxi)*(*)
+  integer, intent(in) :: maxi
+  character, intent(out) :: pglabels(maxi)*(*),asclabels(maxi)*(*)
   
   pglabels(1) = 'Model'
   pglabels(2) = 't (yr)'
@@ -571,9 +584,12 @@ end subroutine set_plotpltn_labels
 
 !***********************************************************************************************************************************
 !> \brief Print the list of variables in a *.plt? file to screen, for input menu of plotplt
+!!
+!! \param nf  Number of input files
+
 subroutine printpltvarlist(nf)
   implicit none
-  integer :: nf
+  integer, intent(in) :: nf
   
   write(6,*)''
   write(6,'(A)')'  Primary variables:                                  0: Quit                           '
@@ -631,14 +647,27 @@ end subroutine printpltvarlist
 
 !***********************************************************************************************************************************
 !> \brief Read the *.plt[12] file fname from unit u and return its length and the contents
+!!
+!! \param u         Input unit
+!! \param fname     Input file name
+!! \param nn        Maximum number of model lines
+!! \param nvar      Number of variables
+!! \param nc        Expected number of columns in the input file - no longer used
+!! \param verbose   Verbosity (0,1)
+!! 
+!! \retval dat      Data array
+!! \retval n        Number of models read
+!! \retval version  Code-output version
+
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use kinds
   use constants
   implicit none
-  integer :: nvar,nn
-  real(double) :: dat(nvar,nn)
-  integer :: ncols,nc,nc1,verbose,i,j,n,version,u
-  character :: fname*(*)
+  integer, intent(in) :: u,nn,nvar,nc,verbose
+  character, intent(in) :: fname*(*)
+  integer, intent(out) :: n,version
+  real(double), intent(out) :: dat(nvar,nn)
+  integer :: ncols,nc1,i,j
   
   nc1 = nc !Get rid of 'unused' message
   
@@ -678,16 +707,28 @@ end subroutine readplt
 
 !***********************************************************************************************************************************
 !> \brief Change (e.g. de-log) and add plot variables for a *.plt? file
+!!
+!! \param nn        Maximum number of model lines
+!! \param nvar      Number of variables
+!! \param n         Number of models read
+!! \retval dat      Data array (I/O)
+!! \retval labels   Variable labels (I/O)
+!! \retval dpdt     Pdot mode: 0: dJ/dt,  1: dP/dt,  2: timescales
+
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use kinds
   use constants
   implicit none
-  integer :: nn,nvar,n,dpdt, i,j,j0,ib
-  real(double) :: dat(nvar,nn),var(nn),dpdj(nn)
-  real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0, Zsurf(nn),Menv(nn)
-  character :: labels(nvar)*(99)
+  integer, intent(in) :: nn,nvar,n
+  real(double), intent(inout) :: dat(nvar,nn)
+  character, intent(inout) :: labels(nvar)*(99)
+  integer, intent(out) :: dpdt
   
-  !de-log some variables
+  integer :: i,j,j0,ib
+  real(double) :: var(nn),dpdj(nn)
+  real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0, Zsurf(nn),Menv(nn)
+  
+  ! de-log some variables:
   do i=4,nvar
      if(dat(i,1).eq.0.) dat(i,1) = dat(i,2)  !In case you want to log them. Skip t,dt
   end do
@@ -695,11 +736,11 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
      if(dat(i,1).le.0.) dat(i,1) = dat(i,2)
   end do
   
-  do i=8,14  !De-log them
+  do i=8,14  ! De-log them
      dat(i,1:n) = 10.d0**dat(i,1:n)
   end do
   
-  !'Clean' the convection data
+  ! 'Clean' the convection data:
   do j0 = 63,69,6
      do i=1,n
         ib = j0+5
@@ -727,14 +768,14 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   !***   CHANGE EXISTING PLOT VARIABLES
   !************************************************************************      
   
-  dat(5,1:n) = dat(5,1:n) + 1.d-30                              !Still necessary?
+  dat(5,1:n) = dat(5,1:n) + 1.d-30                              ! Still necessary?
   
-  !Ebind in 10^40 ergs:
+  ! Ebind in 10^40 ergs:
   dat(15,:) = dat(15,:)*m0*1.d-40                               ! Total envelope BE
   dat(84:87,:) = dat(84:87,:)*m0*1.d-40                         ! Envelope BE terms
   
-  !Abundances: limit them to >10^-10
-  !isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
+  ! Abundances: limit them to >10^-10
+  ! isn't it weird that the compiler actually understands this...?  You'd need at least two for-loops in freakin' C!
   dat(42:62,:) = max(dat(42:62,:),1.d-10)
   
   

@@ -62,14 +62,20 @@ end program grid
 !***********************************************************************************************************************************
 !> \brief  Print the masses, mass ratios or periods in a grid
 !!
-!! \note  Shared with getgrid.f90
+!! \param xi1  Initial value for log M/q/P
+!! \param dx   Increment of M/q/P
+!! \param n    Number of steps in grid
+!!
+!! \note  Shared with grid.f90
 
 subroutine printgrid(xi1,dx,n)
   use kinds
   
   implicit none
-  real(double) :: xi1,xi,dx
-  integer :: i,n
+  real(double), intent(in) :: xi1,dx
+  integer, intent(in) :: n
+  real(double) :: xi
+  integer :: i
   
   xi = xi1
   write(6,'(A5,2A10)')'i','x','log x'

@@ -70,10 +70,8 @@ elseif( Fortran_COMPILER_NAME MATCHES "g95" )
   endif( WANT_CHECKS )
   
   if( WANT_WARNINGS )
-    #set( WARN_FLAGS "-std=f2003 -Wall -Wobsolescent -Wunused-parameter -Wunused-internal-procs -Wunused-types -Wmissing-intent" )
-    #set( WARN_FLAGS "-std=f2003 -Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
-    set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=102,112,136,165,163,140" )
-    #set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=112,136,165,140" )
+    # 112: var is set but not used,  136: module variable not used,  140: precision loss,  165: implicit interface
+    set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=112,136,140,165" )
     #set( WARN_FLAGS "-std=f2003 ${WARN_FLAGS}" )
   endif( WANT_WARNINGS )
   
