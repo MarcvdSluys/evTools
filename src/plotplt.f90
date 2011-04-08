@@ -39,7 +39,7 @@ program plotplt
   real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
   real(double), allocatable :: dat(:,:,:),datf(:,:)
   real(double) :: mint,maxt,dt
-  logical :: logt
+  logical :: logt,lgx,lgy
   
   integer :: system, status
   real :: yy1(nmax),minx,dist,mindist
@@ -48,7 +48,7 @@ program plotplt
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
   integer :: hrd,djdt,conv,tscls,ch,dpdt,sabs,tabs,cabs,io
-  integer :: nt,wait,lums,lgx,lgy,nsel,os
+  integer :: nt,wait,lums,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: col,lng
   real :: sch
@@ -211,9 +211,9 @@ program plotplt
      asclx = 'HRD'
      ascly = 'HRD'
      vy = 0
-     lgx = 0
-     if(logt) lgx = 1
-     lgy = 1
+     lgx = .false.
+     if(logt) lgx = .true.
+     lgy = .true.
      goto 50
   end if
   
@@ -353,10 +353,10 @@ program plotplt
      if(log.eq.'N') log='n'
   end if  !if(plot.ne.6.and.plot.ne.7) then   
   
-  lgx = 0
-  lgy = 0
-  if(log.eq.'x'.or.log.eq.'b') lgx = 1
-  if(log.eq.'y'.or.log.eq.'b') lgy = 1
+  lgx = .false.
+  lgy = .false.
+  if(log.eq.'x'.or.log.eq.'b') lgx = .true.
+  if(log.eq.'y'.or.log.eq.'b') lgy = .true.
   
   
   pglx = pglabels(vx)
@@ -364,7 +364,7 @@ program plotplt
   asclx = asclabels(vx)
   ascly = asclabels(vy)
   
-  if(lgx.eq.1) then
+  if(lgx) then
      do pl=1,npl
         if(xx(pl,1).le.0.) xx(pl,1) = xx(pl,2)
      end do
@@ -377,9 +377,9 @@ program plotplt
      end do
   end if
   
-  if(djdt.eq.1) lgy = 1
+  if(djdt.eq.1) lgy = .true.
   excly = 0
-  if(lgy.eq.1) then
+  if(lgy) then
      do pl=1,npl
         if(yy(pl,1).eq.0.) yy(pl,1) = yy(pl,2)
         miny(pl) = huge(miny(pl))
@@ -407,39 +407,39 @@ program plotplt
   ymax = -huge(ymax)
   do pl=1,npl
      if(excly(pl).eq.1) cycle
-     if(lgy.eq.0) then
-        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-huge(ymin)), ymin)
-        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt. huge(ymax)), ymax)
-     else
+     if(lgy) then
         ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-log10(huge(ymin))), ymin)
         ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt. log10(huge(ymin))), ymax)
+     else
+        ymin = min(minval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).gt.-huge(ymin)), ymin)
+        ymax = max(maxval(yy(pl,1:n(pl)), yy(pl,1:n(pl)).lt. huge(ymax)), ymax)
      end if
   end do
   
   if(vx.eq.119) then !R/(dR/dt)
-     !if(xmin.lt.1.e4.and.lgx.eq.0) xmin = 1.e4
-     !if(xmin.lt.4..and.lgx.eq.1) xmin = 4.
-     if(xmax.gt.1.e12.and.lgx.eq.0) xmax = 1.e12
-     if(xmax.gt.12..and.lgx.eq.0) xmax = 12.
+     !if(xmin.lt.1.e4.and..not.lgx) xmin = 1.e4
+     !if(xmin.lt.4..and.lgx) xmin = 4.
+     if(xmax.gt.1.e12.and..not.lgx) xmax = 1.e12
+     if(xmax.gt.12..and..not.lgx) xmax = 12.
   end if
   if(vy.eq.119) then !R/(dR/dt)
-     !if(ymin.lt.1.e4.and.lgy.eq.0) ymin = 1.e4
-     !if(ymin.lt.4..and.lgy.eq.1) ymin = 4.
-     if(ymax.gt.1.e12.and.lgy.eq.0) ymax = 1.e12
-     if(ymax.gt.12..and.lgy.eq.1) ymax = 12.
+     !if(ymin.lt.1.e4.and..not.lgy) ymin = 1.e4
+     !if(ymin.lt.4..and.lgy) ymin = 4.
+     if(ymax.gt.1.e12.and..not.lgy) ymax = 1.e12
+     if(ymax.gt.12..and.lgy) ymax = 12.
   end if
   
-  if(lums.eq.1.and.lgy.eq.1) ymin = max(ymin,ymax-10.)
+  if(lums.eq.1.and.lgy) ymin = max(ymin,ymax-10.)
   
   if(conv.eq.1) ymin = 0.d0
   
   
   
   ! Limit ranges for logged axes like Mdot:
-  if(lgx.eq.1) then
+  if(lgx) then
      !if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.  ! Mdot
   end if
-  if(lgy.eq.1) then
+  if(lgy) then
      !if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.  ! Mdot
      !if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.  ! Mdots
      if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
@@ -449,8 +449,8 @@ program plotplt
      end if
   end if
   
-  if(vy.eq.211.and.lgy.eq.1.and.ymin.lt.1.) ymin = 1.
-  if(vy.eq.211.and.lgy.eq.1.and.ymax.gt.15.) ymax = 15.
+  if(vy.eq.211.and.lgy.and.ymin.lt.1.) ymin = 1.
+  if(vy.eq.211.and.lgy.and.ymax.gt.15.) ymax = 15.
   if(vy.eq.122.and.ymin.lt.-20.) ymin = -20.
   
   
@@ -512,10 +512,10 @@ program plotplt
   
   if(plot.ne.7) write(6,*)''  
   !Limit ranges for logged axes like Mdot
-  if(lgx.eq.1) then
+  if(lgx) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
   end if
-  if(lgy.eq.1) then
+  if(lgy) then
      if(vy.ge.31.and.vy.le.33.and.ymin.lt.-12.) ymin = -12.
      if(vy.eq.222.and.ymin.lt.-12.) ymin = -12.
      if((vy.ge.35.and.vy.le.39).or.vy.eq.221) then
@@ -787,8 +787,8 @@ program plotplt
   call pgswin(xmin,xmax,ymin,ymax)
   boxx = 'BCNTS'
   boxy = 'BCNTS'
-  if(lgx.ge.1) boxx = 'BCLNTS'
-  if(lgy.ge.1) boxy = 'BCLNTS'
+  if(lgx) boxx = 'BCLNTS'
+  if(lgy) boxy = 'BCLNTS'
   call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   if(nf.eq.1 .and. plot.eq.7) then
      f = 1
@@ -909,10 +909,10 @@ program plotplt
   if(vy.eq.121) then !Prot,critical for sat-MB, add Prot
      call pgsls(4)
      do pl=1,npl
-        if(lgy.eq.0) then
-           call pgline(n(pl),xx(pl,1:n(pl)),real(dat(pl,21,1:n(pl))))
-        else 
+        if(lgy) then
            call pgline(n(pl),xx(pl,1:n(pl)),log10(real(dat(pl,21,1:n(pl)))))
+        else 
+           call pgline(n(pl),xx(pl,1:n(pl)),real(dat(pl,21,1:n(pl))))
         end if
      end do !pl
      call pgsls(1)

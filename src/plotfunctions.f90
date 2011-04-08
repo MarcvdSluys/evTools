@@ -104,8 +104,8 @@ end subroutine plotzams
 !! \param  dat0  Model data for nvar variables and nmax model points - not logged!
 !!
 !! \param  vx    ID of x variable
-!! \param  lgx   Logarithmic x-axis? 0/1
-!! \param  lgy   Logarithmic y-axis? 0/1
+!! \param  lgx   Logarithmic x-axis?  (T/F)
+!! \param  lgy   Logarithmic y-axis?  (T/F)
 !!
 !! \param  ymin  Minimum of vertical plot range
 !! \param  ymax  Maximum of vertical plot range
@@ -122,8 +122,9 @@ end subroutine plotzams
 subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl)
   use kinds
   implicit none
-  integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx, lgx,lgy
+  integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
   real(double), intent(in) :: dat0(nvar,nmax)  ! Can be modified at nuclear burning
+  logical, intent(in) :: lgx,lgy
   real, intent(in) :: ymin,ymax
   
   logical, intent(in) :: hlp,hlbl
@@ -146,8 +147,8 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   
   
   dat = real(dat0)
-  if(lgx.eq.1) dat(vx,1:n) = real(log10(dat0(vx,1:n) + tiny(dat)))
-  if(lgy.eq.1) dat(63:80,1:n) = real(log10(dat0(63:80,1:n) + tiny(dat)))
+  if(lgx) dat(vx,1:n) = real(log10(dat0(vx,1:n) + tiny(dat)))
+  if(lgy) dat(63:80,1:n) = real(log10(dat0(63:80,1:n) + tiny(dat)))
   
   call pgslw(3)
   xx(1:n) = dat(vx,1:n)
