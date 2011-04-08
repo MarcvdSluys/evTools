@@ -32,7 +32,6 @@ if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   
   if( WANT_STATIC )
     set( STATIC_FLAGS "-static" )
-    message( STATUS "Linking statically" )
   endif( WANT_STATIC )
   
   if( WANT_CHECKS )
@@ -113,7 +112,6 @@ elseif( Fortran_COMPILER_NAME MATCHES "ifort" )
   
   if( WANT_STATIC )
     set( STATIC_FLAGS "-static" )
-    message( STATUS "Linking statically" )
   endif( WANT_STATIC )
   
   if( WANT_CHECKS )
@@ -187,6 +185,9 @@ endif( WANT_WARNINGS )
 if( WANT_LIBRARY )
   message( STATUS "Compiling with library options:  ${LIB_FLAGS}" )
 endif( WANT_LIBRARY )
+if( WANT_STATIC )
+  message( STATUS "Linking statically:  ${STATIC_FLAGS}" )
+endif( WANT_STATIC )
 
 message( STATUS "Compiler flags used:  ${CMAKE_Fortran_FLAGS}" )
 

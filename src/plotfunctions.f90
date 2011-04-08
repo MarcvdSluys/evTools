@@ -101,8 +101,12 @@ end subroutine plotzams
 !! \param  nvar  Number of variables in the data array
 !! \param  n     Number of model points
 !!
-!! \param  dat   Model data for nvar variables and nmax model points
+!! \param  dat0  Model data for nvar variables and nmax model points - not logged!
+!!
 !! \param  vx    ID of x variable
+!! \param  lgx   Logarithmic x-axis? 0/1
+!! \param  lgy   Logarithmic y-axis? 0/1
+!!
 !! \param  ymin  Minimum of vertical plot range
 !! \param  ymax  Maximum of vertical plot range
 !!
@@ -115,17 +119,18 @@ end subroutine plotzams
 !!  - don't pass all nvar variables, but only those needed?
 !!  - do I need all nmax rows, or should n do?
 
-subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
+subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl)
   use kinds
   implicit none
-  integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
-  real(double), intent(inout) :: dat(nvar,nmax)  ! Can be modified at nuclear burning
+  integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx, lgx,lgy
+  real(double), intent(in) :: dat0(nvar,nmax)  ! Can be modified at nuclear burning
   real, intent(in) :: ymin,ymax
+  
   logical, intent(in) :: hlp,hlbl
   integer :: i,j,ci0,lw0
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
-  real :: ch0
+  real :: ch0, dat(nvar,nmax)
   character :: hlbls*(5)
   
   
@@ -134,11 +139,15 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   plnuc  = 1  !Plot nuclear burning regions
   plcb   = 1  !Plot core boundaries
   
-  !Get original styles and colours
+  ! Save original styles and colours:
   call pgqci(ci0)
   call pgqlw(lw0)
   call pgqch(ch0)
   
+  
+  dat = real(dat0)
+  if(lgx.eq.1) dat(vx,1:n) = real(log10(dat0(vx,1:n) + tiny(dat)))
+  if(lgy.eq.1) dat(63:80,1:n) = real(log10(dat0(63:80,1:n) + tiny(dat)))
   
   call pgslw(3)
   xx(1:n) = dat(vx,1:n)
@@ -170,15 +179,15 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            nz = 1
            zonex = real((/xx(i-1),xx(i-1),xx(i),xx(i)/))
            if(ib.eq.63.or.ib.eq.65.or.ib.eq.67) then
-              zoney(1,:)                          = abs(real((/0.d0,dat(63,i-1),dat(63,i),0.d0/)))
-              if(ib.eq.65.or.ib.eq.67) zoney(2,:) = abs(real((/dat(64,i-1),dat(65,i-1),dat(65,i),dat(64,i)/)))
-              if(ib.eq.67) zoney(3,:)             = abs(real((/dat(66,i-1),dat(67,i-1),dat(67,i),dat(66,i)/)))
+              zoney(1,:)                          = abs((/0.,dat(63,i-1),dat(63,i),0./))
+              if(ib.eq.65.or.ib.eq.67) zoney(2,:) = abs((/dat(64,i-1),dat(65,i-1),dat(65,i),dat(64,i)/))
+              if(ib.eq.67) zoney(3,:)             = abs((/dat(66,i-1),dat(67,i-1),dat(67,i),dat(66,i)/))
               nz = (ib-61)/2
            end if
            if(ib.eq.62.or.ib.eq.64.or.ib.eq.66.or.ib.eq.68) then
-              zoney(1,:) = abs(real((/dat(63,i-1),dat(64,i-1),dat(64,i),dat(63,i)/)))
-              zoney(2,:) = abs(real((/dat(65,i-1),dat(66,i-1),dat(66,i),dat(65,i)/)))
-              zoney(3,:) = abs(real((/dat(67,i-1),dat(68,i-1),dat(68,i),dat(67,i)/)))
+              zoney(1,:) = abs((/dat(63,i-1),dat(64,i-1),dat(64,i),dat(63,i)/))
+              zoney(2,:) = abs((/dat(65,i-1),dat(66,i-1),dat(66,i),dat(65,i)/))
+              zoney(3,:) = abs((/dat(67,i-1),dat(68,i-1),dat(68,i),dat(67,i)/))
               nz = (ib-62)/2
               if(nz.eq.0.and.dib.ne.0) nz = 1
            end if
@@ -219,8 +228,8 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            !if(xx(i).gt.1245.and.xx(i).lt.1265) then
            !write(6,*)''
            !!if(dib.ne.0) then
-           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,real(dat(63:68,i-1))
-           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,real(dat(63:68,i))
+           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
+           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
            !write(6,'(5I10)')nint(zonex),nz
            !do j=1,nz
            !write(6,'(4F10.6)')zoney(j,:)
@@ -239,7 +248,7 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
      
      
      
-     !*** Semiconvection ***  NOTICE that dat(69:74) was 'cleaned' after reading the file
+     !*** Semiconvection ***  NOTE that dat(69:74) was 'cleaned' after reading the file
      if(plsmcv.eq.1) then
         call pgsfs(1)
         call pgsls(1)
@@ -259,15 +268,15 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            nz = 1
            zonex = real((/xx(i-1),xx(i-1),xx(i),xx(i)/))
            if(ib.eq.69.or.ib.eq.71.or.ib.eq.73) then
-              zoney(1,:)                          = abs(real((/0.d0,dat(69,i-1),dat(69,i),0.d0/)))
-              if(ib.eq.71.or.ib.eq.73) zoney(2,:) = abs(real((/dat(70,i-1),dat(71,i-1),dat(71,i),dat(70,i)/)))
-              if(ib.eq.73) zoney(3,:)             = abs(real((/dat(72,i-1),dat(73,i-1),dat(73,i),dat(72,i)/)))
+              zoney(1,:)                          = abs((/0.,dat(69,i-1),dat(69,i),0./))
+              if(ib.eq.71.or.ib.eq.73) zoney(2,:) = abs((/dat(70,i-1),dat(71,i-1),dat(71,i),dat(70,i)/))
+              if(ib.eq.73) zoney(3,:)             = abs((/dat(72,i-1),dat(73,i-1),dat(73,i),dat(72,i)/))
               nz = (ib-67)/2
            end if
            if(ib.eq.68.or.ib.eq.70.or.ib.eq.72.or.ib.eq.74) then
-              zoney(1,:) = abs(real((/dat(69,i-1),dat(70,i-1),dat(70,i),dat(69,i)/)))
-              zoney(2,:) = abs(real((/dat(71,i-1),dat(72,i-1),dat(72,i),dat(71,i)/)))
-              zoney(3,:) = abs(real((/dat(73,i-1),dat(74,i-1),dat(74,i),dat(73,i)/)))
+              zoney(1,:) = abs((/dat(69,i-1),dat(70,i-1),dat(70,i),dat(69,i)/))
+              zoney(2,:) = abs((/dat(71,i-1),dat(72,i-1),dat(72,i),dat(71,i)/))
+              zoney(3,:) = abs((/dat(73,i-1),dat(74,i-1),dat(74,i),dat(73,i)/))
               nz = (ib-68)/2
               if(nz.eq.0.and.dib.ne.0) nz = 1
            end if
@@ -309,8 +318,8 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            !if(xx(i).gt.1280.and.xx(i).lt.1330) then
            !!if(dib.ne.0) then
            !write(6,*)''
-           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,real(dat(69:74,i-1))
-           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,real(dat(69:74,i))
+           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
+           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
            !write(6,'(5I10)')nint(zonex),nz
            !do j=1,nz
            !write(6,'(4F10.6)')zoney(j,:)
@@ -350,15 +359,15 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
            nz = 1
            zonex = real((/xx(i-1),xx(i-1),xx(i),xx(i)/))
            if(ib.eq.75.or.ib.eq.77.or.ib.eq.79) then
-              zoney(1,:)                          = abs(real((/0.d0,dat(75,i-1),dat(75,i),0.d0/)))
-              if(ib.eq.77.or.ib.eq.79) zoney(2,:) = abs(real((/dat(76,i-1),dat(77,i-1),dat(77,i),dat(76,i)/)))
-              if(ib.eq.79) zoney(3,:)             = abs(real((/dat(78,i-1),dat(79,i-1),dat(79,i),dat(78,i)/)))
+              zoney(1,:)                          = abs((/0.,dat(75,i-1),dat(75,i),0./))
+              if(ib.eq.77.or.ib.eq.79) zoney(2,:) = abs((/dat(76,i-1),dat(77,i-1),dat(77,i),dat(76,i)/))
+              if(ib.eq.79) zoney(3,:)             = abs((/dat(78,i-1),dat(79,i-1),dat(79,i),dat(78,i)/))
               nz = (ib-73)/2
            end if
            if(ib.eq.76.or.ib.eq.78.or.ib.eq.80) then
-              zoney(1,:) = abs(real((/dat(75,i-1),dat(76,i-1),dat(76,i),dat(75,i)/)))
-              zoney(2,:) = abs(real((/dat(77,i-1),dat(78,i-1),dat(78,i),dat(77,i)/)))
-              zoney(3,:) = abs(real((/dat(79,i-1),dat(80,i-1),dat(80,i),dat(79,i)/)))
+              zoney(1,:) = abs((/dat(75,i-1),dat(76,i-1),dat(76,i),dat(75,i)/))
+              zoney(2,:) = abs((/dat(77,i-1),dat(78,i-1),dat(78,i),dat(77,i)/))
+              zoney(3,:) = abs((/dat(79,i-1),dat(80,i-1),dat(80,i),dat(79,i)/))
               nz = (ib-74)/2
            end if
            
@@ -424,6 +433,7 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
               if(hlbl) call pgtext(xx(hp(i)),y(hp(i)),hlbls)
            end do
         end if
+        
      end if !If plnuc.eq.1
      
   end if !if(ch.eq.1)
@@ -433,13 +443,13 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   !call pgsci(14)
   !do j=63,68
   !   do i=1,n
-  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !semiconvection bounds
+  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !semiconvection bounds
   !   end do
   !end do !j
   !call pgsci(15)
   !do j=69,74
   !   do i=1,n
-  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !convection bounds
+  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !convection bounds
   !   end do
   !end do !j
   
@@ -447,7 +457,7 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
   if(plnuc.eq.1) then
      do j=75,80
         do i=1,n
-           if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(real(dat(j,i))),1) !nuclear burning bounds
+           if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !nuclear burning bounds
         end do
      end do !j
   end if
@@ -459,7 +469,7 @@ subroutine plt_convection(nmax,nvar,n, dat,vx,ymin,ymax, nhp,hp,hlp,hlbl)
      do j=5,7 !core masses
         call pgsci(j-1)
         do i=1,n-1
-           dat1(1:2) = real(dat(j,i:i+1))
+           dat1(1:2) = dat(j,i:i+1)
            if(maxval(dat1(1:2)).gt.1.e-10) call pgline(2,xx(i:i+1),dat1(1:2))  !Only plot when one of them != 0
         end do
      end do !j

@@ -2,6 +2,11 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   156: AstroFloyd, 08/04/2011
+     - Finally fixed the bug that wouldn't allow plotting a log(t_f-t) structure plot:
+       - dat(), not xx(),yy(), is passed to plt_convection(), which not logged
+       - call it dat0(), copy it to dat() and log when necessary
+   
    155: AstroFloyd, 23/03/2011
      - Added intent statements and Doxygen comments
      

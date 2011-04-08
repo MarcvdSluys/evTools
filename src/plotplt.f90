@@ -887,7 +887,7 @@ program plotplt
      
      !Convection plot - replots axes at the end:
      !call plt_convection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
-     call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
+     call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)), vx, lgx,lgy, ymin,ymax, nhp(pl),hp(pl,:),hlp,hlbl)
      call pgsci(2)
   end if
   
