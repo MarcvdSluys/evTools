@@ -130,7 +130,7 @@ program plotplt
   !Allocate arrays:
   npl = max(nf,nl)
   
-  allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
+  allocate(dat(npl,nvar,nmax))
   allocate(n(npl), strmdls(npl,nmax))
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))
   allocate(hp(npl,1000), nhp(npl))
@@ -148,6 +148,7 @@ program plotplt
   verbose = 1
   if(plot.eq.7) verbose = 0
   if(verbose.eq.1) write(6,*)
+  allocate(datf(nvar,nmax))
   do f=1,nf
      if(verbose.eq.1) write(6,'(A)', advance='no')' Reading file '//trim(fnames(f))//':'
      call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  !Use unit 10

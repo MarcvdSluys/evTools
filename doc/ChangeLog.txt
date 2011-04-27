@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   158: AstroFloyd, 27/04/2011
+     - Fixed small bug in array allocation when continously updating a plot with plotplt
+     
    157: AstroFloyd, 08/04/2011
      - Changed type of lgx,lgy from integer to logical
      
