@@ -193,7 +193,16 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(150) = 'E\dbind\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
   pglabels(151) = 'E\dtot\u (GM\d\(2281)\u\u2\dR\d\(2281)\u\u-1\d)'
   
-  defvar(101:151) = 1
+  pglabels(152) = 'E\dbind,env,grav\u + E\dbind,env,int\u (10\u40\d erg)'
+  pglabels(153) = 'E\dbind,env,recom\u + E\dbind,env,H2ass\u (10\u40\d erg)'
+  pglabels(154) = 'E\dbind,env,grav\u / E\dbind,env,int\u'
+  pglabels(155) = 'E\dbind,env,recom\u / E\dbind,env,H2ass\u'
+  pglabels(156) = 'E\dbind,env,grav+int\u / E\dbind,env,recom+H2ass\u'
+  
+  pglabels(157) = '\(2137)\denv,gr\u'      ! lambda_env,gr  !'E\dbind,env,grav\u / GMM\denv\u/R'  
+  pglabels(158) = '\(2137)\denv,gr+in\u'   ! lambda_env,gr+int
+  
+  defvar(101:158) = 1
   
   
   !Special plots:
@@ -359,6 +368,15 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(150) = 'Ebind'
   asclabels(151) = 'Etot'
   
+  asclabels(152) = 'Ebind_grav_int'
+  asclabels(153) = 'Ebind_recom_H2ass'
+  asclabels(154) = 'Ebind_grav_o_int'
+  asclabels(155) = 'Ebind_recom_o_H2ass'
+  asclabels(156) = 'Ebind_grav_int_o_recom_H2ass'
+  
+  asclabels(157) = 'Ebind_grav_o_GMM_R'
+  asclabels(158) = 'Ebind_grav_int_o_GMM_R'
+
   
   
   asclabels(201) = 'HRD'
@@ -617,18 +635,18 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   85: Eb,int       90: Rhe                                                             '
   write(6,'(A)')'                                                                                        ' 
   write(6,'(A)')'  Derived variables:                                                                    '
-  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R    151: E_tot   '  
-  write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin '  
-  write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      '
-  write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      '
-  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin             '
-  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot       '
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb       '
-  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin       '
+  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '  
+  write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
+  write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
+  write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
+  write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
+  write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr/GMM/R'
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gi/GMM/R'
   write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       '
-  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind       '
-  write(6,'(A)')'                                                                                        '
-  write(6,'(A)')'  Special plots:                                                                        '
+  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     '
+  write(6,'(A)')'                                                                                                 '
+  write(6,'(A)')'  Special plots:                                                                                 '
   if(nf.eq.1) then
      write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
      write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
@@ -1005,6 +1023,27 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   ! 151: E_tot = E_so + E_bind (G Mo^2 / Ro):
   dat(151,1:n) = dat(149,1:n) + dat(150,1:n)
   
+  
+  ! 152: E_bind_env_grav + E_bind_env_int (10^40 erg)
+  dat(152,1:n) = dat(84,1:n) + dat(85,1:n)
+  
+  ! 153: E_bind_env_recom + E_bind_int_H2ass (10^40 erg)
+  dat(153,1:n) = dat(86,1:n) + dat(87,1:n)
+  
+  ! 154: E_bind_env_grav / E_bind_env_int
+  dat(154,1:n) = dat(84,1:n) / dat(85,1:n)
+  
+  ! 155: E_bind_env_recom / E_bind_int_H2ass
+  dat(155,1:n) = dat(86,1:n) / dat(87,1:n)
+  
+  ! 156: (E_bind_env_grav + E_bind_env_int) / (E_bind_env_recom + E_bind_int_H2ass)
+  dat(156,1:n) = dat(152,1:n) / dat(153,1:n)
+  
+  ! 157: lambda_env,gr = GMMenv/R / E_bind_env_grav 
+  dat(157,1:n) = dat(141,1:n) / dat(84,1:n)
+  
+  ! 158: lambda_env,gr+int =  GMMenv/R / (E_bind_env_grav+E_bind_env_int)
+  dat(158,1:n) = dat(141,1:n) / dat(152,1:n)
   
   
   

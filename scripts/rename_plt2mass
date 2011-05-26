@@ -1,0 +1,19 @@
+#!/bin/bash
+
+##  rename_plt2mass
+##  Rename a .plt output file from ev to the initial mass of the primary,
+##  e.g. 012.34Mo.plt
+##  AF, 8/4/2011
+
+
+for infile in `ls *.plt1`
+do
+    
+    mass=`head -2 ${infile} |tail -1 |awk '{printf "%06.2lf\n", $4}'`
+    outfile="${mass}Mo.plt1"
+    
+    echo "${infile}  ->  ${outfile}"
+    mv -f ${infile} ${outfile}
+    
+done
+

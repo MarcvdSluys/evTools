@@ -2,6 +2,10 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   159: AstroFloyd, 26/05/2011
+     - Plotplt: added variables 152-158 for envelope binding energy
+     - Added rename_plt2mass to svn
+     
    158: AstroFloyd, 27/04/2011
      - Fixed small bug in array allocation when continously updating a plot with plotplt
      
