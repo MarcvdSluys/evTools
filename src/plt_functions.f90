@@ -199,7 +199,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(155) = 'E\dbind,env,recom\u / E\dbind,env,H2ass\u'
   pglabels(156) = 'E\dbind,env,grav+int\u / E\dbind,env,recom+H2ass\u'
   
-  pglabels(157) = '\(2137)\denv,gr\u'      ! lambda_env,gr  !'E\dbind,env,grav\u / GMM\denv\u/R'  
+  pglabels(157) = '\(2137)\denv,gr\u'      ! lambda_env,gr
   pglabels(158) = '\(2137)\denv,gr+in\u'   ! lambda_env,gr+int
   
   defvar(101:158) = 1
@@ -374,8 +374,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(155) = 'Ebind_recom_o_H2ass'
   asclabels(156) = 'Ebind_grav_int_o_recom_H2ass'
   
-  asclabels(157) = 'Ebind_grav_o_GMM_R'
-  asclabels(158) = 'Ebind_grav_int_o_GMM_R'
+  asclabels(157) = 'lambda_grav'
+  asclabels(158) = 'lambda_grint'
 
   
   
@@ -641,8 +641,8 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
   write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
   write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr/GMM/R'
-  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gi/GMM/R'
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr'
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in'
   write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       '
   write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     '
   write(6,'(A)')'                                                                                                 '
