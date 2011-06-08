@@ -195,9 +195,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   pglabels(152) = 'E\dbind,env,grav\u + E\dbind,env,int\u (10\u40\d erg)'
   pglabels(153) = 'E\dbind,env,recom\u + E\dbind,env,H2ass\u (10\u40\d erg)'
-  pglabels(154) = 'E\dbind,env,grav\u / E\dbind,env,int\u'
-  pglabels(155) = 'E\dbind,env,recom\u / E\dbind,env,H2ass\u'
-  pglabels(156) = 'E\dbind,env,grav+int\u / E\dbind,env,recom+H2ass\u'
+  pglabels(154) = '|E\dbind,env,grav\u / E\dbind,env,int\u|'
+  pglabels(155) = '|E\dbind,env,recom\u / E\dbind,env,H2ass\u|'
+  pglabels(156) = '|E\dbind,env,grav+int\u / E\dbind,env,recom+H2ass\u|'
   
   pglabels(157) = '\(2137)\denv,gr\u'      ! lambda_env,gr
   pglabels(158) = '\(2137)\denv,gr+in\u'   ! lambda_env,gr+int
@@ -1031,13 +1031,13 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(153,1:n) = dat(86,1:n) + dat(87,1:n)
   
   ! 154: E_bind_env_grav / E_bind_env_int
-  dat(154,1:n) = dat(84,1:n) / dat(85,1:n)
+  dat(154,1:n) = abs(dat(84,1:n) / dat(85,1:n))
   
   ! 155: E_bind_env_recom / E_bind_int_H2ass
-  dat(155,1:n) = dat(86,1:n) / dat(87,1:n)
+  dat(155,1:n) = abs(dat(86,1:n) / dat(87,1:n))
   
   ! 156: (E_bind_env_grav + E_bind_env_int) / (E_bind_env_recom + E_bind_int_H2ass)
-  dat(156,1:n) = dat(152,1:n) / dat(153,1:n)
+  dat(156,1:n) = abs(dat(152,1:n) / dat(153,1:n))
   
   ! 157: lambda_env,gr = GMMenv/R / E_bind_env_grav 
   dat(157,1:n) = dat(141,1:n) / dat(84,1:n)

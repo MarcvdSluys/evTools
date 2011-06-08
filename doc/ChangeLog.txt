@@ -2,6 +2,12 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   160: AstroFloyd, 08/06/2011
+     - Plotplt:
+       - replace Ebind contribution ratios by their absolute values
+       - fix memory allocation when reading different model
+       - fix double-axes plotted for logarithmic Kippenhahn plot
+       
    159: AstroFloyd, 26/05/2011
      - Plotplt: added variables 152-158 for envelope binding energy
      - Added rename_plt2mass to svn

@@ -132,7 +132,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   integer :: plconv,plsmcv,plnuc,plcb,ib,ibold,nz,dib,ch
   real :: xx(nmax),xx2(2),y(nmax),yy2(2),zonex(4),zoney(3,4),zoney1(4),zoney2(2),dat1(nmax)
   real :: ch0, dat(nvar,nmax)
-  character :: hlbls*(5)
+  character :: hlbls*(5), boxx*(19),boxy*(19)
   
   
   plconv = 1  !Plot convection
@@ -155,7 +155,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   y(1:n) = dat(4,1:n)
   call pgline(n,xx(1:n),y(1:n))
   
-  ch = 1 !Plot hatches
+  ch = 1 ! Plot hatches
   if(ch.eq.1) then
      call pgsls(4)
      call pgslw(1)
@@ -440,7 +440,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   end if !if(ch.eq.1)
   
   
-  !Plot outlines
+  ! Plot outlines:
   !call pgsci(14)
   !do j=63,68
   !   do i=1,n
@@ -463,7 +463,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
      end do !j
   end if
   
-  !Plot core boundaries:
+  ! Plot core boundaries:
   if(plcb.eq.1) then
      call pgslw(3)
      call pgsls(1)
@@ -477,13 +477,17 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   end if
   
   
-  !Set original styles and colours:
+  ! Set original styles and colours:
   call pgsci(ci0)
   call pgslw(lw0)
   call pgsch(ch0)
   
-  !Replot axes:
-  call pgbox('BCTS',0.0,0,'BCTS',0.0,0)
+  ! Replot axes:
+  boxx = 'BCNTS'
+  boxy = 'BCNTS'
+  if(lgx) boxx = 'BCLNTS'
+  if(lgy) boxy = 'BCLNTS'
+  call pgbox(trim(boxx),0.0,0,trim(boxy),0.0,0)
   
 end subroutine plt_convection
 !***********************************************************************************************************************************

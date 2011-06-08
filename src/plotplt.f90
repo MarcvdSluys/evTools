@@ -108,10 +108,10 @@ program plotplt
   
   
   plot = 0
-  xwini = 1  !Number of X window to try first
+  xwini = 1  ! Number of X window to try first
 5 continue
   
-  !Search for input files in current dir:
+  ! Search for input files in current dir:
   nf = command_argument_count()
   if(nf.ge.1.and.plot.eq.0) then
      do f=1,nf
@@ -121,13 +121,13 @@ program plotplt
   else
      !fname = findfile('*.plt*') !Match string
      !if(fname(1:10).eq.'          ') goto 9999
-     call findfiles('*.plt*',nfmax,0,fnames,nf)   !all=0
+     call findfiles('*.plt*',nfmax,0,fnames,nf)   ! all=0
      if(nf.le.0) goto 9999
   end if
   plot = 1
   
   
-  !Allocate arrays:
+  ! Allocate arrays:
   npl = max(nf,nl)
   
   allocate(dat(npl,nvar,nmax))
@@ -135,7 +135,7 @@ program plotplt
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))
   allocate(hp(npl,1000), nhp(npl))
   
-  !Get the labels for the plot axes; defvar = 0 for non-defined variables:
+  ! Get the labels for the plot axes; defvar = 0 for non-defined variables:
   call getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   
@@ -997,7 +997,10 @@ program plotplt
   if(plot.eq.2) goto 37
   if(plot.eq.3) goto 70
   if(plot.eq.6) goto 7
-  if(plot.eq.8) goto 5
+  if(plot.eq.8) then
+     deallocate(dat, n,strmdls, xx,yy,miny,excly, hp,nhp)
+     goto 5
+  end if
   if(plot.eq.9) goto 501
   
   if(plot.eq.4) then  !Select region
