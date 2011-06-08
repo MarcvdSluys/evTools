@@ -2,14 +2,21 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
-   160: AstroFloyd, 08/06/2011
-     - Plotplt:
+   162: AstroFloyd, 08/06/2011
+     - plotmdl: added read_chosen_mdl()
+     - Added plotmdln_new.f90 to start using mdl_functions
+     
+   161: AstroFloyd, 08/06/2011
+     - plotplt:
        - replace Ebind contribution ratios by their absolute values
        - fix memory allocation when reading different model
        - fix double-axes plotted for logarithmic Kippenhahn plot
        
+   160: AstroFloyd, 01/06/2011
+     - plotplt: renamed variables 157, 158
+     
    159: AstroFloyd, 26/05/2011
-     - Plotplt: added variables 152-158 for envelope binding energy
+     - plotplt: added variables 152-158 for envelope binding energy
      - Added rename_plt2mass to svn
      
    158: AstroFloyd, 27/04/2011

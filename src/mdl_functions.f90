@@ -26,7 +26,7 @@ module mdl_data
   save
   
   ! Constants:
-  integer, parameter :: nn=2001, nq=400  ! nn: max number of lines, nq: max number of columns
+  integer, parameter :: nn=501, nq=400  ! nn: max number of lines, nq: max number of columns
   
   integer :: nc, nmsh, nv, nm
   integer :: pxnr(nq), pxin(nq)
@@ -67,15 +67,15 @@ subroutine compute_mdl_variables(dat)
   do i=1,nm
      dat(201,i) = dble(i)
   end do
-  dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 !Nabla_rad
+  dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 ! Nabla_rad
   !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
   dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
-  dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     !M/M*
-  dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   !R/R*
-  dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 !C/O
-  dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 !Ne/O
-  dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  !Ugr + Uint  
-  dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            !Mean free path = 1/(rho * kappa)
+  dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     ! M/M*
+  dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   ! R/R*
+  dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 ! C/O
+  dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 ! Ne/O
+  dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  ! Ugr + Uint  
+  dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            ! Mean free path = 1/(rho * kappa)
   if(pxin(31).ne.0) then
      dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
      pxnr(209) = 209
@@ -215,8 +215,10 @@ end subroutine compute_mdl_variables
   
 !***********************************************************************************************************************************
 !> \brief  Read all structure models in the file and display main properties
+!!
 !! \param infile  Name of the .mdl[12] input file
 !! \retval nblk   Number of stellar-structure blocks in the file
+
 subroutine list_mdl_models(infile,nblk)
   use constants
   use mdl_data
@@ -254,6 +256,10 @@ subroutine list_mdl_models(infile,nblk)
      pxnr(1:nc)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
   end if
   
+  if(nmsh.eq.0) then ! Then post-2005 version output
+     rewind(10)
+  end if
+  
   write(6,*)''
   write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
@@ -272,7 +278,7 @@ subroutine list_mdl_models(infile,nblk)
         exit block !EOF
      end if
      if(io.gt.0) then  !Error
-        write(0,'(A,I5,A,/)')'2  Error reading first line (header) of model',bl,', aborting...'
+        write(0,'(A,I5,A,/)')'2  Error reading first line (header) of model block',bl,', aborting...'
         close(10)
         stop
      end if
@@ -285,6 +291,7 @@ subroutine list_mdl_models(infile,nblk)
      be = 0.
      be1 = 0.
      
+     if(nmsh.eq.0) nmsh = 199
      mesh: do mp=1,nmsh
         read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
              mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
@@ -322,16 +329,16 @@ subroutine list_mdl_models(infile,nblk)
         if(mhe.eq.0.0.and.hh.gt.0.1) mhe = mm
         if(mco.eq.0.0.and.hhe.gt.0.1) mco = mm
         
-        !Calculate V.K. of the envelope
+        ! Calculate V.K. of the envelope:
         if(mp.gt.2.and.hh.gt.0.1) then
            vk = vk + (mm-mm1)*rr**2
-           be = be + g*(mm-mm1)*mm1/rr*5.6847e15 !In 10^40 erg
+           be = be + g*(mm-mm1)*mm1/rr*5.6847e15    ! in 10^40 erg
         end if
         if(mp.gt.2.and.hh.gt.0.001) then
-           be1 = be1 + g*(mm-mm1)*mm1/rr*5.6847e15 !In 10^40 erg
+           be1 = be1 + g*(mm-mm1)*mm1/rr*5.6847e15  ! in 10^40 erg
         end if
         
-        mm1 = mm !Remember the previous value
+        mm1 = mm ! Remember the previous value
      end do mesh !do mp=1,nmsh
      
      vk = vk/((m1-mhe)*r1**2)   
@@ -540,9 +547,11 @@ end subroutine print_mdl_details
 
 
 !***********************************************************************************************************************************
-!> \brief  Open a .mdl[12] file and read the first blk models 
+!> \brief  Open a .mdl[12] file and read the first blk models without storing the data
+!!
 !! \param infile   Name of the input file
-!! \param blk      Number of the stellar-structure block to display
+!! \param blk      Number of the stellar-structure blocks to read
+
 subroutine read_first_mdls(infile,blk)
   use mdl_data
   
@@ -569,8 +578,12 @@ subroutine read_first_mdls(infile,blk)
      nc = 21
   end if
   
+  if(nmsh.eq.0) then ! Then post-2005 version output
+     rewind(10)
+  end if
+  
   ! Read file, upto chosen model (blk-1)
-  if(blk.ne.1) then
+  if(blk.gt.1) then
      do bl=1,blk
         read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
         if(io.ne.0) then
@@ -579,6 +592,7 @@ subroutine read_first_mdls(infile,blk)
            stop
         end if
         
+        if(nmsh.eq.0) nmsh = 199
         do mp=1,nmsh
            !read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
            read(10,*,iostat=io) tmpstr
@@ -599,6 +613,55 @@ subroutine read_first_mdls(infile,blk)
   
 end subroutine read_first_mdls
 !***********************************************************************************************************************************
+
+
+!***********************************************************************************************************************************
+!> \brief  Read the chosen structure model from an open .mdl[12] file
+!!
+!! \param infile   Name of the input file
+!! \param blk      Number of the stellar-structure block to display
+
+subroutine read_chosen_mdl(mdl,age,dat)
+  use kinds, only: double
+  use mdl_data
+  
+  implicit none
+  integer, intent(out) :: mdl
+  real(double), intent(out) :: age, dat(nq,nn)
+  
+  integer :: i,io,bl,mp
+  real(double) :: dat1(nq)
+  
+  read(10,'(I6,1x,E16.9)',iostat=io) mdl,age
+  if(io.ne.0) then
+     write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
+     close(10)
+     stop
+  end if
+  
+  if(nmsh.eq.0) nmsh = 199
+  do mp=1,nm
+     
+     read(10,*,iostat=io) (dat1(i),i=1,nc)  ! gfortran reports a read error when the number is smaller or larger than the accuracy
+     dat(1:nc,mp) = dat1(1:nc)
+     
+     if(io.ne.0) then  !Error/EOF
+        close(10)
+        if(io.lt.0) then
+           write(6,'(A,/)')'  Program finished'  !EOF
+        else
+           write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+           print*,real(dat1(1:nc))
+        end if
+        stop
+     end if
+     
+  end do !mp
+  
+end subroutine read_chosen_mdl
+!***********************************************************************************************************************************
+
+
 
 
 !***********************************************************************************************************************************

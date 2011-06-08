@@ -17,7 +17,9 @@
 ! <http://www.gnu.org/licenses/>.
 
 
+!***********************************************************************************************************************************
 !> \brief Plot the data in the *.mdl[12] output files of ev
+
 program plotmdl  
   use kinds
   use constants
@@ -25,7 +27,7 @@ program plotmdl
   
   implicit none
   integer :: nr,mdl,nx,ny,nsel,io,xwini,pgopen
-  real(double) :: dat1(nq)
+  !real(double) :: dat1(nq)
   
   real(double) :: dat(nq,nn),age
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
@@ -37,7 +39,7 @@ program plotmdl
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
-  !Set constants:
+  ! Set constants:
   call setconstants()
   write(6,*)
   call print_code_version(6)  !To screen
@@ -59,10 +61,12 @@ program plotmdl
   call set_mdl_labels()
   
   
-  !Read current path and use it as plot title
 3 continue
+  
+  ! Read current path and use it as plot title:
   write(title,'(A)')trim(workdir)
   
+  ! Get filename:
   if(command_argument_count().eq.1) then
      call get_command_argument(1,fname)
   else
@@ -75,9 +79,6 @@ program plotmdl
   
 4 continue
   call list_mdl_models(trim(fname),nblk)
-  
-6 format (I6,1x,E16.9)
-  
   
   if(nblk.eq.1) then
      blk = 1 
@@ -96,7 +97,7 @@ program plotmdl
   
   
   
-  !Read file, upto chosen model (blk-1)
+  ! Read file, upto chosen model (blk-1):
 25 continue
   
   
@@ -106,25 +107,10 @@ program plotmdl
   
   
   !***   READ CHOSEN STRUCTURE MODEL
-  read(10,6,iostat=io) mdl,age
-  if(io.ne.0) then
-     write(6,'(A,/)')'  Error reading first line of block, aborting...'
-     close(10)
-     stop
-  end if
-  do j=1,nm
-     read(10,*,iostat=io) (dat1(i),i=1,nc)  !Gfortran reports a read error when the number is smaller or larger than the accuracy
-     dat(1:nc,j) = dat1(1:nc)
-     if(io.ne.0) then
-        print*,'  Error reading line',j-1,' of the selected block, aborting...'
-        close(10)
-        print*,real(dat1(1:nc))
-        stop
-     end if
-  end do
+  call read_chosen_mdl(mdl,age,dat)
   close(10)
   
-  !Add file name and model number to plot title
+  ! Add file name and model number to plot title
   write(title,'(A,I6)')trim(title)//'/'//trim(fname),mdl
   
   
@@ -141,7 +127,7 @@ program plotmdl
   write(6,*)''
   
   
-  nr = 4 !Number of variable columns
+  nr = 4 ! Number of variable columns
   ii = ceiling(real(nc)/real(nr)) !Number of rows
   write(6,'(A)')' Variables:                         0: Quit                   ' 
   do i=1,ii
@@ -156,7 +142,7 @@ program plotmdl
   end do
   
   
-  !Print derived variables, from number 201 on:
+  ! Print derived variables, from number 201 on:
   write(6,'(A)')'                                                              '
   write(6,'(A)')'  Derived variables:                                          '
   
@@ -174,7 +160,7 @@ program plotmdl
   end do
   
   
-  !Print special variables, from number 301 on:
+  ! Print special variables, from number 301 on:
   write(6,'(A)')'                                                              '
   write(6,'(A)')'  Special plots:                                          '
   
