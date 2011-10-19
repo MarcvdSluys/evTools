@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   165: AstroFloyd, 19/10/2011
+     - Make sure the code compiles with g95 (even if it can't run)
+     
    164: AstroFloyd, 19/10/2011
      - plotplt: 
        - t-t_final (var 133): start at 10^3 years iso 10^4 years
