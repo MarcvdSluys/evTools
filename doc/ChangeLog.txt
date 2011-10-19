@@ -2,6 +2,14 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
    
+   164: AstroFloyd, 19/10/2011
+     - plotplt: 
+       - t-t_final (var 133): start at 10^3 years iso 10^4 years
+       - add companion labels (*1/*2) to legend
+     - mdl:
+       - BUGFIX: read_first_mdls(): read file if blk.gt.0, not .gt.1
+       - add dummy variable blk to read_chosen_mdl()
+       
    163: AstroFloyd, 19/10/2011
      - Updated CMake, using options from CMakeFiles
      

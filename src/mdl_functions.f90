@@ -374,9 +374,11 @@ end subroutine list_mdl_models
 
 !***********************************************************************************************************************************
 !> \brief  Print the details of model blk in file infile to screen
+!!
 !! \param infile  Name of the input file
 !! \param blk     Number of the stellar-structure block to display
 !! \param svblk   Save block or not (in/out)
+
 subroutine print_mdl_details(infile,blk,svblk)
   use constants
   use mdl_data
@@ -550,7 +552,7 @@ end subroutine print_mdl_details
 !> \brief  Open a .mdl[12] file and read the first blk models without storing the data
 !!
 !! \param infile   Name of the input file
-!! \param blk      Number of the stellar-structure blocks to read
+!! \param blk      Number of the stellar-structure blocks to read (and ignore)
 
 subroutine read_first_mdls(infile,blk)
   use mdl_data
@@ -565,6 +567,7 @@ subroutine read_first_mdls(infile,blk)
   
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
+  rewind(10)
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver
   if(io.ne.0) then
      write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
@@ -582,8 +585,8 @@ subroutine read_first_mdls(infile,blk)
      rewind(10)
   end if
   
-  ! Read file, upto chosen model (blk-1)
-  if(blk.gt.1) then
+  ! Read file, upto chosen model:
+  if(blk.gt.0) then
      do bl=1,blk
         read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
         if(io.ne.0) then
@@ -621,20 +624,21 @@ end subroutine read_first_mdls
 !! \param infile   Name of the input file
 !! \param blk      Number of the stellar-structure block to display
 
-subroutine read_chosen_mdl(mdl,age,dat)
+subroutine read_chosen_mdl(mdl,age,dat,blk)
   use kinds, only: double
   use mdl_data
   
   implicit none
   integer, intent(out) :: mdl
   real(double), intent(out) :: age, dat(nq,nn)
+  integer, intent(in) :: blk
   
-  integer :: i,io,bl,mp
+  integer :: i,io,mp
   real(double) :: dat1(nq)
   
   read(10,'(I6,1x,E16.9)',iostat=io) mdl,age
   if(io.ne.0) then
-     write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
+     write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',blk,', aborting...'
      close(10)
      stop
   end if
@@ -650,7 +654,7 @@ subroutine read_chosen_mdl(mdl,age,dat)
         if(io.lt.0) then
            write(6,'(A,/)')'  Program finished'  !EOF
         else
-           write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+           write(0,'(A,2(I5,A),/)')'  Error reading model',blk-1,'line',mp-1,', aborting...'  ! Read error
            print*,real(dat1(1:nc))
         end if
         stop

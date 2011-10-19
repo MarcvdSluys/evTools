@@ -57,7 +57,7 @@ program plotplt
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(29)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
-  character :: pstitle*(99),asclx*(99),ascly*(99)
+  character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3)
   logical :: ex,prleg, hlp,hlbl
   
   !Set constants:
@@ -854,25 +854,28 @@ program plotplt
   end if
   
   
-  !Print legenda:
+  ! Print legenda:
   call pgsch(sch)
   if(prleg) then
-     if(nf.eq.1) then  !Then multi-variable plot
+     if(nf.eq.1) then  ! Then multi-variable plot
         do pl=1,npl
            col = colours(mod(pl-1,ncolours)+1)
            call pgsci(col)
            call pgmtext('RV',0.5,real(20-pl)/20.,0.,trim(leglbl(pl)))
         end do !pl
         
-     else  !Then: multi-file plot
+     else  ! Then: multi-file plot
         do f=1,nf
            fname = fnames(f)
            lng = len_trim(fname)
+           complbl = '   '
+           if(fname(lng:lng).eq.'1') complbl = ' *1'
+           if(fname(lng:lng).eq.'2') complbl = ' *2'
            if(fname(lng:lng).eq.'1'.or.fname(lng:lng).eq.'2') lng = lng-1
            lng = lng-4 !get rid of '.plt'
            col = colours(mod(f-1,ncolours)+1)
            call pgsci(col)
-           call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,fname(1:lng))
+           call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,trim(fname(1:lng))//trim(complbl))
         end do
      end if
      call pgsci(1)

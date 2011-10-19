@@ -635,7 +635,7 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   85: Eb,int       90: Rhe                                                             '
   write(6,'(A)')'                                                                                        ' 
   write(6,'(A)')'  Derived variables:                                                                    '
-  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '  
+  write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '
   write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
   write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
@@ -953,7 +953,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(132,1:n) = Zsurf(1:n)
   
   ! 133: t - t_final, avoid by setting dat(,1) = dat(,2):
-  dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d4)
+  dat(133,1:n) = dat(2,n) - min(dat(2,1:n), dat(2,n)-1.d3)
   
   ! 134: Critical (Keplerian) omega:
   !dat(134,1:n) = sqrt(2*g*dat(4,1:n)*m0/(dat(8,1:n)*r0)**3)/day

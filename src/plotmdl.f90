@@ -107,7 +107,7 @@ program plotmdl
   
   
   !***   READ CHOSEN STRUCTURE MODEL
-  call read_chosen_mdl(mdl,age,dat)
+  call read_chosen_mdl(mdl,age,dat,blk)
   close(10)
   
   ! Add file name and model number to plot title
@@ -437,6 +437,7 @@ program plotmdl
      end do
      call pgbegin(1,trim(psname)//'/cps',1,1)
      call pgpap(10.5,0.68)                    ! Make it fit on letter paper
+     !call pgpap(10.5,0.25)                    ! Tailored ratio
      call pgslw(2)
   else ! Screen
      io = 0
