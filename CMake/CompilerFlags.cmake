@@ -1,10 +1,6 @@
 # Compiler flags for Fortran compilers
 
 
-# Default for all compilers:
-set(MOD_FLAGS "${INCLUDE_FLAGS}" )
-
-
 # Get compiler name:
 get_filename_component( Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME )
 
@@ -14,8 +10,8 @@ get_filename_component( Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME )
 ######################################################################################################################################################
 if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   
-  #set( CMAKE_Fortran_FLAGS_ALL "-std=f2008 -fall-intrinsics -pedantic" )               # v.4.4
-  set( CMAKE_Fortran_FLAGS_ALL "-fwhole-file -std=f2008 -fall-intrinsics -pedantic" )  # v.4.5
+  set( CMAKE_Fortran_FLAGS_ALL "-std=f2008 -fall-intrinsics -pedantic" )               # v.4.4
+  #set( CMAKE_Fortran_FLAGS_ALL "-fwhole-file -std=f2008 -fall-intrinsics -pedantic" )  # v.4.5
   set( CMAKE_Fortran_FLAGS "-pipe -funroll-all-loops" )
   set( CMAKE_Fortran_FLAGS_RELEASE "-pipe -funroll-all-loops" )
   set( CMAKE_Fortran_FLAGS_DEBUG "-g -ffpe-trap=zero,invalid -fsignaling-nans -fbacktrace" )
@@ -35,8 +31,8 @@ if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   endif( WANT_STATIC )
   
   if( WANT_CHECKS )
-    #set( CHECK_FLAGS "-O0 -fbounds-check -ffpe-trap=zero,invalid -fsignaling-nans -fbacktrace" ) # v.4.4
-    set( CHECK_FLAGS "-O0 -fcheck=all -ffpe-trap=zero,invalid -fsignaling-nans -fbacktrace" )  # From v.4.5
+    set( CHECK_FLAGS "-O0 -fbounds-check -ffpe-trap=zero,invalid -fsignaling-nans -fbacktrace" ) # v.4.4
+    #set( CHECK_FLAGS "-O0 -fcheck=all -ffpe-trap=zero,invalid -fsignaling-nans -fbacktrace" )  # v.4.5
   else( WANT_CHECKS )
     set( CHECK_FLAGS "-O2" )
   endif( WANT_CHECKS )
@@ -44,6 +40,9 @@ if( Fortran_COMPILER_NAME MATCHES "gfortran" )
   if( WANT_WARNINGS )
     set( WARN_FLAGS "-Wall -Wextra" )
   endif( WANT_WARNINGS )
+  if( STOP_ON_WARNING )
+    set( WARN_FLAGS "${WARN_FLAGS} -Werror" )
+  endif( STOP_ON_WARNING )
   
   if( WANT_LIBRARY )
     set( LIB_FLAGS "-fPIC -g" )
@@ -70,9 +69,12 @@ elseif( Fortran_COMPILER_NAME MATCHES "g95" )
   
   if( WANT_WARNINGS )
     # 112: var is set but not used,  136: module variable not used,  140: precision loss,  165: implicit interface
-    set( WARN_FLAGS "-Wall -Wextra -Werror -Wno=112,136,140,165" )
-    #set( WARN_FLAGS "-std=f2003 ${WARN_FLAGS}" )
+    set( WARN_FLAGS "-Wall -Wextra -Wno=112,136,140,165" )
+    set( WARN_FLAGS "-std=f2003 ${WARN_FLAGS}" )
   endif( WANT_WARNINGS )
+  if( STOP_ON_WARNING )
+    set( WARN_FLAGS "${WARN_FLAGS} -Werror" )
+  endif( STOP_ON_WARNING )
   
   if( WANT_LIBRARY )
     set( LIB_FLAGS "-fPIC -g" )
@@ -87,7 +89,7 @@ elseif( Fortran_COMPILER_NAME MATCHES "g95" )
 elseif( Fortran_COMPILER_NAME MATCHES "ifort" )
   
   
-  set( CMAKE_Fortran_FLAGS_ALL "-stand f03 -diag-disable 6894 -nogen-interfaces" )
+  set( CMAKE_Fortran_FLAGS_ALL "-nogen-interfaces" )
   set( CMAKE_Fortran_FLAGS "-vec-guard-write -fpconstant -funroll-loops -align all -ip" )
   set( CMAKE_Fortran_FLAGS_RELEASE "-vec-guard-write -fpconstant -funroll-loops -align all -ip" )
   set( CMAKE_Fortran_FLAGS_DEBUG "-g -traceback" )
@@ -121,7 +123,8 @@ elseif( Fortran_COMPILER_NAME MATCHES "ifort" )
   endif( WANT_CHECKS )
   
   if( WANT_WARNINGS )
-    set( WARN_FLAGS "-warn all" )
+     #8291: W>=D+7 in esW.D format
+    set( WARN_FLAGS "-warn all -stand f03  -diag-disable 8291" )
   endif( WANT_WARNINGS )
   
   if( WANT_LIBRARY )
@@ -160,7 +163,7 @@ endif( Fortran_COMPILER_NAME MATCHES "gfortran" )
 #  Put everything together:
 ######################################################################################################################################################
 
-set( USER_FLAGS "${LIB_FLAGS} ${CHECK_FLAGS} ${WARN_FLAGS} ${SSE_FLAGS} ${IPO_FLAGS} ${OPENMP_FLAGS} ${STATIC_FLAGS} ${MOD_FLAGS} ${PACKAGE_FLAGS}" )
+set( USER_FLAGS "${LIB_FLAGS} ${CHECK_FLAGS} ${WARN_FLAGS} ${SSE_FLAGS} ${IPO_FLAGS} ${OPENMP_FLAGS} ${STATIC_FLAGS} ${INCLUDE_FLAGS} ${PACKAGE_FLAGS}" )
 
 set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS_ALL} ${CMAKE_Fortran_FLAGS} ${USER_FLAGS}" )
 set( CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_ALL} ${CMAKE_Fortran_FLAGS_RELEASE} ${USER_FLAGS}" )

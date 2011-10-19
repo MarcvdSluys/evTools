@@ -9,13 +9,13 @@
 ##
 
 
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 # Set build type. Do this *before* we set the project name:
 if( NOT CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo Profile."
-    FORCE)
+    FORCE )
 endif( NOT CMAKE_BUILD_TYPE )
 set( CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "internal" )
 
@@ -24,9 +24,12 @@ set( CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "internal" )
 project( evTools Fortran )
 
 
+# Use CPack for packaging:
+#include( CPack )
+#set( CPACK_INSTALL_PREFIX_PATH ${CMAKE_INSTALL_PREFIX_PATH} )
+
 # Search in the CMake/ directory for CMake modules:
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake )
-
 
 # Various compile/optimisation options that we may want to enable:
 include( SetCompileOptions )
@@ -34,8 +37,6 @@ include( SetCompileOptions )
 
 # Place the products in their directories:
 get_filename_component( Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME )
-#set( MODULE_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/include/libTheSky/${Fortran_COMPILER_NAME}" )
-#set( LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/usr/lib" )
 set( MODULE_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/mod" )
 set( LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/usr/lib" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/bin" )
@@ -46,11 +47,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/bin" )
 find_package( PGPLOT REQUIRED )
 find_package( LibSUFR REQUIRED )
 
-#include_directories( ${PGPLOT_INCLUDE_DIRS} )
-#include_directories( ${LibSUFR_INCLUDE_DIRS} )
-#set( Fortran_INCLUDE_OPTIONS "-I${LibSUFR_INCLUDES} -I${PGPLOT_INCLUDES}" )
-#set( INCLUDE_FLAGS "-I${LibSUFR_INCLUDES} -I${PGPLOT_INCLUDES}" )  # transferred to CompilerFlags
-set( INCLUDE_FLAGS "-I${LibSUFR_INCLUDES}" )  # transferred to CompilerFlags; no PGPlot modules used
+set( INCLUDE_FLAGS "-I${LibSUFR_INCLUDES}" )  # will be transferred to CompilerFlags
 
 
 
