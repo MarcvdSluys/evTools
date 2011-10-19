@@ -107,7 +107,7 @@ program plotmdl
   
   
   !***   READ CHOSEN STRUCTURE MODEL
-  call read_chosen_mdl(mdl,age,dat,blk)
+  call read_chosen_mdl(blk, mdl,age,dat)
   close(10)
   
   ! Add file name and model number to plot title

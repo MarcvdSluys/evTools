@@ -621,17 +621,20 @@ end subroutine read_first_mdls
 !***********************************************************************************************************************************
 !> \brief  Read the chosen structure model from an open .mdl[12] file
 !!
-!! \param infile   Name of the input file
-!! \param blk      Number of the stellar-structure block to display
+!! \param  blk  Number of the stellar-structure block to display
+!!
+!! \retval mdl  Model number of the selected model
+!! \retval age  Age of the selected model
+!! \retval dat  Data for the selected model
 
-subroutine read_chosen_mdl(mdl,age,dat,blk)
+subroutine read_chosen_mdl(blk, mdl,age,dat)
   use kinds, only: double
   use mdl_data
   
   implicit none
+  integer, intent(in) :: blk
   integer, intent(out) :: mdl
   real(double), intent(out) :: age, dat(nq,nn)
-  integer, intent(in) :: blk
   
   integer :: i,io,mp
   real(double) :: dat1(nq)

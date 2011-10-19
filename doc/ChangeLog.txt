@@ -1,11 +1,18 @@
 
   ChangeLog for the eggleton-tools repository.  
-  Please log (major) changes here (and add a short comment using svn commit -m 'Comment').
+  Please log (major) changes here (and add a short comment using bzr commit -m 'Comment').
+  
    
-   165: AstroFloyd, 19/10/2011
+******************************************************************************************
+   167: AstroFloyd, 19/10/2011:  *** SF v0.1.2 ***
+     - Converted revision numbers from svn to bzr (i.e., bzr# = svn# + 1) in ChangeLog.txt
+     - Updated Doxygen comments
+     - Updated Doxyfile
+     
+   166: AstroFloyd, 19/10/2011  (was svn rev.165)
      - Make sure the code compiles with g95 (even if it can't run)
      
-   164: AstroFloyd, 19/10/2011
+   165: AstroFloyd, 19/10/2011
      - plotplt: 
        - t-t_final (var 133): start at 10^3 years iso 10^4 years
        - add companion labels (*1/*2) to legend
@@ -13,72 +20,76 @@
        - BUGFIX: read_first_mdls(): read file if blk.gt.0, not .gt.1
        - add dummy variable blk to read_chosen_mdl()
        
-   163: AstroFloyd, 19/10/2011
+   164: AstroFloyd, 19/10/2011
      - Updated CMake, using options from CMakeFiles
      
-   162: AstroFloyd, 08/06/2011
+   163: AstroFloyd, 08/06/2011
      - plotmdl: added read_chosen_mdl()
      - Added plotmdln_new.f90 to start using mdl_functions
      
-   161: AstroFloyd, 08/06/2011
+   162: AstroFloyd, 08/06/2011
      - plotplt:
        - replace Ebind contribution ratios by their absolute values
        - fix memory allocation when reading different model
        - fix double-axes plotted for logarithmic Kippenhahn plot
        
-   160: AstroFloyd, 01/06/2011
+   161: AstroFloyd, 01/06/2011
      - plotplt: renamed variables 157, 158
      
-   159: AstroFloyd, 26/05/2011
+   160: AstroFloyd, 26/05/2011
      - plotplt: added variables 152-158 for envelope binding energy
      - Added rename_plt2mass to svn
      
-   158: AstroFloyd, 27/04/2011
+   159: AstroFloyd, 27/04/2011
      - Fixed small bug in array allocation when continously updating a plot with plotplt
      
-   157: AstroFloyd, 08/04/2011
+   158: AstroFloyd, 08/04/2011
      - Changed type of lgx,lgy from integer to logical
      
-   156: AstroFloyd, 08/04/2011
+   157: AstroFloyd, 08/04/2011
      - Finally fixed the bug that wouldn't allow plotting a log(t_f-t) structure plot:
-       - dat(), not xx(),yy(), is passed to plt_convection(), which not logged
+       - dat(), not xx(),yy(), is passed to plt_convection(), which is not logged
        - call it dat0(), copy it to dat() and log when necessary
    
-   155: AstroFloyd, 23/03/2011
+   156: AstroFloyd, 23/03/2011
      - Added intent statements and Doxygen comments
      
-   154: AstroFloyd, 23/03/2011
+   155: AstroFloyd, 23/03/2011
      - Minor updates
      
-   153: AstroFloyd, 22/03/2011
+   154: AstroFloyd, 22/03/2011
      - Added the 9 new plotting variables that are in the plt[12] file since yesterday 
        (Rev.1373) + 2 older ones:
        - 82-83: Pc; Prot,c; 84-87: BE terms, 88-89: Sc; S@T=1e5K; 90-91: Rhe; Rco, 92: STRMDL
      - Always read .plt[12] files unformatted
      - Use Ebind rather than Ubind consistently
      
-   152: AstroFloyd, 22/03/2011
+   153: AstroFloyd, 22/03/2011
      - plotplt: added variable 223: Winds
      - plt_functions: clean up/comment
+    
      
-   150: AstroFloyd, 11/01/2011
+******************************************************************************************
+   152: AstroFloyd, 11/01/2011:  *** SF v0.1.1 ***
+        
+   151: AstroFloyd, 11/01/2011
      - Updated Doxyfile
      
-   149: AstroFloyd, 11/01/2011
+   150: AstroFloyd, 11/01/2011
      - Updated CMake files for release: 
        - added option to switch off code_version generation
        - remove plotpltn/p
        - add installation
      - Updated nagfor file
      
-   148: AstroFloyd, 09/01/2011
+   149: AstroFloyd, 09/01/2011
      - Added CMake files
      - plotpltp: use constants
    
-   147: AstroFloyd, 07/01/2011
+   148: AstroFloyd, 07/01/2011
      - Move unused (NRF) code from functions.f90 to unused_code.f90
      
-   146: AstroFloyd, 07/01/2011
+   147: AstroFloyd, 07/01/2011
      - Updated copyright to 2011
      - Updated (Doxygen) comments: file and routine titles everywhere(?)
      - Removed old Fortran intrinsics (dlog)
@@ -86,193 +97,193 @@
      - In plotplt, made hlp,hlbl logical iso character (y/n)
      - Added intent()
           
-   145: AstroFloyd, 06/01/2011
+   146: AstroFloyd, 06/01/2011
      - Updated code to compile with gfortran 4.5, F2008 standard
      - Updated Makefile
    
-   144: AstroFloyd, 15/11/2010
+   145: AstroFloyd, 15/11/2010
      - plotplt: fix automatic plot limits 1.e-20 should have been -1.e20 -> -huge
      - findplt: use command-line arguments only; print syntax and exit otherwise
    
-   143: AstroFloyd, 25/08/2010
+   144: AstroFloyd, 25/08/2010
      - added global variable libdir and read it from settings file
      
-   142: AstroFloyd, 23/08/2010
+   143: AstroFloyd, 23/08/2010
      - plotmdl: clean up a little
      
-   141: AstroFloyd, 23/08/2010
+   142: AstroFloyd, 23/08/2010
      - plotmdl: 
        - allow graphs with different x-variables (nx=1 or nx=ny only)
        - added special plots 304,305 for E,J_post-ce
        
-   140: AstroFloyd, 23/08/2010
+   141: AstroFloyd, 23/08/2010
      - plotmdl: added variables 127-131 for gamma-CE
      
-   139: AstroFloyd, 23/08/2010
+   140: AstroFloyd, 23/08/2010
      - plotmdl: 
        - variables 220-223: a,P,E,J orb for r(m)=Rrl
        - variables 224-227: a,P,E,J orb for alpha-CE
        - allow plot styles: lines, dots or both
      - plotplt: make plot styles compatible with plotmdl
      
-   138: AstroFloyd, 23/08/2010
+   139: AstroFloyd, 23/08/2010
      - plotmdl: compute secondary variables in new routine compute_mdl_variables()
    
-   137: AstroFloyd, 23/08/2010
+   138: AstroFloyd, 23/08/2010
      - plotmdl: make array dat() of type double
      
-   136: AstroFloyd, 22/08/2010
+   137: AstroFloyd, 22/08/2010
      - Consistently use ev for the code name and evTools for the package name
    
-   135: AstroFloyd, 21/08/2010
+   136: AstroFloyd, 21/08/2010
      - created read_first_mdls from code in print_mdl_details
      - call it from there and from plotmdl
      
-   134: AstroFloyd, 21/08/2010
+   135: AstroFloyd, 21/08/2010
      - move mdl functions from listmdl to mdl_functions
    
-   133: AstroFloyd, 21/08/2010
+   134: AstroFloyd, 21/08/2010
      - Use the Fortran 2003 standard
     
-   128-132: AstroFloyd, 21/08/2010
+   129-133: AstroFloyd, 21/08/2010
      - combine code from plot and tools in ../src/
    
-   125-127: AstroFloyd, 21/08/2010
+   126-128: AstroFloyd, 21/08/2010
      - create mdl_functions; move code from plotmdl to mdl_functions and plotfunctions
     
-   124: AstroFloyd, 21/08/2010 
+   125: AstroFloyd, 21/08/2010 
      - plotmdl: 
        - create post-CE comparison plot; fixed some comparison-plot issues
        - list comparison plots in menu, use nrs 300+
        - added variable names to output file name
      
-   123: AstroFloyd, 20/08/2010
+   124: AstroFloyd, 20/08/2010
      - plotmdl: 
        - added var 220: post-CE period, based on r(m)=R_rl (M2=M1)
        - added var 221: post-CE period, based on alpha-CE  (M2=M1)
        
-   122: AstroFloyd, 20/08/2010
+   123: AstroFloyd, 20/08/2010
      - plotmdl: 
        - moved vars 216-218 to 217-219
        - added var 216: dM, fixed vars 217-218 (Ebind)
        
-   121: AstroFloyd, 20/08/2010
+   122: AstroFloyd, 20/08/2010
      - plotplt:
        - Redefined var 130: J_spin -> w_spin
        - Added vars 142-143: Mbin, a_orb
        - Added vars 144-146: J_orb, J_spin, J_tot
        - Added vars 147-151: E_orb, E_spin, E_so, E_bind, E_tot
        
-   120: AstroFloyd, 07/08/2010
+   121: AstroFloyd, 07/08/2010
      - plotplt:
        - Don't plot logarithmic Teff axis in HRD for small T ranges
        - Add more info in title of auto-update plot
    
-   119: AstroFloyd, 30/07/2010
+   120: AstroFloyd, 30/07/2010
      - Add variable 141 to plotplt: GMMenv/R
      
-   118: AstroFloyd, 24/07/2010
+   119: AstroFloyd, 24/07/2010
       - listmod: add jf, doxygen comments
       
-   114-117: AstroFloyd, 22/07/2010
+   115-118: AstroFloyd, 22/07/2010
       - listmdl: remove some archaic Fortran, stick things into subroutines
    
-   112: AstroFloyd, 22/07/2010
+   113: AstroFloyd, 22/07/2010
       - listmod: automatically recognise whether DH is stored, and, if so,
                  allow to read and copy it
 		 
-   111: AstroFloyd, 22/07/2010
+   112: AstroFloyd, 22/07/2010
       - listmod: stick things into subroutines
    
-   110: AstroFloyd, 22/07/2010
+   111: AstroFloyd, 22/07/2010
       - listmod: remove much archaic Fortran
     
-   109: AstroFloyd, 21/07/2010
+   110: AstroFloyd, 21/07/2010
      - Update documentation/comments
      
-   108: AstroFloyd, 21/07/2010
+   109: AstroFloyd, 21/07/2010
      - Added Doxyfile
      - Added/improved comments in function files
    
-   107: AstroFloyd, 21/07/2010
+   108: AstroFloyd, 21/07/2010
      - Put line colours in the module constants
      
-   106: AstroFloyd, 21/07/2010
+   107: AstroFloyd, 21/07/2010
      - Add white_bg to module constants and settings file (integer -> logical)
      - Updated print_code_version() in Makefile
    
-   101-4: AstroFloyd, 21/07/2010
+   102-5: AstroFloyd, 21/07/2010
      - Try to fix mod and obj directories
     
-   100: AstroFloyd, 21/07/2010
+   101: AstroFloyd, 21/07/2010
      - Updated Makefile
     
-    99: AstroFloyd, 20/07/2010
+   100: AstroFloyd, 20/07/2010
       - Update listmod: give the output file the model number as name; allow >999 blocks
     
-    98: AstroFloyd, 20/07/2010
+    99: AstroFloyd, 20/07/2010
       - Change source code to free format, .f90
     
-    95: AstroFloyd, 20/07/2010
+    96: AstroFloyd, 20/07/2010
       - updates in (plt_)functions from plot rev.90-92
       
-    94: AstroFloyd, 14/07/2010
+    95: AstroFloyd, 14/07/2010
      - Minor update in Makefile to report program version
     
-    93: AstroFloyd, 14/07/2010
+    94: AstroFloyd, 14/07/2010
      - Fixed some 'uninitialised variable' compiler warnings
     
-    92: AstroFloyd, 14/07/2010
+    93: AstroFloyd, 14/07/2010
      - Updated Makefile
      - Small changes in settings file
      - Small bugfix
     
-    91: AstroFloyd, 13/07/2010
+    92: AstroFloyd, 13/07/2010
      - Store screen size + dpi in settings file iso paper size/ratio
     
-    90: AstroFloyd, 13/07/2010
+    91: AstroFloyd, 13/07/2010
      - Added routine eggletonplot_settings() to read write a settings file in the user's
        home directory
     
-    89: AstroFloyd, 13/07/2010
+    90: AstroFloyd, 13/07/2010
      - Plotplt: added variables 139,140: Mzams-M, (Mzams-M)/Mzams
      
-    88: AstroFloyd, 13/07/2010
+    89: AstroFloyd, 13/07/2010
       - Updated Makefile
       - small bugfix
     
-    86: AstroFloyd, 13/07/2010
+    87: AstroFloyd, 13/07/2010
       - Most of these changes in functions were done in ../plot/
         - Introduced module kinds
         - Moved routines from functions.f to new file plt_functions.f
       - plt2dat.f: added output for Lennart
     
-    85: AstroFloyd, 13/07/2010
+    86: AstroFloyd, 13/07/2010
      - Renamed module basic to kinds
      
-    83: AstroFloyd, 25/06/2010
+    84: AstroFloyd, 25/06/2010
      - Compile code with NAG Fortran, update Makefile
     
-    78: AstroFloyd, 12/04/2010
+    79: AstroFloyd, 12/04/2010
      - Minor updates in plotplt
     
-    77: AstroFloyd, 12/04/2010
+    78: AstroFloyd, 12/04/2010
      - Added code version
     
-    76: AstroFloyd, 12/04/2010
+    77: AstroFloyd, 12/04/2010
      - Moved source, object and module files to subdirs
     
-    75: AstroFloyd, 12/04/2010
+    76: AstroFloyd, 12/04/2010
      - Renamed plotplt_new.f to plotplt.f
     
-    74: AstroFloyd, 11/04/2010
+    75: AstroFloyd, 11/04/2010
      - Added old plotplt.f as plotplt_r066.f
      - Added nagfor.f with dummy routines
      
-    73: AstroFloyd, 11/04/2010
+    74: AstroFloyd, 11/04/2010
      - Everything in plot/ compiles with nagfor (warnings off)
     
-    72: AstroFloyd, 11/04/2010
+    73: AstroFloyd, 11/04/2010
      - developing plotplt_new: fixing details
        - added entry in Makefile
        - use both pglabels and asclabels, use the latter for PS file names and title
@@ -280,143 +291,143 @@
          - plotting where structure models were stored now works
        - print legenda when using multiple input files
            
-    71: AstroFloyd, 11/04/2010
+    72: AstroFloyd, 11/04/2010
      - developing plotplt_new: replaced f,nf with pl,npl in most places
      - adapted getpltlabels(), printpltvarlist() and pltconvection()
      - most things seem to work
      
-    70: AstroFloyd, 11/04/2010
+    71: AstroFloyd, 11/04/2010
      - developing plotplt_new: added a dimension to variables (e.g. dat(:,:) -> dat(:,:,:))
      - to do: distinguish between multi-variable (ny) and multi-file plots (nf)
     
-    69: AstroFloyd, 11/04/2010
+    70: AstroFloyd, 11/04/2010
      - added plotplt_new.f to create a version of plotplt.f that can read multiple
        files (and will replace plotpltn.f)
     
-    68: AstroFloyd, 11/04/2010
+    69: AstroFloyd, 11/04/2010
      - moved routines to read plt files from functions.f plt_functions.f
     
-    67: AstroFloyd, 11/04/2010
+    68: AstroFloyd, 11/04/2010
      - plotplt.f:
        - remapped variables 82-100 to 116-134
        - moved around variables >200
        - renamed AM H -> J
        - use defvar to determine whether a variable is defined
     
-    66: AstroFloyd, 11/04/2010
+    67: AstroFloyd, 11/04/2010
      - plotplt.f:
        - use proper colours and legenda for multi-variable plots
        - added variable 115: R/Rzams
        - swapped vars 202/203 (now convection and dH/dt plots)
        - set screen dimensions for ThinkPad
     
-    64: AstroFloyd, 01/04/2010
+    65: AstroFloyd, 01/04/2010
      - remove string length from findfile(s)(), quit_program()
      - plotplt: plot x on log scale iso log(x)
          
-    63: AstroFloyd, 01/04/2010
+    64: AstroFloyd, 01/04/2010
       - Removed string length as an argument in findfile(s) and quit_program
       - selplt.f: sorted Reddy&Lambert data
       - functions.f: 
         - get hostname,user,uid from environment
       	- created set_plotpltn_labels(), set_PGPS_title()
     
-    62: AstroFloyd, 02/03/2010
+    63: AstroFloyd, 02/03/2010
      - plotpltn: plot x on log scale iso log(x)
      - read some more environment variables
     
-    61: AstroFloyd, 08/02/2010
+    62: AstroFloyd, 08/02/2010
      - plotplt: fixed bug in and enhanced Kippenhahn diagram
     
-    60: AstroFloyd, 02/02/2010
+    61: AstroFloyd, 02/02/2010
       - plotpltn:
         - moved label definition to subroutine set_plotpltn_labels in functions.f
 	- added ascii labels to pgplot labels
 	- added var 91: Reimers ratio
 	- rename file and plot PS-title to include variable names with set_PGPS_title
     
-    59: AstroFloyd, 05/01/2010
+    60: AstroFloyd, 05/01/2010
       - fixed small bug in findplt: iout undefined when calling w/o command-line options
       
-    58: AstroFloyd, 05/01/2010
+    59: AstroFloyd, 05/01/2010
       - added convert_initdat.f, plt2dat.f
       - findplt: read unformatted, allows reading CVS plt output
     
-    56: AstroFloyd, 17/11/2009
+    57: AstroFloyd, 17/11/2009
       - updated/changed NRF functions to put online
       - added copyright labels
       - made compatible with gfortran-4.4
       - updated Makefiles
     
-    54: AstroFloyd, 27/10/2009
+    55: AstroFloyd, 27/10/2009
       - made routines compatible with gfortran 4.3
       - added plotpltp.f
       - some f77->f90 notation conversion
     
-    53: AstroFloyd, 27/10/2009
+    54: AstroFloyd, 27/10/2009
      - made code compatible with gfortran and ifort v.11
      - listmod: more screen output
      - updated doc/Makefile
          
-    52: AstroFloyd, 03/07/2009
+    53: AstroFloyd, 03/07/2009
       - Read homedir from environment variable $HOME using getenv()
     
-    51: AstroFloyd, 01/07/2009
+    52: AstroFloyd, 01/07/2009
       - ~/bin/lib/ -> ~/usr/lib/
     
-    50: AstroFloyd, 01/07/2009
+    51: AstroFloyd, 01/07/2009
      - ~/bin/lib/ -> ~/usr/lib/
     
-    48: AstroFloyd, 22/05/2009
+    49: AstroFloyd, 22/05/2009
       - plotplt(n): read input files unformatted
       - plotpltn (hardcoded in plotpltn.f):
         - use custom colours (ncolours/colours() array)
 	- switch 'legend' on/off (prlegend)
       
-    46: AstroFloyd, 19/05/2009
+    47: AstroFloyd, 19/05/2009
       - plotmdl: started implementation of Ubind
       - plotplt: fixed bug in plotting which structure models were saved
       - functions: added indexx (real/dble), bin_data_1d and time_stamp (for phist)
 		   added polint (d) for gw_evolve
     
-    33: AstroFloyd, 09/03/2009
+    34: AstroFloyd, 09/03/2009
      - listmod and mergeplt should now be able to handle v.2005 output
      
-    29: AstroFloyd, 05/03/2009
+    30: AstroFloyd, 05/03/2009
       - plotmdl: 
         - added secondary variables mu, n, P_rad, P_gas, beta=P_rad/P_gas
 	      
-    28: AstroFloyd, 03/03/2009
+    29: AstroFloyd, 03/03/2009
       - added q_qrit and m_2,crit (for dynamical MT) to plotplt
       
-    26: AstroFloyd, 25/02/2009
+    27: AstroFloyd, 25/02/2009
      - updated listmdl, listmod, listplt for use with module constants and gfortran
     
-    25: AstroFloyd, 24/02/2009
+    26: AstroFloyd, 24/02/2009
       - take into account fully convective state when computing MB
       - added hardcoded parameter ncolours to plotpln.f
       
-    19: AstroFloyd, 17/02/2009
+    20: AstroFloyd, 17/02/2009
       - fixed autoupdate function in plotplt now that pgopen is used
       - fixed chosing 'zoom in' after eps file was written in plotplt(n)
       
-    17: AstroFloyd, 13/02/2009
+    18: AstroFloyd, 13/02/2009
       added lambda_env to plotplt(n)
 	
-    15: AstroFloyd, 11/02/2009
+    16: AstroFloyd, 11/02/2009
        plotplt:
         - add lambda_ce
 	- open next xwin if first is in use
 	    
-    14: AstroFloyd, 04/02/2009
+    15: AstroFloyd, 04/02/2009
      - some updates
      - added dat2plt, to convert output from a different evolution code to plt format
      
-     2: AstroFloyd, 16/01/2009
+     3: AstroFloyd, 16/01/2009
        Cleaning of files for compilation with -warn all and -check all:
        - stick things into arrays before calling pgline/pgpoly
        - remove unused variables
      
-     1: AstroFloyd, 16/01/2009
-     Initial import of eggleton tools
+     2: AstroFloyd, 16/01/2009
+     Initial import of eggleton tools (bzr rev.2 = svn rev.1)
      

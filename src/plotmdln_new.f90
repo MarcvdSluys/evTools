@@ -234,7 +234,7 @@ program plotmdln
   ! Read the models again:
   call read_first_mdls(fname,0)  ! Read header
   do bl = 1,nb
-     call read_chosen_mdl(mdl1,age1,dat1, bl)
+     call read_chosen_mdl(bl, mdl1,age1,dat1)
      mdl(bl) = mdl1
      age(bl) = age1
      dat(bl,:,:) = dat1(:,:)
