@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using bzr commit -m 'Comment').
   
+   166: AstroFloyd, 26/10/2011:
+     - Updated FindLibSUFR.cmake to default
+   
    168: AstroFloyd, 26/10/2011:
      - Updated CMakeLocations.cmake, FindPGPLOT.cmake to default
    
