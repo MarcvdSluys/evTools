@@ -2,6 +2,8 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using bzr commit -m 'Comment').
   
+   168: AstroFloyd, 26/10/2011:
+     - Updated CMakeLocations.cmake, FindPGPLOT.cmake to default
    
 ******************************************************************************************
    167: AstroFloyd, 19/10/2011:  *** SF v0.1.2 ***

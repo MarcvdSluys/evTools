@@ -31,6 +31,7 @@ project( evTools Fortran )
 # Search in the CMake/ directory for CMake modules:
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake )
 
+
 # Various compile/optimisation options that we may want to enable:
 include( SetCompileOptions )
 
@@ -58,10 +59,12 @@ include( FileList )
 include( CompilerFlags )
 
 
-# Create the file code_version.f90, which contains the svn version number and date:
+
+
+# Create the file code_version.f90, which contains the code revision number and date:
 if( CREATE_VERSION )
   
-  # SVN version generator:
+  # SVN/BZR version generator:
   ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_SOURCE_DIR}/src/code_version.f90
     COMMAND cd $(CMAKE_SOURCE_DIR)
