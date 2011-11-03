@@ -2,7 +2,14 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using bzr commit -m 'Comment').
   
-   166: AstroFloyd, 26/10/2011:
+   170: AstroFloyd, 03/11/2011:
+     - Updated CMake files to CMakeFiles rev.11:
+       - renamed CompilerFlags -> CompilerFlags_Fortran
+       - CompilerFlags_Fortran: introduce OPT variable
+       - FindLibSUFR: search for compiler-specific headers/libraries
+       - FindLibSUFR, FindPGPLOT: clearer Found messages
+     
+   169: AstroFloyd, 26/10/2011:
      - Updated FindLibSUFR.cmake to default
    
    168: AstroFloyd, 26/10/2011:
