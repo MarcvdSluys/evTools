@@ -202,7 +202,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(157) = '\(2137)\denv,gr\u'      ! lambda_env,gr
   pglabels(158) = '\(2137)\denv,gr+in\u'   ! lambda_env,gr+int
   
-  defvar(101:158) = 1
+  pglabels(159) = 'P\dorb\u (h)'           ! Porb in hours
+  pglabels(160) = 'P\dorb\u (m)'           ! Porb in minutes
+  
+  defvar(101:160) = 1
   
   
   !Special plots:
@@ -376,7 +379,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   asclabels(157) = 'lambda_grav'
   asclabels(158) = 'lambda_grint'
-
+  
+  asclabels(159) = 'Porb_hr'
+  asclabels(160) = 'Porb_mn'
+  
   
   
   asclabels(201) = 'HRD'
@@ -643,8 +649,8 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
   write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr'
   write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in'
-  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       '
-  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)'
+  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min)'
   write(6,'(A)')'                                                                                                 '
   write(6,'(A)')'  Special plots:                                                                                 '
   if(nf.eq.1) then
@@ -1044,6 +1050,10 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   ! 158: lambda_env,gr+int =  GMMenv/R / (E_bind_env_grav+E_bind_env_int)
   dat(158,1:n) = dat(141,1:n) / dat(152,1:n)
+  
+  ! 159, 160: Porb in hours and minutes
+  dat(159,1:n) = dat(28,1:n) * 24.
+  dat(160,1:n) = dat(28,1:n) * 1440.
   
   
   
