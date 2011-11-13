@@ -2,6 +2,9 @@
   ChangeLog for the eggleton-tools repository.  
   Please log (major) changes here (and add a short comment using bzr commit -m 'Comment').
   
+   172: AstroFloyd, 13/11/2011:
+     - Updated CMake files to CMakeFiles rev.21
+       
    171: AstroFloyd, 13/11/2011:
      - Plt: added variables 159, 160: Porb (hr), Porb (min)
      

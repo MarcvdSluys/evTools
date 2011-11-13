@@ -24,10 +24,6 @@ set( CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "internal" )
 project( evTools Fortran )
 
 
-# Use CPack for packaging:
-#include( CPack )
-#set( CPACK_INSTALL_PREFIX_PATH ${CMAKE_INSTALL_PREFIX_PATH} )
-
 # Search in the CMake/ directory for CMake modules:
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake )
 
@@ -39,7 +35,7 @@ include( SetCompileOptions )
 # Place the products in their directories:
 get_filename_component( Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME )
 set( MODULE_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/mod" )
-set( LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/usr/lib" )
+set( LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/usr/lib${LIB_SUFFIX}" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/usr/bin" )
 
 
