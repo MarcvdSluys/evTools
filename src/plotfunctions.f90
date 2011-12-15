@@ -522,7 +522,7 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   
   character :: hlbls*(5)
   
-  !Identify closest model
+  ! Identify closest model:
   xsel = 0.
   ysel = 0.
   write(6,'(A)')' Select a point in the graph and press "x" to finish'

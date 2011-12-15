@@ -65,9 +65,9 @@ subroutine compute_mdl_variables(dat)
   end do
   
   do i=1,nm
-     dat(201,i) = dble(i)
+     dat(201,i) = dble(i)     ! Mesh point (1 = centre)
+     dat(202,i) = dble(nm-i)  ! Reversed mesh point (1 = surface)
   end do
-  dat(202,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 ! Nabla_rad
   !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
   dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
   dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     ! M/M*
@@ -199,7 +199,10 @@ subroutine compute_mdl_variables(dat)
   end do
   
   pxnr(221:230) = (/221,222,223,224,225,226,227,228,229,230/)
-  pxnr(231:231) = (/231/)
+  
+  dat(232,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 ! Nabla_rad
+  
+  pxnr(231:232) = (/231,232/)
   
   
   if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
@@ -690,10 +693,10 @@ subroutine set_mdl_labels
   pxns(41:50) = [character(len=99) :: '...','LDRK','Enth','V^2','FAC','','','','','Rpp']
   pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
   
-  pxns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
+  pxns(201:210) = [character(len=99) :: 'Mesh pt','Rev mesh pt','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
   pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','a_rlof']
   pxns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
-  pxns(231:231) = [character(len=99) :: 'Jgce']
+  pxns(231:232) = [character(len=99) :: 'Jgce','Nrad']
   pxns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','CEEs','CEJs']
   
   !Names of the variables in px, to be used in output file name (no /.?*)
@@ -705,10 +708,10 @@ subroutine set_mdl_labels
   pxfns(41:50) = [character(len=99) :: '-','LDRK','Enth','V2','FAC','-','-','-','-','Rpp']
   pxfns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','-','-','-','-','N2']
   
-  pxfns(201:210) = [character(len=99) :: 'Mesh pt','Nrad','mM','rR','CO','NeO','Ugr-Uint','Mfp','Ndens','g']
+  pxfns(201:210) = [character(len=99) :: 'Mesh pt','Rev mesh pt','mM','rR','CO','NeO','Ugr-Uint','Mfp','Ndens','g']
   pxfns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','PrPg','dM','Ubst','Ubenv','Prho','arlof']
   pxfns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
-  pxfns(231:231) = [character(len=99) :: 'Jgce']
+  pxfns(231:232) = [character(len=99) :: 'Jgce','Nrad']
   pxfns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','EEPs','JEPs']
   
   !Axis labels, px numbers
@@ -767,7 +770,7 @@ subroutine set_mdl_labels
   
   
   labels(201) = '\u\(2263) centre\d    Mesh point    \usurface \(2261)'
-  labels(202) = '\(2266)\drad\u'
+  labels(202) = '\u\(2263) surface\d    Mesh point    \ucentre \(2261)'
   labels(203) = 'm/M\d*\u'
   labels(204) = 'r/R\d*\u'
   labels(205) = 'C/O'
@@ -802,12 +805,13 @@ subroutine set_mdl_labels
   labels(229) = 'P\dpost-\gg-CE\u (day)'                                                   ! Porb after \gamma CE
   labels(230) = 'E\dpost-\gg-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'                       ! Eorb after \gamma CE
   labels(231) = 'J\dpost-\gg-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'        ! Jorb after \gamma CE
+  labels(232) = '\(2266)\drad\u'
   
-  nv_der = 231 - 200  !Number of derived variables
+  nv_der = 232 - 200  ! Number of derived variables
   
   
   
-  !Special plots:
+  ! Special plots:
   labels(301) = 'Abundances'
   labels(302) = "\(2266)'s"
   labels(303) = 'P\dorb,post-CE\u (day)'

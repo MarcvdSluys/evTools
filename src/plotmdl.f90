@@ -30,12 +30,12 @@ program plotmdl
   !real(double) :: dat1(nq)
   
   real(double) :: dat(nq,nn),age
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x,xtmp,ytmp
   real :: xx(10,nn),yy(10,nn),xx1(nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
   character findfile*(99),fname*(99),rng,log,xwin*(19)
-  character :: lx*(99),ly*(99),fx*(99),fy*(99),title*(99),psname*(99)
+  character :: lx*(99),ly*(99), lxs(10)*(99),lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
@@ -218,6 +218,9 @@ program plotmdl
 37 continue 
   lx = labels(pxnr(vx))
   ly = labels(pxnr(vy))
+  lxs(1) = lx
+  lys(1) = ly
+  
   fx = pxfns(pxnr(vx))
   fy = pxfns(pxnr(vy))
   
@@ -238,6 +241,7 @@ program plotmdl
      ab = .true.
      vy = pxin(10)
      yy(1:7,1:nm) = real(dat(pxin(10):pxin(16),1:nm))
+     lys(1:7) = labels(pxnr(pxin(10):pxin(16)))
      ny = 7
   end if
   
@@ -246,9 +250,8 @@ program plotmdl
      nab = .true.
      vy = pxin(6)
      yy(1,1:nm) = real(dat(pxin(6),1:nm))    ! Nabla_ad
-     yy(2,1:nm) = real(dat(pxin(202),1:nm))  ! Nabla_rad
+     yy(2,1:nm) = real(dat(pxin(232),1:nm))  ! Nabla_rad
      yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
-     print*,pxin(6),pxin(7),pxin(202)
      ny = 3
   end if
   
@@ -408,12 +411,14 @@ program plotmdl
   
   
   
-  hmp = 0
-  if(vx.eq.201) then
-111  write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',nm,'): '
-     read*,hmp
-     if(hmp.gt.nm) goto 111
-     if(hmp.lt.1) hmp=0
+  hmp = -999
+  if(vx.eq.201.or.vx.eq.202) then
+     do while(hmp.lt.0.or.hmp.gt.nm)
+        write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',nm,'): '
+        read*,hmp
+        if(hmp.lt.1) hmp=0
+     end do
+     if(vx.eq.202) hmp = nm - hmp
   end if
   
   
@@ -469,6 +474,7 @@ program plotmdl
      call pgsvp(0.06,0.92,0.07,0.96)          ! Multiple lines; need room for legend on right-hand side
   end if
   
+  ! Plot axes and labels:
   call pgswin(xmin,xmax,ymin,ymax)
   if(log.eq.'n') call pgbox('BCNTS',0.0,0,'BCNTS',0.0,0)  !Use logarithmic axes rather than logarithmic variables
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
@@ -478,6 +484,7 @@ program plotmdl
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.4,0.5,0.5,ly)
   
+  ! Plot data lines or points:
   do i=1,ny
      col = colours(mod(i-1,ncolours)+1)
      call pgsci(col)
@@ -502,11 +509,19 @@ program plotmdl
   end do
   
   
+  ! Plot and print values for highlighted mesh points:
   call pgsch(1.5)
   call pgsci(8)
   if(hmp.ne.0) then
+     write(fmt,'(A,I3.3,A)')'(4x,A',maxval(len_trim(lys(1:ny))),',A,F15.5,ES15.4)'
      do i=1,ny
         call pgpoint(1,xx(1,hmp),yy(i,hmp),2)
+        xtmp = xx(1,hmp)
+        ytmp = yy(i,hmp)
+        if(log.eq.'x'.or.log.eq.'b') xtmp = 10.0**xtmp
+        if(log.eq.'y'.or.log.eq.'b') ytmp = 10.0**ytmp
+        if(i.eq.1) write(*,'(/,A,I4,A)')'  Variable value(s) for highlighted mesh point',nint(xtmp),':'
+        write(*,trim(fmt))trim(lys(i)),':',ytmp,ytmp
      end do
   end if
   call pgsci(1)
