@@ -86,7 +86,7 @@ add_executable( listplt  src/listplt.f90 ${evTools_std_files} )
 add_executable( makerun  src/makerun.f90 ${evTools_std_files} )
 add_executable( mergeplt  src/mergeplt.f90 ${evTools_std_files} )
 add_executable( plt2ce  src/plt2ce.f90 ${evTools_std_files} )
-add_executable( plt2dat  src/plt2dat.f90 ${evTools_std_files} )
+add_executable( plt2dat  src/plt2dat.f90 ${evTools_std_files} ${evTools_plt_files} )
 add_executable( plt2obs  src/plt2obs.f90 ${evTools_std_files} )
 add_executable( selplt  src/selplt.f90 ${evTools_std_files} ${evTools_plt_files} )
 

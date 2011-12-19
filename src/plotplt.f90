@@ -27,9 +27,9 @@
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
 
 program plotplt
-  use kinds
-  use constants
-  use ubvdata
+  use kinds, only: double,dbl
+  use constants, only: homedir,libdir, colours,ncolours,scrrat,scrsz,white_bg
+  use ubvdata, only: ubv
   
   implicit none
   integer,parameter :: nmax=10000,nvar=229,nc=81,nl=7,nfmax=50

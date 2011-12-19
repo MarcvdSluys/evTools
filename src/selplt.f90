@@ -21,7 +21,8 @@
 
 
 program selplt
-  use constants
+  use kinds, only: double
+  
   implicit none
   ! ndim is the number of dimensions of the conditions array (different variables, for AND), 
   ! ncondmax is the max number of conditions (for OR)

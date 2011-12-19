@@ -44,9 +44,10 @@ end module kinds
 !> \brief  Contains data to compute magnitudes and colours from L,T,g
 
 module ubvdata
-  use kinds
+  use kinds, only: double
   implicit none
   save
+  private :: double
   
   integer, parameter :: nzgr=9,ntgr=61,nggr=11
   real(double) :: zgr(nzgr),tgr(ntgr),ggr(nggr),ubv(8,nggr,ntgr,nzgr)
@@ -67,9 +68,10 @@ end module ubvdata
 !> \brief  Contains the 'constants' used in the evTools package
 
 module constants
-  use kinds
+  use kinds, only: double
   implicit none
   save
+  private :: double
   
   integer :: screen_dpi,screen_size_h,screen_size_v
   integer :: colours(29), ncolours
@@ -89,7 +91,11 @@ end module constants
 !> \brief  Define the 'constants' in the evTools package
 
 subroutine setconstants()
-  use constants
+  use constants, only: a_rad,amu,c,g,h_bar,h_p,k_b,m_h,sigma,  km,  l0,m0,r0
+  use constants, only: pi,pi2,tpi,c3rd, cursordown,cursorleft,cursorright,cursorup
+  use constants, only: day,yr, homedir,workdir,hostname,libdir,userid,username, colours,ncolours
+  use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg
+  
   implicit none
   
   ! ThinkPad, Gentoo with 1440x900:
@@ -177,8 +183,9 @@ end subroutine setconstants
 !! - UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
 
 subroutine lt2ubv(logl,logt,mass,logz,  mbol,bolc,mv,uminb,bminv,vminr,rmini)
-  use kinds
-  use ubvdata
+  use kinds, only: double
+  use ubvdata, only: ntgr,nggr,nzgr, tgr,ggr,zgr, ubv
+  
   implicit none
   real(double), intent(in) :: logl,logt,mass,logz
   real(double), intent(out) :: mbol,bolc,mv,uminb,bminv,vminr,rmini
@@ -237,7 +244,7 @@ end subroutine lt2ubv
 !> \brief  Determine the operating system type: 1-Linux, 2-MacOSX
 
 function getos()
-  use constants
+  use constants, only: homedir
   implicit none
   integer :: status,system,getos
   character :: ostype*(25)
@@ -260,7 +267,7 @@ end function getos
 !! \retval findfile  File name (if found)
 
 function findfile(match)
-  use constants
+  use constants, only: homedir
   implicit none
   character, intent(in) :: match*(*)
   integer, parameter :: maxfile=1000
@@ -326,7 +333,7 @@ end function findfile
 !! \retval nf      The actual number of files returned in fnames ( = min(number found, nff))
 
 subroutine findfiles(match,nff,all, fnames,nf)  
-  use constants
+  use constants, only: homedir
   implicit none
   character, intent(in) :: match*(*)
   integer, intent(in) :: nff,all
@@ -477,7 +484,8 @@ end function find_index
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
 
 subroutine locate(arr,narr,v, i)
-  use kinds
+  use kinds, only: double
+  
   implicit none
   integer, intent(in) :: narr
   real(double), intent(in) :: v,arr(narr)
@@ -516,8 +524,8 @@ end subroutine locate
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
 
 subroutine locater(rarr,narr,rv,i)
+  use kinds, only: double
   
-  use kinds
   implicit none
   integer, intent(in) :: narr
   real, intent(in) :: rarr(narr), rv
@@ -549,8 +557,9 @@ end subroutine locater
 !! \retval a2j   Orbital angular momentum (cgs)
 
 function a2j(m1,m2,a)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g,m0,r0
+  
   implicit none
   real(double), intent(in) :: m1,m2,a
   real(double) :: a2j
@@ -570,8 +579,9 @@ end function a2j
 !! \retval j2a   Orbital separation (Ro)
 
 function j2a(m1,m2,j)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g,m0,r0
+  
   implicit none
   real(double), intent(in) :: m1,m2,j
   real(double) :: j2a
@@ -592,8 +602,9 @@ end function j2a
 !! \retval p2j   Orbital angular momentum (cgs)
 
 function p2j(m1,m2,p)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g
+  
   implicit none
   real(double), intent(in) :: m1,m2,p
   real(double) :: p2j,a
@@ -614,8 +625,9 @@ end function p2j
 !! \retval j2p  Orbital period (s)
 
 function j2p(m1,m2,j)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g
+  
   implicit none
   real(double), intent(in) :: m1,m2,j
   real(double) :: j2p,a
@@ -636,8 +648,9 @@ end function j2p
 !! \retval a    Binary orbital separation (cm)
 
 subroutine p2a(mtot,p,a)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g,pi,c3rd
+  
   implicit none
   real(double), intent(in) :: mtot,p
   real(double), intent(out) :: a
@@ -656,8 +669,9 @@ end subroutine p2a
 !! \retval p     Binary period (s)
 
 subroutine a2p(mtot,a,p)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: g,pi
+  
   implicit none
   real(double), intent(in) :: mtot,a
   real(double), intent(out) :: p
@@ -677,8 +691,9 @@ end subroutine a2p
 !! \retval a2rl  Roche-lobe radius of star 1 (same unit as a)
 
 function a2rl(m1,m2,a)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: c3rd
+  
   implicit none
   real(double), intent(in) :: m1,m2,a
   real(double) :: a2rl,q
@@ -700,8 +715,9 @@ end function a2rl
 !! \retval rl2a  Orbital separation (same unit as rl1)
 
 function rl2a(m1,m2,rl1)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: c3rd
+  
   implicit none
   real(double), intent(in) :: m1,m2,rl1
   real(double) :: rl2a,q
@@ -722,7 +738,8 @@ end function rl2a
 !! \retval p2rl  Roche-lobe radius of star 1 (cm)
 
 function p2rl(m1,m2,p)
-  use kinds
+  use kinds, only: double
+  
   implicit none
   real(double), intent(in) :: m1,m2,p
   real(double) :: p2rl,a,a2rl
@@ -743,7 +760,8 @@ end function p2rl
 !! \retval rl2p  Orbital period (s)
 
 function rl2p(m1,m2,rl1)
-  use kinds
+  use kinds, only: double
+  
   implicit none
   real(double), intent(in) :: m1,m2,rl1
   real(double) :: rl2p,a,rl2a
@@ -839,7 +857,8 @@ end subroutine bin_data_1d
 !! \param os  Operating system: 1-Linux, 2-BSD/MacOS
 
 function time_stamp(os)
-  use kinds
+  use kinds, only: double
+  
   implicit none
   integer, intent(in) :: os
   real(double) :: time_stamp
@@ -899,7 +918,7 @@ end subroutine set_PGPS_title
 !> \brief  Read/create evTools settings file ~/.evTools
 
 subroutine evTools_settings()
-  use constants
+  use constants, only: homedir,libdir,screen_dpi,screen_size_h,screen_size_v,scrrat,scrsz,white_bg
   implicit none
   integer :: io,u
   logical :: ex

@@ -684,8 +684,8 @@ end subroutine printpltvarlist
 !! \retval version  Code-output version
 
 subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
-  use kinds
-  use constants
+  use kinds, only: double
+  
   implicit none
   integer, intent(in) :: u,nn,nvar,nc,verbose
   character, intent(in) :: fname*(*)
@@ -740,8 +740,9 @@ end subroutine readplt
 !! \retval dpdt     Pdot mode: 0: dJ/dt,  1: dP/dt,  2: timescales
 
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
-  use kinds
-  use constants
+  use kinds, only: double
+  use constants, only: pi,tpi, c,g, km,yr,day, l0,m0,r0
+  
   implicit none
   integer, intent(in) :: nn,nvar,n
   real(double), intent(inout) :: dat(nvar,nn)
