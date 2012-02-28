@@ -43,9 +43,9 @@ program plt2dat
   !sel(1:nsel) = (/1,2,28, 33/)
   
   ! Silvia: MB, 12/2011:
-  nsel = 13
-  !               t  Xc, Mc R,L,Te, Qconv Mconv RosNr Tet  Tet int/anal Pcr SillsMB
-  sel(1:nsel) = (/2, 56, 5, 8,9,10, 81,   118,  120,  25,  123,         121,122     /)
+  nsel = 12
+  !               t  Xc, Mc R,L,Te, Qconv RosNr Tet  Tet int/anal Pcr SillsMB
+  sel(1:nsel) = (/2, 56, 5, 8,9,10, 81,   120,  25,  123,         121,122     /)
   
   
   !Use the first nff files of *.plt1, *.plt or *.plt2:

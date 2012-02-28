@@ -869,7 +869,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   ! 118: Convective core boundary:
   do i=1,n
      dat(118,i) = 0.d0
-     if(dat(64,i).lt.0.d0) dat(118,i) = abs(dat(64,i))
+     if(dat(64,i).lt.0.d0 .and. abs(dat(64,i)).lt.dat(4,i)*0.99d0) dat(118,i) = abs(dat(64,i))
   end do
   
   ! 119: R/(dR/dt):
