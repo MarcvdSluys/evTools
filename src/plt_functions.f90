@@ -205,7 +205,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(159) = 'P\dorb\u (h)'           ! Porb in hours
   pglabels(160) = 'P\dorb\u (m)'           ! Porb in minutes
   
-  defvar(101:160) = 1
+  pglabels(161) = 'dlogR/dlogM'            ! zeta_*  = d(logR)/d(logM)
+  pglabels(162) = 'dlogRL/dlogM'           ! zeta_RL = d(logRL)/d(logM)
+  
+  defvar(101:162) = 1
   
   
   !Special plots:
@@ -382,6 +385,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   asclabels(159) = 'Porb_hr'
   asclabels(160) = 'Porb_mn'
+  
+  asclabels(161) = 'Zeta_st'
+  asclabels(162) = 'Zeta_RL'
   
   
   
@@ -640,19 +646,23 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   84: Eb,grav      89: S1e5K                                                           '
   write(6,'(A)')'   85: Eb,int       90: Rhe                                                             '
   write(6,'(A)')'                                                                                        ' 
-  write(6,'(A)')'  Derived variables:                                                                    '
+  write(6,'(A)')'  Derived variables:                                                                                             '
   write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '
   write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
   write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
   write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
   write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr'
-  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in'
-  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)'
-  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min)'
-  write(6,'(A)')'                                                                                                 '
-  write(6,'(A)')'  Special plots:                                                                                 '
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr     '
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in  '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)  '
+  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min) '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'   161: zeta_*                                                                                                   '
+  write(6,'(A)')'   162: zeta_RL                                                                                                  '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'  Special plots:                                                                                                 '
   if(nf.eq.1) then
      write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
      write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
