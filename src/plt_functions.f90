@@ -205,8 +205,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(159) = 'P\dorb\u (h)'           ! Porb in hours
   pglabels(160) = 'P\dorb\u (m)'           ! Porb in minutes
   
-  pglabels(161) = 'dlogR/dlogM'            ! zeta_*  = d(logR)/d(logM)
-  pglabels(162) = 'dlogRL/dlogM'           ! zeta_RL = d(logRL)/d(logM)
+  pglabels(161) = '\(0632)\d*\u  = dlogR\d*\u/dlogM'    ! zeta_*  = d(logR)/d(logM)
+  pglabels(162) = '\(0632)\dRL\u = dlogR\dRL\u/dlogM'   ! zeta_RL = d(logRL)/d(logM)
   
   defvar(101:162) = 1
   
@@ -1066,7 +1066,21 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(159,1:n) = dat(28,1:n) * 24.
   dat(160,1:n) = dat(28,1:n) * 1440.
   
-  
+  ! 161, 162: zeta_*, zeta_rl
+  do i=2,n-1
+     if(dat(4,i+1).eq.dat(4,i-1)) then
+        dat(161,i) = dat(161,i-1)
+        dat(162,i) = dat(162,i-1)
+     else
+        ! dlogR/dlogM = M/R dR/dM
+        dat(161,i) = dat(4,i)/dat(8,i)   * (dat(8,i+1)   - dat(8,i-1))   / (dat(4,i+1) - dat(4,i-1))  ! zeta_*  =   dlogR/dlogM
+        dat(162,i) = dat(4,i)/dat(127,i) * (dat(127,i+1) - dat(127,i-1)) / (dat(4,i+1) - dat(4,i-1))  ! zeta_rl = dlogRrl/dlogM
+     end if
+  end do
+  dat(161,1) = dat(161,2)
+  dat(162,1) = dat(162,2)
+  dat(161,n) = dat(161,n-1)
+  dat(162,n) = dat(162,n-1)
   
   
   
