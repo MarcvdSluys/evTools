@@ -230,7 +230,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
      pglabels(221) = 'dJ\dorb\u/dt'
      pglabels(222) = 'dM/dt (M\d\(2281)\u/yr)'
      pglabels(223) = 'dM/dt (M\d\(2281)\u/yr)'
-     defvar(221:223) = 1
+     pglabels(224) = '\(0632)'
+     defvar(221:224) = 1
   end if
   
   
@@ -403,6 +404,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(221) = 'dJdts'
   asclabels(222) = 'Mdots'
   asclabels(223) = 'Winds'
+  asclabels(224) = 'Zetas'
   !asclabels(22) = ''
   
   
@@ -667,7 +669,7 @@ subroutine printpltvarlist(nf)
      write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
      write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
      write(6,'(A)')'                           213: Surface abundances    223: Winds                        '
-     write(6,'(A)')'                           214: Tmax abundances                                         '
+     write(6,'(A)')'                           214: Tmax abundances       224: Zetas                                 '
      write(6,'(A)')'                           215: Core abundances                                         '
   else
      write(6,'(A)')'   201: HR Diagram                                                                      '
