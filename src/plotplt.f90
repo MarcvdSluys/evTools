@@ -855,7 +855,7 @@ program plotplt
   
   
   ! Print legenda:
-  call pgsch(sch)
+  call pgsch(sch*0.5)
   if(prleg) then
      if(nf.eq.1) then  ! Then multi-variable plot
         do pl=1,npl
