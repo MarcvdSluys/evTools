@@ -268,6 +268,14 @@ program plotplt
         leglbl(1:3) = (/'dM\dwind\u','dM\dR\u   ','dM\dRlk\u '/)
         prleg = .true.
      end if
+     if(vy.eq.224) then ! Zetas = dlogR/dlogMs
+        npl = 2
+        yy(1,1:nmax) = real(dat(f,161,1:nmax))
+        yy(2,1:nmax) = real(dat(f,162,1:nmax))
+        leglbl(1:2) = (/'\(0632)\d*\u ','\(0632)\dRL\u'/)
+        prleg = .true.
+     end if
+     
      if(vy.eq.211) then !Timescales
         tscls = 1
         npl = 5

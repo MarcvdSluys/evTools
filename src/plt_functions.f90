@@ -205,7 +205,10 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(159) = 'P\dorb\u (h)'           ! Porb in hours
   pglabels(160) = 'P\dorb\u (m)'           ! Porb in minutes
   
-  defvar(101:160) = 1
+  pglabels(161) = '\(0632)\d*\u  = dlogR\d*\u/dlogM'    ! zeta_*  = d(logR)/d(logM)
+  pglabels(162) = '\(0632)\dRL\u = dlogR\dRL\u/dlogM'   ! zeta_RL = d(logRL)/d(logM)
+  
+  defvar(101:162) = 1
   
   
   !Special plots:
@@ -227,7 +230,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
      pglabels(221) = 'dJ\dorb\u/dt'
      pglabels(222) = 'dM/dt (M\d\(2281)\u/yr)'
      pglabels(223) = 'dM/dt (M\d\(2281)\u/yr)'
-     defvar(221:223) = 1
+     pglabels(224) = '\(0632)'
+     defvar(221:224) = 1
   end if
   
   
@@ -383,6 +387,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(159) = 'Porb_hr'
   asclabels(160) = 'Porb_mn'
   
+  asclabels(161) = 'Zeta_st'
+  asclabels(162) = 'Zeta_RL'
+  
   
   
   asclabels(201) = 'HRD'
@@ -397,6 +404,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(221) = 'dJdts'
   asclabels(222) = 'Mdots'
   asclabels(223) = 'Winds'
+  asclabels(224) = 'Zetas'
   !asclabels(22) = ''
   
   
@@ -640,24 +648,28 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   84: Eb,grav      89: S1e5K                                                           '
   write(6,'(A)')'   85: Eb,int       90: Rhe                                                             '
   write(6,'(A)')'                                                                                        ' 
-  write(6,'(A)')'  Derived variables:                                                                    '
+  write(6,'(A)')'  Derived variables:                                                                                             '
   write(6,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '
   write(6,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
   write(6,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
   write(6,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
   write(6,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
   write(6,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
-  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr'
-  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in'
-  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)'
-  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min)'
-  write(6,'(A)')'                                                                                                 '
-  write(6,'(A)')'  Special plots:                                                                                 '
+  write(6,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr     '
+  write(6,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in  '
+  write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)  '
+  write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min) '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'   161: zeta_*                                                                                                   '
+  write(6,'(A)')'   162: zeta_RL                                                                                                  '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'                                                                                                                 '
+  write(6,'(A)')'  Special plots:                                                                                                 '
   if(nf.eq.1) then
      write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
      write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
      write(6,'(A)')'                           213: Surface abundances    223: Winds                        '
-     write(6,'(A)')'                           214: Tmax abundances                                         '
+     write(6,'(A)')'                           214: Tmax abundances       224: Zetas                                 '
      write(6,'(A)')'                           215: Core abundances                                         '
   else
      write(6,'(A)')'   201: HR Diagram                                                                      '
@@ -1056,7 +1068,21 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(159,1:n) = dat(28,1:n) * 24.
   dat(160,1:n) = dat(28,1:n) * 1440.
   
-  
+  ! 161, 162: zeta_*, zeta_rl
+  do i=2,n-1
+     if(dat(4,i+1).eq.dat(4,i-1)) then
+        dat(161,i) = dat(161,i-1)
+        dat(162,i) = dat(162,i-1)
+     else
+        ! dlogR/dlogM = M/R dR/dM
+        dat(161,i) = dat(4,i)/dat(8,i)   * (dat(8,i+1)   - dat(8,i-1))   / (dat(4,i+1) - dat(4,i-1))  ! zeta_*  =   dlogR/dlogM
+        dat(162,i) = dat(4,i)/dat(127,i) * (dat(127,i+1) - dat(127,i-1)) / (dat(4,i+1) - dat(4,i-1))  ! zeta_rl = dlogRrl/dlogM
+     end if
+  end do
+  dat(161,1) = dat(161,2)
+  dat(162,1) = dat(162,2)
+  dat(161,n) = dat(161,n-1)
+  dat(162,n) = dat(162,n-1)
   
   
   
