@@ -1,6 +1,6 @@
 !> \file plt_functions.f90  Functions and subroutines for plotplt* in the evTools package that need pgplot
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -25,6 +25,38 @@
 !***********************************************************************************************************************************
 
 
+
+!***********************************************************************************************************************************
+!> \brief  Procedures for plt functions
+
+module plt_funcs
+  implicit none
+  save
+  
+contains
+  
+  !*********************************************************************************************************************************
+  !> \brief  Compute the analytical zeta_ad from the He core mass
+  !!
+  !! \param  Mc    Array with helium core masses fraction
+  !! \retval zeta  Array with zeta_ad values
+  
+  subroutine compute_zeta_ad(Mc, zeta)
+    use kinds, only: double
+    implicit none
+    real(double), intent(in) :: Mc(:)
+    real(double), intent(out) :: zeta(size(Mc))
+    
+    zeta  =  2.d0/3.d0 * Mc / (1.d0 - Mc)
+    zeta  =  zeta - 1.d0/3.d0 * (1.d0 - Mc)/(1.d0 + 2*Mc)
+    zeta  =  zeta - 0.03d0*Mc
+    zeta  =  zeta + 0.2d0 * Mc/(1.d0+(1.d0-Mc)**(-1.d0/6.d0))
+    
+  end subroutine compute_zeta_ad
+  !*********************************************************************************************************************************
+  
+end module plt_funcs
+!***********************************************************************************************************************************
 
 
 
@@ -205,10 +237,11 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(159) = 'P\dorb\u (h)'           ! Porb in hours
   pglabels(160) = 'P\dorb\u (m)'           ! Porb in minutes
   
-  pglabels(161) = '\(0632)\d*\u  = dlogR\d*\u/dlogM'    ! zeta_*  = d(logR)/d(logM)
-  pglabels(162) = '\(0632)\dRL\u = dlogR\dRL\u/dlogM'   ! zeta_RL = d(logRL)/d(logM)
+  pglabels(161) = '\(0632)\d*\u = dlogR\d*\u/dlogM'             ! zeta_*  = d(logR)/d(logM)
+  pglabels(162) = '\(0632)\dRL\u = dlogR\dRL\u/dlogM'           ! zeta_RL = d(logRL)/d(logM)
+  pglabels(163) = '\(0632)\dad\u = (dlogR\d*\u/dlogM)\dad\u'    ! zeta_*  = d(logR)/d(logM) - analytical
   
-  defvar(101:162) = 1
+  defvar(101:163) = 1
   
   
   !Special plots:
@@ -389,6 +422,7 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   asclabels(161) = 'Zeta_st'
   asclabels(162) = 'Zeta_RL'
+  asclabels(163) = 'Zeta_ad'
   
   
   
@@ -662,6 +696,7 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'                                                                                                                 '
   write(6,'(A)')'   161: zeta_*                                                                                                   '
   write(6,'(A)')'   162: zeta_RL                                                                                                  '
+  write(6,'(A)')'   163: zeta_ad                                                                                                  '
   write(6,'(A)')'                                                                                                                 '
   write(6,'(A)')'                                                                                                                 '
   write(6,'(A)')'  Special plots:                                                                                                 '
@@ -754,6 +789,7 @@ end subroutine readplt
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use kinds, only: double
   use constants, only: pi,tpi, c,g, km,yr,day, l0,m0,r0
+  use plt_funcs, only: compute_zeta_ad
   
   implicit none
   integer, intent(in) :: nn,nvar,n
@@ -1084,6 +1120,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(161,n) = dat(161,n-1)
   dat(162,n) = dat(162,n-1)
   
+  ! 163: analytical zeta_ad
+  call compute_zeta_ad(dat(5,1:n)/dat(4,1:n), dat(163,1:n))  ! Compute zeta_ad from the relative He core mass fraction
+  
   
   
   !*** Timescales:
@@ -1142,5 +1181,10 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
 end subroutine changepltvars
 !***********************************************************************************************************************************
+
+
+
+
+
 
 
