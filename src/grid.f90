@@ -1,7 +1,7 @@
 !> \file grid.f90  See what a log grid of models in ev will result in
 
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

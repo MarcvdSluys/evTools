@@ -3,7 +3,7 @@
 !! For general functions and routines that need PGPlot, see plotfunctions.f90
 
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
