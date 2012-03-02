@@ -35,7 +35,7 @@ program plotplt
   integer,parameter :: nmax=10000,nvar=229,nc=81,nl=7,nfmax=50
   real(double) :: d(nvar)
   
-  integer, allocatable :: n(:), strmdls(:,:),hp(:,:),nhp(:)
+  integer, allocatable :: n(:),oldn(:),unchanged(:), strmdls(:,:),hp(:,:),nhp(:)
   real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
   real(double), allocatable :: dat(:,:,:),datf(:,:)
   real(double) :: mint,maxt,dt
@@ -54,13 +54,13 @@ program plotplt
   real :: sch
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
-  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(99)*(29)
+  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3)
   logical :: ex,prleg, hlp,hlbl
   
-  !Set constants:
+  ! Set constants:
   call setconstants()
   write(6,*)
   call print_code_version(6)  !To screen
@@ -74,7 +74,7 @@ program plotplt
   os = 1        ! Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
   plotstyle = 1 ! 1: draw lines, 2: draw dots, 3: draw both
   
-  !Remove 'uninitialised' compiler warnings:
+  ! Remove 'uninitialised' compiler warnings:
   hrd   = 0
   djdt  = 0
   conv  = 0
@@ -83,7 +83,7 @@ program plotplt
   i0 = 1
   pl0 = 1
   
-  !Read atmosphere-model data
+  ! Read atmosphere-model data
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr
@@ -131,9 +131,11 @@ program plotplt
   npl = max(nf,nl)
   
   allocate(dat(npl,nvar,nmax))
-  allocate(n(npl), strmdls(npl,nmax))
+  allocate(n(npl), oldn(npl), unchanged(npl),  strmdls(npl,nmax))
   allocate(xx(npl,nmax), yy(npl,nmax), miny(npl), excly(npl))
   allocate(hp(npl,1000), nhp(npl))
+  oldn = 0
+  unchanged = 0
   
   ! Get the labels for the plot axes; defvar = 0 for non-defined variables:
   call getpltlabels(nf,nvar,pglabels,asclabels,defvar)
@@ -691,7 +693,7 @@ program plotplt
   end if !if(plot.lt.2.or.plot.eq.8) then
   
   
-  !Redetermine which structure models were saved after rereading file:
+  ! Redetermine which structure models were saved after rereading file:
   if(plot.eq.6.or.plot.eq.7.and.hlp.and.hlp1.eq.'s') then
      !Use saved structure models, store them in hp()
      !write(6,'(/,A)')'      Nr    Line   Model'
@@ -760,7 +762,7 @@ program plotplt
      
   else !plot.ne.9
      
-     if(plot.eq.7) call pgend  !Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
+     if(plot.eq.7) call pgend  ! Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
         io = 0
         do while(io.le.0)
@@ -784,20 +786,11 @@ program plotplt
         call pgswin(-1.,1.,-1.,1.)
         call pgrect(-2.,2.,-2.,2.)
         call pgsci(1)
+        
+        call pgscr(3,0.0,0.8,0.0)  ! Dark green
+        call pgscr(5,0.0,0.8,0.8)  ! Dark cyan
      end if
   end if !plot.ne.9
-  
-  !if(white_bg.and.plot.ne.9) then     !Create a white background; swap black (ci=0) and white (ci=1)
-  !   call pgscr(0,1.,1.,1.)  !Repeat this, to make it work for AquaTerm, for which it was designed
-  !   call pgscr(1,0.,0.,0.)
-  !   call pgsci(1)
-  !   call pgsci(0)
-  !   call pgsvp(0.,1.,0.,1.)
-  !   call pgswin(-1.,1.,-1.,1.)
-  !   call pgrect(-2.,2.,-2.,2.)
-  !   call pgsci(1)
-  !end if
-  
   
   call pgscf(1)
   !if(os.eq.2.or.plot.eq.9) call pgscf(2)
@@ -837,7 +830,7 @@ program plotplt
   call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
   
   
-  !Draw curves/points:
+  ! Draw curves/points:
   call pgsci(2)
   do pl=1,npl
      col = colours(mod(pl-1,ncolours)+1)
@@ -856,12 +849,31 @@ program plotplt
      call pgsci(col)
      end select
      
-     if(plot.eq.7) call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)  !Draw end of track for auto-update
+     if(plot.eq.7) then
+        if(n(pl).eq.oldn(pl)) then
+           unchanged(pl) = unchanged(pl) + 1
+        else
+           unchanged(pl) = 0
+        end if
+        oldn(pl) = n(pl)
+        
+        call pgpoint(1,xx(pl,1),yy(pl,1),4)              ! Draw beginning of track for auto-update
+        if(unchanged(pl).eq.5) then                      ! The model hasn't changed for a while
+           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),17)  ! Draw end of track for auto-update
+        else
+           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)   ! Draw end of track for auto-update
+        end if
+        
+        if(minval(unchanged(1:npl)).ge.5) then
+           write(*,'(/,A,/)') 'All models that were tracked have stopped evolving, stopping auto-update'
+           plot = 1           ! Stop auto-update
+        end if
+     end if
   end do
   call pgsci(1)
   
   
-  !Highlight points:
+  ! Highlight points:
   call pgsch(1.5*sch)
   call pgsci(2)
   if(hlp) then
@@ -1067,8 +1079,9 @@ program plotplt
      goto 501
   end if
   
-  if(plot.eq.7) then  !Auto update
-     wait = 2  !Pause in seconds
+  if(plot.eq.7) then  ! Auto update
+     write(*,'(/,A)', advance='no') 'Auto-updating...  '
+     wait = 2         ! Pause in seconds
      goto 7
   end if
   
