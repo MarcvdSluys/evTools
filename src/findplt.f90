@@ -5,7 +5,7 @@
 ! Needs the file <libdir>/UBVRI.Kur to calculate magnitudes and colours (see below)
 
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

@@ -2,7 +2,7 @@
 !
 !  AF, 19-04-2006
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -54,7 +54,7 @@ program plotplt
   real :: sch
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
-  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(29)
+  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(99)*(29)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3)
@@ -251,13 +251,13 @@ program plotplt
         djdt = 1
         npl = 5
         yy(1:5,1:nmax) = real(dat(f,35:39,1:nmax))
-        leglbl(1:5) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
+        leglbl(1:npl) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
         prleg = .true.
      end if
      if(vy.eq.222) then !Mdots
         npl = 3
         yy(1:3,1:nmax) = real(dat(f,31:33,1:nmax))
-        leglbl(1:3) = (/'dM\dtot\u ','dM\dwind\u','dM\dMT\u  '/)
+        leglbl(1:npl) = (/'dM\dtot\u ','dM\dwind\u','dM\dMT\u  '/)
         prleg = .true.
      end if
      if(vy.eq.223) then ! Winds
@@ -265,14 +265,36 @@ program plotplt
         yy(1,1:nmax) = real(dat(f,32,1:nmax))
         yy(2,1:nmax) = real(dat(f,136,1:nmax))
         yy(3,1:nmax) = real(dat(f,137,1:nmax))
-        leglbl(1:3) = (/'dM\dwind\u','dM\dR\u   ','dM\dRlk\u '/)
+        leglbl(1:npl) = (/'dM\dwind\u','dM\dR\u   ','dM\dRlk\u '/)
         prleg = .true.
      end if
-     if(vy.eq.224) then ! Zetas = dlogR/dlogMs
+     if(vy.eq.224) then  ! Zetas = dlogR/dlogMs: model
         npl = 2
         yy(1,1:nmax) = real(dat(f,161,1:nmax))
         yy(2,1:nmax) = real(dat(f,162,1:nmax))
-        leglbl(1:2) = (/'\(0632)\d*\u ','\(0632)\dRL\u'/)
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\d*\u','\(0632)\dRL\u']
+        prleg = .true.
+     end if
+     if(vy.eq.225) then  ! Zetas = dlogR/dlogMs: analytic
+        npl = 4
+        yy(1,1:nmax) = real(dat(f,163,1:nmax))
+        yy(2,1:nmax) = real(dat(f,164,1:nmax))
+        yy(3,1:nmax) = real(dat(f,165,1:nmax))
+        yy(4,1:nmax) = real(dat(f,166,1:nmax))
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\dad\u','\(0632)\dRL,an\u, \(0628)=0.0','\(0632)\dRL,an\u, \(0628)=0.5', &
+             '\(0632)\dRL,an\u, \(0628)=1.0']
+        prleg = .true.
+     end if
+     if(vy.eq.226) then  ! Zetas = dlogR/dlogMs: all
+        npl = 6
+        yy(1,1:nmax) = real(dat(f,161,1:nmax))
+        yy(2,1:nmax) = real(dat(f,162,1:nmax))
+        yy(3,1:nmax) = real(dat(f,163,1:nmax))
+        yy(4,1:nmax) = real(dat(f,164,1:nmax))
+        yy(5,1:nmax) = real(dat(f,165,1:nmax))
+        yy(6,1:nmax) = real(dat(f,166,1:nmax))
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\d*\u','\(0632)\dRL\u','\(0632)\dad\u','\(0632)\dRL,an\u, \(0628)=0.0', &
+             '\(0632)\dRL,an\u, \(0628)=0.5','\(0632)\dRL,an\u, \(0628)=1.0']
         prleg = .true.
      end if
      
@@ -281,10 +303,10 @@ program plotplt
         npl = 5
         yy(1:5,1:nmax) = real(dat(f,201:205,1:nmax))
         !Line labels for Timescales plot:
-        leglbl(1:5) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)
+        leglbl(1:npl) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)
         npl = 6
         yy(6,1:nmax) = real(dat(f,119,1:nmax))
-        leglbl(6) = '\(0645)\ddR/dt\u  '
+        leglbl(npl) = '\(0645)\ddR/dt\u  '
         prleg = .true.
      end if
      if(vy.eq.212) then !Luminosities

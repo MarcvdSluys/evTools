@@ -7,7 +7,7 @@
 
 !   AF, 18-05-2005. Works for ifort on MacOS, 12-10-2006.
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

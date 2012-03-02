@@ -7,7 +7,7 @@
 ! AF 2004-08-05
 
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

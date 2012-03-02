@@ -3,7 +3,7 @@
 !!  The idea is to plot np panels with the same horizontal axis and different vertical axes.
 !!  The output is written to ps only.
 
-! Copyright 2002-2011 AstroFloyd - astrofloyd.org
+! Copyright 2002-2012 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
