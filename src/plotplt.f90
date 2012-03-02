@@ -858,7 +858,7 @@ program plotplt
         oldn(pl) = n(pl)
         
         call pgpoint(1,xx(pl,1),yy(pl,1),4)              ! Draw beginning of track for auto-update
-        if(unchanged(pl).eq.5) then                      ! The model hasn't changed for a while
+        if(unchanged(pl).ge.5) then                      ! The model hasn't changed for a while
            call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),17)  ! Draw end of track for auto-update
         else
            call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)   ! Draw end of track for auto-update
