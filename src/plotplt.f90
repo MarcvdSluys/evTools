@@ -57,7 +57,7 @@ program plotplt
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
-  character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3)
+  character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3), mdlnr*(9)
   logical :: ex,prleg, hlp,hlbl
   
   ! Set constants:
@@ -859,12 +859,12 @@ program plotplt
         
         call pgpoint(1,xx(pl,1),yy(pl,1),4)              ! Draw beginning of track for auto-update
         if(unchanged(pl).ge.5) then                      ! The model hasn't changed for a while
-           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),17)  ! Draw end of track for auto-update
+           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),17)  ! Draw end of track
         else
-           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)   ! Draw end of track for auto-update
+           call pgpoint(1,xx(pl,n(pl)),yy(pl,n(pl)),2)   ! Draw end of track
         end if
         
-        if(minval(unchanged(1:npl)).ge.5) then
+        if(pl.eq.npl .and. minval(unchanged(1:npl)).ge.10) then
            write(*,'(/,A,/)') 'All models that were tracked have stopped evolving, stopping auto-update'
            plot = 1           ! Stop auto-update
         end if
@@ -915,9 +915,12 @@ program plotplt
            if(fname(lng:lng).eq.'2') complbl = ' *2'
            if(fname(lng:lng).eq.'1'.or.fname(lng:lng).eq.'2') lng = lng-1
            lng = lng-4 !get rid of '.plt'
+           write(mdlnr,'(I6)') n(f)
+           if(n(f).le.9999) write(mdlnr,'(I5)') n(f)
+           if(n(f).le.999) write(mdlnr,'(I4)') n(f)
            col = colours(mod(f-1,ncolours)+1)
            call pgsci(col)
-           call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,trim(fname(1:lng))//trim(complbl))
+           call pgmtext('RV',0.5,real(46.-real(f))/45.,0.,trim(fname(1:lng))//trim(complbl)//trim(mdlnr))
         end do
      end if
      call pgsci(1)
