@@ -50,9 +50,52 @@ contains
     zeta  =  2.d0/3.d0 * Mc / (1.d0 - Mc)
     zeta  =  zeta - 1.d0/3.d0 * (1.d0 - Mc)/(1.d0 + 2*Mc)
     zeta  =  zeta - 0.03d0*Mc
-    zeta  =  zeta + 0.2d0 * Mc/(1.d0+(1.d0-Mc)**(-1.d0/6.d0))
+    zeta  =  zeta + 0.2d0 * Mc/(1.d0+(1.d0-Mc)**(-6))
+    
+    !print*, Mc(size(Mc)), 2.d0/3.d0 * Mc(size(Mc)) / (1.d0 - Mc(size(Mc))), &
+    !     1.d0/3.d0 * (1.d0 - Mc(size(Mc)))/(1.d0 + 2*Mc(size(Mc))), 0.03d0*Mc(size(Mc)),  &
+    !     0.2d0 * Mc(size(Mc))/(1.d0+(1.d0-Mc(size(Mc)))**(-6)), zeta(size(Mc))
     
   end subroutine compute_zeta_ad
+  !*********************************************************************************************************************************
+  
+  
+  !*********************************************************************************************************************************
+  !> \brief  Compute the analytical zeta_rl from the masses of the two binary components, and the MT conservation factor
+  !! \note Assuming no wind mass loss
+  !! \see  Woods et al., ApJ 744, 12 (2012), Sect. 2.3
+  !!
+  !!
+  !! \param  Md    Array with donor masses
+  !! \param  Ma    Array with accretor masses
+  !! \param  beta  Mass-conservation factor: beta=1 means fully conservative MT
+  !!
+  !! \retval zeta  Array with zeta_rl values
+  
+  subroutine compute_zeta_rl(Md,Ma, beta, zeta)
+    use kinds, only: double
+    implicit none
+    real(double), intent(in) :: Md(:),Ma(:), beta
+    real(double), intent(out) :: zeta(size(Md))
+    real(double) :: Md2(size(Md)),Ma2(size(Md)),Mt(size(Md)), q(size(Md)),q3(size(Md)), c3rd
+    real(double) :: dlnAdlnMd(size(Md)), dlnRldlnQ(size(Md)), dlnQdlnMd(size(Md))
+    
+    c3rd = 1.d0/3.d0
+    Md2 = Md**2
+    Ma2 = Ma**2
+    Mt  = Md+Ma
+    q   = Md/Ma
+    q3  = q**c3rd  ! q^(1/3)
+    
+    dlnAdlnMd = (2*(Md2-Ma2) - Md*Ma*(1.d0-beta)) / (Ma*Mt)                                    ! Eq.11, dlna/dlnMd
+    dlnRldlnQ = 2*c3rd - c3rd*q3 * (1.2d0*q3 + 1.d0/(1.d0+q3)) / (0.6d0*q3**2 + log(1.d0+q3))  ! Eq.12, dln(Rrl/a)/dlnq
+    dlnQdlnMd = 1.d0 + beta*Md/Ma                                                              ! Eq.13, dlnq/dlnMd
+    
+    zeta = dlnAdlnMd + dlnRldlnQ * dlnQdlnMd                                                   ! Eq.9
+    
+    !print*,real((/Md(1),Ma(1),beta, q(1),dlnAdlnMd(1), dlnRldlnQ(1), dlnQdlnMd(1),zeta(1)/))
+    
+  end subroutine compute_zeta_rl
   !*********************************************************************************************************************************
   
 end module plt_funcs
@@ -240,8 +283,11 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   pglabels(161) = '\(0632)\d*\u = dlogR\d*\u/dlogM'             ! zeta_*  = d(logR)/d(logM)
   pglabels(162) = '\(0632)\dRL\u = dlogR\dRL\u/dlogM'           ! zeta_RL = d(logRL)/d(logM)
   pglabels(163) = '\(0632)\dad\u = (dlogR\d*\u/dlogM)\dad\u'    ! zeta_*  = d(logR)/d(logM) - analytical
+  pglabels(164) = '\(0632)\drl,an\u, \(0628)=0.0'        ! zeta_RL,an = d(logRL)/d(logM) - analytical
+  pglabels(165) = '\(0632)\drl,an\u, \(0628)=0.5'        ! zeta_RL,an = d(logRL)/d(logM) - analytical
+  pglabels(166) = '\(0632)\drl,an\u, \(0628)=1.0'        ! zeta_RL,an = d(logRL)/d(logM) - analytical
   
-  defvar(101:163) = 1
+  defvar(101:166) = 1
   
   
   !Special plots:
@@ -263,8 +309,8 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
      pglabels(221) = 'dJ\dorb\u/dt'
      pglabels(222) = 'dM/dt (M\d\(2281)\u/yr)'
      pglabels(223) = 'dM/dt (M\d\(2281)\u/yr)'
-     pglabels(224) = '\(0632)'
-     defvar(221:224) = 1
+     pglabels(224:226) = '\(0632)'
+     defvar(221:226) = 1
   end if
   
   
@@ -423,6 +469,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(161) = 'Zeta_st'
   asclabels(162) = 'Zeta_RL'
   asclabels(163) = 'Zeta_ad'
+  asclabels(164) = 'Zeta_RL_an_beta00'
+  asclabels(165) = 'Zeta_RL_an_beta05'
+  asclabels(166) = 'Zeta_RL_an_beta10'
   
   
   
@@ -438,7 +487,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(221) = 'dJdts'
   asclabels(222) = 'Mdots'
   asclabels(223) = 'Winds'
-  asclabels(224) = 'Zetas'
+  asclabels(224) = 'Zetas_mdl'
+  asclabels(225) = 'Zetas_anal'
+  asclabels(226) = 'Zetas_all'
   !asclabels(22) = ''
   
   
@@ -697,19 +748,23 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'   161: zeta_*                                                                                                   '
   write(6,'(A)')'   162: zeta_RL                                                                                                  '
   write(6,'(A)')'   163: zeta_ad                                                                                                  '
+  write(6,'(A)')'   164: zeta_RL,an, beta=0.0                                                                                     '
+  write(6,'(A)')'   165: zeta_RL,an, beta=0.5                                                                                     '
+  write(6,'(A)')'   166: zeta_RL,an, beta=1.0                                                                                     '
   write(6,'(A)')'                                                                                                                 '
   write(6,'(A)')'                                                                                                                 '
   write(6,'(A)')'  Special plots:                                                                                                 '
   if(nf.eq.1) then
-     write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                      "
-     write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                        '
-     write(6,'(A)')'                           213: Surface abundances    223: Winds                        '
-     write(6,'(A)')'                           214: Tmax abundances       224: Zetas                                 '
-     write(6,'(A)')'                           215: Core abundances                                         '
+     write(6,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                                            "
+     write(6,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                                              '
+     write(6,'(A)')'                           213: Surface abundances    223: Winds                                              '
+     write(6,'(A)')'                           214: Tmax abundances       224: Zetas: mdl                                         '
+     write(6,'(A)')'                           215: Core abundances       225: Zetas: anl                                         '
+     write(6,'(A)')'                                                      226: Zetas: all                                         '
   else
-     write(6,'(A)')'   201: HR Diagram                                                                      '
+     write(6,'(A)')'   201: HR Diagram                                                                                            '
   end if
-  write(6,'(A)')'                                                                                        '
+  write(6,'(A)')'                                                                                                                 '
   
 end subroutine printpltvarlist
 !***********************************************************************************************************************************
@@ -789,7 +844,7 @@ end subroutine readplt
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use kinds, only: double
   use constants, only: pi,tpi, c,g, km,yr,day, l0,m0,r0
-  use plt_funcs, only: compute_zeta_ad
+  use plt_funcs, only: compute_zeta_ad, compute_zeta_rl
   
   implicit none
   integer, intent(in) :: nn,nvar,n
@@ -798,7 +853,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   integer, intent(out) :: dpdt
   
   integer :: i,j,j0,ib
-  real(double) :: var(nn),dpdj(nn)
+  real(double) :: var(nn),dpdj(nn), beta
   real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0, Zsurf(nn),Menv(nn)
   
   ! de-log some variables:
@@ -1122,6 +1177,14 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   ! 163: analytical zeta_ad
   call compute_zeta_ad(dat(5,1:n)/dat(4,1:n), dat(163,1:n))  ! Compute zeta_ad from the relative He core mass fraction
+  
+  ! 164 - 166: analytical zeta_rl
+  beta = 0.0d0
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(164,1:n))  ! Compute zeta_rl from the component masses and beta=0.0
+  beta = 0.5d0
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(165,1:n))  ! Compute zeta_rl from the component masses and beta=0.5
+  beta = 1.0d0
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(166,1:n))  ! Compute zeta_rl from the component masses and beta=1.0
   
   
   

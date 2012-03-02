@@ -54,7 +54,7 @@ program plotplt
   real :: sch
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
-  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(29)
+  character :: ans,rng,log,hlp1,hlbls*(5),leglbl(99)*(29)
   character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3)
@@ -268,12 +268,33 @@ program plotplt
         leglbl(1:npl) = (/'dM\dwind\u','dM\dR\u   ','dM\dRlk\u '/)
         prleg = .true.
      end if
-     if(vy.eq.224) then ! Zetas = dlogR/dlogMs
-        npl = 3
+     if(vy.eq.224) then  ! Zetas = dlogR/dlogMs: model
+        npl = 2
+        yy(1,1:nmax) = real(dat(f,161,1:nmax))
+        yy(2,1:nmax) = real(dat(f,162,1:nmax))
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\d*\u','\(0632)\dRL\u']
+        prleg = .true.
+     end if
+     if(vy.eq.225) then  ! Zetas = dlogR/dlogMs: analytic
+        npl = 4
+        yy(1,1:nmax) = real(dat(f,163,1:nmax))
+        yy(2,1:nmax) = real(dat(f,164,1:nmax))
+        yy(3,1:nmax) = real(dat(f,165,1:nmax))
+        yy(4,1:nmax) = real(dat(f,166,1:nmax))
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\dad\u','\(0632)\dRL,an\u, \(0628)=0.0','\(0632)\dRL,an\u, \(0628)=0.5', &
+             '\(0632)\dRL,an\u, \(0628)=1.0']
+        prleg = .true.
+     end if
+     if(vy.eq.226) then  ! Zetas = dlogR/dlogMs: all
+        npl = 6
         yy(1,1:nmax) = real(dat(f,161,1:nmax))
         yy(2,1:nmax) = real(dat(f,162,1:nmax))
         yy(3,1:nmax) = real(dat(f,163,1:nmax))
-        leglbl(1:npl) = (/'\(0632)\d*\u ','\(0632)\dRL\u','\(0632)\dad\u'/)
+        yy(4,1:nmax) = real(dat(f,164,1:nmax))
+        yy(5,1:nmax) = real(dat(f,165,1:nmax))
+        yy(6,1:nmax) = real(dat(f,166,1:nmax))
+        leglbl(1:npl) = [character(len=99) :: '\(0632)\d*\u','\(0632)\dRL\u','\(0632)\dad\u','\(0632)\dRL,an\u, \(0628)=0.0', &
+             '\(0632)\dRL,an\u, \(0628)=0.5','\(0632)\dRL,an\u, \(0628)=1.0']
         prleg = .true.
      end if
      
