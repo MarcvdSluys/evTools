@@ -170,12 +170,17 @@ program plotplt
 30 if(plot.ne.6.and.plot.ne.7) then      
      call printpltvarlist(nf)  !Print the list of variables in a *.plt? file to screen, for input menu
      
-     
-35   write(6,'(A)', advance='no')'  Choose the X-axis variable: '
-     read*,vx
-     if(vx.eq.0) goto 9999
-     if(vx.lt.0.or.vx.gt.201) goto 35
-     if(defvar(vx).eq.0) goto 35
+     io = -1
+     do while(io.ne.0)
+        write(6,'(A)', advance='no') '  Choose the X-axis variable: '
+        read(*,*, iostat=io) vx
+        if(io.ne.0) cycle
+        
+        if(vx.eq.0) goto 9999
+        io = 0
+        if(vx.lt.0.or.vx.gt.201) io = -1
+        if(defvar(vx).eq.0)  io = -1
+     end do
      
      hrd   = 0
      djdt  = 0
@@ -192,7 +197,7 @@ program plotplt
   prleg = .false.  !Don't print legenda by default
   if(nf.gt.1) prleg = .true.
   
-  if(vx.eq.201.or.hrd.eq.1) then  !HRD
+  if(vx.eq.201.or.hrd.eq.1) then  ! HRD
      hrd = 1
      pl = 1
      mint = minval( dat(pl,10,1:n(pl)) )
@@ -221,13 +226,18 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-36   continue
-     write(6,'(A)', advance='no')'  Choose the Y-axis variable: '
-     read*,vy
-     if(vy.eq.0) goto 9999
-     if(vy.lt.0) goto 36
-     if(defvar(vy).eq.0) goto 36
-     if(vy.eq.201) goto 36   ! Can't take HRD as y-variable
+     
+     io = -1
+     do while(io.ne.0)
+        write(6,'(A)', advance='no') '  Choose the Y-axis variable: '
+        read(*,*, iostat=io) vy
+        if(io.ne.0) cycle
+        
+        if(vy.eq.0) goto 9999
+        io = 0
+        if(vy.lt.0.or.vy.eq.201) io = -1  ! Can't take HRD as y-variable
+        if(defvar(vy).eq.0)  io = -1
+     end do
   end if   !if(plot.lt.2) then   
   
   
@@ -300,18 +310,22 @@ program plotplt
         prleg = .true.
      end if
      
-     if(vy.eq.211) then !Timescales
+     if(vy.eq.211) then  ! Timescales
         tscls = 1
         npl = 5
         yy(1:5,1:nmax) = real(dat(f,201:205,1:nmax))
-        !Line labels for Timescales plot:
+        
+        ! Line labels for Timescales plot:
         leglbl(1:npl) = (/'\(0645)\dnuc\u ','\(0645)\dth\u  ','\(0645)\dML\u  ','\(0645)\dGW\u  ','\(0645)\ddyn\u '/)
+        
+        ! Add R/(dR/dt)
         npl = 6
         yy(6,1:nmax) = real(dat(f,119,1:nmax))
         leglbl(npl) = '\(0645)\ddR/dt\u  '
+        
         prleg = .true.
      end if
-     if(vy.eq.212) then !Luminosities
+     if(vy.eq.212) then  ! Luminosities
         lums = 1
         npl = 6
         yy(1,1:nmax) = real(dat(f,9,1:nmax))
@@ -321,7 +335,7 @@ program plotplt
         prleg = .true.
      end if
      
-     if(vy.eq.213) then !Surface abundances
+     if(vy.eq.213) then  ! Surface abundances
         sabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,42:48,1:nmax))
@@ -329,7 +343,7 @@ program plotplt
         leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
-     if(vy.eq.214) then !Tmax abundances
+     if(vy.eq.214) then  ! Tmax abundances
         tabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,49:55,1:nmax))
@@ -1018,7 +1032,8 @@ program plotplt
   !***   POST-PLOT MENU   ***
   !************************************************************************      
   
-900 if(plot.ne.0.and.plot.ne.9) then
+900 continue
+  if(plot.ne.0.and.plot.ne.9) then
      write(6,*)''
      write(6,'(A)')' You can:'
      write(6,'(A)')'  0) quit'
@@ -1034,9 +1049,13 @@ program plotplt
      write(6,'(A)')' 10) identify a point in the graph'
      write(6,'(A)')' 11) toggle drawing line/points'
   end if !if(plot.ne.9) then
-  write(6,*)''
-  write(6,'(A27)', advance='no')' What do you want to do ?  '
-  read*,plot
+  
+  io = -1
+  write(*,*)
+  do while(io.ne.0)
+     write(6,'(A)', advance='no') ' What do you want to do ?  '
+     read(*,*, iostat=io) plot
+  end do
   if(plot.lt.0.or.plot.gt.11) goto 900
   
   if(plot.ne.4.and.plot.ne.10) call pgend
