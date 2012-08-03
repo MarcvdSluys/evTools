@@ -24,9 +24,9 @@
 !> \brief  Find the model with the closest value for a specified variable, interpolate, and return the values of the other variables
 
 program findplt
-  use kinds
-  use constants
-  use ubvdata
+  use kinds, only: double
+  use constants, only: libdir
+  use ubvdata, only: ubv
   
   implicit none
   integer, parameter :: nn=30000,nnn=100
@@ -54,12 +54,12 @@ program findplt
   if(narg.eq.3.or.narg.eq.4) then
      call get_command_argument(1,fname)
      call get_command_argument(2,arg)
-     read(arg,*)iin
+     read(arg,*) iin
      call get_command_argument(3,arg)
-     read(arg,*)xfind
+     read(arg,*) xfind
      if(narg.eq.4) then
         call get_command_argument(4,arg)
-        read(arg,*)iout
+        read(arg,*) iout
      end if
   else
      write(6,'(A)')'                                                                           ' 
@@ -169,56 +169,56 @@ end program findplt
 !> \brief  Prints a selected (interpolated) model
 !!
 !! \param n     Size of data array
-!! \param x     Data array
+!! \param xx    Data array
 !! \param iin   Variable number to print if iout>0
 !! \param iout  0: print standard selection, <0: print all variables, >0: print variables iin and iout
 
-subroutine printmodel(n,x,iin,iout)
-  use kinds
+subroutine printmodel(n, xx, iin, iout)
+  use kinds, only: double
+  use constants, only: m0
   
   implicit none
   integer, intent(in) :: n,iin,iout
-  real(double), intent(in) :: x(n)
+  real(double), intent(in) :: xx(n)
+  real(double) :: x(n)
   integer :: i
+  
+  x = xx
+  
+  x(8)  = 10.d0**x(8)   ! logR -> R
+  x(9)  = 10.d0**x(9)   ! logL -> L
+  x(10) = 10.d0**x(10)  ! logT -> Teff
+  
+  x(15) = x(15)*m0
   
   if(iout.eq.0) then
      write(6,*)''
      write(6,*)''
      
-     write(6,'(A10,5x,A10,A12,4A8,A12)')'General:','Mdl','t (Gyr)','M (Mo)','log R','log L','log Te','dM/dt'
-     write(6,'(15x,f10.3,es12.5,4f8.4,es12.4)')x((/1,2,4,8,9,10,33/))
+     write(6,'(A10,5x,A10,A12,3A9,5A11)') 'General:','Mdl','t (Gyr)','M (Mo)','Mhe (Mo)','Mco (Mo)','R','L','Teff','Ubind','dM/dt'
+     write(6,'(15x,f10.3,es12.5,3f9.4,5es11.3)') x((/1,2, 4,5,6, 8,9,10, 15,33/))
      
-     write(6,'(A10,5x,5A10,4A6)')'Surface:','H','He','C','N','O','V','B-V','V-I','U-V'
-     write(6,'(15x,5ES10.3,4F6.2)')x((/42,43,44,45,46,91,93,94,96/))
+     write(6,'(A10,5x,5A10,4A6)') 'Surface:','H','He','C','N','O','V','B-V','V-I','U-V'
+     write(6,'(15x,5ES10.3,4F6.2)') x((/42,43,44,45,46,91,93,94,96/))
      
-     write(6,'(A10,5x,5A10,3A8,A10)')'Core:','H','He','C','N','O','log Tc','log rho','Mhe'
-     write(6,'(15x,5es10.3,3f8.4)')x((/56,57,58,59,60,11,13,5/))
+     write(6,'(A10,5x,5A10,3A8,A10)') 'Core:','H','He','C','N','O','log Tc','log rho','Mhe'
+     write(6,'(15x,5es10.3,3f8.4)') x((/56,57,58,59,60,11,13,5/))
      write(6,*)''
   else if(iout.gt.0) then
-     write(6,'(70x,2G12.3)')x(iin),x(iout)
+     write(6,'(70x,1p,2G12.3)') x(iin),x(iout)
   else !iout.lt.0
      do i=1,n
-        write(6,'(I6,G12.3)')i,x(i)
+        write(6,'(I6,1p,G12.3)') i,x(i)
      end do
   end if
   
   
   if(1.eq.2) then 
      write(6,*)''
-     write(6,'(F8.4,ES12.5)', advance='no')x((/4,2/))
+     write(6,'(F8.4,ES12.5)', advance='no') x((/4,2/))
   end if
   
 end subroutine printmodel
 !***********************************************************************************************************************************
-
-
-
-
-
-
-
-
-
-
 
 
