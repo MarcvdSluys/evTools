@@ -219,8 +219,8 @@ mergeplt: $(STDOBJ) $(OBJDIR)/mergeplt.o
 plt2ce: $(STDOBJ) $(OBJDIR)/plt2ce.o
 	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2ce $(STDOBJ) $(OBJDIR)/plt2ce.o
 
-plt2dat: $(STDOBJ) $(OBJDIR)/plt2dat.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2dat $(STDOBJ) $(OBJDIR)/plt2dat.o
+plt2dat: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plt2dat.o
+	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2dat $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plt2dat.o
 
 plt2obs: $(STDOBJ) $(OBJDIR)/plt2obs.o
 	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2obs $(STDOBJ) $(OBJDIR)/plt2obs.o
