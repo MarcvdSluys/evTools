@@ -289,6 +289,11 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   
   defvar(101:166) = 1
   
+  pglabels(171) = 'q\d1\u'  ! q_1 = M1/M2
+  pglabels(172) = 'q\d2\u'  ! q_2 = M2/M1
+  defvar(171:172) = 1
+  
+  
   
   !Special plots:
   defvar(201) = 1  !HRD
@@ -472,6 +477,9 @@ subroutine getpltlabels(nf,nvar,pglabels,asclabels,defvar)
   asclabels(164) = 'Zeta_RL_an_beta00'
   asclabels(165) = 'Zeta_RL_an_beta05'
   asclabels(166) = 'Zeta_RL_an_beta10'
+  
+  asclabels(171) = 'q1'
+  asclabels(172) = 'q2'
   
   
   
@@ -745,8 +753,8 @@ subroutine printpltvarlist(nf)
   write(6,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)  '
   write(6,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min) '
   write(6,'(A)')'                                                                                                                 '
-  write(6,'(A)')'   161: zeta_*                                                                                                   '
-  write(6,'(A)')'   162: zeta_RL                                                                                                  '
+  write(6,'(A)')'   161: zeta_*                  171: q1                                                                          '
+  write(6,'(A)')'   162: zeta_RL                 172: q2                                                                          '
   write(6,'(A)')'   163: zeta_ad                                                                                                  '
   write(6,'(A)')'   164: zeta_RL,an, beta=0.0                                                                                     '
   write(6,'(A)')'   165: zeta_RL,an, beta=0.5                                                                                     '
@@ -1186,6 +1194,9 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   beta = 1.0d0
   call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(166,1:n))  ! Compute zeta_rl from the component masses and beta=1.0
   
+  ! 171 - 172: mass ratios:
+  dat(171,:) = dat(4,:)/dat(40,:)  ! q_1 = M1/M2
+  dat(172,:) = dat(40,:)/dat(4,:)  ! q_2 = M2/M1
   
   
   !*** Timescales:
