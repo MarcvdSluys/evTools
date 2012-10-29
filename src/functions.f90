@@ -149,7 +149,7 @@ subroutine setconstants()
   
   ! Line colours:
   ncolours = 13                                            ! Number of (line) colours used to distinguish tracks.  Default: 13
-  colours(1:ncolours) = (/2,3,4,5,6,8,9,10,11,12,13,7,1/)  ! Use black as last resort
+  colours(1:ncolours) = (/2,4,5,6,3,8,9,10,11,12,13,7,1/)  ! Use green late (avoid comparison with red) and black as last resort
   
 end subroutine setconstants
 !***********************************************************************************************************************************
