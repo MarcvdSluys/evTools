@@ -805,6 +805,8 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   
   nc1 = nc !Get rid of 'unused' message
   
+  if(verbose.eq.1) write(6,'(A)', advance='no')' Reading ev file '//trim(fname)//':'
+  
   !*** Unformatted:
   dat = 0.d0
   open(unit=u,form='formatted',status='old',file=trim(fname))
@@ -827,7 +829,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   n = j-1   ! Number of models in the file
   return
   
-12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading file, line',j
+12 if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading ev file, line',j
   close(u)
   if(j.lt.3) call quit_program('Error reading input file')
   if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
@@ -835,6 +837,97 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   n = j-1   ! Number of models in the file
   
 end subroutine readplt
+!***********************************************************************************************************************************
+
+
+
+!***********************************************************************************************************************************
+!> \brief Read a BSE binary.dat file fname from unit u and return its length and contents
+!!
+!! \param u         Input unit
+!! \param fname     Input file name
+!! \param nn        Maximum number of model lines
+!! \param nvar      Number of variables
+!! \param verbose   Verbosity (0,1)
+!! 
+!! \retval dat      Data array
+!! \retval n        Number of models read
+!! \retval version  Code-output version
+
+subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
+  use kinds, only: double
+  use constants, only: pi, sigma,day, M0,R0,L0
+  
+  implicit none
+  integer, intent(in) :: u,nn,nvar,verbose
+  character, intent(in) :: fname*(*)
+  integer, intent(out) :: n,version
+  real(double), intent(out) :: dat(nvar,nn)
+  
+  integer :: ncols,j
+  real(double) :: tmpdat(19), Porb, a2j
+  
+  if(verbose.eq.1) write(6,'(A)', advance='no')' Reading BSE file '//trim(fname)//':'
+  
+  ! Fixed for BSE:
+  ncols = 19
+  version = 1
+  
+  dat = 0.d0
+  open(unit=u,form='formatted',status='old',file=trim(fname))
+  rewind u
+  
+  do j=1,nn
+     read(u,*,err=12,end=11) tmpdat !(dat(i,j),i=1,ncols)
+     if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',tmpdat(4),'Mo.'
+     if(tmpdat(1).lt.0.d0) goto 11  ! Final model has t=-1.0
+     
+     ! Copy variables:
+     dat(4,j)  = tmpdat(4)   ! M1
+     dat(40,j) = tmpdat(5)   ! M2
+     dat(5,j)  = tmpdat(6)   ! Mc1
+     dat(8,j)  = tmpdat(8)   ! log R1
+     dat(9,j)  = tmpdat(12)  ! log L1
+     dat(31,j) = tmpdat(16)  ! dM1/dt
+     dat(33,j) = tmpdat(16)  ! dM1/dt
+     dat(41,j) = tmpdat(19)  ! e_orb
+     
+     ! Convert variables:
+     dat(1,j)  = dble(j)  ! Model number
+     dat(2,j)  = tmpdat(1)*1.d6   ! age Myr -> yr
+     if(j.gt.1) dat(3,j)  = dat(2,j)-dat(2,j-1)  ! Delta t
+     
+     dat(29,j) = log(tmpdat(10))     ! R1/RL1 -> FLR = ln(R1/RL1)
+     dat(21,j) = 2*pi*tmpdat(14)/day  ! Ospin1 -> Prot1
+     dat(10,j) = log10( 10.d0**tmpdat(12)*L0 / (4*pi*(10.d0**tmpdat(8)*R0)**2 * sigma) )*0.25d0  ! log L1, log R1 -> log Teff1
+     
+     call a2p(sum(tmpdat(4:5))*M0, tmpdat(18)*R0, Porb)  ! a_orb -> P_orb in s
+     dat(28,j) = Porb/day                                ! P_orb: s -> day
+     dat(34,j) = a2j(tmpdat(4), tmpdat(5), tmpdat(18))*1.d-50   ! M1,M2,a_orb -> J_orb in 10^50 g cm^2 s^-1
+  end do
+  
+  
+  write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
+  close(u)
+  n = j-1   ! Number of models in the file
+  return
+  
+11 continue
+  if(verbose.eq.1) write(6,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
+  close(u)
+  n = j-1   ! Number of models in the file
+  return
+  
+12 continue
+  if(verbose.eq.1.or.j.ge.3) write(6,'(A,I6)')'  Error reading BSE file, line',j
+  print*,real(tmpdat)
+  close(u)
+  if(j.lt.3) call quit_program('Error reading input file')
+  if(verbose.eq.1) write(6,'(A)')"  I'll skip the rest of the file and use the first part."
+  
+  n = j-1   ! Number of models in the file
+  
+end subroutine read_bse
 !***********************************************************************************************************************************
 
 
