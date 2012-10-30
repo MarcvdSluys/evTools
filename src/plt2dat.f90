@@ -79,7 +79,7 @@ program plt2dat
      
      
      ! Read input file:
-     call readplt(10,trim(infile),nmax,nvar,nc,verbose,datf,nfi,version)  ! Use unit 10
+     call read_plt_bse(10,trim(infile),nmax,nvar,nc,verbose,datf,nfi,version)  ! Use unit 10
      
      ! Change (e.g. de-log) and add plot variables:
      call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)

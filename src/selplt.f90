@@ -98,7 +98,7 @@ program selplt
      if(trim(fname).eq.'selection.plt1') cycle
      
      ! When nn is large, this somehow takes a very long time!!!
-     call readplt(10,fname,nn,nvar,81,0,dat,n,ver)  !unit=10, nc=81, verbose=0
+     call read_plt_bse(10,fname,nn,nvar,81,0,dat,n,ver)  !unit=10, nc=81, verbose=0
      dato = dat  !Save original data, for output
      
      call changepltvars(nn,nvar,n,dat,labels,dpdt)  !Change (e.g. de-log) and add plot variables

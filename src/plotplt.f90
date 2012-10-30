@@ -152,7 +152,7 @@ program plotplt
   if(verbose.eq.1) write(6,*)
   allocate(datf(nvar,nmax))
   do f=1,nf
-     call readplt(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  ! Use unit 10
+     call read_plt_bse(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  ! Use unit 10
      if(version.eq.2005) strmdls(f,:) = nint(datf(83,:))   ! Structure model was saved (1) or not (0)
      if(version.ge.2011) strmdls(f,:) = nint(datf(92,:))   ! Structure model was saved (1) or not (0)
      call changepltvars(nmax,nvar,nfi,datf,pglabels,dpdt)  ! Change (e.g. de-log) and add plot variables

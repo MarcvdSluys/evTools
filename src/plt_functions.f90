@@ -793,7 +793,7 @@ end subroutine printpltvarlist
 !! \retval nfi      Number of models read
 !! \retval version  Code-output version
 
-subroutine readplt(u,fname,nmax,nvar,nc,verbose,datf,nfi,version)
+subroutine read_plt_bse(u,fname,nmax,nvar,nc,verbose,datf,nfi,version)
   use kinds, only: double
   
   implicit none
@@ -808,7 +808,7 @@ subroutine readplt(u,fname,nmax,nvar,nc,verbose,datf,nfi,version)
      call read_plt(u,trim(fname),nmax,nvar,nc,verbose,datf,nfi,version)
   end if
   
-end subroutine readplt
+end subroutine read_plt_bse
 !***********************************************************************************************************************************
 
 
