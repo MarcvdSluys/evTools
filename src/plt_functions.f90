@@ -784,6 +784,40 @@ end subroutine printpltvarlist
 !!
 !! \param u         Input unit
 !! \param fname     Input file name
+!! \param nmax      Maximum number of model lines
+!! \param nvar      Number of variables
+!! \param nc        Expected number of columns in the input file - no longer used
+!! \param verbose   Verbosity (0,1)
+!! 
+!! \retval datf     Data array
+!! \retval nfi      Number of models read
+!! \retval version  Code-output version
+
+subroutine readplt(u,fname,nmax,nvar,nc,verbose,datf,nfi,version)
+  use kinds, only: double
+  
+  implicit none
+  integer, intent(in) :: u,nmax,nvar,nc,verbose
+  character, intent(in) :: fname*(*)
+  integer, intent(out) :: nfi,version
+  real(double), intent(out) :: datf(nvar,nmax)
+  
+  if(len_trim(fname)-index(trim(fname),'.dat',.true.).eq.3) then  ! File name ends in '.dat', assume BSE output
+     call read_bse(u,trim(fname),nmax,nvar,verbose,datf,nfi,version)
+  else
+     call read_plt(u,trim(fname),nmax,nvar,nc,verbose,datf,nfi,version)
+  end if
+  
+end subroutine readplt
+!***********************************************************************************************************************************
+
+
+
+!***********************************************************************************************************************************
+!> \brief Read the *.plt[12] file fname from unit u and return its length and the contents
+!!
+!! \param u         Input unit
+!! \param fname     Input file name
 !! \param nn        Maximum number of model lines
 !! \param nvar      Number of variables
 !! \param nc        Expected number of columns in the input file - no longer used
@@ -793,7 +827,7 @@ end subroutine printpltvarlist
 !! \retval n        Number of models read
 !! \retval version  Code-output version
 
-subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
+subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use kinds, only: double
   
   implicit none
@@ -836,7 +870,7 @@ subroutine readplt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   
   n = j-1   ! Number of models in the file
   
-end subroutine readplt
+end subroutine read_plt
 !***********************************************************************************************************************************
 
 
