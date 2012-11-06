@@ -238,6 +238,79 @@ end subroutine lt2ubv
 !***********************************************************************************************************************************
 
 
+!***********************************************************************************************************************************
+!> Convert spectral type and luminosity class to L, Teff using De Jager & Nieuwenhuijzen 1987
+!!
+!! \param  sptyp  Spectral type (0.0-8.5 for O0-M10)
+!! \param  lumcl  Lumonosity class (0.0-5.0 for Ia+-V)
+!! \retval lum    Luminosity (Lo)
+!! \retval teff   Effective temperature (K)
+!!
+!! \see 1987A&A...177..217D
+
+subroutine num_sp_type_2_lt(sptyp,lumcl, lum,teff)
+  use kinds, only: double
+  implicit none
+  real(double), intent(in) :: sptyp, lumcl
+  real(double), intent(out) :: lum, teff
+  integer :: i,j ,n
+  real(double) :: st,lc, acst,aclc, cij(0:5,0:5),dij(0:5,0:5), logl,logt, fac !, cheb
+  
+  st = sptyp/4.25d0 - 1.d0  ! s: 0.0 - 8.5  ->  -1 - +1
+  lc = lumcl/2.5d0  - 1.d0  ! b: 0.0 - 5.0  ->  -1 - +1
+  
+  acst = acos(st)  ! s
+  aclc = acos(lc)  ! b
+  
+  cij = 0.d0  !       0           1           2           3          4
+  cij(0,0:5) = (/ 3.82573d0, -2.13868d0, -0.46357d0,  0.02076d0, -0.11937d0,  0.d0/)  ! c(0,5) = 0?  0.108?
+  cij(1,0:4) = (/-1.55607d0, -1.89216d0, -0.96916d0, -0.08869d0, -0.20423d0/)
+  cij(2,0:3) = (/ 1.05165d0,  0.42330d0, -0.94379d0, -0.07438d0/)
+  cij(3,0:2) = (/-0.01663d0, -0.20024d0, -0.18552d0/)
+  cij(4,0:1) = (/-0.07576d0, -0.10934d0/)
+  cij(5,0)   =    0.11008d0
+  
+  dij = 0.d0  !       0           1           2           3          4
+  dij(0,0:5) = (/ 3.96105d0,  0.03165d0, -0.02963d0,  0.01307d0, -0.01172d0,  0.d0/)  !d(0,5) = 0?  0.023?
+  dij(1,0:4) = (/-0.62945d0,  0.02596d0, -0.06009d0,  0.01881d0, -0.01121d0/)
+  dij(2,0:3) = (/ 0.14370d0, -0.00977d0, -0.03265d0,  0.01649d0/)
+  dij(3,0:2) = (/ 0.00791d0,  0.00076d0, -0.03006d0/)
+  dij(4,0:1) = (/ 0.00723d0, -0.02621d0/)
+  dij(5,0)   =    0.02755d0
+  
+  
+  logl = 0.d0
+  logt = 0.d0
+  do n=0,5
+     do i=0,n
+        j = n-i
+  !do i=0,5
+  !   do j=0,5-i
+        fac  = cos(dble(i)*acst) * cos(dble(j)*aclc)
+        logl = logl + cij(i,j) * fac
+        logt = logt + dij(i,j) * fac
+        !if(i.eq.0.and.j.eq.5) print*, st,lc, acst,aclc, i,j, cij(i,j),dij(i,j), cos(dble(i)*acst) , cos(dble(j)*aclc), fac
+        !write(*,'(2I4,4(2x,2F9.5))') i,j, st,lc, acst,aclc, cos(dble(i)*acst), cos(dble(j)*aclc), cij(i,j),dij(i,j)
+        !write(*,'(2I4,4(2x,2F9.5))') i,j, st,lc, acst,aclc, cos(dble(i)*acst), cos(dble(j)*aclc), cij(i,j),cij(i,j)*fac
+     end do
+     !print*
+  end do
+  
+  lum  = 10.d0**logl
+  teff = 10.d0**logt
+  !stop
+  !write(*,'(2F9.4, 2F9.4)') st,lc, acst,aclc
+  !write(*,'(2F6.2, 2F8.3)') lumcl,sptyp, log10(teff), log10(lum)
+end subroutine num_sp_type_2_lt
+!***********************************************************************************************************************************
+
+
+
+
+
+
+
+
 
 
 !***********************************************************************************************************************************
