@@ -347,7 +347,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
         do i=2,n
            do j=80,76,-1
               ! If upper and lower boundary are equal, remove them:   (this is the only point where we modify dat())
-              if(abs(dat(j-1,i)-dat(j,i)).lt.1.d-10) dat(j-1:j,i) = (/0.d0,0.d0/)
+              if(abs(dat(j-1,i)-dat(j,i)).lt.1.e-10) dat(j-1:j,i) = (/0.0,0.0/)
            end do
            ib = 80
            do j=80,75,-1

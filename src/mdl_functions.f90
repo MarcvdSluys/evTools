@@ -335,10 +335,10 @@ subroutine list_mdl_models(infile,nblk)
         ! Calculate V.K. of the envelope:
         if(mp.gt.2.and.hh.gt.0.1) then
            vk = vk + (mm-mm1)*rr**2
-           be = be + g*(mm-mm1)*mm1/rr*5.6847e15    ! in 10^40 erg
+           be = be + real(g*(mm-mm1)*mm1/rr*5.6847d15)    ! in 10^40 erg
         end if
         if(mp.gt.2.and.hh.gt.0.001) then
-           be1 = be1 + g*(mm-mm1)*mm1/rr*5.6847e15  ! in 10^40 erg
+           be1 = be1 + real(g*(mm-mm1)*mm1/rr*5.6847d15)  ! in 10^40 erg
         end if
         
         mm1 = mm ! Remember the previous value

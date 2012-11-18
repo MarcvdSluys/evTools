@@ -40,7 +40,7 @@ program plotmod
   character :: fname*(99),findfile*(99)
   
   real :: dat(nc,nm),dat1(nc,nm)
-  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
+  real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,xr
   integer :: vx,vy,hmp,plotagain,system,status
   character :: log,ans
   character :: labels(nc)*(60),lx*(60),ly*(60),title*(100)
@@ -164,10 +164,10 @@ program plotmod
      dat(1,j) = real(j)
      dat1(2,j) = exp(dat1(2,j))
      dat1(3,j) = exp(dat1(3,j))
-     dat1(5,j) = dat1(5,j)*1.d33/m0
-     dat1(8,j) = exp(dat1(8,j))*1.e11/r0
-     dat1(9,j) = dat1(9,j)*1.d33/l0
-     dat1(20,j) = dat1(20,j)*1.d33/m0*yr
+     dat1(5,j) = dat1(5,j)*real(1.d33/m0)
+     dat1(8,j) = exp(dat1(8,j))*1.e11/real(r0)
+     dat1(9,j) = dat1(9,j)*1.e33/real(l0)
+     dat1(20,j) = dat1(20,j)*1.e33/real(m0*yr)
   end do
 
   !Make more sensible array, without 'eigenvalues' etc
@@ -188,7 +188,7 @@ program plotmod
 
   !Mass density
   do i=2,kh
-     dat(5,i) = (dat(2,i)-dat(2,i-1))*m0/(4.d0*pi/3.d0*(dat(3,i)**3-dat(3,i-1)**3)*r0**3)
+     dat(5,i) = (dat(2,i)-dat(2,i-1))*real(m0)/(real(4.d0*pi/3.d0)*(dat(3,i)**3-dat(3,i-1)**3)*real(r0)**3)
   end do
   dat(5,1) = dat(5,2)
 
@@ -294,14 +294,14 @@ program plotmod
 
 
 100 continue
-  x = 0.02*abs(xmax-xmin)
-  if(x.eq.0.) x = 0.05*xmax
-  xmin = xmin - x
-  xmax = xmax + x
-  x = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) x = 0.05*ymax
-  ymin = ymin - x
-  ymax = ymax + x
+  xr = 0.02*abs(xmax-xmin)
+  if(xr.eq.0.) xr = 0.05*xmax
+  xmin = xmin - xr
+  xmax = xmax + xr
+  xr = 0.02*abs(ymax-ymin)
+  if(x.eq.0.) xr = 0.05*ymax
+  ymin = ymin - xr
+  ymax = ymax + xr
 
   hmp = 999
   !      if(vx.eq.1) then
