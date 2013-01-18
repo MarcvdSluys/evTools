@@ -260,7 +260,7 @@ subroutine num_sp_type_2_lt(sptyp,lumcl, lum,teff)
   cij = 0.d0
   dij = 0.d0
   
-  ! 20 coefficients:
+  ! 20 coefficients: - up to 50% difference in logL,T compared to the 40-coefficients version!
   if(1.eq.2) then
      ! L:                0           1           2           3          4
      cij(0,0:5) = (/ 3.82573d0, -2.13868d0, -0.46357d0,  0.02076d0, -0.11937d0,  0.d0/)  ! c(0,5) = 0?
@@ -280,7 +280,7 @@ subroutine num_sp_type_2_lt(sptyp,lumcl, lum,teff)
   end if
   
   
-  ! 40 coefficients (1):
+  ! 40 coefficients:
   if(2.eq.2) then
      ! L:
      cij(0,0) =  3.948671d0

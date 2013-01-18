@@ -18,7 +18,7 @@ program testplt
      end do
      write(*,*)
      
-     do spi = 30,830,200 !800 !40
+     do spi = 30,830,40 !200 !800 !40
         sptyp = dble(spi)/100.d0
         lci = 5
         write(*,'(F8.2)', advance='no') sptyp
@@ -44,7 +44,7 @@ program testplt
   end do
   write(*,*)
   
-  do spi = 30,790,190 !760 !40
+  do spi = 30,790,40 !190 !760 !40
      sptyp = dble(spi)/100.d0
      lci = 5
      write(*,'(F8.2)', advance='no') sptyp
@@ -63,20 +63,20 @@ program testplt
   
   
   ! Compare to cheby40i.awk
-  write(*,*)
-  sptyp = 0.3d0
-  lumcl = 1.d0
-  do spi=1,7
-     if(spi.eq.2) sptyp = 1.05d0
-     if(spi.eq.3) sptyp = 2.10d0
-     if(spi.eq.4) sptyp = 4.d0
-     if(spi.eq.5) sptyp = 5.d0
-     if(spi.eq.6) sptyp = 6.d0
-     if(spi.eq.7) sptyp = 6.9d0
-     call num_sp_type_2_lt(sptyp,lumcl, lum,teff)
-     write(*,'(2F6.2,5x,2F7.3)') sptyp,lumcl, log10((/teff,lum/))
-  end do
-  write(*,*)
+  !write(*,*)
+  !sptyp = 0.3d0
+  !lumcl = 1.d0
+  !do spi=1,7
+  !   if(spi.eq.2) sptyp = 1.05d0
+  !   if(spi.eq.3) sptyp = 2.10d0
+  !   if(spi.eq.4) sptyp = 4.d0
+  !   if(spi.eq.5) sptyp = 5.d0
+  !   if(spi.eq.6) sptyp = 6.d0
+  !   if(spi.eq.7) sptyp = 6.9d0
+  !   call num_sp_type_2_lt(sptyp,lumcl, lum,teff)
+  !   write(*,'(2F6.2,5x,2F7.3)') sptyp,lumcl, log10((/teff,lum/))
+  !end do
+  !write(*,*)
   
 end program testplt
 !***********************************************************************************************************************************
