@@ -98,7 +98,7 @@ subroutine setconstants()
   
   implicit none
   
-  ! ThinkPad, Gentoo with 1440x900:
+  ! ThP, Gentoo with 1440x900:
   ! screen_size_h = 1435
   ! screen_size_v = 860
   
@@ -139,7 +139,7 @@ subroutine setconstants()
   call get_environment_variable('HOSTNAME',hostname)  ! Set hostname = $HOSTNAME  !Apparently not always exported
   call get_environment_variable('USER',username)      ! Set username = $USER
   call get_environment_variable('UID',userid)         ! Set userid   = $UID
-  write(libdir,'(A)')trim(homedir)//'/usr/lib'        ! Default lib dir, may be overwritten by settings file
+  write(libdir,'(A)') trim(homedir)//'/usr/lib'       ! Default lib dir, may be overwritten by settings file
   
   cursorup = char(27)//'[2A'         ! Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
   cursordown = char(27)//'[1B'       ! Print this to go down one line (on screen)
@@ -1051,26 +1051,14 @@ end function time_stamp
 !! \param PStitle  Title for the PS file
 
 subroutine set_PGPS_title(PSfile,PStitle)
+  use SUFR_constants, only: username
   implicit none
   character, intent(in) :: PSfile*(*),PStitle*(*)
   integer :: status,system
-  character :: tempfile*(99)
   
-  tempfile = 'temp_PGPS_file.eps'
+  status = system( "sed -i -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile) )
   
-  status = system("sed -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile)//" > "//trim(tempfile))
-  if(status.eq.0) then
-     status = system('mv -f '//trim(tempfile)//' '//trim(PSfile))
-  else
-     status = system('rm -f '//trim(tempfile))
-  end if
-  
-  status = system("sed -e 's/For: AstroFloyd/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile)//" > "//trim(tempfile))
-  if(status.eq.0) then
-     status = system('mv -f '//trim(tempfile)//' '//trim(PSfile))
-  else
-     status = system('rm -f '//trim(tempfile))
-  end if
+  status = system( "sed -i -e 's/For: "//trim(username)//"/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile))
   
 end subroutine set_PGPS_title
 !***********************************************************************************************************************************
