@@ -256,11 +256,11 @@ program listplt
   dat(37,1:n) = dat(88,1:n)  !Take Sills MB in stead of Wind AML
   
   !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (tpi*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**c3rd
+  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (pi2*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**c3rd
   
   !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of 
   !dat(33):
-  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(tpi*(dat(4,1:n)+dat(40,1:n))*m0))**c3rd/1.d50
+  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(pi2*(dat(4,1:n)+dat(40,1:n))*m0))**c3rd/1.d50
   
   
   dat(63,1:n) = dat(4,1:n) - dat(5,1:n) 
@@ -274,7 +274,7 @@ program listplt
   dat(80,1:n) = dat(79,1:n)
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30
-  c82(1:n) = tpi*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) * (dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
+  c82(1:n) = pi2*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) * (dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
   !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
   dat(82,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c82(1:n)/day
   

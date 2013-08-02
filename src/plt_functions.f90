@@ -978,7 +978,7 @@ end subroutine read_bse
 
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use kinds, only: double
-  use constants, only: pi,tpi, c,g, km,yr,day, l0,m0,r0
+  use constants, only: pi,pi2, c,g, km,yr,day, l0,m0,r0
   use plt_funcs, only: compute_zeta_ad, compute_zeta_rl
   
   implicit none
@@ -1091,7 +1091,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   end do
   
   ! 114: Vrot = 2piR/P -> km/s:
-  dat(114,1:n) = tpi*dat(8,1:n)*r0/(dat(21,1:n)*day)/km
+  dat(114,1:n) = pi2*dat(8,1:n)*r0/(dat(21,1:n)*day)/km
   
   ! 115: R/Rzams:
   dat(115,1:n) = dat(8,1:n)/(dat(8,1)+1.d-30)

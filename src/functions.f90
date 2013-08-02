@@ -76,7 +76,7 @@ module constants
   integer :: screen_dpi,screen_size_h,screen_size_v
   integer :: colours(29), ncolours
   real :: scrsz,scrrat
-  real(double) :: pi,tpi,pi2,c3rd
+  real(double) :: pi,pi2,c3rd
   real(double) :: l0,r0,m0,g,c,day,yr,km
   real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
   character :: homedir*(99),workdir*(99),libdir*(99),username*(99),userID*(9),hostname*(99)
@@ -91,12 +91,16 @@ end module constants
 !> \brief  Define the 'constants' in the evTools package
 
 subroutine setconstants()
+  use SUFR_constants, only: set_SUFR_constants
+  
   use constants, only: a_rad,amu,c,g,h_bar,h_p,k_b,m_h,sigma,  km,  l0,m0,r0
-  use constants, only: pi,pi2,tpi,c3rd, cursordown,cursorleft,cursorright,cursorup
+  use constants, only: pi,pi2,c3rd, cursordown,cursorleft,cursorright,cursorup
   use constants, only: day,yr, homedir,workdir,hostname,libdir,userid,username, colours,ncolours
   use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg
   
   implicit none
+  
+  call set_SUFR_constants()  ! Set libSUFR constants
   
   ! ThP, Gentoo with 1440x900:
   ! screen_size_h = 1435
@@ -111,8 +115,7 @@ subroutine setconstants()
   
   
   pi       =  4*atan(1.d0)                            ! Pi, area of circle/r^2
-  tpi      =  2*pi
-  pi2      =  0.5d0*pi
+  pi2      =  2*pi
   c3rd     =  1.d0/3.d0
   
   l0       =  3.83d33                                 ! Solar luminosity, erg s^-1
@@ -130,7 +133,7 @@ subroutine setconstants()
   m_h      =  1.007825*amu                            ! Mass of a hydrogen atom
   k_b      =  1.380658d-16                            ! Boltzmann constant, erg/K
   h_p      =  6.6260755d-27                           ! Planck's constant, erg s
-  h_bar    =  h_p/tpi                                 ! Reduced Planck constant, erg s
+  h_bar    =  h_p/pi2                                 ! Reduced Planck constant, erg s
   a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0     ! Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
   sigma    =  a_rad*c*0.25d0                          ! Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
   
