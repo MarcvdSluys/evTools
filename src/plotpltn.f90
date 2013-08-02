@@ -24,7 +24,7 @@
 
 program plotpltn
   use kinds
-  use constants
+  use SUFR_constants
   use ubvdata
   
   implicit none
@@ -196,10 +196,10 @@ program plotpltn
      do i=8,14
         dat(f,i,1:n(f)) = 10**dat(f,i,1:n(f))
      end do
-     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*m0*1.d-40                                         !Ebind in 10^40 erg
+     dat(f,15,1:n(f)) = dat(f,15,1:n(f))*msun*1.d-40                                         !Ebind in 10^40 erg
      dat(f,71,1:n(f)) = dat(f,5,1:n(f)) - dat(f,6,1:n(f))                                  !Mhe-CO: intershell mass
      dat(f,72,1:n(f)) = dat(f,22,1:n(f))*dat(f,4,1:n(f))*dat(f,8,1:n(f))**2                !Moment of inertia
-     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*m0/(4/3.d0*pi*(dat(f,8,1:n(f))*r0)**3)             !Average Rho
+     dat(f,73,1:n(f)) = dat(f,4,1:n(f))*msun/(4/3.d0*pi*(dat(f,8,1:n(f))*rsun)**3)             !Average Rho
      dat(f,74,1:n(f)) = dat(f,81,1:n(f))                                                   !Move Qconv from 81 to 74
      dat(f,75,1:n(f)) = 1.d0 - dat(f,42,1:n(f)) - dat(f,43,1:n(f))                         !Z_surf = 1 - X - Y
      dat(f,76,1:n(f)) = dat(f,2,n(f))-min(dat(f,2,1:n(f)),dat(f,2,n(f))-1.d4)              !t_f - t
@@ -218,7 +218,7 @@ program plotpltn
      
      dat(f,89,1:n(f)) = dat(f,4,1:n(f)) - dat(f,5,1:n(f))                         !H-envelope mass
      !lambda_env = G*M*M_env/(Ebind*R):
-     dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*m0**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*r0*1.d40+1.d-30)
+     dat(f,90,1:n(f)) = g*dat(f,4,1:n(f))*dat(f,89,1:n(f))*msun**2 / (dat(f,15,1:n(f))*dat(f,8,1:n(f))*rsun*1.d40+1.d-30)
      !dat(f,90,1:n(f)) = abs(dat(f,90,1:n(f)))    !This 'hides' the fact that Ebind changes sign
      dat(f,90,1:n(f)) = max(dat(f,90,1:n(f)),0.d0)
      do i=1,n(f)

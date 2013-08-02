@@ -23,7 +23,9 @@
 
 !> Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
 program plotmdln  
-  use constants
+  use SUFR_constants
+  use constants, only: scrrat,scrsz, white_bg
+  
   
   implicit none
   integer, parameter :: nn=1000,nq=30,nbb=500

@@ -24,7 +24,7 @@
 !> \brief Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
 
 program plotmdln  
-  use constants
+  use SUFR_constants
   use mdl_data !, mdl2 => mdl
   
   implicit none

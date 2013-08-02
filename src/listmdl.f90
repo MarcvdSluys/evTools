@@ -18,7 +18,7 @@
 
 !> \brief  Lists the data contained in *.mdl[12] files
 program listmdl
-  use constants
+  use SUFR_constants
   implicit none
   
   integer :: nblk,blk,ans

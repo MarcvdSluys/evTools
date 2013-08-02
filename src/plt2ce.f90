@@ -24,12 +24,12 @@ program plt2ce
   implicit none   
   
   integer, parameter :: nff=200, n=100000,nc=89
-  real(double) :: dat(nc),r,l,t,m0,r0
+  real(double) :: dat(nc),r,l,t,msun,rsun
   integer :: i,nc1,f,nf,fl
   character :: fnames(nff)*(99),fname*(99)
   
-  m0 = 1.9891d33
-  r0 = 6.9599d10
+  msun = 1.9891d33
+  rsun = 6.9599d10
   
   call findfiles('*.plt1',nff,1,fnames,nf)  !Use the first nff files
   
@@ -58,7 +58,7 @@ program plt2ce
         !  16:core entropy, 17:T10^5K entropy
         !BEs: 8:be: Total Binding Energy, 9:be0: Gravitational BE, 10:be1: Internal BE, 11:be2: Recombination BE, 
         !  12:be3: H2 dissociation BE.   13:I: Moment of Inertia
-        write(20,20)dat(2),dat(4:6),r,l,t, dat(15)*m0,dat(84:87)*m0, dat(22)*dat(4)*m0*(r*r0)**2, dat(57),dat(58)+dat(60), &
+        write(20,20)dat(2),dat(4:6),r,l,t, dat(15)*msun,dat(84:87)*msun, dat(22)*dat(4)*msun*(r*rsun)**2, dat(57),dat(58)+dat(60), &
              dat(88),dat(89)
 20      format(ES17.9,16ES13.5)
      end do! i=1,n

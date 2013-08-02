@@ -18,7 +18,8 @@
 
 program listplt
   use kinds
-  use constants
+  use SUFR_constants
+  use constants, only: libdir
   use ubvdata
   
   implicit none
@@ -238,7 +239,7 @@ program listplt
   dat(12,1:n) = 10**dat(12,1:n)
   dat(13,1:n) = 10**dat(13,1:n)
   dat(14,1:n) = 10**dat(14,1:n)
-  dat(15,1:n) = dat(15,1:n)*m0  !One would like to print Ebind in erg, not erg/m0
+  dat(15,1:n) = dat(15,1:n)*msun  !One would like to print Ebind in erg, not erg/msun
   
   
   
@@ -246,7 +247,7 @@ program listplt
   !****** CALCULATE SOME VARIABLES THAT ARE NOT IN THE FILE ***************
   
   !Calculate actual magnetic braking, according to Rappaport, Joss, Verbunt 1983
-  dat(38,1:n)  = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4 * (2*pi/(dat(21,1:n)*day))**3/1.d50
+  dat(38,1:n)  = 3.8e-30*dat(4,1:n)*msun*(dat(8,1:n)*rsun)**4 * (2*pi/(dat(21,1:n)*solday))**3/1.d50
   do i=1,n
      if(dat(81,i).lt.0.02) dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
   end do !i
@@ -256,27 +257,30 @@ program listplt
   dat(37,1:n) = dat(88,1:n)  !Take Sills MB in stead of Wind AML
   
   !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*m0*m0) * (pi2*(dat(28,1:n)*day)**2*(dat(4,1:n)+dat(40,1:n))*m0/(g*g))**c3rd
+  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*msun*msun) * &
+       (pi2*(dat(28,1:n)*solday)**2*(dat(4,1:n)+dat(40,1:n))*msun/(pc_g*pc_g))**c3rd
   
-  !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of 
+  !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of
   !dat(33):
-  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*m0*dat(31,1:n)*m0/yr*(g*g*dat(28,1:n)*day/(pi2*(dat(4,1:n)+dat(40,1:n))*m0))**c3rd/1.d50
+  dat(39,1:n) = (dat(4,1:n)-dat(40,1:n))*msun*dat(31,1:n)*msun/julyear * &
+       (pc_g*pc_g*dat(28,1:n)*solday/(pi2*(dat(4,1:n)+dat(40,1:n))*msun))**c3rd / 1.d50
   
   
   dat(63,1:n) = dat(4,1:n) - dat(5,1:n) 
   
   
-  dat(75,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr          !KH timescale
-  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)          !Gravitational waves
-  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)             !Magnetic braking (Actually SO-coupling!)
+  dat(75,1:n) = pc_g*dat(4,1:n)**2*msun*msun/(dat(8,1:n)*rsun*dat(9,1:n)*lsun)/julyear          !KH timescale
+  dat(76,1:n) = dat(34,1:n)/max(dat(36,1:n)*julyear,1.d-30)          !Gravitational waves
+  dat(77,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*julyear,1.d-30)             !Magnetic braking (Actually SO-coupling!)
   dat(78,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)         !Mass transfer
-  dat(79,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10              !Nuclear evolution timescale
+  dat(79,1:n) = dat(4,1:n)*msun/1.9891/(dat(9,1:n)*lsun)*4.e10              !Nuclear evolution timescale
   dat(80,1:n) = dat(79,1:n)
   
   dat(5,1:n) = dat(5,1:n) + 1.d-30
-  c82(1:n) = pi2*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) * (dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
+  c82(1:n) = pi2*(256.d0/5.d0)**(3*c8th) * pc_g**(5*c8th)/pc_c**(15*c8th) * (dat(5,1:n)*1.4)**(3*c8th) * &
+       msun**(5*c8th)/(dat(5,1:n)+1.4)**c8th
   !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
-  dat(82,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c82(1:n)/day
+  dat(82,1:n) = ((13.6d9-dat(2,1:n))*julyear)**(3*c8th)*c82(1:n)/solday
   
   
   dat(83,1:n) = dat(4,1:n) - dat(5,1:n)                                 !H-envelope mass
@@ -298,8 +302,8 @@ program listplt
      if(dat(21,i).gt.dat(87,i)) dat(88,i) = 2.7e-3*(2*pi/dat(21,i))**3*dat(8,i)**0.5d0*dat(4,i)**(-0.5d0)
      if(dat(81,i).lt.0.02) dat(88,i) = dat(88,i)*exp(1.d0-2.d-2/dat(81,i)) !Exponential decrease for thin convective envelopes
   end do !i
-  !      dat(88,1:n) = log10(dat(88,1:n)/day**3)
-  dat(88,1:n) = dat(88,1:n)/day**3
+  !      dat(88,1:n) = log10(dat(88,1:n)/solday**3)
+  dat(88,1:n) = dat(88,1:n)/solday**3
   
   var(1:n) = (1.1487d0*dat(9,1:n)**0.47d0 + 0.1186d0*dat(9,1:n)**0.8d0)/dat(4,1:n)**0.31d0  !~Hyashi track radius
   !Analytic convective turnover timescale (days), adapted from Eggleton's CFUNCS.F:
@@ -310,16 +314,17 @@ program listplt
   
   dat(91,1:n) = (dat(61,1:n)/dat(60,1:n))/(dat(47,1:n)/dat(46,1:n))   !(Ne/O)cen/(Ne/O)surf
   
-  c92(1:n) = 2*pi*(256.d0/5.d0)**(3*c8th) * g**(5*c8th)/c**(15*c8th) *(dat(5,1:n)*1.4)**(3*c8th)*m0**(5*c8th)/(dat(5,1:n)+1.4)**c8th
+  c92(1:n) = 2*pi*(256.d0/5.d0)**(3*c8th) * pc_g**(5*c8th)/pc_c**(15*c8th) *(dat(5,1:n)*1.4)**(3*c8th) * &
+       msun**(5*c8th)/(dat(5,1:n)+1.4)**c8th
   !Pmax that can still be converged for a WD with the mass of the He core and a NS of 1.4Mo in a time t-t_H due to GWs:
-  dat(92,1:n) = ((13.6d9-dat(2,1:n))*yr)**(3*c8th)*c92(1:n)/day
+  dat(92,1:n) = ((13.6d9-dat(2,1:n))*julyear)**(3*c8th)*c92(1:n)/solday
   
   dat(93,1:n) = dat(8,1:n)/exp(dat(29,1:n))    
   dat(94,1:n) = 2*dat(56,1:n) + dat(57,1:n) + 1.                                !Xf := 2Xc + Yc + 1
   !M.I. = k^2*M*R^2 in MoRo^2  (in some models, log(VK2) is listed:
   dat(95,1:n) = 10.d0**dat(22,1:n)*dat(4,1:n)*dat(8,1:n)**2
-  dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*m0*r0*r0/day)     !Jspin = I*w in 10^50 g cm^2 s^-1
-  dat(97,1:n) = dat(4,1:n)*m0/(4*c3rd*pi*(dat(8,1:n)*r0)**3)                !Average Rho
+  dat(96,1:n) = dat(95,1:n)*2*pi/(dat(21,1:n)+1.e-30)*(1.d-50*msun*rsun*rsun/solday)     !Jspin = I*w in 10^50 g cm^2 s^-1
+  dat(97,1:n) = dat(4,1:n)*msun/(4*c3rd*pi*(dat(8,1:n)*rsun)**3)                !Average Rho
   dat(98,1:n) = 1.d0 - dat(42,1:n)-dat(43,1:n)                              !Z_surf = 1 - X - Y
   
   

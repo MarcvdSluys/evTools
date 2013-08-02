@@ -28,7 +28,8 @@
 
 program plotplt
   use kinds, only: double,dbl
-  use constants, only: homedir,libdir, colours,ncolours,scrrat,scrsz,white_bg
+  use SUFR_constants, only: homedir
+  use constants, only: libdir, colours,ncolours, scrrat,scrsz, white_bg
   use ubvdata, only: ubv
   
   implicit none

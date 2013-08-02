@@ -20,7 +20,7 @@
 
 program plotpltp      
   use kinds
-  use constants
+  use SUFR_constants
   
   implicit none
   integer, parameter :: nn=30000, nvar=100
@@ -172,16 +172,16 @@ program plotpltp
   dat(14,1:n) = 10**dat(14,1:n)
   
   !TRUE Magnetic braking in stead of Spin-orbit coupling:
-  dat(38,1:n) = 3.8e-30*dat(4,1:n)*m0*(dat(8,1:n)*r0)**4* (2*pi/(dat(21,1:n)*day))**3/1.d50
+  dat(38,1:n) = 3.8e-30*dat(4,1:n)*msun*(dat(8,1:n)*rsun)**4* (2*pi/(dat(21,1:n)*solday))**3/1.d50
   do i=1,nn
      if(dat(81,i).lt.0.02) dat(38,i) = dat(38,i)*exp(1.d0-2.d-2/dat(81,i))
   end do
   
-  dat(72,1:n) = g*dat(4,1:n)**2*m0*m0/(dat(8,1:n)*r0*dat(9,1:n)*l0)/yr                 !KH timescale
+  dat(72,1:n) = g*dat(4,1:n)**2*msun*msun/(dat(8,1:n)*rsun*dat(9,1:n)*lsun)/yr                 !KH timescale
   dat(73,1:n) = dat(34,1:n)/max(dat(36,1:n)*yr,1.d-30)                      !Gravitational waves
   dat(74,1:n) = dat(34,1:n)/max(abs(dat(38,1:n))*yr,1.d-30)                 !Magnetic braking
   dat(75,1:n) = dat(4,1:n)/max(abs(dat(33,1:n)),1.d-30)                     !Mass transfer
-  dat(76,1:n) = dat(4,1:n)*m0/1.9891/(dat(9,1:n)*l0)*4.e10                  !Nuclear timescale
+  dat(76,1:n) = dat(4,1:n)*msun/1.9891/(dat(9,1:n)*lsun)*4.e10                  !Nuclear timescale
   dat(77,1:n) = dat(34,1:n)/max(abs(dat(35,1:n))*yr,1.d-30)                 !Total dOA
   dat(78,1:n) = dat(34,1:n)/max(dat(39,1:n)*yr,1.d-30)                      !dOA due to Mass loss
   

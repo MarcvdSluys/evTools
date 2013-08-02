@@ -175,7 +175,7 @@ end program findplt
 
 subroutine printmodel(n, xx, iin, iout)
   use kinds, only: double
-  use constants, only: m0
+  use SUFR_constants, only: msun
   
   implicit none
   integer, intent(in) :: n,iin,iout
@@ -189,7 +189,7 @@ subroutine printmodel(n, xx, iin, iout)
   x(9)  = 10.d0**x(9)   ! logL -> L
   x(10) = 10.d0**x(10)  ! logT -> Teff
   
-  x(15) = x(15)*m0
+  x(15) = x(15)*msun
   
   if(iout.eq.0) then
      write(6,*)''

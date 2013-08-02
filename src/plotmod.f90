@@ -26,12 +26,13 @@
 !> \brief Plot the contents of the *.mod output file of ev
 program plotmod
   use kinds
-  use constants
+  use SUFR_constants
+  use constants, only: scrrat,scrsz, white_bg
   
   implicit none
   integer, parameter :: nc=25,nm=1000
   real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real(double) :: lnf,lnt,x16,lnm,x1,lnr,l,x4,x12,x20
+  real(double) :: lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20
   real(double) :: mi,pr,phi,phis,e,f,x
   real(double) :: r1,l1,ts,tc,hc,hec,zc
   real(double) :: mhe,mco
@@ -90,8 +91,8 @@ program plotmod
      do j=1,kh
         read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
         if(j.eq.1) then
-           r1  = exp(lnr)*1.e11/r0
-           l1  = l*1.d33/l0
+           r1  = exp(lnr)*1.e11/rsun
+           l1  = l*1.d33/lsun
            ts  = exp(lnt)
         end if
         if(j.eq.kh) then
@@ -100,8 +101,8 @@ program plotmod
            hec = x4
            zc  = 1.d0 - x1 - x4
         end if
-        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
-        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
+        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
+        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
      end do !j
      write(6,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
           i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,ts,tc,hc,hec,zc,bms,p,ecc,p1
@@ -164,10 +165,10 @@ program plotmod
      dat(1,j) = real(j)
      dat1(2,j) = exp(dat1(2,j))
      dat1(3,j) = exp(dat1(3,j))
-     dat1(5,j) = dat1(5,j)*real(1.d33/m0)
-     dat1(8,j) = exp(dat1(8,j))*1.e11/real(r0)
-     dat1(9,j) = dat1(9,j)*1.e33/real(l0)
-     dat1(20,j) = dat1(20,j)*1.e33/real(m0*yr)
+     dat1(5,j) = dat1(5,j)*real(1.d33/msun)
+     dat1(8,j) = exp(dat1(8,j))*1.e11/real(rsun)
+     dat1(9,j) = dat1(9,j)*1.e33/real(lsun)
+     dat1(20,j) = dat1(20,j)*1.e33/real(msun*julyear)
   end do
 
   !Make more sensible array, without 'eigenvalues' etc
@@ -188,7 +189,7 @@ program plotmod
 
   !Mass density
   do i=2,kh
-     dat(5,i) = (dat(2,i)-dat(2,i-1))*real(m0)/(real(4.d0*pi/3.d0)*(dat(3,i)**3-dat(3,i-1)**3)*real(r0)**3)
+     dat(5,i) = (dat(2,i)-dat(2,i-1))*real(msun)/(real(4.d0*pi/3.d0)*(dat(3,i)**3-dat(3,i-1)**3)*real(rsun)**3)
   end do
   dat(5,1) = dat(5,2)
 

@@ -22,7 +22,8 @@
 
 program plotmdl  
   use kinds
-  use constants
+  use SUFR_constants
+  use constants, only: colours,ncolours, scrrat,scrsz, white_bg
   use mdl_data
   
   implicit none

@@ -19,7 +19,8 @@
 
 program plt2obs
   use kinds
-  use constants
+  use SUFR_constants
+  use constants, only: libdir
   use ubvdata
   
   implicit none
@@ -31,7 +32,7 @@ program plt2obs
   
   call setconstants()
   
-  !Read atmosphere-model data
+  ! Read atmosphere-model data:
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
      read(10,*)tmpstr

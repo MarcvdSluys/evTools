@@ -24,7 +24,7 @@
 
 program dat2plt
   use kinds
-  use constants
+  use SUFR_constants
   
   implicit none
   integer, parameter :: nci1=99,nco=89

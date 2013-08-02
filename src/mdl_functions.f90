@@ -48,7 +48,7 @@ end module mdl_data
 !! \param  dat  Data array (in/out)
 subroutine compute_mdl_variables(dat)
   use kinds
-  use constants
+  use SUFR_constants
   use mdl_data
   
   implicit none
@@ -74,20 +74,20 @@ subroutine compute_mdl_variables(dat)
   dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   ! R/R*
   dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 ! C/O
   dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 ! Ne/O
-  dat(207,1:nm) = -g*dat(pxin(9),1:nm)*m0/(dat(pxin(17),1:nm)*r0) + dat(pxin(27),1:nm)  ! Ugr + Uint  
+  dat(207,1:nm) = -pc_g*dat(pxin(9),1:nm)*msun/(dat(pxin(17),1:nm)*rsun) + dat(pxin(27),1:nm)  ! Ugr + Uint  
   dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            ! Mean free path = 1/(rho * kappa)
   if(pxin(31).ne.0) then
-     dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*amu)                !n = rho / (mu * amu)
+     dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*pc_amu)                !n = rho / (mu * pc_amu)
      pxnr(209) = 209
   end if
-  dat(210,1:nm) = real(g*dble(dat(pxin(9),1:nm))*m0/(dble(dat(pxin(17),1:nm))**2*r0**2))                !n = rho / (mu * amu)
+  dat(210,1:nm) = real(pc_g*dble(dat(pxin(9),1:nm))*msun/(dble(dat(pxin(17),1:nm))**2*rsun**2))  ! n = rho / (mu * pc_amu)
   pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
   
   !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
   dat(211,1:nm) = 2.d0 / (1.d0 + 3*dat(9,1:nm) + 0.5d0*dat(10,1:nm))
-  dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*m_h)                                       ! Particle density       n = rho/(mu*m_H)
-  dat(213,1:nm) = a_rad*dat(5,1:nm)**4*c3rd                                             ! P_rad = aT^4/3
-  dat(214,1:nm) = dat(212,1:nm)*k_b*dat(5,1:nm)                                         ! P_gas = nkT
+  dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*pc_mh)                                     ! Particle density       n = rho/(mu*m_H)
+  dat(213,1:nm) = pc_arad*dat(5,1:nm)**4*c3rd                                           ! P_rad = aT^4/3
+  dat(214,1:nm) = dat(212,1:nm)*pc_kb*dat(5,1:nm)                                       ! P_gas = nkT
   dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.d-30)                                  ! beta = Prad/Pgas
   
   !216-217: binding energy:
@@ -96,8 +96,8 @@ subroutine compute_mdl_variables(dat)
   dat(218,1:nm) = 0.0d0
   do i=2,nm
      dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
-     !dE = dat(207,i)*dat(216,i) * m0*1.d-40                                            ! BE of the shell (10^40 erg)
-     dE = dat(207,i)*dat(216,i) * m0 / (G*M0**2/R0)                                     ! BE of the shell       (G Mo^2 / Ro)
+     !dE = dat(207,i)*dat(216,i) * msun*1.d-40                                          ! BE of the shell (10^40 erg)
+     dE = dat(207,i)*dat(216,i) * msun / (PC_G*msun**2/rsun)                            ! BE of the shell       (G Mo^2 / Ro)
      dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
      if(dat(pxin(10),i).gt.0.1d0) dat(218,i) = dat(218,i-1) + dE                        ! BE of envelope        (same units)
   end do
@@ -123,7 +123,7 @@ subroutine compute_mdl_variables(dat)
   
   a_orbi = rl2a(m1i,m2i,r1i)                                                             ! a_orb (Ro)
   Eorbi = -m1i*m2i/(2*a_orbi)                                                            ! Eorb (G Mo^2 / Ro)
-  Jorbi = m1i*m2i*sqrt(a_orbi/Mbini)                                                     ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
+  Jorbi = m1i*m2i*sqrt(a_orbi/Mbini)                                                     ! Jorb,i (G^1/2 Mo^3/2 Ro^1/2)
   
   alphaCE = 1.d0
   gammaCE = 1.5d0
@@ -135,10 +135,10 @@ subroutine compute_mdl_variables(dat)
      m1 = dat(pxin(9),i)
      Mbin = m1+m2i
      a_orb = rl2a( m1, m2i, dat(pxin(17),i) )                                            ! a_orb (Ro)
-     call a2p( Mbin*M0, a_orb*R0, Porb)                                                  ! Porb (s)
-     Porb = Porb/day                                                                     ! Porb (day)
-     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
-     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
+     call a2p( Mbin*msun, a_orb*rsun, Porb)                                                  ! Porb (s)
+     Porb = Porb/solday                                                                     ! Porb (day)
+     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G Mo^2 / Ro)
+     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 Mo^3/2 Ro^1/2)
      dat(220,i) = a_orb
      dat(221,i) = Porb
      dat(222,i) = Eorb
@@ -154,9 +154,9 @@ subroutine compute_mdl_variables(dat)
      Mbin = m1+m2i
      Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                     ! Eorb (G Mo^2 / Ro)
      a_orb = -m1*m2i/(2*Eorb)                                                            ! a_orb (Ro)
-     call a2p(Mbin*M0,a_orb*R0,Porb)                                                     ! Porb (s)
-     Porb = Porb/day                                                                     ! Porb (day)
-     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 M0^3/2 R0^1/2)
+     call a2p(Mbin*msun,a_orb*rsun,Porb)                                                     ! Porb (s)
+     Porb = Porb/solday                                                                     ! Porb (day)
+     Jorb = m1*m2i*sqrt(a_orb/Mbin)                                                      ! Jorb (G^1/2 Mo^3/2 Ro^1/2)
      
      dat(224,i) = a_orb
      dat(225,i) = Porb
@@ -171,10 +171,10 @@ subroutine compute_mdl_variables(dat)
      m1 = dat(pxin(9),i)
      Mbin = m1+m2i
      Jorb = Jorbi * (1.d0 - gammaCE*(m1i-m1)/Mbini)
-     a_orb = Mbin * (Jorb/(m1*m2i))**2                                                   ! Jorb,i (G^1/2 M0^3/2 R0^1/2)
-     call a2p(Mbin*M0,a_orb*R0,Porb)                                                     ! Porb (s)
-     Porb = Porb/day                                                                     ! Porb (day)
-     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G M0^2 / R0)
+     a_orb = Mbin * (Jorb/(m1*m2i))**2                                                   ! Jorb,i (G^1/2 Mo^3/2 Ro^1/2)
+     call a2p(Mbin*msun,a_orb*rsun,Porb)                                                     ! Porb (s)
+     Porb = Porb/solday                                                                     ! Porb (day)
+     Eorb = m1*m2i/(2*a_orb)                                                             ! Eorb (G Mo^2 / Ro)
      !Eorb = Eorbi + dat(217,nm) - dat(217,i)/alphaCE                                    ! Eorb (G Mo^2 / Ro)  FOR ALPHA_CE !!!
      
      dat(228,i) = a_orb
@@ -223,7 +223,7 @@ end subroutine compute_mdl_variables
 !! \retval nblk   Number of stellar-structure blocks in the file
 
 subroutine list_mdl_models(infile,nblk)
-  use constants
+  use SUFR_constants
   use mdl_data
   
   implicit none
@@ -335,10 +335,10 @@ subroutine list_mdl_models(infile,nblk)
         ! Calculate V.K. of the envelope:
         if(mp.gt.2.and.hh.gt.0.1) then
            vk = vk + (mm-mm1)*rr**2
-           be = be + real(g*(mm-mm1)*mm1/rr*5.6847d15)    ! in 10^40 erg
+           be = be + real(pc_g*(mm-mm1)*mm1/rr*5.6847d15)    ! in 10^40 erg
         end if
         if(mp.gt.2.and.hh.gt.0.001) then
-           be1 = be1 + real(g*(mm-mm1)*mm1/rr*5.6847d15)  ! in 10^40 erg
+           be1 = be1 + real(pc_g*(mm-mm1)*mm1/rr*5.6847d15)  ! in 10^40 erg
         end if
         
         mm1 = mm ! Remember the previous value
@@ -383,7 +383,7 @@ end subroutine list_mdl_models
 !! \param svblk   Save block or not (in/out)
 
 subroutine print_mdl_details(infile,blk,svblk)
-  use constants
+  use SUFR_constants
   use mdl_data
   
   implicit none

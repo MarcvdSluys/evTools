@@ -73,15 +73,10 @@ module constants
   save
   private :: double
   
-  integer :: screen_dpi,screen_size_h,screen_size_v
-  integer :: colours(29), ncolours
+  integer :: screen_dpi,screen_size_h,screen_size_v, colours(29),ncolours
   real :: scrsz,scrrat
-  real(double) :: pi,pi2,c3rd
-  real(double) :: l0,r0,m0,g,c,day,yr,km
-  real(double) :: amu,m_h,k_b,h_p,h_bar,a_rad,sigma
-  character :: homedir*(99),workdir*(99),libdir*(99),username*(99),userID*(9),hostname*(99)
-  character :: cursorup*(4),cursordown*(4),cursorright*(4),cursorleft*(4) !Cursor movement
-  logical :: student_mode,white_bg
+  character :: libdir*(99)
+  logical :: student_mode, white_bg
   
 end module constants
 !***********************************************************************************************************************************
@@ -93,18 +88,12 @@ end module constants
 subroutine setconstants()
   use SUFR_constants, only: set_SUFR_constants
   
-  use constants, only: a_rad,amu,c,g,h_bar,h_p,k_b,m_h,sigma,  km,  l0,m0,r0
-  use constants, only: pi,pi2,c3rd, cursordown,cursorleft,cursorright,cursorup
-  use constants, only: day,yr, homedir,workdir,hostname,libdir,userid,username, colours,ncolours
-  use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg
+  use SUFR_constants, only: homedir
+  use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg, colours,ncolours, libdir
   
   implicit none
   
   call set_SUFR_constants()  ! Set libSUFR constants
-  
-  ! ThP, Gentoo with 1440x900:
-  ! screen_size_h = 1435
-  ! screen_size_v = 860
   
   ! Default:
   screen_size_h = 1000   ! Horizontal screen size (pixels)
@@ -113,41 +102,7 @@ subroutine setconstants()
   screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
   white_bg = .true.      ! F: black background on screen, T: white
   
-  
-  pi       =  4*atan(1.d0)                            ! Pi, area of circle/r^2
-  pi2      =  2*pi
-  c3rd     =  1.d0/3.d0
-  
-  l0       =  3.83d33                                 ! Solar luminosity, erg s^-1
-  r0       =  6.9599d10                               ! Solar radius, cm
-  m0       =  1.9891d33                               ! Solar mass, g
-  
-  g        =  6.67259d-8                              ! Newton's constant, cm^3 g^-1 s^-2
-  c        =  2.99792458d10                           ! Speed of light in vacuo, cm s^-1
-  
-  day      =  8.64d4                                  ! Day, s
-  yr       =  3.15569d7                               ! Year, s
-  km       =  1.d5                                    ! Kilometer, cm
-  
-  amu      =  1.6605402d-24                           ! Atomic mass unit; (mass of C12 atom)/12, g
-  m_h      =  1.007825*amu                            ! Mass of a hydrogen atom
-  k_b      =  1.380658d-16                            ! Boltzmann constant, erg/K
-  h_p      =  6.6260755d-27                           ! Planck's constant, erg s
-  h_bar    =  h_p/pi2                                 ! Reduced Planck constant, erg s
-  a_rad    =  k_b**4/((c*h_p)**3) * 8*pi**5/15.d0     ! Radiation (density) constant, 7.56591d-15 erg cm^-3 K^-4
-  sigma    =  a_rad*c*0.25d0                          ! Stefan-Boltzmann constant, 5.67051d-5 erg cm^-2 K^-4 s^-1
-  
-  call get_environment_variable('HOME',homedir)       ! Set homedir  = $HOME (the environment variable)
-  call get_environment_variable('PWD',workdir)        ! Set workdir  = $PWD
-  call get_environment_variable('HOSTNAME',hostname)  ! Set hostname = $HOSTNAME  !Apparently not always exported
-  call get_environment_variable('USER',username)      ! Set username = $USER
-  call get_environment_variable('UID',userid)         ! Set userid   = $UID
   write(libdir,'(A)') trim(homedir)//'/usr/lib'       ! Default lib dir, may be overwritten by settings file
-  
-  cursorup = char(27)//'[2A'         ! Print this to go up one line (on screen) (actually 2 lines, for some reason that's needed)
-  cursordown = char(27)//'[1B'       ! Print this to go down one line (on screen)
-  cursorright = char(27)//'[1C'      ! Makes the cursor move right one space
-  cursorleft = char(27)//'[1D'       ! Makes the cursor move left one space
   
   
   ! Line colours:
@@ -229,7 +184,7 @@ subroutine lt2ubv(logl,logt,mass,logz,  mbol,bolc,mv,uminb,bminv,vminr,rmini)
   end do
   
   !mbol = 4.75 - 2.5*logl
-  mbol = 4.741 - 2.5*logl  ! AF: 4.74 = -2.5*log10(l0) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
+  mbol = 4.741 - 2.5*logl  ! AF: 4.74 = -2.5*log10(lsun) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
   bolc = cm(1)
   mv = mbol - bolc
   uminb = cm(2)
@@ -409,7 +364,7 @@ end subroutine num_sp_type_2_lt
 !> \brief  Determine the operating system type: 1-Linux, 2-MacOSX
 
 function getos()
-  use constants, only: homedir
+  use SUFR_constants, only: homedir
   implicit none
   integer :: status,system,getos
   character :: ostype*(25)
@@ -432,7 +387,7 @@ end function getos
 !! \retval findfile  File name (if found)
 
 function findfile(match)
-  use constants, only: homedir
+  use SUFR_constants, only: homedir
   implicit none
   character, intent(in) :: match*(*)
   integer, parameter :: maxfile=1000
@@ -498,7 +453,7 @@ end function findfile
 !! \retval nf      The actual number of files returned in fnames ( = min(number found, nff))
 
 subroutine findfiles(match,nff,all, fnames,nf)  
-  use constants, only: homedir
+  use SUFR_constants, only: homedir
   implicit none
   character, intent(in) :: match*(*)
   integer, intent(in) :: nff,all
@@ -723,13 +678,13 @@ end subroutine locater
 
 function a2j(m1,m2,a)
   use kinds, only: double
-  use constants, only: g,m0,r0
+  use SUFR_constants, only: pc_g,msun,rsun
   
   implicit none
   real(double), intent(in) :: m1,m2,a
   real(double) :: a2j
   
-  a2j = m1*m2*sqrt(g*a*r0/(m1+m2)*m0**3)
+  a2j = m1*m2*sqrt(pc_g*a*rsun/(m1+m2)*msun**3)
 
 end function a2j
 !***********************************************************************************************************************************
@@ -745,13 +700,13 @@ end function a2j
 
 function j2a(m1,m2,j)
   use kinds, only: double
-  use constants, only: g,m0,r0
+  use SUFR_constants, only: pc_g,msun,rsun
   
   implicit none
   real(double), intent(in) :: m1,m2,j
   real(double) :: j2a
   
-  j2a = (j/(m1*m2))**2 * (m1+m2)/(g*m0**3)/r0
+  j2a = (j/(m1*m2))**2 * (m1+m2)/(pc_g*msun**3)/rsun
 
 end function j2a
 !***********************************************************************************************************************************
@@ -768,14 +723,14 @@ end function j2a
 
 function p2j(m1,m2,p)
   use kinds, only: double
-  use constants, only: g
+  use SUFR_constants, only: pc_g
   
   implicit none
   real(double), intent(in) :: m1,m2,p
   real(double) :: p2j,a
   
   call p2a(m1+m2,p,a)
-  p2j = m1*m2*sqrt(g*a/(m1+m2))
+  p2j = m1*m2*sqrt(pc_g*a/(m1+m2))
   
 end function p2j
 !***********************************************************************************************************************************
@@ -791,13 +746,13 @@ end function p2j
 
 function j2p(m1,m2,j)
   use kinds, only: double
-  use constants, only: g
+  use SUFR_constants, only: pc_g
   
   implicit none
   real(double), intent(in) :: m1,m2,j
   real(double) :: j2p,a
   
-  a = (j/(m1*m2))**2 * (m1+m2)/g
+  a = (j/(m1*m2))**2 * (m1+m2)/pc_g
   call a2p(m1+m2,a,j2p)
   
 end function j2p
@@ -814,13 +769,13 @@ end function j2p
 
 subroutine p2a(mtot,p,a)
   use kinds, only: double
-  use constants, only: g,pi,c3rd
+  use SUFR_constants, only: pc_g,pi,c3rd
   
   implicit none
   real(double), intent(in) :: mtot,p
   real(double), intent(out) :: a
   
-  a = (g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
+  a = (pc_g*mtot/(4*pi**2))**c3rd * p**(2*c3rd)
   
 end subroutine p2a
 !***********************************************************************************************************************************
@@ -835,13 +790,13 @@ end subroutine p2a
 
 subroutine a2p(mtot,a,p)
   use kinds, only: double
-  use constants, only: g,pi
+  use SUFR_constants, only: pc_g,pi
   
   implicit none
   real(double), intent(in) :: mtot,a
   real(double), intent(out) :: p
   
-  p = (4*pi**2/(g*mtot))**0.5d0*a**1.5d0
+  p = (4*pi**2/(pc_g*mtot))**0.5d0*a**1.5d0
   
 end subroutine a2p
 !***********************************************************************************************************************************
@@ -857,7 +812,7 @@ end subroutine a2p
 
 function a2rl(m1,m2,a)
   use kinds, only: double
-  use constants, only: c3rd
+  use SUFR_constants, only: c3rd
   
   implicit none
   real(double), intent(in) :: m1,m2,a
@@ -881,7 +836,7 @@ end function a2rl
 
 function rl2a(m1,m2,rl1)
   use kinds, only: double
-  use constants, only: c3rd
+  use SUFR_constants, only: c3rd
   
   implicit none
   real(double), intent(in) :: m1,m2,rl1
@@ -1071,7 +1026,9 @@ end subroutine set_PGPS_title
 !> \brief  Read/create evTools settings file ~/.evTools
 
 subroutine evTools_settings()
-  use constants, only: homedir,libdir,screen_dpi,screen_size_h,screen_size_v,scrrat,scrsz,white_bg
+  use SUFR_constants, only: homedir
+  use constants, only: libdir,screen_dpi,screen_size_h,screen_size_v,scrrat,scrsz,white_bg
+  
   implicit none
   integer :: io,u
   logical :: ex

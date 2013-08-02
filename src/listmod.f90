@@ -25,7 +25,7 @@
 
 program listmod
   use kinds
-  use constants
+  use SUFR_constants
   implicit none
   integer :: narg,command_argument_count,blk,ans,nblk
   character :: fname*(99),findfile*(99)
@@ -161,7 +161,7 @@ end subroutine error_reading_block
 !<
 subroutine list_mod_file(fname, nblk, save_dh)
   use kinds
-  use constants
+  use SUFR_constants
   
   implicit none
   character,intent(in) :: fname*(*)
@@ -223,10 +223,10 @@ subroutine list_mod_file(fname, nblk, save_dh)
         f = dat(19)
         
         if(li.eq.1) then
-           r1  = exp(lnr)*1.e11/r0
-           l1  = l*1.d33/l0
+           r1  = exp(lnr)*1.e11/rsun
+           l1  = l*1.d33/lsun
            ts  = exp(lnt)
-           m1 = lnm*1.d33/m0
+           m1 = lnm*1.d33/msun
            hs  = x1
            hes = x4
            zs  = 1.d0 - x1 - x4
@@ -237,8 +237,8 @@ subroutine list_mod_file(fname, nblk, save_dh)
            hec = x4
            zc  = 1.d0 - x1 - x4
         end if
-        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
-        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
+        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
+        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
      end do !li
      
      if(save_dh) then  ! Read the DH block as well; it has no header, and hence kh lines, not kh+1
@@ -282,7 +282,7 @@ end subroutine list_mod_file
 !<
 subroutine print_mod_details(fname, blk, save_dh)
   use kinds
-  use constants
+  use SUFR_constants
   
   implicit none
   character, intent(in) :: fname*(*)
@@ -329,9 +329,9 @@ subroutine print_mod_details(fname, blk, save_dh)
   read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
   if(io.ne.0) call error_reading_block(0)
   
-  m1  = lnm*1.d33/m0
-  r1  = exp(lnr)*1.e11/r0
-  l1  = l*1.d33/l0
+  m1  = lnm*1.d33/msun
+  r1  = exp(lnr)*1.e11/rsun
+  l1  = l*1.d33/lsun
   !l1  = l/3.844d0  !Peter's CLSN
   ts  = exp(lnt)
   hs  = x1
@@ -346,8 +346,8 @@ subroutine print_mod_details(fname, blk, save_dh)
   do li=1,kh-1 !Number of Mesh points
      read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
      if(io.ne.0) call error_reading_block(li)
-     if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/m0
-     if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/m0
+     if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
+     if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
   end do
   
   close(10)
@@ -367,7 +367,7 @@ subroutine print_mod_details(fname, blk, save_dh)
   q1  = m1/m2
   q2  = m2/m1
   
-  a   = (p*day/((g*bms*m0)/(4.d0*pi**2))**(-.5d0))**(2.d0/3.d0)/r0
+  a   = (p*solday/((pc_g*bms*msun)/(4.d0*pi**2))**(-.5d0))**(2.d0/3.d0)/rsun
   
   a1  = a *m2/bms
   a2  = a *m1/bms
