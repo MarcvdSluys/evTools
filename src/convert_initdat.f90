@@ -19,10 +19,10 @@
 
 
 
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 !> \brief  Store the parameters in init.dat
 
-module initdat_contents
+module initdat
   use SUFR_kinds, only: double
   save
   
@@ -121,7 +121,7 @@ module initdat_contents
   
   
   
-  !From read_init_dat in bbegin:
+  ! From read_init_dat in bbegin:
   real(double) :: ch_opac
   real(double) :: cdc_ems, cdc_hg, cdc_1dup, cdc_rlof, cdc_rlof_reduce, unused1, unused(17)
   
@@ -130,20 +130,21 @@ module initdat_contents
   
   
   
-  !From module zams_nucleosynthesis_abundances:
-  real(double) :: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13,cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22,cxna22,cxna23,cxmg24,cxmg25,cxmg26
-  real(double) :: cxal26m,cxal27,cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34,cxfe57,cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58,cxni60
+  ! From module zams_nucleosynthesis_abundances:
+  real(double) :: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13,cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22
+  real(double) :: cxna22,cxna23,cxmg24,cxmg25,cxmg26,cxal26m,cxal27,cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34
+  real(double) :: cxfe57,cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58,cxni60
   
-end module initdat_contents
-!*****************************************************************************************************************************************************
+end module initdat
+!***********************************************************************************************************************************
 
 
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 program convert_initdat
   implicit none
-  character :: infilename*99,outfilename*99
+  character :: infilename*(99),outfilename*(99)
   
-  !Read command-line variables:
+  ! Read command-line variables:
   if(command_argument_count().eq.1) then
      call get_command_argument(1,infilename)
      outfilename = trim(infilename)//'.new'
@@ -163,13 +164,32 @@ program convert_initdat
   call write_new_initdat(trim(outfilename))
   
 end program convert_initdat
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 
 
 
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 subroutine set_defaults()
-  use initdat_contents
+  use initdat, only: kh2,kh,jch,kl,jh, kt1,kt2,kt3,kt4,kt5,ksv, kth,kx,ky,kz, kcl,kion,kam,kcc,knuc,kcn, kr1,kr2
+  use initdat, only: eps,del,dh0, use_quadratic_predictions
+  use initdat, only: wanted_eps,use_fudge_control,allow_extension,allow_underrelaxation,allow_overrelaxation
+  use initdat, only: allow_egenrelaxation,allow_mdotrelaxation,allow_avmurelaxation,use_previous_mu,off_centre_weight
+  use initdat, only: cdc_ms,cdc_hec,cdc_hes,cdc_dblsh,cdc5, ct1,ct2,ct3, ke1,ke2,ke3,kbc,kev, kp_var,kp_eqn,kp_bc
+  use initdat, only: cc,cn,co,cne,cmg,csi,cfe, ct, convection_scheme,calp,cu,cos,cps,crd,cxb,cgr,cth,cgrs,ccac
+  use initdat, only: multiplier_reimers, multiplier_vasiliadis_wood, multiplier_schroeder, multiplier_wachter, multiplier_achmad
+
+  use initdat, only: artmix, cdsi,cshi,cssi,cesc,cgsf, cea,cet, cmi_mode,zscaling_mdot
+  use initdat, only: cmt,cms,cmi,cmr,cmj,cmv,cmk,cmnl,cml,chl,ctf,clt, cpa,cbr,csu,csd,cdf,cgw,cso,cmb, kn,kjn, cdc
+  use initdat, only: ch_opac,cphotontire,cmv,cmk,cmnl,ch,artmix,cgrs,ccac,cdc,cdc_ems,cdc_hg,cdc_1dup,cdc_rlof
+  use initdat, only: cdc_rlof_reduce,csmc,convection_ledoux,cmdotrot_hlw,cmdotrot_mm,cmtel,cmtwl
+  use initdat, only: smart_mass_loss,cmrr,cmvw,cmsc,cmw,cmal, ccac,x1ac,x4ac,x12ac,x14ac,x16ac,x20ac,x24ac,cmi_mode
+  use initdat, only: climit, wanted_eps, cphotontire, enc_parachute, eos_include_pairproduction, smart_mass_loss
+  use initdat, only: kr_nucsyn, rigid_rotation, use_smooth_remesher,relax_loaded_model
+  use initdat, only: zscaling_mdot, artmix, ccac, cgrs, csmc,  cdsi,cshi,cssi,cesc,cgsf, cfmu,cfc
+  use initdat, only: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13,cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22
+  use initdat, only: cxna22,cxna23,cxmg24,cxmg25,cxmg26,cxal26m,cxal27,cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34
+  use initdat, only: cxfe57,cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58,cxni60
+  
   implicit none
   
   
@@ -310,7 +330,7 @@ subroutine set_defaults()
   
   
   
-  !***************************************************************************************************************************************************
+  !*********************************************************************************************************************************
   
   !From read_init_dat in bbegin:
   
@@ -348,7 +368,8 @@ subroutine set_defaults()
   cmal = multiplier_achmad
   
   !if (ktw == 2) ccac = 1.0d0 ! default (binary/twin): do accrete composition
-  ccac = 1.0d0 ! default (binary/twin): do accrete composition - ktw not defined here, but in init.run  CHECK is ccac=1.0 ok for single-star run?
+  ccac = 1.0d0 ! default (binary/twin): do accrete composition - ktw not defined here, but in init.run
+  !              CHECK is ccac=1.0 ok for single-star run?
   x1ac = -1.0
   x4ac = -1.0
   x12ac = -1.0
@@ -472,17 +493,22 @@ subroutine set_defaults()
   
   
 end subroutine set_defaults
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 
 
 
 
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 subroutine read_old_initdat(infilename)
-  use initdat_contents
+  use initdat,only: kh2,kr1,kr2,jch,kth,kx,ky,kz, kcl,kion,kam,kop,kcc,knuc,kcn,kt1,kt2,kt3,kt4,kt5,ksv
+  use initdat,only: eps,del,dh0,cdc_ms,cdc_hec,cdc_hes,cdc_dblsh,cdc5, ke1,ke2,ke3,kbc,kev,kfn,kl,jh,kp_var,kp_eqn,kp_bc
+  use initdat,only: ke1_2,ke2_2,ke3_2,kbc_2,kev_2,kfn_2,kl_2,jh_2,kp_var_2,kp_eqn_2,kp_bc_2, ksx,kn,kjn,ct1,ct2,ct3,ct
+  use initdat,only: cc,cn,co,cne,cmg,csi,cfe,  calp,cu,cos,cps,crd,cxb,cgr,cea,cet,  cmt,cms,cmi,cmr,cmj,cml,chl,ctf,clt
+  use initdat,only: cpa,cbr,csu,csd,cdf,cgw,cso,cmb,unused1, cth,unused
+
   implicit none
+  character, intent(in) :: infilename*(*)
   integer :: io
-  character :: infilename*(*)
   
   open(unit=10,form='formatted',status='old',action='read',position='rewind',file=trim(infilename),iostat=io)
   if(io.ne.0) then
@@ -516,17 +542,34 @@ subroutine read_old_initdat(infilename)
   end if
   
 end subroutine read_old_initdat
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 
 
 
 
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************
 subroutine write_new_initdat(outfilename)
-  use initdat_contents
+  use initdat, only: kh2,kr1,kr2,jch,kth,kx,ky,kz,  kcl,kion,kam,kop,kcc,knuc,kcn, kt1,kt2,kt3,kt4,kt5,ksv
+  use initdat, only: eps,wanted_eps,del,dh0,cdc_ms,cdc_hec,cdc_hes,cdc_dblsh,cdc5,  cdc_ems,cdc_hg,cdc_1dup,cdc_rlof,cdc_rlof_reduce
+  use initdat, only: ke1,ke2,ke3,kbc,kev,kfn,kl,jh,kp_var,kp_eqn,kp_bc
+  use initdat, only: ke1_2,ke2_2,ke3_2,kbc_2,kev_2,kfn_2,kl_2,jh_2,kp_var_2,kp_eqn_2,kp_bc_2, ksx,kn,kjn
+  use initdat, only: ct1,ct2,ct3,ct,  ch,cc,cn,co,cne,cmg,csi,cfe,  calp,cu,cos,cps,crd,cxb,cgr,cea,cet,  cmt,cms,cmi,cmr,cmj,cmv
+  use initdat, only: cmk,cmnl,cmrr,cmvw,cmsc,cmw, cmal,smart_mass_loss,cml,chl,ctf,clt,cmdotrot_hlw,cmdotrot_mm
+  use initdat, only: cmtel,cmtwl, cpa,cbr,csu,csd,cdf,cgw,cso,cmb,cphotontire,unused1, cth,unused,use_fudge_control,allow_extension
+  use initdat, only: allow_underrelaxation,allow_overrelaxation,convection_scheme,allow_egenrelaxation
+  use initdat, only: use_previous_mu,off_centre_weight,allow_mdotrelaxation, use_smooth_remesher,relax_loaded_model
+  use initdat, only: convection_ledoux, allow_avmurelaxation,use_quadratic_predictions,climit, cmi_mode,zscaling_mdot,cdsi,cshi,cssi
+  use initdat, only: cesc,cgsf,cfmu,cfc,artmix,cgrs,ccac,csmc
+  
+  !use initdat, only: x1ac,x4ac,x12ac,x14ac,x16ac,x20ac,x24ac,accret_composition
+  
+  !use initdat, only: cxd,cxhe3,cxli7,cxbe7,cxb11,cxc12,cxc13, cxc14,cxn14,cxn15,cxo16,cxo18,cxo17,cxf19,cxne21,cxne20,cxne22
+  !use initdat, only: cxna22,cxna23,cxmg24,cxmg25,cxmg26,cxal26m,cxal27, cxal26g,cxsi28,cxsi30,cxsi29,cxp31,cxs33,cxs32,cxs34,cxfe57
+  !use initdat, only: cxfe60,cxfe56,cxfe58,cxfe59,cxco59,cxni61,cxni59,cxni58, cxni60
+  
   implicit none
   integer :: io
-  character :: outfilename*(*)
+  character, intent(in) :: outfilename*(*)
   
   namelist /init_dat/ kh2, kr1, kr2, jch, kth, kx, ky, kz,   &
        kcl, kion, kam, kop, kcc, knuc, kcn,  &
@@ -552,15 +595,15 @@ subroutine write_new_initdat(outfilename)
        cesc, cgsf, cfmu, cfc, artmix, cgrs, ccac, csmc
   
   ! namelist for the accretion of matter
-  namelist /accret/ x1ac, x4ac, x12ac, x14ac, x16ac, x20ac, x24ac, accret_composition
+  !namelist /accret/ x1ac, x4ac, x12ac, x14ac, x16ac, x20ac, x24ac, accret_composition
   
   ! namelist for initial (zams) nucleosynthesis abundances
-  namelist /abund/ cxd, cxhe3, cxli7, cxbe7, cxb11, cxc12, cxc13,  &
-       cxc14, cxn14, cxn15, cxo16, cxo18, cxo17, cxf19, cxne21, cxne20,  &
-       cxne22, cxna22, cxna23, cxmg24, cxmg25, cxmg26, cxal26m, cxal27,  &
-       cxal26g, cxsi28, cxsi30, cxsi29, cxp31, cxs33, cxs32, cxs34, cxfe57,  &
-       cxfe60, cxfe56, cxfe58, cxfe59, cxco59, cxni61, cxni59, cxni58,  &
-       cxni60
+  !namelist /abund/ cxd, cxhe3, cxli7, cxbe7, cxb11, cxc12, cxc13,  &
+  !     cxc14, cxn14, cxn15, cxo16, cxo18, cxo17, cxf19, cxne21, cxne20,  &
+  !     cxne22, cxna22, cxna23, cxmg24, cxmg25, cxmg26, cxal26m, cxal27,  &
+  !     cxal26g, cxsi28, cxsi30, cxsi29, cxp31, cxs33, cxs32, cxs34, cxfe57,  &
+  !     cxfe60, cxfe56, cxfe58, cxfe59, cxco59, cxni61, cxni59, cxni58,  &
+  !     cxni60
   
   
   open(unit=10,form='formatted',status='replace',action='write',position='rewind',file=trim(outfilename),iostat=io)
@@ -576,10 +619,11 @@ subroutine write_new_initdat(outfilename)
   end if
   
   
-  !There's no need to output the two namelists below, since they are not set in the old init.dat files, and hence contain default values anyway (right?)
+  ! There's no need to output the two namelists below, since they are not set in the old init.dat files, 
+  !   and hence contain default values anyway (right?)
   
-  !Try for the accretion information in the same file
-  !This is a bit ugly, but do we want to use another fort.nnn file for this?
+  ! Try for the accretion information in the same file:
+  ! This is a bit ugly, but do we want to use another fort.nnn file for this?
   !write(10, nml=accret, iostat=io)
   !if(io.ne.0) then
   !   write(0,'(A,/)')'  Error writing accret namelist to '//trim(outfilename)//', aborting...'
@@ -587,7 +631,7 @@ subroutine write_new_initdat(outfilename)
   !end if
   
   
-  !Finally, write the nucleosynthesis abundances
+  ! Finally, write the nucleosynthesis abundances:
   !write(10, nml=abund, iostat=io)
   !if(io.ne.0) then
   !   write(0,'(A,/)')'  Error writing abund namelist to '//trim(outfilename)//', aborting...'
@@ -597,4 +641,4 @@ subroutine write_new_initdat(outfilename)
   close(10)
   
 end subroutine write_new_initdat
-!*****************************************************************************************************************************************************
+!***********************************************************************************************************************************

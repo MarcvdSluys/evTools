@@ -89,6 +89,9 @@ endif( CREATE_VERSION )
 
 
 # Create executable targets that don't need PGPlot:
+add_executable( convert_initdat  src/convert_initdat.f90 ${evTools_std_files} )
+target_link_libraries( convert_initdat  ${LibSUFR_LIBRARIES} )
+
 add_executable( dat2plt  src/dat2plt.f90 ${evTools_std_files} )
 target_link_libraries( dat2plt  ${LibSUFR_LIBRARIES} )
 
@@ -130,7 +133,7 @@ target_link_libraries( selplt  ${LibSUFR_LIBRARIES} )
 
 
 # Set module directory:
-set_target_properties( dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plt2ce plt2dat plt2obs selplt 
+set_target_properties( convert_initdat dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plt2ce plt2dat plt2obs selplt 
   PROPERTIES Fortran_MODULE_DIRECTORY ${MODULE_DIRECTORY} )
 
 
