@@ -21,7 +21,7 @@ program listplt
   use SUFR_dummy, only: dumstr9
   use SUFR_constants, only: msun,solday, pi, rsun,c3rd,pi2, pc_g,julyear,lsun,pc_c
   use constants, only: libdir
-  use ubvdata
+  use ubvdata, only: ubv
   
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81

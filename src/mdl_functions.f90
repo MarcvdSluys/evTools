@@ -49,7 +49,7 @@ end module mdl_data
 subroutine compute_mdl_variables(dat)
   use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,msun,pc_g,pc_amu,pc_mh,c3rd,pc_arad,pc_kb,solday
-  use mdl_data
+  use mdl_data, only: pxin,pxnr,nq,nm,nc
   
   implicit none
   real(double), intent(inout) :: dat(nq,nm)
@@ -225,7 +225,7 @@ end subroutine compute_mdl_variables
 subroutine list_mdl_models(infile,nblk)
   use SUFR_constants, only: pc_g
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
-  use mdl_data
+  use mdl_data, only: pxnr,nq,nc, nmsh,nv,mdlver
   
   implicit none
   character, intent(in) :: infile*(*)
@@ -384,7 +384,7 @@ end subroutine list_mdl_models
 !! \param svblk   Save block or not (in/out)
 
 subroutine print_mdl_details(infile,blk,svblk)
-  use mdl_data
+  use mdl_data, only: nmsh,nv,mdlver
   
   implicit none
   character, intent(in) :: infile*(99)
@@ -559,7 +559,7 @@ end subroutine print_mdl_details
 
 subroutine read_first_mdls(infile,blk)
   use SUFR_dummy, only: dumint, dumreal, dumstr
-  use mdl_data
+  use mdl_data, only: pxnr, nmsh,nv,mdlver, nc
   
   implicit none
   character, intent(in) :: infile*(*)
@@ -633,7 +633,7 @@ end subroutine read_first_mdls
 
 subroutine read_chosen_mdl(blk, mdl,age,dat)
   use SUFR_kinds, only: double
-  use mdl_data
+  use mdl_data, only: nq,nn, nmsh,nc,nm
   
   implicit none
   integer, intent(in) :: blk
@@ -677,8 +677,9 @@ end subroutine read_chosen_mdl
 
 !***********************************************************************************************************************************
 !> \brief  Defines the variable labels for the mdl[12] format
+
 subroutine set_mdl_labels
-  use mdl_data
+  use mdl_data, only: pxns,pxfns, labels,abds,nabs,CEs,nv_der,nv_sp
   implicit none
   
   abds = [character(len=99) :: 'H ','He','C ','N ','O ','Ne','Mg']    ! Line labels in abundances plot

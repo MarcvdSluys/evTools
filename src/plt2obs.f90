@@ -21,7 +21,7 @@ program plt2obs
   use SUFR_kinds, only: double
   use SUFR_dummy, only: dumstr9
   use constants, only: libdir
-  use ubvdata
+  use ubvdata, only: ubv
   
   implicit none
   integer, parameter :: nn=30000,nc=81,nff=100

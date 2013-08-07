@@ -24,7 +24,7 @@ program plotmdl
   use SUFR_kinds, only: double
   use SUFR_constants, only: workdir
   use constants, only: colours,ncolours, scrrat,scrsz, white_bg
-  use mdl_data
+  use mdl_data, only: pxin,pxnr,pxns,pxfns, nq,nn,nm,nmsh,nc, nv_der,nv_sp, labels, abds,nabs, CEs
   
   implicit none
   integer :: nr,mdl,nx,ny,nsel,io,xwini,pgopen
