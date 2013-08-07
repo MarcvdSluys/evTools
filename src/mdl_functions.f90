@@ -224,6 +224,7 @@ end subroutine compute_mdl_variables
 
 subroutine list_mdl_models(infile,nblk)
   use SUFR_constants
+  use SUFR_dummy, only: dmrl=>dumreal, dumstr
   use mdl_data
   
   implicit none
@@ -233,11 +234,10 @@ subroutine list_mdl_models(infile,nblk)
   integer :: nmdl
   integer :: bl,mp,io
   real :: age,vk,mm1,be,be1
-  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
-  real :: ll,eeth,eenc,eenu,ss,uuint
+  real :: mm,rr,rrh,tt,hh,hhe,ccc,oo  ! ,kk,mmg,nnrad,nnn,nne,nnad,pp
+  real :: ll  ! ,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
-  real :: hc,hec,cc,oc,zc, hs,hes,cs,os,zs
-  character :: tmpstr*(3)
+  real :: hc,hec,cc,oc, hs,hes,zs  ! ,cs,os,zc
   
   
   
@@ -253,7 +253,7 @@ subroutine list_mdl_models(infile,nblk)
   end if
   
   if(mdlver.gt.1.) then
-     read(10,*)tmpstr
+     read(10,*) dumstr
   else
      nc = 21
      pxnr(1:nc)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
@@ -297,7 +297,8 @@ subroutine list_mdl_models(infile,nblk)
      if(nmsh.eq.0) nmsh = 199
      mesh: do mp=1,nmsh
         read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
-             mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+             !mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+             mm,rr,dmrl,rrh,tt,dmrl,dmrl,dmrl,hh,hhe,ccc,dmrl,oo,dmrl,dmrl,ll,dmrl,dmrl,dmrl,dmrl,dmrl
         !print*,bl,mp,io
         if(io.lt.0) then
            write(0,'(A,I5,A)')'  Model',bl,' seems incomplete, skipping...'
@@ -315,7 +316,7 @@ subroutine list_mdl_models(infile,nblk)
            hec = hhe
            cc = ccc
            oc = oo
-           zc  = 1. - hh - hhe
+           !zc  = 1. - hh - hhe
            rhoc = rrh
         end if
         if(mp.eq.nmsh) then
@@ -325,8 +326,8 @@ subroutine list_mdl_models(infile,nblk)
            ts  = tt
            hs  = hh
            hes = hhe
-           cs = ccc
-           os = oo
+           dmrl = ccc  ! cs = ccc
+           dmrl = oo   ! os = oo
            zs  = 1. - hh - hhe
         end if
         if(mhe.eq.0.0.and.hh.gt.0.1) mhe = mm
@@ -396,9 +397,9 @@ subroutine print_mdl_details(infile,blk,svblk)
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
-  real :: hc,hec,cc,nic,oc,nec,mgc,zc
+  real :: hc,hec,cc,oc,nec,zc  !,mgc,nic
   real :: hs,hes,cs,ns,os,nes,mgs,zs
-  real :: rhoc,pc,ethc,enuc,encc
+  real :: rhoc,pc  !,ethc,enuc,encc
   
   integer :: mp,in,io
   character :: outfile*(99)
@@ -454,16 +455,16 @@ subroutine print_mdl_details(infile,blk,svblk)
   hc   = hh
   hec  = hhe
   cc   = ccc
-  nic   = nnn
+  !nic   = nnn
   oc   = oo
   nec  = nne
-  mgc  = mmg
+  !mgc  = mmg
   zc   = 1. - hh - hhe
   rhoc = rrh
   pc   = pp
-  encc = eenc
-  ethc = eeth
-  enuc = eenu
+  !encc = eenc
+  !ethc = eeth
+  !enuc = eenu
   
   mhe = 0.
   mco = 0.
@@ -558,15 +559,16 @@ end subroutine print_mdl_details
 !! \param blk      Number of the stellar-structure blocks to read (and ignore)
 
 subroutine read_first_mdls(infile,blk)
+  use SUFR_dummy, only: dumint, dumreal, dumstr
   use mdl_data
   
   implicit none
   character, intent(in) :: infile*(*)
   integer, intent(in) :: blk
   
-  integer :: io,bl,mp,nmdl !,ii
-  real :: age !,x
-  character :: tmpstr*(3)
+  integer :: io,bl,mp !,ii,nmdl
+  !real :: age !,x
+  !character :: tmpstr*(3)
   
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
@@ -591,7 +593,7 @@ subroutine read_first_mdls(infile,blk)
   ! Read file, upto chosen model:
   if(blk.gt.0) then
      do bl=1,blk
-        read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
+        read(10,'(I6,1x,ES16.9)',iostat=io) dumint, dumreal  !nmdl,age
         if(io.ne.0) then
            write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
            close(10)
@@ -601,7 +603,7 @@ subroutine read_first_mdls(infile,blk)
         if(nmsh.eq.0) nmsh = 199
         do mp=1,nmsh
            !read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
-           read(10,*,iostat=io) tmpstr
+           read(10,*,iostat=io) dumstr
            
            if(io.ne.0) then  !Error/EOF
               close(10)

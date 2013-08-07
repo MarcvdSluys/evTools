@@ -17,6 +17,7 @@
 
 
 program listplt
+  use SUFR_dummy, only: dumstr9
   use kinds
   use SUFR_constants
   use constants, only: libdir
@@ -25,20 +26,20 @@ program listplt
   implicit none
   integer, parameter :: nn=30000,nnn=200,nc=81
   real(double), parameter :: c8th=0.125_dbl
-  real(double) :: dat(nnn,nn),var(nn),dpdj(nn),d(nn),a(nnn)
+  real(double) :: dat(nnn,nn),var(nn),d(nn),a(nnn)  !,dpdj(nn)
   real(double) :: c82(nn),c85a,c85b,c92(nn),mbol,bc
   
   integer :: i,io,j,n,ans,ncols,narg,command_argument_count
-  character :: findfile*(99), fname*(99),labels(nnn)*(99),tmpstr*(10)
+  character :: findfile*(99), fname*(99),labels(nnn)*(99)
   
   call setconstants()
   
   !Read atmosphere-model data
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
-     read(10,*)tmpstr
-     read(10,*)tmpstr
-     read(10,*)ubv
+     read(10,*) dumstr9
+     read(10,*) dumstr9
+     read(10,*) ubv
      close(10)
   else
      write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
@@ -257,8 +258,8 @@ program listplt
   dat(37,1:n) = dat(88,1:n)  !Take Sills MB in stead of Wind AML
   
   !dP/dJ = 3/(m1m2)(2piP^2(m1+m2)/G^2)^1/3:
-  dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*msun*msun) * &
-       (pi2*(dat(28,1:n)*solday)**2*(dat(4,1:n)+dat(40,1:n))*msun/(pc_g*pc_g))**c3rd
+  !dpdj(1:n) = 3.d0/(dat(4,1:n)*dat(40,1:n)*msun*msun) * &
+  !     (pi2*(dat(28,1:n)*solday)**2*(dat(4,1:n)+dat(40,1:n))*msun/(pc_g*pc_g))**c3rd
   
   !dJ/dt needed to obtain the same effect on Porb as from (conservative) mass transfer, in case of no wind: use dat(31) instead of
   !dat(33):

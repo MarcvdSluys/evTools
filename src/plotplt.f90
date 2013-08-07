@@ -29,6 +29,7 @@
 program plotplt
   use kinds, only: double,dbl
   use SUFR_constants, only: homedir
+  use SUFR_dummy, only: dumstr
   use constants, only: libdir, colours,ncolours, scrrat,scrsz, white_bg
   use ubvdata, only: ubv
   
@@ -42,21 +43,20 @@ program plotplt
   real(double) :: mint,maxt,dt
   logical :: logt,lgx,lgy
   
-  integer :: system, status
   real :: yy1(nmax),minx,dist,mindist
-  real :: x,y,xmin,xmax,ymin,ymax,dx,dy,xmin0,xmax0,ymin0,ymax0
+  real :: x,y,xmin,xmax,ymin,ymax,dx,dy
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
-  integer :: hrd,djdt,conv,tscls,ch,dpdt,sabs,tabs,cabs,io
-  integer :: nt,wait,lums,nsel,os
+  integer :: hrd,djdt,conv,tscls,dpdt,io
+  integer :: wait,lums,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: col,lng
   real :: sch
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
-  character :: xwin*(19),tmpstr,boxx*(19),boxy*(19)
+  character :: xwin*(19),boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3), mdlnr*(9)
   logical :: ex,prleg, hlp,hlbl
@@ -87,9 +87,9 @@ program plotplt
   ! Read atmosphere-model data
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
-     read(10,*)tmpstr
-     read(10,*)tmpstr
-     read(10,*)ubv
+     read(10,*) dumstr
+     read(10,*) dumstr
+     read(10,*) ubv
      close(10)
   else
      write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
@@ -97,15 +97,12 @@ program plotplt
   
   
   !Read current path and use it as plot title
-  status = system('pwd > '//trim(homedir)//'/tmppwd.txt')
+  call system('pwd > '//trim(homedir)//'/tmppwd.txt')
   open(unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
-  status = system('rm '//trim(homedir)//'/tmppwd.txt')
-  do i=10,99
-     if(title(i:i).ne.' ') nt = i
-  end do
+  call system('rm '//trim(homedir)//'/tmppwd.txt')
   
   
   plot = 0
@@ -187,9 +184,6 @@ program plotplt
      conv  = 0
      tscls = 0
      lums  = 0
-     sabs  = 0
-     tabs  = 0
-     cabs  = 0
   end if   !if(plot.ne.6.and.plot.ne.7) then   
   
   
@@ -336,7 +330,6 @@ program plotplt
      end if
      
      if(vy.eq.213) then  ! Surface abundances
-        sabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,42:48,1:nmax))
         !Line labels for Abundances plots:
@@ -344,7 +337,6 @@ program plotplt
         prleg = .true.
      end if
      if(vy.eq.214) then  ! Tmax abundances
-        tabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,49:55,1:nmax))
         !Line labels for Abundances plots:
@@ -352,7 +344,6 @@ program plotplt
         prleg = .true.
      end if
      if(vy.eq.215) then !Core abundances
-        cabs = 1
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,56:62,1:nmax))
         !Line labels for Abundances plots:
@@ -512,12 +503,6 @@ program plotplt
   !***   PLOT RANGE
   !************************************************************************      
   
-  xmin0 = xmin
-  xmax0 = xmax
-  ymin0 = ymin
-  ymax0 = ymax
-  
-  
 70 if(plot.ne.6.and.plot.ne.7) then      
      write(6,*)''
      write(6,*)' X-range:',xmin,'-',xmax
@@ -605,14 +590,6 @@ program plotplt
      write(6,'(A)')'  tau_dyn  : dynamical timescale'
      write(6,*)
   end if
-  
-  !if(conv.eq.1) then
-  !   ch = 0
-  !   !write(6,'(A42)', advance='no')' Do you want to plot hatches (Y)es/(N)o: '
-  !   !read*,cnvh
-  !   !if(cnvh.eq.'y'.or.cnvh.eq.'Y') ch = 1
-  !end if
-  ch = 1
   
   
   
@@ -1002,7 +979,7 @@ program plotplt
         if(vx.eq.201) write(psname,'(A,I3.3,A)')'plot_plt__HRD_',i,'.eps'
         inquire(file=trim(psname), exist=ex)                                                 !Check whether the file already exists
         if(.not.ex) then
-           status = system('mv -f plot_plt_000.eps '//trim(psname))
+           call system('mv -f plot_plt_000.eps '//trim(psname))
            call set_PGPS_title(trim(psname),trim(pstitle))
         end if
         i = i+1

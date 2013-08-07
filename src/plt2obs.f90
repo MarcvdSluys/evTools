@@ -19,6 +19,7 @@
 
 program plt2obs
   use kinds
+  use SUFR_dummy, only: dumstr9
   use SUFR_constants
   use constants, only: libdir
   use ubvdata
@@ -28,16 +29,16 @@ program plt2obs
   real(double) :: tm,m,mc,z,zmod,mbol,bc,mv,umb,bmv,vmr,rmi
   real(double) :: logt,logl,logr,dat(nc,nn)
   integer :: i,j,n,ncols,fnl,nf,f,io
-  character :: fname*(99),fnames(nff)*(99),oname*(55),ans,tmpstr*(10)
+  character :: fname*(99),fnames(nff)*(99),oname*(55),ans
   
   call setconstants()
   
   ! Read atmosphere-model data:
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
-     read(10,*)tmpstr
-     read(10,*)tmpstr
-     read(10,*)ubv
+     read(10,*) dumstr9
+     read(10,*) dumstr9
+     read(10,*) ubv
      close(10)
   else
      write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."

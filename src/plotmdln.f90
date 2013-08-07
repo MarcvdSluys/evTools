@@ -22,23 +22,24 @@
 
 
 !> Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
-program plotmdln  
+program plotmdln
+  use SUFR_dummy, only: dumint, dumreal
   use SUFR_constants
   use constants, only: scrrat,scrsz, white_bg
   
   
   implicit none
   integer, parameter :: nn=1000,nq=30,nbb=500
-  integer :: nm,nv,mdl(nbb),nblk,nsel
-  real :: dat(nbb,nq,nn),age(nbb),dov,x,xx(nbb,nn),yy(nbb,nn)
+  integer :: nm,mdl(nbb),nblk,nsel  ! ,nv
+  real :: dat(nbb,nq,nn),age(nbb),x,xx(nbb,nn),yy(nbb,nn)  !,dov
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0
   real :: xsel(4),ysel(4)
   real :: m1,r1,l1,ts,tc,mhe,mco
-  real :: hc,hec,cc,oc,zc
-  real :: hs,hes,cs,os,zs
+  real :: hc,hec,cc,oc  !,zc
+  real :: hs,hes,zs  !,cs,os
   real :: rhoc
 
-  integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax,system,status
+  integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax
   character findfile*(99),fname*(99),rng,log,mdlnr*(5)
   character :: labels(nq)*(60),lx*(50),ly*(50),title*(100)
   
@@ -84,14 +85,14 @@ program plotmdln
   labels(28) = '(Ne/O)/(Ne/O)\d0\u'
 
 
-  !Read currend path and use it as plot title
+  ! Read currend path and use it as plot title:
 3 continue
-  status = system('pwd > tmppwd.txt')
+  call system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  status = system('rm tmppwd.txt')
+  call system('rm tmppwd.txt')
 
   !Search for input file in current dir
   fname=findfile('*.mdl*')
@@ -107,7 +108,7 @@ program plotmdln
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
 
-  read(10,5,err=11,end=11) nm,nv,dov
+  read(10,5,err=11,end=11) nm,dumint,dumreal !nv,dov
 5 format (2x,I4,4x,I2,F7.3)
   write(6,*)''
   write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
@@ -126,7 +127,7 @@ program plotmdln
            hec  = dat(b,11,j)
            cc   = dat(b,12,j)
            oc   = dat(b,14,j)
-           zc   = 1. - hc - hec
+           !zc   = 1. - hc - hec
            rhoc = dat(b,5,j)
         end if
         if(j.eq.nm) then
@@ -136,8 +137,8 @@ program plotmdln
            ts  = dat(b,6,j)
            hs  = dat(b,10,j)
            hes = dat(b,11,j)
-           cs  = dat(b,12,j)
-           os  = dat(b,14,j)
+           !cs  = dat(b,12,j)
+           !os  = dat(b,14,j)
            zs  = 1. - hs - hes
         end if
         if(mhe.eq.0.0.and.dat(b,10,j).gt.0.1) mhe = dat(b,2,j)

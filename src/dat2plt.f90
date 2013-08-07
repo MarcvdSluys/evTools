@@ -23,14 +23,15 @@
 !!         with evTools
 
 program dat2plt
-  use kinds
   use SUFR_constants
+  use SUFR_dummy, only: dumstr
+  use kinds
   
   implicit none
   integer, parameter :: nci1=99,nco=89
   integer :: i,command_argument_count,ioi,ioo,nci,translate(nci1),skipinlines,ci
   real(double) :: dati(nci1),dato(nco)
-  character :: infile*(99),outfile*(99),bla
+  character :: infile*(99),outfile*(99)
   integer :: logvar(nci1), delogvar(nci1)
   
   logvar = 0
@@ -123,14 +124,14 @@ program dat2plt
   end if
   
   
-  !Read first skipinlines of input file and discard them
+  ! Read first skipinlines of input file and discard them:
   if(skipinlines.gt.0) then
      do i=1,skipinlines
-        read(10,*)bla
+        read(10,*) dumstr
      end do
   end if
   
-  !Write number of columns in first line of output file
+  ! Write number of columns in first line of output file:
   write(20,'(I4)')nco
   
   i=0

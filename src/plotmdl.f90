@@ -36,7 +36,7 @@ program plotmdl
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
   character findfile*(99),fname*(99),rng,log,xwin*(19)
-  character :: lx*(99),ly*(99), lxs(10)*(99),lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)
+  character :: lx*(99),ly*(99), lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)  ! lxs(10)*(99),
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
@@ -219,7 +219,7 @@ program plotmdl
 37 continue 
   lx = labels(pxnr(vx))
   ly = labels(pxnr(vy))
-  lxs(1) = lx
+  !lxs(1) = lx
   lys(1) = ly
   
   fx = pxfns(pxnr(vx))

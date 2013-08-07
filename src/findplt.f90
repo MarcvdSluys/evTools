@@ -24,6 +24,7 @@
 !> \brief  Find the model with the closest value for a specified variable, interpolate, and return the values of the other variables
 
 program findplt
+  use SUFR_dummy, only: dumstr9
   use kinds, only: double
   use constants, only: libdir
   use ubvdata, only: ubv
@@ -32,7 +33,7 @@ program findplt
   integer, parameter :: nn=30000,nnn=100
   real(double) :: x(nnn),x1(nnn),xi(nnn),xfind,a,b,mbol,bc
   integer :: i,j,ncols,prmdl,succ,narg,command_argument_count,iin,iout,glt,io
-  character :: fname*(99),arg*(99),tmpstr*(10)
+  character :: fname*(99),arg*(99)
   
   call setconstants()
   
@@ -40,9 +41,9 @@ program findplt
   !Read atmosphere-model data
   open(unit=10, file=trim(libdir)//'/UBVRI.Kur',status='old',action='read',iostat=io)
   if(io.eq.0) then
-     read(10,*)tmpstr
-     read(10,*)tmpstr
-     read(10,*)ubv
+     read(10,*) dumstr9
+     read(10,*) dumstr9
+     read(10,*) ubv
      close(10)
   else
      write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."

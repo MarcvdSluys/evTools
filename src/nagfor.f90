@@ -22,14 +22,15 @@
 !> \brief  Dummy version of the system() intrinsic function
 
 function system(str)
-   implicit none
-   character, intent(in) :: str*(*)
-   integer :: system
-   character :: dummystr*(99)
-   
-   dummystr = trim(str)
-   system = 0
-   
+  use SUFR_dummy, only: dumstr99
+  implicit none
+  character, intent(in) :: str*(*)
+  integer :: system
+  
+  dumstr99 = trim(str)
+  dumstr99 = dumstr99  ! Avoid 'unused variable' compiler errors
+  system = 0
+  
 end function system
 !***********************************************************************************************************************************
 
@@ -38,12 +39,13 @@ end function system
 !> \brief  Dummy version of the sleep() intrinsic routine
 
 subroutine sleep(nr)
-   implicit none
-   integer, intent(in) :: nr
-   integer :: dummyint
-   
-   dummyint = nr
-   
+  use SUFR_dummy, only: dumint
+  implicit none
+  integer, intent(in) :: nr
+  
+  dumint = nr
+  dumint = dumint  ! Avoid 'unused variable' compiler errors
+  
 end subroutine sleep
 !***********************************************************************************************************************************
 

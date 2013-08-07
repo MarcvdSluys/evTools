@@ -366,10 +366,10 @@ end subroutine num_sp_type_2_lt
 function getos()
   use SUFR_constants, only: homedir
   implicit none
-  integer :: status,system,getos
+  integer :: getos
   character :: ostype*(25)
   
-  status = system('uname > '//trim(homedir)//'/uname.tmp') !This gives Linux or Darwin
+  call system('uname > '//trim(homedir)//'/uname.tmp')  ! This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
   read(16,'(A)')ostype
   close(16, status = 'delete')
@@ -391,7 +391,7 @@ function findfile(match)
   implicit none
   character, intent(in) :: match*(*)
   integer, parameter :: maxfile=1000
-  integer :: i,k,fnum, system,status
+  integer :: i,k,fnum
   character :: names(maxfile)*(99),findfile*(99),fname*(99),tempfile*(99)
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
@@ -400,8 +400,8 @@ function findfile(match)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  !Shell command to list all the files with the search string and pipe them to a temporary file:
-  status = system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  
+  ! Shell command to list all the files with the search string and pipe them to a temporary file:
+  call system('ls '//trim(match)//' 1> '//trim(tempfile)//' 2> /dev/null')  
   
   k=0
   names = ''
@@ -459,7 +459,7 @@ subroutine findfiles(match,nff,all, fnames,nf)
   integer, intent(in) :: nff,all
   character, intent(out) :: fnames(nff)*(99)
   integer, intent(out) :: nf
-  integer :: i,j,k,fnum,system,status
+  integer :: i,j,k,fnum
   character :: names(nff)*(99),tempfile*(99)
   
   if(len_trim(homedir).eq.99) then
@@ -468,8 +468,8 @@ subroutine findfiles(match,nff,all, fnames,nf)
   end if
   
   tempfile = trim(homedir)//'/.findfile.tmp'
-  !Shell command to list all the files with the search string and pipe them to a temporary file:
-  status = system('ls '//trim(match)//' > '//trim(tempfile))
+  ! Shell command to list all the files with the search string and pipe them to a temporary file:
+  call system('ls '//trim(match)//' > '//trim(tempfile))
   
   do i=1,nff
      names(i)='                                                                                                   '
@@ -982,20 +982,19 @@ function time_stamp(os)
   implicit none
   integer, intent(in) :: os
   real(double) :: time_stamp
-  integer :: status,system
   character :: fname*(99)
   
   fname = './.analysemcmc_time_stamp'  !gfortran doesn't want to read from ~ for some reason
   if(os.eq.2) then  ! MacOS
-     status = system('date +%s >& '//trim(fname)) !%N for fractional seconds doesn't work on MacOS!!! (But it does with GNU date)
+     call system('date +%s >& '//trim(fname)) !%N for fractional seconds doesn't work on MacOS!!! (But it does with GNU date)
   else  ! GNU/Linux, default
-     status = system('date +%s.%N >& '//trim(fname))
+     call system('date +%s.%N >& '//trim(fname))
   end if
   
   open(unit=9,status='old',file=trim(fname))
   read(9,*)time_stamp
   close(9)
-  status = system('rm -f '//trim(fname))
+  call system('rm -f '//trim(fname))
   
 end function time_stamp
 !***********************************************************************************************************************************
@@ -1012,11 +1011,10 @@ subroutine set_PGPS_title(PSfile,PStitle)
   use SUFR_constants, only: username
   implicit none
   character, intent(in) :: PSfile*(*),PStitle*(*)
-  integer :: status,system
   
-  status = system( "sed -i -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile) )
+  call system( "sed -i -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile) )
   
-  status = system( "sed -i -e 's/For: "//trim(username)//"/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile))
+  call system( "sed -i -e 's/For: "//trim(username)//"/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile))
   
 end subroutine set_PGPS_title
 !***********************************************************************************************************************************

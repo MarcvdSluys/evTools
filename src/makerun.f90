@@ -32,7 +32,7 @@ program makerun
   real(double) :: m2
   integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
   integer :: kml,kql,kxl,kr,jmx
-  integer :: io,narg,command_argument_count,system,status
+  integer :: io,narg,command_argument_count
   character :: filei*(99),fileo*(99),arg*(10),bla*(500)
   
   write(6,*)''
@@ -123,7 +123,7 @@ program makerun
   close(10)
   close(20)
   
-  status = system('mv -f '//trim(fileo)//' '//trim(filei))
+  call system('mv -f '//trim(fileo)//' '//trim(filei))
   
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   

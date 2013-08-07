@@ -829,15 +829,16 @@ end subroutine read_plt_bse
 
 subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   use kinds, only: double
+  use SUFR_dummy, only: dumint
   
   implicit none
   integer, intent(in) :: u,nn,nvar,nc,verbose
   character, intent(in) :: fname*(*)
   integer, intent(out) :: n,version
   real(double), intent(out) :: dat(nvar,nn)
-  integer :: ncols,nc1,i,j
+  integer :: ncols,i,j
   
-  nc1 = nc !Get rid of 'unused' message
+  dumint = nc ! Get rid of 'unused' message
   
   if(verbose.eq.1) write(6,'(A)', advance='no')' Reading ev file '//trim(fname)//':'
   
@@ -845,7 +846,7 @@ subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   dat = 0.d0
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
-  read(u,*)ncols
+  read(u,*) ncols
   if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
   version = 2005   ! Can no longer distinguish with unformatted read
   if(ncols.eq.83.or.ncols.eq.92) version = 2011  ! Latest version 
@@ -898,13 +899,13 @@ subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
   integer, intent(out) :: n,version
   real(double), intent(out) :: dat(nvar,nn)
   
-  integer :: ncols,j
+  integer :: j  !ncols
   real(double) :: tmpdat(19), Porb, a2j
   
   if(verbose.eq.1) write(6,'(A)', advance='no')' Reading BSE file '//trim(fname)//':'
   
   ! Fixed for BSE:
-  ncols = 19
+  !ncols = 19
   version = 1
   
   dat = 0.d0

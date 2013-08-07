@@ -25,24 +25,25 @@
 
 !> \brief Plot the contents of the *.mod output file of ev
 program plotmod
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal
   use kinds
   use SUFR_constants
   use constants, only: scrrat,scrsz, white_bg
   
   implicit none
   integer, parameter :: nc=25,nm=1000
-  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real(double) :: lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20
-  real(double) :: mi,pr,phi,phis,e,f,x
+  real(double) :: m1,dt,t,p,bms,ecc,p1  !,horb,enc
+  real(double) :: lnt,lnm,x1,lnr,l,x4  ! ,c,lnf,x16,x12,x20
+  !real(double) ::   !,e,f,x,mi,pr,phi,phis
   real(double) :: r1,l1,ts,tc,hc,hec,zc
   real(double) :: mhe,mco
-  integer :: i,j,kh,kp,jmod,jb,jin,n
+  integer :: i,j,kh,jmod,n  ! ,jb,jin,kp
   integer :: narg,blk
   character :: fname*(99),findfile*(99)
   
   real :: dat(nc,nm),dat1(nc,nm)
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,xr
-  integer :: vx,vy,hmp,plotagain,system,status
+  integer :: vx,vy,hmp,plotagain
   character :: log,ans
   character :: labels(nc)*(60),lx*(60),ly*(60),title*(100)
   
@@ -52,12 +53,12 @@ program plotmod
   call evTools_settings()
   
   plotagain = 0
-  status = system('pwd > tmppwd.txt')
+  call system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
   read(10,'(a100)')title
   close(10)
-  status = system('rm tmppwd.txt')
+  call system('rm tmppwd.txt')
 
   
   narg = command_argument_count()
@@ -84,12 +85,16 @@ program plotmod
   write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
        '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
-     read(10,*,err=5,end=10)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     !read(10,*,err=5,end=10) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     read(10,*,err=5,end=10) m1,dt,t,p,bms,ecc,p1,dmrl,kh,dmin,jmod,dmin,dmin
      mhe = 0.d0
      mco = 0.d0
      ts = 1.d0
      do j=1,kh
-        read(10,*,err=6,end=10)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        !read(10,*,err=6,end=10) lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis, &
+        !dmrl,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+        read(10,*,err=6,end=10) dmrl,lnt,dmrl,lnm,x1,dmrl,lnr,l,x4,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl, &
+             dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
         if(j.eq.1) then
            r1  = exp(lnr)*1.e11/rsun
            l1  = l*1.d33/lsun
@@ -152,14 +157,19 @@ program plotmod
 
   rewind 10
   do i=1,blk-1
-     read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     !read(10,*,err=991) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
+     read(10,*,err=991) m1,dt,t,p,bms,ecc,p1,dmrl,kh,dmin,jmod,dmin,dmin
      do j=1,kh
-        read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        !read(10,*,err=993) lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20, &
+        !    mi,pr,phi,phis,dmrl,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+        read(10,*,err=993) dmrl,lnt,dmrl,lnm,x1,dmrl,lnr,l,x4,dmrl,dmrl, &
+             dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
      end do !j
   end do !i
 
-  read(10,*,err=991)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin   !jin = # columns
-  !      read(10,*,err=993)lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  !read(10,*,err=991) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin   !jin = # columns
+  read(10,*,err=991) m1,dt,t,p,bms,ecc,p1,dmrl,kh,dmin,jmod,dmin,dmin
+  !read(10,*,err=993) lnf,lnt,x16,lnm,x1,c,lnr,l,x4,x12,x20,mi,pr,phi,phis,dmrl,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
   do j=1,kh
      read(10,*,err=993) (dat1(i,j),i=2,25)
      dat(1,j) = real(j)
@@ -300,10 +310,10 @@ program plotmod
   xmin = xmin - xr
   xmax = xmax + xr
   xr = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) xr = 0.05*ymax
+  if(xr.eq.0.) xr = 0.05*ymax
   ymin = ymin - xr
   ymax = ymax + xr
-
+  
   hmp = 999
   !      if(vx.eq.1) then
   do while(hmp.gt.kh)

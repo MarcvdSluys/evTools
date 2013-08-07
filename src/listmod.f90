@@ -160,6 +160,7 @@ end subroutine error_reading_block
 !! \retval save_dh  DH is saved along H if true (inout)
 !<
 subroutine list_mod_file(fname, nblk, save_dh)
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   use kinds
   use SUFR_constants
   
@@ -168,14 +169,13 @@ subroutine list_mod_file(fname, nblk, save_dh)
   integer, intent(out) :: nblk
   logical, intent(inout) :: save_dh
   
-  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
-  real(double) :: mhe,mco,mi,pr,phi,phis,e,f
+  real(double) :: m1,dt,t,p,bms,p1  ! ,enc,ecc,horb
+  real(double) :: lnt,lnm,x1,lnr,l,x4  ! ,dqdk,lnf,x12,x20,x16
+  real(double) :: mhe,mco !,e,f,mi,phi,phis,pr
   real(double) :: r1,l1,ts,hs,hes,zs,tc,hc,hec,zc
   real(double) :: dat(99)
-  integer :: kh,kp,jmod,jb,jin,jf, io
+  integer :: kh,jmod,jin,jf, io  ! ,jb,kp
   integer :: bl,li
-  character :: tmp_str*(9)
   
   open(unit=10,form='formatted',status='old',file=trim(fname))
   
@@ -184,7 +184,8 @@ subroutine list_mod_file(fname, nblk, save_dh)
   
   bl = 1   ! Block/model number
   do
-     read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc, kh,kp,jmod,jb,jin, jf  ! jf was introduced in 2005 - for older files
+     !read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc, kh,kp,jmod,jb,jin, jf  ! jf was introduced in 2005 - for older files
+     read(10,*,iostat=io) m1,dt,t,p,bms,dmrl,p1,dmrl, kh,dmin,jmod,dmin,jin, jf  ! jf was introduced in 2005 - for older files
      !                                                                       the solution in rev.117 might be more useful
      if(iand(jf, 4) == 4) save_dh = .true.
      if(io.lt.0) exit
@@ -203,24 +204,24 @@ subroutine list_mod_file(fname, nblk, save_dh)
            exit
         end if
         
-        lnf = dat(1)
+        !lnf = dat(1)
         lnt = dat(2)
-        x16 = dat(3)
+        !x16 = dat(3)
         lnm = dat(4)
         x1 = dat(5)
-        dqdk = dat(6)
+        !dqdk = dat(6)
         lnr = dat(7)
         l = dat(8)
         x4 = dat(9)
-        x12 = dat(10)
-        x20 = dat(11)
-        mi = dat(12)
-        pr = dat(13)
-        phi = dat(14)
-        phis = dat(15)
-        horb = dat(17)
-        e = dat(18)
-        f = dat(19)
+        !x12 = dat(10)
+        !x20 = dat(11)
+        !mi = dat(12)
+        !pr = dat(13)
+        !phi = dat(14)
+        !phis = dat(15)
+        !horb = dat(17)
+        !e = dat(18)
+        !f = dat(19)
         
         if(li.eq.1) then
            r1  = exp(lnr)*1.e11/rsun
@@ -243,7 +244,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
      
      if(save_dh) then  ! Read the DH block as well; it has no header, and hence kh lines, not kh+1
         do li=1,kh
-           read(10,*) tmp_str
+           read(10,*) dumstr9
         end do
      end if
      
@@ -279,8 +280,9 @@ end subroutine list_mod_file
 !! \param fname    Name of the .mod file
 !! \param blk      Number of the structure-model block in the file to print
 !! \param save_dh  DH is saved along H if true
-!<
+
 subroutine print_mod_details(fname, blk, save_dh)
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   use kinds
   use SUFR_constants
   
@@ -289,31 +291,32 @@ subroutine print_mod_details(fname, blk, save_dh)
   integer, intent(in) :: blk
   logical, intent(in) :: save_dh
   
-  real(double) :: m1,dt,t,p,bms,ecc,p1,enc,horb
-  real(double) :: lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20
-  real(double) :: mi,pr,phi,phis,e,f
-  real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2,x
+  real(double) :: m1,dt,t,p,bms,horb  ! ,enc,ecc,p1
+  real(double) :: lnt,x16,lnm,x1,lnr,l,x4,x12,x20  ! ,dqdk,lnf
+  real(double) :: pr,e  !,f,mi,phi,phis
+  real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2
   real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
   real(double) :: mhe,mco,mhenv
-  integer :: kh,kp,jmod,jb,jin,jf, io
+  integer :: kh,kp,jmod,jb,jin, io  ! ,jf
   integer :: bl,li
-  character :: tmp_str*(9)
   
   
   !Read file, upto chosen model (blk-1)
   open(unit=10,form='formatted',status='old',file=trim(fname))
   do bl=1,blk-1  !Block/model
-     read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf
+     !read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf
+     read(10,*,iostat=io)m1,dt,t,p,bms,dmrl,dmrl,dmrl,kh,kp,jmod,jb,jin,dmin
      if(io.ne.0) call error_reading_header(bl)
      
      do li=1,kh  !Line/mesh point in model
-        read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+        !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+        read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
         if(io.ne.0) call error_reading_block(li)
      end do !li
      
      if(save_dh) then  !Read the DH block as well; it has no header, and hence kh lines, not kh+1
         do li=1,kh
-           read(10,*) tmp_str
+           read(10,*) dumstr9
         end do
      end if
      
@@ -324,9 +327,11 @@ subroutine print_mod_details(fname, blk, save_dh)
   
   !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   
-  read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf   !jin = # columns
+  !read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf   !jin = # columns
+  read(10,*,iostat=io)m1,dt,t,p,bms,dmrl,dmrl,dmrl,kh,kp,jmod,jb,jin,dmin   !jin = # columns
   if(io.ne.0) call error_reading_header(0)
-  read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+  !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+  read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
   if(io.ne.0) call error_reading_block(0)
   
   m1  = lnm*1.d33/msun
@@ -344,7 +349,8 @@ subroutine print_mod_details(fname, blk, save_dh)
   mhe = 0.d0
   mco = 0.d0
   do li=1,kh-1 !Number of Mesh points
-     read(10,*,iostat=io)lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,x,x,x,x,x
+     !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+     read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
      if(io.ne.0) call error_reading_block(li)
      if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
      if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
@@ -431,6 +437,7 @@ end subroutine print_mod_details
 !! \note 99 columns max
 
 subroutine copy_mod(infile, blk, save_dh)
+  use SUFR_dummy, only: dumstr9
   use kinds
   implicit none
   character, intent(in) :: infile*(*)
@@ -440,7 +447,7 @@ subroutine copy_mod(infile, blk, save_dh)
   real(double) :: dat1(8),dat2(99)
   integer :: kh,kp,jmod,jb,jin,jf, io
   integer :: bl,li
-  character :: outfile*(99),tmp_str*(9)
+  character :: outfile*(99)
   logical :: ex
   
   !Read blocks before the desired one:
@@ -455,7 +462,7 @@ subroutine copy_mod(infile, blk, save_dh)
      
      if(save_dh) then   ! Read the DH block as well; it has no header, and hence kh lines, not kh+1
         do li=1,kh
-           read(10,*) tmp_str
+           read(10,*) dumstr9
         end do
      end if
      
