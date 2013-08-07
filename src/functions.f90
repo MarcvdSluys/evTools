@@ -928,7 +928,7 @@ subroutine bin_data_1d(n,x,norm,nbin, xmin1,xmax1, xbin,ybin)
   
   do k=1,nbin+1
      !xbin(k) = xmin + (real(k)-0.5)*dx  !x is the centre of the bin
-     xbin(k) = xmin + (k-1)*dx          !x is the left of the bin
+     xbin(k) = xmin + real(k-1)*dx          !x is the left of the bin
   end do
   !ybintot=0.
   ybin = 0.
@@ -1151,8 +1151,8 @@ subroutine pgszrat2xy_screen(size,ratio, dpi, horiz,vert)
   integer, intent(in) :: dpi
   integer, intent(out) :: horiz,vert
   
-  horiz = nint(dpi*size)       + 48
-  vert  = nint(dpi*size*ratio) + 48
+  horiz = nint(real(dpi)*size)       + 48
+  vert  = nint(real(dpi)*size*ratio) + 48
   
 end subroutine pgszrat2xy_screen
 !***********************************************************************************************************************************
