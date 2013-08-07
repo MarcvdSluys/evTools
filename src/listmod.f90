@@ -24,7 +24,6 @@
 !! input.
 
 program listmod
-  use SUFR_kinds, only: double
   implicit none
   integer :: narg,command_argument_count,blk,ans,nblk
   character :: fname*(99),findfile*(99)

@@ -225,7 +225,7 @@ end subroutine compute_mdl_variables
 subroutine list_mdl_models(infile,nblk)
   use SUFR_constants, only: pc_g
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
-  use mdl_data, only: pxnr,nq,nc, nmsh,nv,mdlver
+  use mdl_data, only: pxnr,nc, nmsh,nv,mdlver
   
   implicit none
   character, intent(in) :: infile*(*)
