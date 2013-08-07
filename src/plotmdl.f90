@@ -22,7 +22,7 @@
 
 program plotmdl  
   use kinds
-  use SUFR_constants
+  use SUFR_constants, only: workdir
   use constants, only: colours,ncolours, scrrat,scrsz, white_bg
   use mdl_data
   

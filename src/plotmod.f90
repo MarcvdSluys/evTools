@@ -27,7 +27,7 @@
 program plotmod
   use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal
   use kinds
-  use SUFR_constants
+  use SUFR_constants, only: rsun,lsun,msun,julyear,pi
   use constants, only: scrrat,scrsz, white_bg
   
   implicit none

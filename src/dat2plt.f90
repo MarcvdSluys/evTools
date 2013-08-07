@@ -23,7 +23,6 @@
 !!         with evTools
 
 program dat2plt
-  use SUFR_constants
   use SUFR_dummy, only: dumstr
   use kinds
   

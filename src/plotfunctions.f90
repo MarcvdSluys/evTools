@@ -25,7 +25,7 @@
 !! \param llmax  Maximum logL in HRD
 
 subroutine plotlinesofconstantradius(ltmin,ltmax,llmin,llmax)
-  use SUFR_constants
+  use SUFR_constants, only: lsun,rsun,pc_sigma,pi
   implicit none
   integer :: logri
   real, intent(in) :: ltmin,ltmax,llmin,llmax

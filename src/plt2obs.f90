@@ -20,7 +20,6 @@
 program plt2obs
   use kinds
   use SUFR_dummy, only: dumstr9
-  use SUFR_constants
   use constants, only: libdir
   use ubvdata
   

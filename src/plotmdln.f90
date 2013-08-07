@@ -24,7 +24,6 @@
 !> Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
 program plotmdln
   use SUFR_dummy, only: dumint, dumreal
-  use SUFR_constants
   use constants, only: scrrat,scrsz, white_bg
   
   

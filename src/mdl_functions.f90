@@ -48,7 +48,7 @@ end module mdl_data
 !! \param  dat  Data array (in/out)
 subroutine compute_mdl_variables(dat)
   use kinds
-  use SUFR_constants
+  use SUFR_constants, only: rsun,msun,pc_g,pc_amu,pc_mh,c3rd,pc_arad,pc_kb,solday
   use mdl_data
   
   implicit none
@@ -223,7 +223,7 @@ end subroutine compute_mdl_variables
 !! \retval nblk   Number of stellar-structure blocks in the file
 
 subroutine list_mdl_models(infile,nblk)
-  use SUFR_constants
+  use SUFR_constants, only: pc_g
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
   use mdl_data
   
@@ -384,7 +384,6 @@ end subroutine list_mdl_models
 !! \param svblk   Save block or not (in/out)
 
 subroutine print_mdl_details(infile,blk,svblk)
-  use SUFR_constants
   use mdl_data
   
   implicit none
