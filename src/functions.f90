@@ -20,31 +20,10 @@
 
 
 !***********************************************************************************************************************************
-!> \brief  Contains the integers double and dbl, which shall be used in (almost) all routines
-!! to provide the kind of a (currently double-precision) real variable type.
-!! 
-!! Variables can be declared using "real(double) :: "; constants can be defined as 
-!! e.g. "x = 3.0_dbl".
-
-module kinds
-   implicit none
-   
-   ! Integer, double precision:
-   integer, parameter :: long = selected_int_kind(18)
-   
-   ! Real, double precision:
-   integer, parameter :: double = selected_real_kind(15,307)  !Precision = 15, range = 307
-   integer, parameter :: dbl = selected_real_kind(15,307)     !Precision = 15, range = 307
-   
-end module kinds
-!***********************************************************************************************************************************
-
-
-!***********************************************************************************************************************************
 !> \brief  Contains data to compute magnitudes and colours from L,T,g
 
 module ubvdata
-  use kinds, only: double
+  use SUFR_kinds, only: double
   implicit none
   save
   private :: double
@@ -68,7 +47,7 @@ end module ubvdata
 !> \brief  Contains the 'constants' used in the evTools package
 
 module constants
-  use kinds, only: double
+  use SUFR_kinds, only: double
   implicit none
   save
   private :: double
@@ -141,7 +120,7 @@ end subroutine setconstants
 !! - UBVRI.LBC:  empirically corrected version of the above, from Lejeune, Cuisinier & Buser (1997, A&AS 125, 229)
 
 subroutine lt2ubv(logl,logt,mass,logz,  mbol,bolc,mv,uminb,bminv,vminr,rmini)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use ubvdata, only: ntgr,nggr,nzgr, tgr,ggr,zgr, ubv
   
   implicit none
@@ -207,7 +186,7 @@ end subroutine lt2ubv
 !! \see 1987A&A...177..217D
 
 subroutine num_sp_type_2_lt(sptyp,lumcl, lum,teff)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   implicit none
   real(double), intent(in) :: sptyp, lumcl
   real(double), intent(out) :: lum, teff
@@ -567,7 +546,7 @@ end subroutine rswap
 !! \retval find_index  Index for value v in array arr (integer)
 
 function find_index(v,arr,narr)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer, intent(in) :: narr
   real(double), intent(in) :: v,arr(narr)
@@ -604,7 +583,7 @@ end function find_index
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
 
 subroutine locate(arr,narr,v, i)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   integer, intent(in) :: narr
@@ -644,7 +623,7 @@ end subroutine locate
 !! \retval i    returned index, such that v is between arr(i) and arr(i+1).  If i=0 or narr, v is out of range
 
 subroutine locater(rarr,narr,rv,i)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   integer, intent(in) :: narr
@@ -677,7 +656,7 @@ end subroutine locater
 !! \retval a2j   Orbital angular momentum (cgs)
 
 function a2j(m1,m2,a)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g,msun,rsun
   
   implicit none
@@ -699,7 +678,7 @@ end function a2j
 !! \retval j2a   Orbital separation (Ro)
 
 function j2a(m1,m2,j)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g,msun,rsun
   
   implicit none
@@ -722,7 +701,7 @@ end function j2a
 !! \retval p2j   Orbital angular momentum (cgs)
 
 function p2j(m1,m2,p)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g
   
   implicit none
@@ -745,7 +724,7 @@ end function p2j
 !! \retval j2p  Orbital period (s)
 
 function j2p(m1,m2,j)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g
   
   implicit none
@@ -768,7 +747,7 @@ end function j2p
 !! \retval a    Binary orbital separation (cm)
 
 subroutine p2a(mtot,p,a)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g,pi,c3rd
   
   implicit none
@@ -789,7 +768,7 @@ end subroutine p2a
 !! \retval p     Binary period (s)
 
 subroutine a2p(mtot,a,p)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pc_g,pi
   
   implicit none
@@ -811,7 +790,7 @@ end subroutine a2p
 !! \retval a2rl  Roche-lobe radius of star 1 (same unit as a)
 
 function a2rl(m1,m2,a)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: c3rd
   
   implicit none
@@ -835,7 +814,7 @@ end function a2rl
 !! \retval rl2a  Orbital separation (same unit as rl1)
 
 function rl2a(m1,m2,rl1)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: c3rd
   
   implicit none
@@ -858,7 +837,7 @@ end function rl2a
 !! \retval p2rl  Roche-lobe radius of star 1 (cm)
 
 function p2rl(m1,m2,p)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   real(double), intent(in) :: m1,m2,p
@@ -880,7 +859,7 @@ end function p2rl
 !! \retval rl2p  Orbital period (s)
 
 function rl2p(m1,m2,rl1)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   real(double), intent(in) :: m1,m2,rl1
@@ -977,7 +956,7 @@ end subroutine bin_data_1d
 !! \param os  Operating system: 1-Linux, 2-BSD/MacOS
 
 function time_stamp(os)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   integer, intent(in) :: os

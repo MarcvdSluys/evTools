@@ -1,6 +1,6 @@
 !***********************************************************************************************************************************
 program testplt
-  use kinds, only: double
+  use SUFR_kinds, only: double
   implicit none
   integer :: spi,lci
   real(double) :: sptyp,lumcl, lum,teff

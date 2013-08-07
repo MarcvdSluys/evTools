@@ -23,7 +23,7 @@
 
 
 program plotpltn
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants
   use ubvdata
   

@@ -18,7 +18,7 @@
 
 !***********************************************************************************************************************************
 program plt2dat
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   integer, parameter :: nff=200, n=100000,nc=89

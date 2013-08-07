@@ -120,7 +120,7 @@ end subroutine plotzams
 !!  - do I need all nmax rows, or should n do?
 
 subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
   real(double), intent(in) :: dat0(nvar,nmax)  ! Can be modified at nuclear burning

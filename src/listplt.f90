@@ -17,8 +17,8 @@
 
 
 program listplt
+  use SUFR_kinds, only: double, dbl
   use SUFR_dummy, only: dumstr9
-  use kinds
   use SUFR_constants, only: msun,solday, pi, rsun,c3rd,pi2, pc_g,julyear,lsun,pc_c
   use constants, only: libdir
   use ubvdata

@@ -23,7 +23,7 @@
 !> \brief  This program merges data from the plt output file from ev
 
 program mergeplt      
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   integer, parameter :: nn=30000,nnn=100

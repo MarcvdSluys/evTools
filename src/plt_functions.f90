@@ -42,7 +42,7 @@ contains
   !! \retval zeta  Array with zeta_ad values
   
   subroutine compute_zeta_ad(Mc, zeta)
-    use kinds, only: double
+    use SUFR_kinds, only: double
     implicit none
     real(double), intent(in) :: Mc(:)
     real(double), intent(out) :: zeta(size(Mc))
@@ -73,7 +73,7 @@ contains
   !! \retval zeta  Array with zeta_rl values
   
   subroutine compute_zeta_rl(Md,Ma, beta, zeta)
-    use kinds, only: double
+    use SUFR_kinds, only: double
     implicit none
     real(double), intent(in) :: Md(:),Ma(:), beta
     real(double), intent(out) :: zeta(size(Md))
@@ -794,7 +794,7 @@ end subroutine printpltvarlist
 !! \retval version  Code-output version
 
 subroutine read_plt_bse(u,fname,nmax,nvar,nc,verbose,datf,nfi,version)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   integer, intent(in) :: u,nmax,nvar,nc,verbose
@@ -828,7 +828,7 @@ end subroutine read_plt_bse
 !! \retval version  Code-output version
 
 subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_dummy, only: dumint
   
   implicit none
@@ -890,7 +890,7 @@ end subroutine read_plt
 !! \retval version  Code-output version
 
 subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pi, pc_sigma,solday, msun,rsun,lsun
   
   implicit none
@@ -978,7 +978,7 @@ end subroutine read_bse
 !! \retval dpdt     Pdot mode: 0: dJ/dt,  1: dP/dt,  2: timescales
 
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: pi,pi2, pc_c,pc_g, km,julyear,solday, lsun,msun,rsun
   use plt_funcs, only: compute_zeta_ad, compute_zeta_rl
   

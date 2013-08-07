@@ -23,7 +23,7 @@
 !> \brief  Store the parameters in init.dat
 
 module initdat_contents
-  use kinds
+  use SUFR_kinds, only: double
   save
   
   real(double) :: eps, del, dh0, wanted_eps

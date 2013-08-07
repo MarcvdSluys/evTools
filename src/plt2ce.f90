@@ -20,7 +20,7 @@
 !> \brief  Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
 
 program plt2ce
-  use kinds
+  use SUFR_kinds, only: double
   implicit none   
   
   integer, parameter :: nff=200, n=100000,nc=89

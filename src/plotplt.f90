@@ -27,7 +27,7 @@
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
 
 program plotplt
-  use kinds, only: double,dbl
+  use SUFR_kinds, only: double,dbl
   use SUFR_constants, only: homedir
   use SUFR_dummy, only: dumstr
   use constants, only: libdir, colours,ncolours, scrrat,scrsz, white_bg

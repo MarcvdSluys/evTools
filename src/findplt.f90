@@ -25,7 +25,7 @@
 
 program findplt
   use SUFR_dummy, only: dumstr9
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use constants, only: libdir
   use ubvdata, only: ubv
   
@@ -175,7 +175,7 @@ end program findplt
 !! \param iout  0: print standard selection, <0: print all variables, >0: print variables iin and iout
 
 subroutine printmodel(n, xx, iin, iout)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use SUFR_constants, only: msun
   
   implicit none

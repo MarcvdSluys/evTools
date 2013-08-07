@@ -19,7 +19,7 @@
    
 
 program plotpltp      
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants
   
   implicit none

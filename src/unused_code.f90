@@ -52,7 +52,7 @@ end function ran1
 !! \retval ind   Array with sorted indices
 
 subroutine dindex(narr,arr,ind)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer, intent(in) :: narr
   real(double), intent(in) :: arr(narr)
@@ -153,7 +153,7 @@ end subroutine dindex
 !! \retval indx  Array with sorted indices
 
 subroutine rindex(narr,rarr, indx)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer, intent(in) :: narr
   real, intent(in) :: rarr(narr)
@@ -237,7 +237,7 @@ end subroutine polint
 !! \retval dy  dy
 
 subroutine polintd(xa,ya,n, x,y,dy)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer, intent(in) :: n
   real(double), intent(in) :: xa(n),ya(n)
@@ -288,7 +288,7 @@ end subroutine polintd
 !> \brief  Spline interpolation
 
 subroutine spline(x,y,n,yp1,ypn,y2)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer :: n,i,k
   real(double) :: yp1,ypn,x(n),y(n),y2(n)
@@ -330,7 +330,7 @@ end subroutine spline
 !> \brief  Spline interpolation
 
 subroutine splint(xa,ya,y2a,n,x,y)
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer :: n,k,khi,klo
   real(double) :: x,y,xa(n),y2a(n),ya(n),a,b,h

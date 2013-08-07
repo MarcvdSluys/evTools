@@ -22,7 +22,7 @@
 !> \brief  Reads, optinally changes and (over!)writes an init.run (fort.23) input file
 
 program makerun  
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   real(double) :: ct1(7),ct2(7),ct3(7)

@@ -24,7 +24,7 @@
 !! input.
 
 program listmod
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   integer :: narg,command_argument_count,blk,ans,nblk
   character :: fname*(99),findfile*(99)
@@ -160,7 +160,7 @@ end subroutine error_reading_block
 !<
 subroutine list_mod_file(fname, nblk, save_dh)
   use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,lsun,msun
   
   implicit none
@@ -282,7 +282,7 @@ end subroutine list_mod_file
 
 subroutine print_mod_details(fname, blk, save_dh)
   use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants, only: msun,rsun,lsun, pi, pc_g,solday
   
   implicit none
@@ -437,7 +437,7 @@ end subroutine print_mod_details
 
 subroutine copy_mod(infile, blk, save_dh)
   use SUFR_dummy, only: dumstr9
-  use kinds
+  use SUFR_kinds, only: double
   implicit none
   character, intent(in) :: infile*(*)
   integer, intent(in) :: blk

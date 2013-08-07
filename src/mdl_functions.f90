@@ -47,7 +47,7 @@ end module mdl_data
 !> \brief  Compute secondary variables from the primary variables in a .mdl[12] file
 !! \param  dat  Data array (in/out)
 subroutine compute_mdl_variables(dat)
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,msun,pc_g,pc_amu,pc_mh,c3rd,pc_arad,pc_kb,solday
   use mdl_data
   
@@ -632,7 +632,7 @@ end subroutine read_first_mdls
 !! \retval dat  Data for the selected model
 
 subroutine read_chosen_mdl(blk, mdl,age,dat)
-  use kinds, only: double
+  use SUFR_kinds, only: double
   use mdl_data
   
   implicit none

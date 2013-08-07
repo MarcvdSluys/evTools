@@ -20,7 +20,7 @@
 !> \brief  Find the parameters you need to get a grid with n values between x1 and x2
 
 program getgrid
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   real(double) :: x1,x2,dlgx
@@ -70,7 +70,7 @@ end program getgrid
 !! \note  Shared with grid.f90
 
 subroutine printgrid(xi1,dx,n)
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   real(double), intent(in) :: xi1,dx

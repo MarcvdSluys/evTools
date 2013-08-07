@@ -21,7 +21,7 @@
 
 
 program selplt
-  use kinds, only: double
+  use SUFR_kinds, only: double
   
   implicit none
   ! ndim is the number of dimensions of the conditions array (different variables, for AND), 

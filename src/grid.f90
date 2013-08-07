@@ -21,7 +21,7 @@
 !> \brief  See what a log grid of models in ev will result in
 
 program grid      
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   real(double) :: xi,dx
@@ -69,7 +69,7 @@ end program grid
 !! \note  Shared with grid.f90
 
 subroutine printgrid(xi1,dx,n)
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   real(double), intent(in) :: xi1,dx

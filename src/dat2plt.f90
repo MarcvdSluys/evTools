@@ -24,7 +24,7 @@
 
 program dat2plt
   use SUFR_dummy, only: dumstr
-  use kinds
+  use SUFR_kinds, only: double
   
   implicit none
   integer, parameter :: nci1=99,nco=89

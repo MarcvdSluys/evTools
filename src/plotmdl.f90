@@ -21,7 +21,7 @@
 !> \brief Plot the data in the *.mdl[12] output files of ev
 
 program plotmdl  
-  use kinds
+  use SUFR_kinds, only: double
   use SUFR_constants, only: workdir
   use constants, only: colours,ncolours, scrrat,scrsz, white_bg
   use mdl_data
