@@ -73,11 +73,11 @@ include( CompilerFlags_Fortran )
 # Create the file code_version.f90, which contains the code revision number and date:
 if( CREATE_VERSION )
   
-  # SVN/BZR version generator:
+  # Code version generator:
   ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_SOURCE_DIR}/src/code_version.f90
     COMMAND cd $(CMAKE_SOURCE_DIR)
-    COMMAND . ${CMAKE_SOURCE_DIR}/code_version.sh $(CMAKE_SOURCE_DIR) ${Fortran_COMPILER_NAME}
+    COMMAND . ${CMAKE_SOURCE_DIR}/code_version.sh $(CMAKE_SOURCE_DIR) src/code_version.f90 ${Fortran_COMPILER_NAME} ${OPT_FLAGS}
     )
   
   # Tell CMake the source won't be available until build time:
