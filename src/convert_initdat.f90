@@ -537,7 +537,7 @@ subroutine read_old_initdat(infilename)
   
   if(io.ne.0) then
      if(io.lt.0) write(0,'(A)')'  End of file reached before finishing read, aborting...'
-     if(io.gt.0) write(0,'(A)')'  Error reading file.dat, aborting...'
+     if(io.gt.0) write(0,'(A)')'  Error reading '//trim(infilename)//', aborting...'
      stop
   end if
   
