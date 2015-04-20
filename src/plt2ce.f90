@@ -1,7 +1,7 @@
 !> \file plt2ce.f90  Convert a .plt? file to a .ce file with selected columns for common-envelope calculations
 
 
-! Copyright 2002-2012 AstroFloyd - astrofloyd.org
+! Copyright 2002-2015 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

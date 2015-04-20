@@ -1,7 +1,7 @@
 !> \file getgrid.f90  Find the parameters you need to get a grid with n values between x1 and x2
 
 
-! Copyright 2002-2012 AstroFloyd - astrofloyd.org
+! Copyright 2002-2015 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
