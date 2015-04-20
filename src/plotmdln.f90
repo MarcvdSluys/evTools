@@ -23,6 +23,7 @@
 
 !> Plot the data contained in star.mdl[12], for some or all (n) structure models in the file, and for ONE set of variables
 program plotmdln
+  use SUFR_numerics, only: seq0
   use SUFR_dummy, only: dumint, dumreal
   use constants, only: scrrat,scrsz, white_bg
   
@@ -140,8 +141,8 @@ program plotmdln
            !os  = dat(b,14,j)
            zs  = 1. - hs - hes
         end if
-        if(mhe.eq.0.0.and.dat(b,10,j).gt.0.1) mhe = dat(b,2,j)
-        if(mco.eq.0.0.and.dat(b,11,j).gt.0.1) mco = dat(b,2,j)
+        if(seq0(mhe).and.dat(b,10,j).gt.0.1) mhe = dat(b,2,j)
+        if(seq0(mco).and.dat(b,11,j).gt.0.1) mco = dat(b,2,j)
      end do !j
 7    format (1P,E13.6,4E11.4,16E11.3)
 
@@ -308,14 +309,14 @@ program plotmdln
 
   if(log.eq.'x'.or.log.eq.'b') then
      do b=1,nb
-        if(xx(b,1).eq.0.) xx(b,1) = xx(b,2)
+        if(seq0(xx(b,1))) xx(b,1) = xx(b,2)
      end do
      xx(1:nb,1:nm) = log10(abs(xx(1:nb,1:nm))+1.e-30)
      lx = trim('log '//lx)
   end if
   if(log.eq.'y'.or.log.eq.'b') then
      do b=1,nb
-        if(yy(b,1).eq.0.) yy(b,1) = yy(b,2)
+        if(seq0(yy(b,1))) yy(b,1) = yy(b,2)
      end do
      yy(1:nb,1:nm) = log10(abs(yy(1:nb,1:nm))+1.e-30)
      ly = trim('log '//ly)
@@ -386,11 +387,11 @@ program plotmdln
 
 100 continue
   x = 0.02*abs(xmax-xmin)
-  if(x.eq.0.) x = 0.05*xmax
+  if(seq0(x)) x = 0.05*xmax
   xmin = xmin - x
   xmax = xmax + x
   x = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) x = 0.05*ymax
+  if(seq0(x)) x = 0.05*ymax
   ymin = ymin - x
   ymax = ymax + x
 

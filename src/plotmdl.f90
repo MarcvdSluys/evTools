@@ -23,6 +23,8 @@
 program plotmdl  
   use SUFR_kinds, only: double
   use SUFR_constants, only: workdir
+  use SUFR_numerics, only: seq0
+  
   use constants, only: colours,ncolours, scrrat,scrsz, white_bg
   use mdl_data, only: pxin,pxnr,pxns,pxfns, nq,nn,nm,nmsh,nc, nv_der,nv_sp, labels, abds,nabs, CEs
   
@@ -323,13 +325,13 @@ program plotmdl
   
   if(log.eq.'x'.or.log.eq.'b') then
      do i=1,nx
-        if(xx(i,1).eq.0.d0) xx(i,1) = xx(i,2)
+        if(seq0(xx(i,1))) xx(i,1) = xx(i,2)
      end do
      xx(1:nx,1:nm) = log10(abs(xx(1:nx,1:nm))+1.e-20)
   end if
   if(log.eq.'y'.or.log.eq.'b') then
      do i=1,ny
-        if(yy(i,1).eq.0.d0) yy(i,1) = yy(i,2)
+        if(seq0(yy(i,1))) yy(i,1) = yy(i,2)
      end do
      yy(1:ny,1:nm) = log10(abs(yy(1:ny,1:nm))+1.e-20)
   end if
@@ -402,11 +404,11 @@ program plotmdl
   
 100 continue
   x = 0.02*abs(xmax-xmin)
-  if(x.eq.0.) x = 0.05*xmax
+  if(seq0(x)) x = 0.05*xmax
   xmin = xmin - x
   xmax = xmax + x
   x = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) x = 0.05*ymax
+  if(seq0(x)) x = 0.05*ymax
   ymin = ymin - x
   ymax = ymax + x
   

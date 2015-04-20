@@ -584,6 +584,7 @@ end function find_index
 
 subroutine locate(arr,narr,v, i)
   use SUFR_kinds, only: double
+  use SUFR_numerics, only: deq
   
   implicit none
   integer, intent(in) :: narr
@@ -602,9 +603,9 @@ subroutine locate(arr,narr,v, i)
      end if
   end do
   
-  if(v.eq.arr(1)) then
+  if(deq(v,arr(1))) then
      i = 1
-  else if(v.eq.arr(narr)) then
+  else if(deq(v,arr(narr))) then
      i = narr-1
   else
      i = iLow

@@ -25,9 +25,10 @@
 
 !> \brief Plot the contents of the *.mod output file of ev
 program plotmod
-  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal
   use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,lsun,msun,julyear,pi
+  use SUFR_numerics, only: deq0,seq0
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal
   use constants, only: scrrat,scrsz, white_bg
   
   implicit none
@@ -106,8 +107,8 @@ program plotmod
            hec = x4
            zc  = 1.d0 - x1 - x4
         end if
-        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
-        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
+        if(deq0(mhe).and.x1.lt.0.1) mhe = lnm*1.d33/msun
+        if(deq0(mco).and.x4.lt.0.1) mco = lnm*1.d33/msun
      end do !j
      write(6,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
           i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,ts,tc,hc,hec,zc,bms,p,ecc,p1
@@ -238,12 +239,12 @@ program plotmod
   ly = labels(vy)
 
   if(log.eq.'x'.or.log.eq.'X'.or.log.eq.'b'.or.log.eq.'B') then
-     if(dat(vx,1).eq.0.) dat(vx,1)=dat(vx,2)
+     if(seq0(dat(vx,1))) dat(vx,1)=dat(vx,2)
      dat(vx,1:kh) = log10(abs(dat(vx,1:kh))+1.e-20)
      lx = trim('log '//lx)
   end if
   if(log.eq.'y'.or.log.eq.'Y'.or.log.eq.'b'.or.log.eq.'B') then
-     if(dat(vy,1).eq.0.) dat(vy,1)=dat(vy,2)
+     if(seq0(dat(vy,1))) dat(vy,1)=dat(vy,2)
      dat(vy,1:kh) = log10(abs(dat(vy,1:kh))+1.e-20)
      ly = trim('log '//ly)
   end if
@@ -306,11 +307,11 @@ program plotmod
 
 100 continue
   xr = 0.02*abs(xmax-xmin)
-  if(xr.eq.0.) xr = 0.05*xmax
+  if(seq0(xr)) xr = 0.05*xmax
   xmin = xmin - xr
   xmax = xmax + xr
   xr = 0.02*abs(ymax-ymin)
-  if(xr.eq.0.) xr = 0.05*ymax
+  if(seq0(xr)) xr = 0.05*ymax
   ymin = ymin - xr
   ymax = ymax + xr
   

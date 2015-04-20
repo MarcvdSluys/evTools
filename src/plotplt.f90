@@ -29,7 +29,9 @@
 program plotplt
   use SUFR_kinds, only: double,dbl
   use SUFR_constants, only: homedir
+  use SUFR_numerics, only: seq0,sne0
   use SUFR_dummy, only: dumstr
+  
   use constants, only: libdir, colours,ncolours, scrrat,scrsz, white_bg
   use ubvdata, only: ubv
   
@@ -37,8 +39,8 @@ program plotplt
   integer,parameter :: nmax=10000,nvar=229,nc=81,nl=7,nfmax=50
   real(double) :: d(nvar)
   
-  integer, allocatable :: n(:),oldn(:),unchanged(:), strmdls(:,:),hp(:,:),nhp(:)
-  real, allocatable :: xx(:,:),yy(:,:),miny(:),excly(:)
+  integer, allocatable :: n(:),oldn(:),unchanged(:), strmdls(:,:),hp(:,:),nhp(:),excly(:)
+  real, allocatable :: xx(:,:),yy(:,:),miny(:)
   real(double), allocatable :: dat(:,:,:),datf(:,:)
   real(double) :: mint,maxt,dt
   logical :: logt,lgx,lgy
@@ -409,7 +411,7 @@ program plotplt
      minx = huge(minx)
      do pl=1,npl
         do j=1,n(pl)
-           if(abs(xx(pl,j)).lt.minx.and.abs(xx(pl,j)).ne.0.) minx = abs(xx(pl,j))
+           if(abs(xx(pl,j)).lt.minx.and.sne0(abs(xx(pl,j)))) minx = abs(xx(pl,j))
         end do
         xx(pl,1:n(pl)) = log10(abs(xx(pl,1:n(pl)))+minx*1.e-3)
      end do
@@ -419,10 +421,10 @@ program plotplt
   excly = 0
   if(lgy) then
      do pl=1,npl
-        if(yy(pl,1).eq.0.) yy(pl,1) = yy(pl,2)
+        if(seq0(yy(pl,1))) yy(pl,1) = yy(pl,2)
         miny(pl) = huge(miny(pl))
         do j=1,n(pl)
-           if(abs(yy(pl,j)).lt.miny(pl).and.abs(yy(pl,j)).ne.0.) miny(pl) = abs(yy(pl,j))
+           if(abs(yy(pl,j)).lt.miny(pl).and.sne0(abs(yy(pl,j)))) miny(pl) = abs(yy(pl,j))
         end do
         yy(pl,1:n(pl)) = log10(abs(yy(pl,1:n(pl)))+miny(pl)*1.e-3)
         if(abs(miny(pl)-huge(miny(pl))).lt.1e32) excly(pl) = 1  !Exclude it in determining ranges
@@ -596,12 +598,12 @@ program plotplt
   if(plot.eq.3.and.rng.eq.'n') goto 129
   if(plot.eq.3.and.rng.eq.'y') goto 125
   x = 0.02*abs(xmax-xmin)
-  if(x.eq.0.) x = 0.05*xmax
+  if(seq0(x)) x = 0.05*xmax
   xmin = xmin - x
   xmax = xmax + x
 125 if(plot.eq.3.and.rng.eq.'x') goto 129
   x = 0.02*abs(ymax-ymin)
-  if(x.eq.0.) x = 0.05*ymax
+  if(seq0(x)) x = 0.05*ymax
   ymin = ymin - x
   ymax = ymax + x
 129 continue

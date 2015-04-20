@@ -121,6 +121,8 @@ end subroutine plotzams
 
 subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl)
   use SUFR_kinds, only: double
+  use SUFR_numerics, only: seq0,sne0
+  
   implicit none
   integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
   real(double), intent(in) :: dat0(nvar,nmax)  ! Can be modified at nuclear burning
@@ -351,7 +353,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            end do
            ib = 80
            do j=80,75,-1
-              if(dat(j,i).eq.0.d0) ib = j-1
+              if(seq0(dat(j,i))) ib = j-1
            end do
            dib = ib-ibold
            
@@ -458,7 +460,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   if(plnuc.eq.1) then
      do j=75,80
         do i=1,n
-           if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !nuclear burning bounds
+           if(sne0(dat(j,i))) call pgpoint(1,xx(i),abs(dat(j,i)),1) !nuclear burning bounds
         end do
      end do !j
   end if

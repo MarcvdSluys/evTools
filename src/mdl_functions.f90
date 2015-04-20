@@ -224,6 +224,7 @@ end subroutine compute_mdl_variables
 
 subroutine list_mdl_models(infile,nblk)
   use SUFR_constants, only: pc_g
+  use SUFR_numerics, only: seq0
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
   use mdl_data, only: pxnr,nc, nmsh,nv,mdlver
   
@@ -330,8 +331,8 @@ subroutine list_mdl_models(infile,nblk)
            dmrl = oo   ! os = oo
            zs  = 1. - hh - hhe
         end if
-        if(mhe.eq.0.0.and.hh.gt.0.1) mhe = mm
-        if(mco.eq.0.0.and.hhe.gt.0.1) mco = mm
+        if(seq0(mhe).and.hh.gt.0.1) mhe = mm
+        if(seq0(mco).and.hhe.gt.0.1) mco = mm
         
         ! Calculate V.K. of the envelope:
         if(mp.gt.2.and.hh.gt.0.1) then
@@ -384,6 +385,7 @@ end subroutine list_mdl_models
 !! \param svblk   Save block or not (in/out)
 
 subroutine print_mdl_details(infile,blk,svblk)
+  use SUFR_numerics, only: seq0
   use mdl_data, only: nmsh,nv,mdlver
   
   implicit none
@@ -481,8 +483,8 @@ subroutine print_mdl_details(infile,blk,svblk)
 
      if(svblk) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
-     if(mhe.eq.0.0.and.hh.ge.0.1) mhe = mm
-     if(mco.eq.0.0.and.hhe.ge.0.1) mco = mm
+     if(seq0(mhe).and.hh.ge.0.1) mhe = mm
+     if(seq0(mco).and.hhe.ge.0.1) mco = mm
   end do
   
   close(10)

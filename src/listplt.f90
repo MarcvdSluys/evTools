@@ -18,8 +18,10 @@
 
 program listplt
   use SUFR_kinds, only: double, dbl
-  use SUFR_dummy, only: dumstr9
   use SUFR_constants, only: msun,solday, pi, rsun,c3rd,pi2, pc_g,julyear,lsun,pc_c
+  use SUFR_numerics, only: deq0
+  use SUFR_dummy, only: dumstr9
+  
   use constants, only: libdir
   use ubvdata, only: ubv
   
@@ -230,7 +232,7 @@ program listplt
 29 continue
   !Log or de-log some variables
   do i=4,nnn !skip t,dt
-     if(dat(i,1).eq.0.) dat(i,1) = dat(i,2)
+     if(deq0(dat(i,1))) dat(i,1) = dat(i,2)
   end do
   
   dat(8,1:n)  = 10**dat(8,1:n)

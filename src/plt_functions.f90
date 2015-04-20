@@ -980,6 +980,7 @@ end subroutine read_bse
 subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   use SUFR_kinds, only: double
   use SUFR_constants, only: pi,pi2, pc_c,pc_g, km,julyear,solday, lsun,msun,rsun
+  use SUFR_numerics, only: deq,deq0
   use plt_funcs, only: compute_zeta_ad, compute_zeta_rl
   
   implicit none
@@ -994,7 +995,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   ! de-log some variables:
   do i=4,nvar
-     if(dat(i,1).eq.0.) dat(i,1) = dat(i,2)  !In case you want to log them. Skip t,dt
+     if(deq0(dat(i,1))) dat(i,1) = dat(i,2)  !In case you want to log them. Skip t,dt
   end do
   do i=36,39
      if(dat(i,1).le.0.) dat(i,1) = dat(i,2)
@@ -1298,7 +1299,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   
   ! 161, 162: zeta_*, zeta_rl
   do i=2,n-1
-     if(dat(4,i+1).eq.dat(4,i-1)) then
+     if(deq(dat(4,i+1),dat(4,i-1))) then
         dat(161,i) = dat(161,i-1)
         dat(162,i) = dat(162,i-1)
      else

@@ -158,9 +158,10 @@ end subroutine error_reading_block
 !! \retval save_dh  DH is saved along H if true (inout)
 !<
 subroutine list_mod_file(fname, nblk, save_dh)
-  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,lsun,msun
+  use SUFR_numerics, only: deq0
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   
   implicit none
   character,intent(in) :: fname*(*)
@@ -236,8 +237,8 @@ subroutine list_mod_file(fname, nblk, save_dh)
            hec = x4
            zc  = 1.d0 - x1 - x4
         end if
-        if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
-        if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
+        if(deq0(mhe).and.x1.lt.0.1) mhe = lnm*1.d33/msun
+        if(deq0(mco).and.x4.lt.0.1) mco = lnm*1.d33/msun
      end do !li
      
      if(save_dh) then  ! Read the DH block as well; it has no header, and hence kh lines, not kh+1
@@ -280,9 +281,10 @@ end subroutine list_mod_file
 !! \param save_dh  DH is saved along H if true
 
 subroutine print_mod_details(fname, blk, save_dh)
-  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   use SUFR_kinds, only: double
   use SUFR_constants, only: msun,rsun,lsun, pi, pc_g,solday
+  use SUFR_numerics, only: deq0
+  use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal, dumstr9
   
   implicit none
   character, intent(in) :: fname*(*)
@@ -350,8 +352,8 @@ subroutine print_mod_details(fname, blk, save_dh)
      !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
      read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
      if(io.ne.0) call error_reading_block(li)
-     if(mhe.eq.0.0.and.x1.lt.0.1) mhe = lnm*1.d33/msun
-     if(mco.eq.0.0.and.x4.lt.0.1) mco = lnm*1.d33/msun
+     if(deq0(mhe).and.x1.lt.0.1) mhe = lnm*1.d33/msun
+     if(deq0(mco).and.x4.lt.0.1) mco = lnm*1.d33/msun
   end do
   
   close(10)
