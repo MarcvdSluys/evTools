@@ -1,0 +1,37 @@
+
+evTools README
+
+
+The evTools package provides tools to manipulate and display output from the binary 
+stellar-evolution code ev (also known as STARS and TWIN).  The plotting programmes
+need PGPlot (available from http://www.astro.caltech.edu/~tjp/pgplot/), for compilation
+you can use CMake (available at http://www.cmake.org/).  To download the evTools 
+package, read the code documentation, or to contact the developers, see: 
+http://evtools.sourceforge.net/
+
+
+
+INSTALLATION:
+
+For installation instructions, see INSTALL.
+
+
+
+LICENCE:
+
+Copyright 2002-2013 AstroFloyd - astrofloyd.org
+ 
+This file is part of the evTools package.
+ 
+This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this code (LICENCE).  If not, see 
+<http://www.gnu.org/licenses/>.
+
+
+
+

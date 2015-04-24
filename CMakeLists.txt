@@ -82,7 +82,7 @@ endif( CREATE_VERSION )
 
 # Put common source files in a static library, and link it to the other object files:
 add_library( "ET"   STATIC  ${evTools_std_files} src/plt_functions.f90 src/mdl_functions.f90 src/plotfunctions.f90 )    # Creates libET.a
-target_link_libraries( ET   ${LibSUFR_LIBRARIES} )                                                                      # link libSUFR to libET.a to avoid undefined references when using --as-needed to link
+target_link_libraries( ET   ${LibSUFR_LIBRARIES} )                                                                      # link libSUFR to libET.a to avoid undefined references when using --as-needed to link libET to the executables later on
 
 # List of programs to compile:
 set( ET_PROGRAMS convert_initdat dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plotmdl plotmdln plotmod plotplt plt2ce plt2dat plt2obs selplt )
