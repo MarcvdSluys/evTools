@@ -66,26 +66,27 @@ include( CompilerFlags_Fortran )
 
 
 
-# Create the file code_version.f90, which contains the code revision number and date:
-if( CREATE_VERSION )
-  # Tell CMake the source won't be available until build time:
-  set_source_files_properties( ${CMAKE_SOURCE_DIR}/src/code_version.f90 PROPERTIES GENERATED 1 )
-
+# Create the file code_version.f90, which contains the code version number/hash and date:
+if( NOT EXISTS ${CMAKE_SOURCE_DIR}/src/code_version.f90 OR CREATE_VERSION )
   # Code version generator:
   add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/src/code_version.f90
     COMMAND cd $(CMAKE_SOURCE_DIR)
     COMMAND . ${CMAKE_SOURCE_DIR}/code_version.sh $(CMAKE_SOURCE_DIR) src/code_version.f90 ${Fortran_COMPILER_NAME} ${OPT_FLAGS}
     )
-endif( CREATE_VERSION )
-
+  
+  # Tell CMake the source won't be available until build time:
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/src/code_version.f90 PROPERTIES GENERATED 1 )
+endif( NOT EXISTS ${CMAKE_SOURCE_DIR}/src/code_version.f90 OR CREATE_VERSION )
 
 # Put common source files in a static library, and link it to the other object files:
 add_library( "ET"   STATIC  ${evTools_std_files} src/plt_functions.f90 src/mdl_functions.f90 src/plotfunctions.f90 )    # Creates libET.a
 target_link_libraries( ET   ${LibSUFR_LIBRARIES} )                                                                      # link libSUFR to libET.a to avoid undefined references when using --as-needed to link libET to the executables later on
 
+
 # List of programs to compile:
 set( ET_PROGRAMS convert_initdat dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plotmdl plotmdln plotmod plotplt plt2ce plt2dat plt2obs selplt )
+
 
 # For each program, specify the binary name (ev_PROGRAM), source name (src/PROGRAM.f90), and compile and link the code:
 foreach( program ${ET_PROGRAMS} )
@@ -93,6 +94,7 @@ foreach( program ${ET_PROGRAMS} )
   target_link_libraries( ev_${program}   ${LibSUFR_LIBRARIES} ${PGPLOT_LIBRARIES} ET )  # libSUFR, PGPlot and libET.a
   set( ET_BINARIES ${ET_BINARIES} ev_${program} )                                       # For install()
 endforeach( program )
+
 
 # Install the binaries:
 install( TARGETS  ${ET_BINARIES}  RUNTIME DESTINATION bin )
