@@ -179,7 +179,7 @@ program plotmod
      dat1(5,j) = dat1(5,j)*real(1.d33/msun)
      dat1(8,j) = exp(dat1(8,j))*1.e11/real(rsun)
      dat1(9,j) = dat1(9,j)*1.e33/real(lsun)
-     dat1(20,j) = dat1(20,j)*1.e33/real(msun*julyear)
+     dat1(20,j) = dat1(20,j) * real(1.d33/(msun*julyear))
   end do
 
   !Make more sensible array, without 'eigenvalues' etc
