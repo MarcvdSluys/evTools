@@ -1,6 +1,6 @@
 !> \file plotfunctions.f90  Functions and subroutines for the evTools package that need pgplot
 
-! Copyright 2002-2015 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

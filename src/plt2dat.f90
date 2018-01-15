@@ -1,7 +1,7 @@
 !> \file plt2dat.f90  Convert a .plt[12] file to a .dat file with selected columns
 
 
-! Copyright 2002-2015 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.

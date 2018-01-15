@@ -3,7 +3,7 @@
 ! Use default values for new parameters
 
 
-! Copyright 2002-2015 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 AstroFloyd - astrofloyd.org
 ! 
 ! 
 ! This file is part of the evTools package.
