@@ -176,9 +176,9 @@ program plotmod
      dat(1,j) = real(j)
      dat1(2,j) = exp(dat1(2,j))
      dat1(3,j) = exp(dat1(3,j))
-     dat1(5,j) = dat1(5,j)*real(1.d33/msun)
-     dat1(8,j) = exp(dat1(8,j))*1.e11/real(rsun)
-     dat1(9,j) = dat1(9,j)*1.e33/real(lsun)
+     dat1(5,j) = dat1(5,j) * real(1.d33/msun)
+     dat1(8,j) = exp(dat1(8,j)) * real(1.d11/rsun)
+     dat1(9,j) = dat1(9,j) * real(1.d33/lsun)
      dat1(20,j) = dat1(20,j) * real(1.d33/(msun*julyear))
   end do
 
