@@ -1,10 +1,10 @@
 ##  CMakeLocations.cmake:
 ##  Set search locations for libraries and header files on Linux/Unix/BSD/MacOSX
 ##  Adapted from CMakeSettings.cmake 2818 2009-07-15 19:02:31Z baehren
-##    by AstroFloyd - astrofloyd.org
+##    by Marc van der Sluys - marc.vandersluys.nl
 ##  
 ##  Copyright (C) 2007 Lars B"ahren (bahren@astron.nl)
-##  Copyright 2010-2013 AstroFloyd - astrofloyd.org
+##  Copyright 2010-2013 Marc van der Sluys - marc.vandersluys.nl
 ##   
 ##  This file is part of the CMakeFiles package, 
 ##  see: http://cmakefiles.sf.net/

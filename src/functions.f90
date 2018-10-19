@@ -3,7 +3,7 @@
 !! For general functions and routines that need PGPlot, see plotfunctions.f90
 
 
-! Copyright 2002-2018 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -994,7 +994,7 @@ subroutine set_PGPS_title(PSfile,PStitle)
   
   call system( "sed -i -e 's/Title: PGPLOT PostScript plot/Title: "//trim(PStitle)//"/' "//trim(PSfile) )
   
-  call system( "sed -i -e 's/For: "//trim(username)//"/For: AstroFloyd - astrofloyd.org/' "//trim(PSfile))
+  call system( "sed -i -e 's/For: "//trim(username)//"/For: Marc van der Sluys - marc.vandersluys.nl/' "//trim(PSfile))
   
 end subroutine set_PGPS_title
 !***********************************************************************************************************************************

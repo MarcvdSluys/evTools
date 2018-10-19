@@ -2,7 +2,7 @@
 
 ! AF, 19-05-2005
 
-! Copyright 2002-2018 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.
@@ -67,7 +67,7 @@ program plotmdl
 3 continue
   
   ! Read current path and use it as plot title:
-  write(title,'(A)')trim(workdir)
+  write(title,'(A)') trim(workdir)
   
   ! Get filename:
   if(command_argument_count().eq.1) then
@@ -114,7 +114,7 @@ program plotmdl
   close(10)
   
   ! Add file name and model number to plot title
-  write(title,'(A,I6)')trim(title)//'/'//trim(fname),mdl
+  write(title,'(A,", mdl ",I0)') trim(title)//'/'//trim(fname),mdl
   
   
   
@@ -435,11 +435,11 @@ program plotmdl
   !***   PLOT TO SCREEN OR FILE
   
 501 continue
-  if(plot.eq.8) then !PS file
+  if(plot.eq.8) then  ! PS file
      ex = .true.
      i = 1
      do while(ex)
-        write(psname,'(A,I3.3,A4)')'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'
+        write(psname,'(A,I3.3,A4)') 'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'
         inquire(file=trim(psname), exist=ex)  ! Check whether the file already exists; ex is True or False
         i = i+1
      end do
@@ -483,7 +483,7 @@ program plotmdl
   if(log.eq.'x') call pgbox('BCLNTS',0.0,0,'BCNTS',0.0,0)
   if(log.eq.'y') call pgbox('BCNTS',0.0,0,'BCLNTS',0.0,0)
   if(log.eq.'b') call pgbox('BCLNTS',0.0,0,'BCLNTS',0.0,0)
-  call pgmtxt('T',0.7,0.5,0.5,'~'//trim(title(12:)))  !13 to remove /home/user/
+  call pgmtxt('T',0.7,0.5,0.5, trim(title))
   call pgmtxt('B',2.4,0.5,0.5,lx)
   call pgmtxt('L',2.4,0.5,0.5,ly)
   
@@ -537,8 +537,8 @@ program plotmdl
   end if
   
   if(plot.eq.8) then
-     call pgend
-     write(6,'(A)')' Plot saved to '//trim(psname)
+     call pgend()
+     write(6,'(A)') ' Plot saved to '//trim(psname)
   end if
   
   

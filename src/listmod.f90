@@ -1,9 +1,9 @@
 !> \file listmod.f90  List the contents of a .mod file to screen
 !!
-!! AF 2003-12-17
+!! MvdS 2003-12-17
 
 
-! Copyright 2002-2018 AstroFloyd - astrofloyd.org
+! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.

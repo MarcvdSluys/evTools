@@ -10,7 +10,7 @@
 ##  2012-11-25, AF: bzr -> git
 ##  2013-08-07, AF: ported to evTools
 ##  
-##  Copyright (c) 2010-2013 AstroFloyd - astrofloyd.org
+##  Copyright (c) 2010-2013 Marc van der Sluys - marc.vandersluys.nl
 ##  
 ##  This file is part of the evTools package, 
 ##  see: http://evtools.sf.net/

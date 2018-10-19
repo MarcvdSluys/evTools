@@ -1,7 +1,7 @@
 ##  CMakeFile for evTools
 ##  AF, 2011-01-07
 ##  
-##  Copyright 2002-2013 AstroFloyd - astrofloyd.org
+##  Copyright 2002-2013 Marc van der Sluys - marc.vandersluys.nl
 ##   
 ##  This file is part of the evTools package, 
 ##  see: http://evtools.sf.net/

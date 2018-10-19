@@ -1,11 +1,11 @@
 ##  FindPGPLOT.cmake:
 ##  Check for the presence of the PGPLOT library
-##  Adapted by AF on 2010-12-27, from:
+##  Adapted by MvdS on 2010-12-27, from:
 ##    http://usg.lofar.org/websvn/filedetails.php?repname=repos+1&path=%2Fcode%2Ftrunk%2Fdevel_common%2Fcmake%2FFindPGPLOT.cmake&sc=1
 ##    $Id:: FindPGPLOT.cmake 3830 2009-12-09 14:35:58Z alexov
 ##  
 ##  Copyright (C) 2007 Lars B"ahren (bahren@astron.nl)
-##  Copyright 2010-2013 AstroFloyd - astrofloyd.org
+##  Copyright 2010-2013 Marc van der Sluys - marc.vandersluys.nl
 ##   
 ##  This file is part of the CMakeFiles package, 
 ##  see: http://cmakefiles.sf.net/

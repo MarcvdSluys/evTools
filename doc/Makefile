@@ -39,9 +39,9 @@ MODOBJ =
 
 #ifort:
 ifeq ($(FORT),ifort)
-   CFLAGS += #-I/home/AstroFloyd/usr/include/libSUFR/ifort
-   LFLAGS += #-L/home/AstroFloyd/usr/lib -lSUFR_ifort
-   STATLIBS += #/home/AstroFloyd/usr/lib/libSUFR_ifort.a
+   CFLAGS += #-I/home/Marc van der Sluys/usr/include/libSUFR/ifort
+   LFLAGS += #-L/home/Marc van der Sluys/usr/lib -lSUFR_ifort
+   STATLIBS += #/home/Marc van der Sluys/usr/lib/libSUFR_ifort.a
 
    #To develop code  (don't mix -check bounds with -O>0!):
    ifeq ($(CHECK),yes)
@@ -84,9 +84,9 @@ endif
 #gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
 #ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
 ifeq ($(FORT),gfortran)
-   CFLAGS += #-I/home/AstroFloyd/usr/include/libSUFR/gfortran
-   LFLAGS += #-L/home/AstroFloyd/usr/lib -lSUFR_gfortran
-   STATLIBS += #/home/AstroFloyd/usr/lib/libSUFR_gfortran.a
+   CFLAGS += #-I/home/Marc van der Sluys/usr/include/libSUFR/gfortran
+   LFLAGS += #-L/home/Marc van der Sluys/usr/lib -lSUFR_gfortran
+   STATLIBS += #/home/Marc van der Sluys/usr/lib/libSUFR_gfortran.a
 
    CFLAGS += -fwhole-file
 
