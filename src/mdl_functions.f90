@@ -398,8 +398,8 @@ subroutine print_mdl_details(infile,blk,svblk)
   real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
-  real :: hc,hec,cc,oc,nec,zc  !,mgc,nic
-  real :: hs,hes,cs,ns,os,nes,mgs,zs
+  real :: hc,hec,cc,nic,oc,nec,mgc,zc
+  real :: hs,hes,cs,nis,os,nes,mgs,zs
   real :: rhoc,pc  !,ethc,enuc,encc
   
   integer :: mp,in,io
@@ -456,10 +456,10 @@ subroutine print_mdl_details(infile,blk,svblk)
   hc   = hh
   hec  = hhe
   cc   = ccc
-  !nic   = nnn
+  nic  = nnn
   oc   = oo
   nec  = nne
-  !mgc  = mmg
+  mgc  = mmg
   zc   = 1. - hh - hhe
   rhoc = rrh
   pc   = pp
@@ -496,7 +496,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   hs  = hh
   hes = hhe
   cs  = ccc
-  ns  = nnn
+  nis = nnn
   os  = oo
   nes = nne
   mgs = mmg
@@ -513,20 +513,18 @@ subroutine print_mdl_details(infile,blk,svblk)
   !***   PRINT MODEL DETAILS
   !************************************************************************      
   if(.not.svblk) then
-     write(6,'(A)')' Properties of this model:'
-     write(6,*)''
-     write(6,81)nmdl,nmsh,m1,age,zs
-     write(6,*)''
-     write(6,83)m1,r1,l1,ts
-     write(6,84)tc,pc,rhoc
-     write(6,*)''
-     write(6,85)mhe,mco,mhenv
-     write(6,*)''
-     !write(6,88)hs,hes,cs,ns,os,nes,mgs,zs
-     !write(6,89)hc,hec,cc,ns,oc,nec,mgs,zc
-     write(6,90)hs,hes,cs,ns,os,nes,mgs,zs
-     write(6,91)hc,hec,cc,ns,oc,nec,mgs,zc
-     write(6,*)''
+     write(6,'(A)') ' Properties of this model:'
+     write(6,*) ''
+     write(6,81) nmdl,nmsh,m1,age,zs
+     write(6,*) ''
+     write(6,83) m1,r1,l1,ts
+     write(6,84) tc,pc,rhoc
+     write(6,*) ''
+     write(6,85) mhe,mco,mhenv
+     write(6,*) ''
+     write(6,90) hs,hes,cs,nis,os,nes,mgs,zs
+     write(6,91) hc,hec,cc,nic,oc,nec,mgc,zc
+     write(6,*) ''
   end if
   
 81 format('  Model:        Model nr:',i5,',    Mesh pts: ',i4,',    Mass:',f7.2,' Mo,    Age: ',es12.6,' yr,    Z =',f7.4)
@@ -678,7 +676,7 @@ end subroutine read_chosen_mdl
 
 
 !***********************************************************************************************************************************
-!> \brief  Defines the variable labels for the mdl[12] format
+!> \brief  Defines the variable labels for the mdl[12] format.
 
 subroutine set_mdl_labels
   use mdl_data, only: pxns,pxfns, labels,abds,nabs,CEs,nv_der,nv_sp
@@ -688,7 +686,7 @@ subroutine set_mdl_labels
   nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
   CEs  = [character(len=99) :: 'r=R\drl\u','\ga-CE','\gg-CE']         ! Line labels in CEs plot
   
-  !Names of the variables in px
+  ! Names of the variables in px:
   pxns(0) = ''
   pxns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
   pxns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
@@ -703,7 +701,7 @@ subroutine set_mdl_labels
   pxns(231:232) = [character(len=99) :: 'Jgce','Nrad']
   pxns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','CEEs','CEJs']
   
-  !Names of the variables in px, to be used in output file name (no /.?*)
+  ! Names of the variables in px, to be used in output file name (no /.?*):
   pxfns(0) = ''
   pxfns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
   pxfns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
