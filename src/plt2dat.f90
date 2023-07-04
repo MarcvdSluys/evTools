@@ -1,7 +1,7 @@
 !> \file plt2dat.f90  Convert a .plt[12] file to a .dat file with selected columns
 
 
-! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
+! Copyright 2002-2023 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.

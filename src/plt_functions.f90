@@ -1,6 +1,6 @@
 !> \file plt_functions.f90  Functions and subroutines for plotplt* in the evTools package that need pgplot
 
-! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
+! Copyright 2002-2023 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.

@@ -1,7 +1,7 @@
 !> \file listplt.f90  Reads the data contained in star.plt1,2 and prints it to screen, taken from plotplt
 !
 
-! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
+! Copyright 2002-2023 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.
