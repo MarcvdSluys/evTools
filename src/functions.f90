@@ -162,8 +162,8 @@ subroutine lt2ubv(logl,logt,mass,logz,  mbol,bolc,mv,uminb,bminv,vminr,rmini)
           ubv(k,ig-1,it-1,iz-1)*dg2)*dt2)*dz2
   end do
   
-  !mbol = 4.75 - 2.5*logl
-  mbol = 4.741 - 2.5*logl  ! AF: 4.74 = -2.5*log10(lsun) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
+  ! mbol = 4.75 - 2.5*logl
+  mbol = 4.741 - 2.5*logl  ! 4.74 = -2.5*log10(lsun) + 2.5*log10(4*pi*(10*pc)**2) - 11.49  !(Verbunt, p.36 -> cgs)
   bolc = cm(1)
   mv = mbol - bolc
   uminb = cm(2)
@@ -371,7 +371,10 @@ function findfile(match)
   character, intent(in) :: match*(*)
   integer, parameter :: maxfile=1000
   integer :: i,k,fnum
-  character :: names(maxfile)*(99),findfile*(99),fname*(99),tempfile*(99)
+  character :: findfile*(99),fname*(99),tempfile*(99)
+  character, allocatable :: names(:)*(99)
+  
+  allocate(names(maxfile))
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
      write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'

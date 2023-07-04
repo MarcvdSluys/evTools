@@ -1,6 +1,6 @@
 !> \file plotmdl.f90  Plots the data contained in mdl[12] files
 
-! AF, 19-05-2005
+! 2005-05-19
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 

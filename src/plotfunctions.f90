@@ -523,11 +523,13 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   real :: dx,dy,xsel(4),ysel(4)
   
   character :: hlbls*(5)
+
+  i0 = 0  ! Ensure it is defined
   
   ! Identify closest model:
   xsel = 0.
   ysel = 0.
-  write(6,'(A)')' Select a point in the graph and press "x" to finish'
+  write(6,'(A)') ' Select a point in the graph and press "x" to finish'
   nsel=0
   call pgsci(1)
   call pgolin(1,nsel,xsel,ysel,2)
@@ -553,8 +555,8 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
      end do
   end do
   write(6,*)''
-  write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-  write(6,'(A,ES12.4,A,ES12.4,A,I5)')' Closest model:     x =',xx(ix0,i0),',  y =',yy(iy0,i0),  &
+  write(6,'(A,ES12.4,A,ES12.4)')      ' Selected point:    x =',xsel(1),',  y =',ysel(1)
+  write(6,'(A,ES12.4,A,ES12.4,A,I5)') ' Closest model:     x =',xx(ix0,i0),',  y =',yy(iy0,i0),  &
        ',  model =',i0
   
   !Copied from plotplt:

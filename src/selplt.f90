@@ -2,7 +2,7 @@
 !!  and write them to a new file.
 !!  Use this on a grid of models, e.g. to pick out the models that fit V = 10+-1 and B-V = 1.1+-0.1
 
-! AF, July 2007
+! July 2007
 
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl

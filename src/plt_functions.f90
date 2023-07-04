@@ -913,7 +913,7 @@ subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
   rewind u
   
   do j=1,nn
-     read(u,*,err=12,end=11) tmpdat !(dat(i,j),i=1,ncols)
+     read(u,*,err=12,end=11) tmpdat  ! (dat(i,j),i=1,ncols)
      if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',tmpdat(4),'Mo.'
      if(tmpdat(1).lt.0.d0) goto 11  ! Final model has t=-1.0
      
@@ -930,7 +930,7 @@ subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
      ! Convert variables:
      dat(1,j)  = dble(j)  ! Model number
      dat(2,j)  = tmpdat(1)*1.d6   ! age Myr -> yr
-     if(j.gt.1) dat(3,j)  = dat(2,j)-dat(2,j-1)  ! Delta t
+     if(j.gt.1) dat(3,j)  = dat(2,j)-dat(2,max(j-1,1))  ! Delta t - max: silence array out of bounds compiler warning
      
      dat(29,j) = log(tmpdat(10))     ! R1/RL1 -> FLR = ln(R1/RL1)
      dat(21,j) = 2*pi*tmpdat(14)/solday  ! Ospin1 -> Prot1

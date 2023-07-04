@@ -1,6 +1,6 @@
 !> \file mergeplt.f90  Merges the data contained in two .plt-files
 !!
-!! MvdS 21-01-2004
+!! 2004-01-21
 
 
 !  Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl

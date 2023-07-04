@@ -4,7 +4,7 @@
 
 ! One can select a model to plot its contents.
 ! Adapted from listmod.f90
-! MvdS 2004-08-05
+! 2004-08-05
 
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl

@@ -1,6 +1,6 @@
-!> \file plotplt.f90  Plots the data contained in .plt[12] files, highlights selected points
+!> \file plotplt.f90  Plots the data contained in .plt[12] files, highlights selected points.
 !
-!  AF, 19-04-2006
+!  2006-04-19
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 

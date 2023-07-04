@@ -2,7 +2,7 @@
 !!                      and for ONE set of variables
 
 
-! AF, 19-05-2005
+! 2005-05-19
 
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
@@ -38,32 +38,32 @@ program plotmdln
   real :: hc,hec,cc,oc  !,zc
   real :: hs,hes,zs  !,cs,os
   real :: rhoc
-
+  
   integer i,j,blk(nbb),vx,vy,plotagain,b,nb,plt,nbmax
   character findfile*(99),fname*(99),rng,log,mdlnr*(5)
   character :: labels(nq)*(60),lx*(50),ly*(50),title*(100)
   
   
-  !Set constants:
+  ! Set constants:
   call setconstants()
   write(6,*)
-  call print_code_version(6)  !To screen
+  call print_code_version(6)  ! To screen
   
   call evTools_settings()
   
-  
+  i = 0  ! Ensure it is defined
   plotagain = 0
   
-  !Axis labels
-  labels(1)='\u\(2263) centre\d    Mesh point    \usurface \(2261)'
-  labels(2) = 'M (M\d\(2281)\u)'
-  labels(3) = 'R (R\d\(2281)\u)'
-  labels(4) = 'P (dyn cm\u-2\d)'
-  labels(5) = '\gr (g cm\u-3\d)'
-  labels(6) = 'T (K)'
-  labels(7) = 'k (cm\u2\d g\u-1\d)'
-  labels(8) = '\(2266)\dad\u'
-  labels(9) = '\(2266)\drad\u'
+  ! Axis labels:
+  labels(1)  = '\u\(2263) centre\d    Mesh point    \usurface \(2261)'
+  labels(2)  = 'M (M\d\(2281)\u)'
+  labels(3)  = 'R (R\d\(2281)\u)'
+  labels(4)  = 'P (dyn cm\u-2\d)'
+  labels(5)  = '\gr (g cm\u-3\d)'
+  labels(6)  = 'T (K)'
+  labels(7)  = 'k (cm\u2\d g\u-1\d)'
+  labels(8)  = '\(2266)\dad\u'
+  labels(9)  = '\(2266)\drad\u'
   labels(10) = 'H abundance'
   labels(11) = 'He abundance'
   labels(12) = 'C abundance'
@@ -83,8 +83,8 @@ program plotmdln
   labels(26) = 'C/O'
   labels(27) = 'Ne/O'
   labels(28) = '(Ne/O)/(Ne/O)\d0\u'
-
-
+  
+  
   ! Read currend path and use it as plot title:
 3 continue
   call system('pwd > tmppwd.txt')
@@ -93,25 +93,25 @@ program plotmdln
   read(10,'(a100)')title
   close(10)
   call system('rm tmppwd.txt')
-
-  !Search for input file in current dir
-  fname=findfile('*.mdl*')
-
-
-
+  
+  ! Search for input file in current dir:
+  fname = findfile('*.mdl*')
+  
+  
+  
   !************************************************************************      
   !***   READ ALL STRUCTURE MODELS IN THE FILE AND DISPLAY MAIN PROPERTIES
   !************************************************************************      
-
-  write(6,*)''
-4 write(6,'(A)')'Reading file '//trim(fname)
+  
+  write(6,*) ''
+4 write(6,'(A)') 'Reading file '//trim(fname)
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
-
+  
   read(10,5,err=11,end=11) nm,dumint,dumreal !nv,dov
 5 format (2x,I4,4x,I2,F7.3)
-  write(6,*)''
-  write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
+  write(6,*) ''
+  write(6,'(A)') ' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
   
   do b=1,nbb
@@ -145,7 +145,7 @@ program plotmdln
         if(seq0(mco).and.dat(b,11,j).gt.0.1) mco = dat(b,2,j)
      end do !j
 7    format (1P,E13.6,4E11.4,16E11.3)
-
+     
      if(mod(b,25).eq.0) then
         write(6,*)''
         write(6,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
@@ -156,17 +156,17 @@ program plotmdln
   
 9 format(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,3f6.3)
   
-  write(6,'(A)')'  Arrays are too small !'
+  write(6,'(A)') '  Arrays are too small !'
   goto 9999
   
-11 write(6,'(A)')'  Error reading first line of file, aborting...'
+11 write(6,'(A)') '  Error reading first line of file, aborting...'
   close(10)
   goto 9999
-12 write(6,'(A)')'  Error reading first line of block, aborting...'
+12 write(6,'(A)') '  Error reading first line of block, aborting...'
   close(10)
   goto 15
   goto 9999
-13 write(6,'(A,I4,A,I5,A)')'  Error reading block',i-1,' line',j-1,', aborting...'
+13 write(6,'(A,I4,A,I5,A)') '  Error reading block',i-1,' line',j-1,', aborting...'
   close(10)
   goto 9999
 15 close(10)
@@ -188,8 +188,8 @@ program plotmdln
   
   write(6,'(A)')'Which structure models do you want to plot:' 
   write(6,'(A78,I2,A3)')'  (press ENTER after each number, 0 for all models and -1 to end the list) (1-',nblk,'): '
-
-
+  
+  
   b = 1
   nbmax = 30!nblk   !Read max 30 models, so that all labels can be printed next to plot
   do j=1,nbmax
@@ -209,14 +209,15 @@ program plotmdln
      b = b+1
   end do
   nb = b-1
-
-
+  
+  
   !************************************************************************      
   !***   PRINT A LIST OF CHOSEN STRUCTURE MODELS
   !************************************************************************      
-
+  
 24 continue
   goto 30
+  
   write(6,*)''
   write(6,'(I5,A)')nb,' blocks selected:'
   write(6,'(A)')'  Nr  Model       Age    Mass  Radius   Luminos      Teff        H     He    C+O'
@@ -227,21 +228,21 @@ program plotmdln
   write(6,*)''
 8 format(2(I5,2x),1PE8.2,2x,2(0PF6.2,2x),2(1PE8.2,2x),3(0PF5.2,2x))
   
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
   !************************************************************************      
   !***   CREATE EXTRA PLOT VARIABLES
   !************************************************************************      
-
+  
 30 if(plotagain.eq.0) then
      do i=1,nm
         dat(:,1,i) = real(i)
      end do
-
+     
      dat(:,23,1:nm) = dat(:,9,1:nm) - dat(:,8,1:nm)
      dat(:,23,1:nm) = dat(:,23,1:nm)/abs(dat(:,23,1:nm))
      do b=1,nb
@@ -252,13 +253,13 @@ program plotmdln
         dat(blk(b),28,1:nm) = dat(blk(b),27,1:nm)/dat(blk(b),27,nm)
      end do
   end if !if(plotagain.eq.0) then
-
-
-
+  
+  
+  
   !************************************************************************      
   !***   CHOOSE PLOT VARIABLES
   !************************************************************************      
-
+  
 32 continue   
   write(6,*)''
   write(6,'(A)')'Variables:                       0: Quit'
@@ -273,40 +274,40 @@ program plotmdln
   write(6,'(A)')' 8: Nad     15: Ne      22: Uint                         '
   write(6,'(A)')' 9: Nrad    16: Mg      23: Nrad-Nad                     '
   write(6,*)''
-
+  
 35 write(6,'(A36)',advance='no')' Choose the X-axis variable (1-28): '
   read*,vx
   if(vx.eq.0) goto 9999
   if(vx.lt.1.or.vx.gt.28) goto 35
-
+  
 36 write(6,'(A36)',advance='no')' Choose the Y-axis variable (1-28): '
   read*,vy
   if(vy.eq.0) goto 9999
   if(vy.lt.1.or.vy.gt.28) goto 36
-
-
+  
+  
 41 continue
   lx = trim(labels(vx))
   ly = trim(labels(vy))
-
+  
   xx(1:nb,1:nm) = dat(blk(1:nb),vx,1:nm)
   yy(1:nb,1:nm) = dat(blk(1:nb),vy,1:nm)
-
-
-
-
-
+  
+  
+  
+  
+  
   !************************************************************************      
   !***   LIN/LOG AXES
   !************************************************************************      
-
+  
   write(6,'(A68)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
   read*,log
   if(log.eq.'X') log='x'
   if(log.eq.'Y') log='y'
   if(log.eq.'B') log='b'
   if(log.eq.'N') log='n'
-
+  
   if(log.eq.'x'.or.log.eq.'b') then
      do b=1,nb
         if(seq0(xx(b,1))) xx(b,1) = xx(b,2)
@@ -321,26 +322,26 @@ program plotmdln
      yy(1:nb,1:nm) = log10(abs(yy(1:nb,1:nm))+1.e-30)
      ly = trim('log '//ly)
   end if
-
+  
   xmin = minval(xx(1:nb,1:nm))
   xmax = maxval(xx(1:nb,1:nm))
   ymin = minval(yy(1:nb,1:nm))
   ymax = maxval(yy(1:nb,1:nm))
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
   !************************************************************************      
   !***   PLOT RANGE
   !************************************************************************      
-
+  
   xmin0 = xmin
   xmax0 = xmax
   ymin0 = ymin
   ymax0 = ymax
-
+  
 70 write(6,*)''
   write(6,'(A,ES12.3,A1,ES12.3)')'  X-range:',xmin,'-',xmax
   write(6,'(A,ES12.3,A1,ES12.3)')'  Y-range:',ymin,'-',ymax
@@ -350,10 +351,10 @@ program plotmdln
   if(rng.eq.'X') rng='x'
   if(rng.eq.'Y') rng='y'
   if(rng.eq.'B') rng='b'
-
+  
   if(rng.eq.'n'.or.rng.eq.' ') goto 100
-
-
+  
+  
   if(rng.eq.'x'.or.rng.eq.'b') then
      write(6,'(A)')'Give the new range for the X-axis (Xmin, Xmax):'
      read*,xmin,xmax
@@ -366,7 +367,7 @@ program plotmdln
      if(xmin.lt.xmin0) xmin = xmin0
      if(xmax.gt.xmax0) xmax = xmax0
   end if
-
+  
   if(rng.eq.'y'.or.rng.eq.'b') then
      write(6,'(A)')'Give the new range for the Y-axis (Ymin, Ymax):'
      read*,ymin,ymax
@@ -379,12 +380,12 @@ program plotmdln
      if(ymin.lt.ymin0) ymin = ymin0
      if(ymax.gt.ymax0) ymax = ymax0
   end if
-
+  
   write(6,*)''
   write(6,'(A,ES12.3,A1,ES12.3)')'X-range:',xmin,'-',xmax
   write(6,'(A,ES12.3,A1,ES12.3)')'Y-range:',ymin,'-',ymax
-
-
+  
+  
 100 continue
   x = 0.02*abs(xmax-xmin)
   if(seq0(x)) x = 0.05*xmax
@@ -394,25 +395,25 @@ program plotmdln
   if(seq0(x)) x = 0.05*ymax
   ymin = ymin - x
   ymax = ymax + x
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   !************************************************************************      
   !***   PLOT TO SCREEN, FILE
   !************************************************************************      
-
+  
 501 continue
   do plt=1,2    !Plot to PS, then screen
-
+     
      if(plt.eq.1) call pgbegin(1,'plot_mdln.eps/cps',1,1)
      if(plt.eq.2) then
         call pgbegin(1,'3/xserve',1,1)
@@ -430,7 +431,7 @@ program plotmdln
      end if
      call pgscf(1)
      call pgscr(7,0.7,0.7,0.7)  !Replace yellow by light grey
-
+     
      call pgsvp(0.06,0.95,0.07,0.96)
      call pgswin(xmin,xmax,ymin,ymax)
      
@@ -447,9 +448,9 @@ program plotmdln
      call pgmtxt('T',0.7,0.5,0.5,title(13:100))  !13, to remove /home/user/
      call pgmtxt('B',2.4,0.5,0.5,lx)
      call pgmtxt('L',2.0,0.5,0.5,ly)
-
+     
      if(plt.eq.1) call pgslw(2)
-
+     
      call pgsch(0.7)
      if(vx.ne.1.and.vy.ne.1) then
         do b=1,nb
@@ -460,31 +461,31 @@ program plotmdln
            call pgmtext('RV',0.5,1.-real(b-1)/30.,0.,mdlnr)
         end do
      end if
-
+     
      if(vx.eq.1.or.vy.eq.1) then
         do b=1,nb
            call pgsci(mod(b-1,12)+2)
            call pgpoint(nm,xx(b,1:nm),yy(b,1:nm),1)
         end do
      end if
-
+     
      call pgsci(1)
      call pgsch(1.)
      call pgsls(2)
      if(vy.eq.22) call pgline(2,(/xmin,xmax/),(/0.,0./))
-
+     
      if(plt.eq.1) call pgend
-
-  end do  !do plt=1,2    !Plot to screen, then file
-
-
-
-
-
+     
+  end do  ! do plt=1,2    !Plot to screen, then file
+  
+  
+  
+  
+  
   !************************************************************************      
   !***   FINISH
   !************************************************************************      
-
+  
 900 write(6,*)''
   write(6,'(A)')' You can:'
   write(6,'(A)')'  0) quit'
@@ -499,14 +500,14 @@ program plotmdln
   write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plotagain
   if(plotagain.lt.0.or.plotagain.gt.7) goto 900
-
+  
   if(plotagain.ne.4) call pgend
   if(plotagain.eq.1) goto 32
   if(plotagain.eq.2) goto 41
   if(plotagain.eq.3) goto 70
   if(plotagain.eq.6) goto 4
   if(plotagain.eq.7) goto 3
-
+  
   if(plotagain.eq.4) then  !Select region
 941  call pgsci(1)
      xsel = 0.
@@ -529,7 +530,7 @@ program plotmdln
      call pgend
      goto 501
   end if
-
+  
   if(plotagain.eq.5) then  !Zoom out
      xmin = (xmin+xmax)/2. - 2*abs((xmin+xmax)/2.-xmin) !Central value - 2x the 'radius', 'radius' = central value - minimum
      xmax = (xmin+xmax)/2. + 2*abs((xmin+xmax)/2.-xmin)
@@ -541,17 +542,8 @@ program plotmdln
      write(6,*)''
      goto 501
   end if
-
+  
 9999 write(6,'(A)')'Program finished'
   write(6,*)''
 end program plotmdln
-
-
-
-
-
-
-
-
-
 

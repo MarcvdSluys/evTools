@@ -1,6 +1,6 @@
 !> \file mdl_functions.f90  Routines to help plot the data contained in mdl[12] files
 
-! AF, 21-08-2010
+! 2010-08-21
 
 ! Copyright 2002-2018 Marc van der Sluys - marc.vandersluys.nl
 ! 
@@ -463,9 +463,9 @@ subroutine print_mdl_details(infile,blk,svblk)
   zc   = 1. - hh - hhe
   rhoc = rrh
   pc   = pp
-  !encc = eenc
-  !ethc = eeth
-  !enuc = eenu
+  ! encc = eenc
+  ! ethc = eeth
+  ! enuc = eenu
   
   mhe = 0.
   mco = 0.
