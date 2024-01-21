@@ -2,7 +2,7 @@
 !
 !  2006-04-19
 
-! Copyright 2002-2023 Marc van der Sluys - marc.vandersluys.nl
+! Copyright 2002-2024 Marc van der Sluys - marc.vandersluys.nl
 ! 
 ! 
 ! This file is part of the evTools package.
