@@ -1,6 +1,6 @@
 !> \file listmod.f90  List the contents of a .mod file to screen
 !!
-!! 2003-12-17
+!! 2003-12-17, MvdS: initial version.
 
 
 ! Copyright 2002-2023 Marc van der Sluys - marc.vandersluys.nl
@@ -38,18 +38,18 @@ program listmod
   if(narg.gt.0) then
      call get_command_argument(1,fname)
   else
-     write(6,'(A)')'  listmod: lists the contents of a mod-file to screen'
-     write(6,'(A)')'           syntax:  listmod <filename>'
-     write(6,*)''
-     write(6,'(A)')"  I'll look in the current directory for a *.mod file..."
+     write(*,'(A)') '  listmod: lists the contents of a mod-file to screen'
+     write(*,'(A)') '           syntax:  listmod <filename>'
+     write(*,*)''
+     write(*,'(A)') "  I'll look in the current directory for a *.mod file..."
      fname = findfile('*.mod')
   end if
-  write(6,'(/,A,/)')'  Reading file '//trim(fname)
+  write(*,'(/,A,/)') '  Reading file '//trim(fname)
   
   
   
   
-  !***   LIST ALL STRUCTURE MODELS IN THE FILE AND THEIR MAIN PROPERTIES
+  ! *** LIST ALL STRUCTURE MODELS IN THE FILE AND THEIR MAIN PROPERTIES
 3 continue
   call list_mod_file(fname,nblk, save_dh)
   
@@ -57,15 +57,15 @@ program listmod
   
   
   
-  !***   CHOOSE STRUCTURE MODEL AND PRINT DETAILS
+  ! *** CHOOSE STRUCTURE MODEL AND PRINT DETAILS
 
 49 continue  
   blk = 0
   do while(blk.lt.1.or.blk.gt.nblk)
-     write(6,'(A,I5,A4)', advance='no')'  For which model do you want to print details (1 -',nblk,'):  '
+     write(*,'(A,I0,A4)', advance='no') '  For which model do you want to print details (1-',nblk,'):  '
      read*,blk
      if(blk.eq.0) then
-        write(6,*)''
+        write(*,*) ''
         stop
      end if
   end do
@@ -73,29 +73,29 @@ program listmod
   call print_mod_details(fname,blk, save_dh)
   
   
-  !***   FINISH
+  ! *** FINISH
   
   ans = -1
   do while(ans.gt.3.or.ans.lt.0)
      if(nblk.eq.1) then
-        write(6,*)''
+        write(*,*)''
         stop
      end if
      
-     write(6,*)''
-     write(6,'(A)')'  You can:'
-     write(6,'(A)')'    0) Quit'
-     write(6,'(A)')'    1) Choose another model'
-     write(6,'(A)')'    2) List all models again and choose another model'
-     write(6,'(A)')'    3) Write this model to another file'
-     write(6,*)''
-     write(6,'(A28)', advance='no')'  What do you want to do ?  '
+     write(*,*)''
+     write(*,'(A)') '  You can:'
+     write(*,'(A)') '    0) Quit'
+     write(*,'(A)') '    1) Choose another model'
+     write(*,'(A)') '    2) List all models again and choose another model'
+     write(*,'(A)') '    3) Write this model to another file'
+     write(*,*) ''
+     write(*,'(A28)', advance='no') '  What do you want to do ?  '
      read*,ans
   end do
   
   if(ans.eq.0)  then
      close(10)
-     write(6,*)''
+     write(*,*) ''
      stop
   end if
   if(ans.eq.1) goto 49
@@ -106,14 +106,11 @@ program listmod
   
   
   
-  
-  
-  !***   COPY MODEL TO DIFFERENT FILE
+  ! *** COPY MODEL TO DIFFERENT FILE
   call copy_mod(fname,blk, save_dh)
   
   
-  
-  write(6,*)''
+  write(*,*) ''
 end program listmod
 !***********************************************************************************************************************************
 
@@ -125,9 +122,9 @@ subroutine error_reading_header(b)
   implicit none
   integer, intent(in) :: b
   if(b.eq.0) then
-     write(6,'(A,/)')'  Error reading header line, aborting.'
+     write(*,'(A,/)') '  Error reading header line, aborting.'
   else
-     write(6,'(A,I5,A,/)')'  Error reading header line in block',b,', aborting.'
+     write(*,'(A,I0,A,/)') '  Error reading header line in block ', b, ', aborting.'
   end if
   close(10)
   stop
@@ -140,9 +137,9 @@ subroutine error_reading_block(l)
   implicit none
   integer, intent(in) :: l
   if(l.eq.0) then
-     write(6,'(A,/)')'  Error reading (the first?) line of the data block, aborting.'
+     write(*,'(A,/)') '  Error reading (the first?) line of the data block, aborting.'
   else
-     write(6,'(A,I5,A,/)')'  Error reading the data block, line',l,', aborting.'
+     write(*,'(A,I0,A,/)') '  Error reading the data block, line ', l, ', aborting.'
   end if
   close(10)
   stop
@@ -178,7 +175,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
   
   open(unit=10,form='formatted',status='old',file=trim(fname))
   
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
+  write(*,'(A)') '  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   bl = 1   ! Block/model number
@@ -189,7 +186,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
      if(iand(jf, 4) == 4) save_dh = .true.
      if(io.lt.0) exit
      if(io.gt.0) then
-        write(0,'(A,I5,A)')'  Error reading the header line of block',bl,'.  Skipping the rest of the file.'
+        write(0,'(A,I0,A)') '  Error reading the header line of block ', bl, '.  Skipping the rest of the file.'
         exit
      end if
      
@@ -199,7 +196,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
         read(10,*,iostat=io)dat(1:jin)
         if(io.lt.0) exit
         if(io.gt.0) then
-           write(0,'(A,2(I5,A))')'  Error reading line',li,' of block',bl,'.  Skipping the rest of the file.'
+           write(0,'(A,2(I0,A))') '  Error reading line ', li, ' of block ', bl, '.  Skipping the rest of the file.'
            exit
         end if
         
@@ -223,7 +220,7 @@ subroutine list_mod_file(fname, nblk, save_dh)
         !f = dat(19)
         
         if(li.eq.1) then
-           r1  = exp(lnr)*1.e11/rsun
+           r1  = exp(lnr)*1.d11/rsun
            l1  = l*1.d33/lsun
            ts  = exp(lnt)
            m1 = lnm*1.d33/msun
@@ -247,9 +244,9 @@ subroutine list_mod_file(fname, nblk, save_dh)
         end do
      end if
      
-     if(mod(bl,50).eq.0) write(6,'(/,A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
+     if(mod(bl,50).eq.0) write(*,'(/,A)') '  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R'// &
           '        L     Teff      Xs     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
-     write(6,'(I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)') &
+     write(*,'(I4,I7,I5, ES13.5,ES9.2, F10.4,2F7.3,ES9.2, 1x,3ES9.2,1x,3F7.4, 2x,ES9.2,1x,3f7.4,1x,3ES9.2)') &
           bl,jmod,kh,t,dt,m1,mhe,mco,m1-mhe,r1,l1,ts,hs,hes,zs,tc,hc,hec,zc,bms,p,p1
      
      bl = bl+1
@@ -258,14 +255,14 @@ subroutine list_mod_file(fname, nblk, save_dh)
   
   close(10)
   
-  write(6,'(A)')'  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
+  write(*,'(A)') '  Nr  Model Nmsh          Age       dT        M1    Mhe    Mco     Menv         R        L     Teff      Xs'// &
        '     Ys     Zs         Tc      Xc     Yc     Zc      Mtot     Porb     Prot'
   
   nblk = bl-1
-  write(6,'(/,I5,A)', advance='no')nblk,' blocks of H'
-  if(save_dh) write(6,'(A)', advance='no')' and DH'
-  write(6,'(A,/)')' read.'
-     
+  write(*,'(/,1x,I0,A)', advance='no') nblk,' blocks of H'
+  if(save_dh) write(*,'(A)', advance='no') ' and DH'
+  write(*,'(A,/)') ' read.'
+  
   
   if(nblk.eq.0) stop
   
@@ -295,49 +292,49 @@ subroutine print_mod_details(fname, blk, save_dh)
   real(double) :: lnt,x16,lnm,x1,lnr,l,x4,x12,x20  ! ,dqdk,lnf
   real(double) :: pr,e  !,f,mi,phi,phis
   real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2
-  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes,tc,hc,hec,cc,oc,nec,zc
+  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes, tc,hc,hec,cc,oc,nec,zc
   real(double) :: mhe,mco,mhenv
   integer :: kh,kp,jmod,jb,jin, io  ! ,jf
   integer :: bl,li
   
   
-  !Read file, upto chosen model (blk-1)
+  ! Read file, upto chosen model (blk-1)
   open(unit=10,form='formatted',status='old',file=trim(fname))
-  do bl=1,blk-1  !Block/model
-     !read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf
+  do bl=1,blk-1  ! Block/model
+     ! read(10,*,iostat=io) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf
      read(10,*,iostat=io)m1,dt,t,p,bms,dmrl,dmrl,dmrl,kh,kp,jmod,jb,jin,dmin
      if(io.ne.0) call error_reading_header(bl)
      
-     do li=1,kh  !Line/mesh point in model
-        !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+     do li=1,kh  ! Line/mesh point in model
+        ! read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
         read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
         if(io.ne.0) call error_reading_block(li)
-     end do !li
+     end do ! li
      
-     if(save_dh) then  !Read the DH block as well; it has no header, and hence kh lines, not kh+1
+     if(save_dh) then  ! Read the DH block as well; it has no header, and hence kh lines, not kh+1
         do li=1,kh
            read(10,*) dumstr9
         end do
      end if
      
-  end do !bl
+  end do ! bl
   
   
   
   
-  !***   READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
+  ! *** READ CHOSEN STRUCTURE MODEL AND GET VARIABLES TO PRINT
   
-  !read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf   !jin = # columns
-  read(10,*,iostat=io)m1,dt,t,p,bms,dmrl,dmrl,dmrl,kh,kp,jmod,jb,jin,dmin   !jin = # columns
+  ! read(10,*,iostat=io)m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin,jf       ! jin = # columns
+  read(10,*,iostat=io) m1,dt,t,p,bms,dmrl,dmrl,dmrl,kh,kp,jmod,jb,jin,dmin   ! jin = # columns
   if(io.ne.0) call error_reading_header(0)
-  !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+  ! read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
   read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
   if(io.ne.0) call error_reading_block(0)
   
   m1  = lnm*1.d33/msun
-  r1  = exp(lnr)*1.e11/rsun
+  r1  = exp(lnr)*1.d11/rsun
   l1  = l*1.d33/lsun
-  !l1  = l/3.844d0  !Peter's CLSN
+  ! l1  = l/3.844d0  ! Peter's CLSN
   ts  = exp(lnt)
   hs  = x1
   hes = x4
@@ -349,7 +346,7 @@ subroutine print_mod_details(fname, blk, save_dh)
   mhe = 0.d0
   mco = 0.d0
   do li=1,kh-1 !Number of Mesh points
-     !read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
+     ! read(10,*,iostat=io) lnf,lnt,x16,lnm,x1,dqdk,lnr,l,x4,x12,x20,mi,pr,phi,phis,x,horb,e,f,dmrl,dmrl,dmrl,dmrl,dmrl
      read(10,*,iostat=io) dmrl,lnt,x16,lnm,x1,dmrl,lnr,l,x4,x12,x20,dmrl,pr,dmrl,dmrl,dmrl,horb,e,dmrl,dmrl,dmrl,dmrl,dmrl,dmrl
      if(io.ne.0) call error_reading_block(li)
      if(deq0(mhe).and.x1.lt.0.1) mhe = lnm*1.d33/msun
@@ -378,34 +375,29 @@ subroutine print_mod_details(fname, blk, save_dh)
   a1  = a *m2/bms
   a2  = a *m1/bms
   
-  rl1 = a*(0.49*q1**(2.d0/3.)/(0.6d0*q1**(2.d0/3.) + log(1.d0+q1**(1.d0/3.))))
-  rl2 = a*(0.49*q2**(2.d0/3.)/(0.6d0*q2**(2.d0/3.) + log(1.d0+q2**(1.d0/3.))))
+  rl1 = a*(0.49d0*q1**(2.d0/3.d0)/(0.6d0*q1**(2.d0/3.) + log(1.d0+q1**(1.d0/3.d0))))
+  rl2 = a*(0.49d0*q2**(2.d0/3.d0)/(0.6d0*q2**(2.d0/3.) + log(1.d0+q2**(1.d0/3.d0))))
   
   
   
   
-
+  ! *** PRINT MODEL DETAILS
   
-  
-  
-  
-  !***   PRINT MODEL DETAILS
-  
-  write(6,'(A)')'  Properties of this model:'
-  write(6,*)''
-  write(6,81)jmod,m1,t,dt,zs
-  write(6,82)kh,kp,jin,jb
-  write(6,*)''
-  write(6,83)m1,r1,l1,tc,ts
-  write(6,84)mhe,mco,mhenv
-  write(6,*)''
-  write(6,85)m1,m2,bms,q1,q2
-  write(6,*)''
-  write(6,86)p,a,a1,a2,rl1,rl2
-  write(6,87)horb*1.d50,e,pr
-  write(6,*)''
-  write(6,88)hs,hes,cs,os,nes,zs
-  write(6,89)hc,hec,cc,oc,nec,zc
+  write(*,'(A)') '  Properties of this model:'
+  write(*,*) ''
+  write(*,81) jmod,m1,t,dt,zs
+  write(*,82) kh,kp,jin,jb
+  write(*,*) ''
+  write(*,83) m1,r1,l1,tc,ts
+  write(*,84) mhe,mco,mhenv
+  write(*,*) ''
+  write(*,85) m1,m2,bms,q1,q2
+  write(*,*) ''
+  write(*,86) p,a,a1,a2,rl1,rl2
+  write(*,87) horb*1.d50,e,pr
+  write(*,*) ''
+  write(*,88) hs,hes,cs,os,nes,zs
+  write(*,89) hc,hec,cc,oc,nec,zc
   
 81 format ('  Model:        Model nr:',i5,',    Mass:',f7.2,' Mo,    Age: ',es10.4,' yr,  Time step:   ',es10.4,' yr,    Z =',f7.4)
 82 format ('                Mesh pts: ',i4,',      Kp: ',i6,',       Jin: ',i3,',            Binary component:',i2)
@@ -417,9 +409,6 @@ subroutine print_mod_details(fname, blk, save_dh)
 87 format ('                J  =  ',es10.4,' erg s,                e  =',f9.5,',     Prot =',ES12.5,' days')
 88 format ('  Composition:  Surface:  H: ',f7.4,',   He: ',f7.4,',   C: ',f7.4,',   O: ',f7.4,',   Ne: ',f7.4,',    Z: ',f7.4)
 89 format ('  Composition:     Core:  H: ',f7.4,',   He: ',f7.4,',   C: ',f7.4,',   O: ',f7.4,',   Ne: ',f7.4,',    Z: ',f7.4)
-  
-  
-  
   
   
 end subroutine print_mod_details
@@ -450,7 +439,7 @@ subroutine copy_mod(infile, blk, save_dh)
   character :: outfile*(99)
   logical :: ex
   
-  !Read blocks before the desired one:
+  ! Read blocks before the desired one:
   open(unit=10,form='formatted',status='old',file=trim(infile))
   do bl=1,blk-1   ! Block/model number
      read(10,*,iostat=io) dat1, kh,kp,jmod,jb,jin,jf
@@ -476,16 +465,16 @@ subroutine copy_mod(infile, blk, save_dh)
   if(io.ne.0) call error_reading_header(0)
   
   ! Create name of the output file:
-  write(outfile,'(I5.5,A4)')jmod,'.mod'
+  write(outfile,'(I5.5,A4)') jmod,'.mod'
   inquire(file=trim(outfile), exist=ex)
   if(ex) then
-     write(6,'(A)')'  '//trim(outfile)//' exists.'
-     write(6,'(A)', advance='no')'  Please enter a different name for the output file: '
+     write(*,'(A)') '  '//trim(outfile)//' exists.'
+     write(*,'(A)', advance='no') '  Please enter a different name for the output file: '
      read*,outfile
   end if
   
   ! Open output file:
-  open (unit=20,form='formatted',status='new',file=trim(outfile),iostat=io)
+  open(unit=20,form='formatted',status='new',file=trim(outfile),iostat=io)
   if(io.ne.0) call quit_program('Error opening output file '//trim(outfile)//'.')
   
   ! Write header line:
@@ -509,8 +498,7 @@ subroutine copy_mod(infile, blk, save_dh)
   
   close(10)
   close(20)
-  write(6,'(A)')'  Model written to '//trim(outfile)//'.'
-  
+  write(*,'(A)')'  Model written to '//trim(outfile)//'.'
   
 end subroutine copy_mod
 !***********************************************************************************************************************************

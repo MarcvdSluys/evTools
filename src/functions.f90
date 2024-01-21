@@ -1062,13 +1062,13 @@ subroutine evTools_settings()
   ! Write settings file (do this always, to update in case variables are added):
   open(unit=u,form='formatted',status='unknown',action='write',position='rewind',file=trim(filename),iostat=io)
   if(io.ne.0) then
-     write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for writing.'
+     write(0,'(A,/)') '  Error opening settings file '//trim(filename)//' for writing.'
      return
   end if
   write(u, nml=local_settings, iostat=io)
   write(u, nml=screen_settings, iostat=io)
   close(u)
-  if(io.ne.0) write(0,'(A)')'  An error occured when writing the settings file '//trim(filename)
+  if(io.ne.0) write(0,'(A)') '  An error occured when writing the settings file '//trim(filename)
   
   call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
   
