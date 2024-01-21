@@ -292,7 +292,7 @@ subroutine print_mod_details(fname, blk, save_dh)
   real(double) :: lnt,x16,lnm,x1,lnr,l,x4,x12,x20  ! ,dqdk,lnf
   real(double) :: pr,e  !,f,mi,phi,phis
   real(double) :: m2,q1,q2,a,a1,a2,rl1,rl2
-  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes, tc,hc,hec,cc,oc,nec,zc
+  real(double) :: r1,l1,ts,hs,hes,zs,cs,os,nes, tc,hc,hec,cc,oc,nec,zc  ! , x56,muc
   real(double) :: mhe,mco,mhenv
   integer :: kh,kp,jmod,jb,jin, io  ! ,jf
   integer :: bl,li
@@ -365,6 +365,10 @@ subroutine print_mod_details(fname, blk, save_dh)
   oc  = x16
   nec = x20
   zc  = 1.d0 - hc - hec
+  
+  ! x56 = 1.d0 - x1 - x4 - x12 - x16 - x20
+  ! muc = (x1*1 + x4*4 + x12*12 + x16*16 + x20*20 + x56*56)/(x1+x4+x12+x16+x20+x56)
+  ! rhoc = pc/(kb*tc)*muc*m_h - no pressure!
   
   m2  = bms - m1
   q1  = m1/m2
