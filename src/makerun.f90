@@ -27,12 +27,7 @@ program makerun
   
   implicit none
   real(double) :: ct1(7),ct2(7),ct3(7)
-  ! real(double) :: ml1,dml,ql1,dql,xl1,dxl
-  ! real(double) :: rot,ex
-  ! real(double) :: sm,dty,age,per,bms,ecc,p1,enc
   real(double) :: m2
-  ! integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
-  ! integer :: kml,kql,kxl,kr,jmx
   integer :: io,narg,command_argument_count
   character :: infile*(99),outfile*(99),arg*(10),bla*(500)
   
@@ -43,6 +38,7 @@ program makerun
   ! Read input:
   call read_init_run(trim(infile))
   
+  ! Old format:
   if(.false.) then
      if(io.ne.0) goto 90
      rewind 10
@@ -55,8 +51,9 @@ program makerun
      read(10,*,err=97) ct1
      read(10,*,err=98) ct2
      read(10,*,err=99) ct3
-     ! close(10)
+     close(10)
   end if
+  
   
   kml = 1  ! Only one iteration in mass
   m2 = 0.5d0*sm
@@ -123,7 +120,7 @@ program makerun
   call write_init_run(trim(outfile))
   
   
-  if(.false.) then
+  if(.false.) then  ! Old format
      open(unit=20,form='formatted',file=trim(outfile))
      write(20,50) isb,ktw,ip1,im1,ip2,im2,kpt,kp,  &
           ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
@@ -147,6 +144,7 @@ program makerun
   end if
   
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
+  
   
   
   write(*,'(5(A,ES10.3))') '  M1 = ',sm,',   M2 = ',m2, '  q1 = ',sm/m2,',   Porb = ',per,',   Prot1 = ',p
