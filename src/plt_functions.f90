@@ -45,7 +45,7 @@ contains
     use SUFR_kinds, only: double
     implicit none
     real(double), intent(in) :: Mc(:)
-    real(double), intent(out) :: zeta(size(Mc))
+    real(double), intent(out) :: zeta(:)
     
     zeta  =  2.d0/3.d0 * Mc / (1.d0 - Mc)
     zeta  =  zeta - 1.d0/3.d0 * (1.d0 - Mc)/(1.d0 + 2*Mc)
@@ -76,7 +76,7 @@ contains
     use SUFR_kinds, only: double
     implicit none
     real(double), intent(in) :: Md(:),Ma(:), beta
-    real(double), intent(out) :: zeta(size(Md))
+    real(double), intent(out) :: zeta(:)
     real(double) :: Md2(size(Md)),Ma2(size(Md)),Mt(size(Md)), q(size(Md)),q3(size(Md)), c3rd
     real(double) :: dlnAdlnMd(size(Md)), dlnRldlnQ(size(Md)), dlnQdlnMd(size(Md))
     
@@ -992,6 +992,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   integer :: i,j,j0,ib
   real(double) :: var(nn),dpdj(nn), beta
   real(double) :: c126(nn),c119a,c119b,x,z,mbol,bc,g0, Zsurf(nn),Menv(nn)
+  real(double), allocatable :: zeta(:)
   
   ! de-log some variables:
   do i=4,nvar
@@ -1297,6 +1298,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(159,1:n) = dat(28,1:n) * 24.
   dat(160,1:n) = dat(28,1:n) * 1440.
   
+  
   ! 161, 162: zeta_*, zeta_rl
   do i=2,n-1
      if(deq(dat(4,i+1),dat(4,i-1))) then
@@ -1312,17 +1314,27 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(162,1) = dat(162,2)
   dat(161,n) = dat(161,n-1)
   dat(162,n) = dat(162,n-1)
+
   
   ! 163: analytical zeta_ad
-  call compute_zeta_ad(dat(5,1:n)/dat(4,1:n), dat(163,1:n))  ! Compute zeta_ad from the relative He core mass fraction
+  allocate(zeta(n))  ! Zeta must be allocatable for subroutine call
+  call compute_zeta_ad(dat(5,1:n)/dat(4,1:n), zeta)  ! Compute zeta_ad from the relative He core mass fraction
+  dat(163,1:n) = zeta
+
   
   ! 164 - 166: analytical zeta_rl
   beta = 0.0d0
-  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(164,1:n))  ! Compute zeta_rl from the component masses and beta=0.0
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, zeta)  ! Compute zeta_rl from the component masses and beta=0.0
+  dat(164,1:n) = zeta
+  
   beta = 0.5d0
-  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(165,1:n))  ! Compute zeta_rl from the component masses and beta=0.5
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, zeta)  ! Compute zeta_rl from the component masses and beta=0.5
+  dat(165,1:n) = zeta
+  
   beta = 1.0d0
-  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, dat(166,1:n))  ! Compute zeta_rl from the component masses and beta=1.0
+  call compute_zeta_rl(dat(4,1:n),dat(40,1:n),beta, zeta)  ! Compute zeta_rl from the component masses and beta=1.0
+  dat(166,1:n) = zeta
+  
   
   ! 171 - 172: mass ratios:
   dat(171,:) = dat(4,:)/dat(40,:)  ! q_1 = M1/M2
