@@ -1,4 +1,4 @@
-#Compile the program and put the executable in ~/usr/bin
+# Compile the program and put the executable in ~/usr/bin
 
 .PHONY: clean cleanwarnings code_version exit
 .PRECIOUS: %.o
@@ -6,28 +6,30 @@
 
 # No text/space after statements below!
 FORT = gfortran#  Use GNU fortran compiler >=4.4
-#FORT = ifort#     Use Intel fortran compiler
-#FORT = nagfor#
+# FORT = ifort#     Use Intel fortran compiler
+# FORT = nagfor#
 
 WARN = yes#    # compile with compile-time warnings
-#CHECK = yes#   # compile with run-time checks
-#DEBUG = yes#   # compile with debug options
-F2003 = yes#   #compile with Fortran 2003 standard
+CHECK = yes#   # compile with run-time checks
+DEBUG = yes#   # compile with debug options
+F2003 = yes#   # compile with Fortran 2003 standard
 
 
-#General:
-#OPT = -O0
-#OPT = -O1
-OPT = -O2
-#OPT = -O3
+# General:
+OPT = -O0
+# OPT = -O1
+# OPT = -O2
+# OPT = -O3
 
 
 # Directories for the source, object, module, libary and executable files:
 SRCDIR = src
 OBJDIR = obj
 MODDIR = mod
-BINDIR = ~/usr/bin
 
+BINDIR  = $(HOME)/usr/bin
+INCLDIR = $(HOME)/usr/include
+LIBDIR  = $(HOME)/usr/lib
 
 STDOBJ = $(OBJDIR)/functions.o $(OBJDIR)/code_version.o
 PLTOBJ = $(OBJDIR)/plt_functions.o
@@ -37,13 +39,13 @@ MODOBJ =
 
 
 
-#ifort:
+# ifort:
 ifeq ($(FORT),ifort)
-   CFLAGS += #-I/home/Marc van der Sluys/usr/include/libSUFR/ifort
-   LFLAGS += #-L/home/Marc van der Sluys/usr/lib -lSUFR_ifort
-   STATLIBS += #/home/Marc van der Sluys/usr/lib/libSUFR_ifort.a
+   CFLAGS += #-I$(INCLDIR)/libSUFR/ifort
+   LFLAGS += #-L$(LIBDIR) -lSUFR_ifort
+   STATLIBS += #$(LIBDIR)/libSUFR_ifort.a
 
-   #To develop code  (don't mix -check bounds with -O>0!):
+   # To develop code  (don't mix -check bounds with -O>0!):
    ifeq ($(CHECK),yes)
       OPT = -O0
       CFLAGS += -check all -check noarg_temp_created
@@ -60,7 +62,7 @@ ifeq ($(FORT),ifort)
    CFLAGS += -vec-report0 -traceback
    CFLAGS += -module $(MODDIR) -I$(MODDIR)
 
-   #To debug code:
+   # To debug code:
    ifeq ($(DEBUG),yes)
       OPT = -O0
       CFLAGS += -g
@@ -70,31 +72,31 @@ ifeq ($(FORT),ifort)
    CFLAGS += -nogen-interfaces
    STATIC = -static
 
-   #OPT += -ipo
-   #LFLAGS += -ipo
-   #OPT += -xsse4.1
-   #OPT += -xhost
-   #CFLAGS += -static $(STATLIBS)
-   #CFLAGS += -prof-gen -prof-dir./  #Don't use -ipo. Run the code thus compiled (a few times) and use -prof-use below for the final version
-   #CFLAGS += -prof-use -prof-dir./
+   # OPT += -ipo
+   # LFLAGS += -ipo
+   # OPT += -xsse4.1
+   # OPT += -xhost
+   # CFLAGS += -static $(STATLIBS)
+   # CFLAGS += -prof-gen -prof-dir./  #Don't use -ipo. Run the code thus compiled (a few times) and use -prof-use below for the final version
+   # CFLAGS += -prof-use -prof-dir./
 
 endif
 
 
-#gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
-#ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
+# gfortran: similar in speed to ifort, but file reading is ~2.5x slower!
+# ifneq (,$(filter $(FORT),gfortran gfortran-4.5))
 ifeq ($(FORT),gfortran)
-   CFLAGS += #-I/home/Marc van der Sluys/usr/include/libSUFR/gfortran
-   LFLAGS += #-L/home/Marc van der Sluys/usr/lib -lSUFR_gfortran
-   STATLIBS += #/home/Marc van der Sluys/usr/lib/libSUFR_gfortran.a
+   CFLAGS += -I$(INCLDIR)/libSUFR/gfortran
+   LFLAGS += -L$(LIBDIR) -lSUFR_gfortran
+   STATLIBS += # $(LIBDIR)/libSUFR_gfortran.a
 
    CFLAGS += -fwhole-file
 
    ifeq ($(CHECK),yes)
       OPT = -O0
-      #CFLAGS += -fbounds-check
+      # CFLAGS += -fbounds-check
       CFLAGS += -fcheck=all
-      #CFLAGS += -fcheck-array-temporaries  #Doesn't seem to work...
+      # CFLAGS += -fcheck-array-temporaries  #Doesn't seem to work...
       CFLAGS += -fbacktrace
    endif
 
@@ -106,7 +108,7 @@ ifeq ($(FORT),gfortran)
       CFLAGS += -fmax-errors=10
       ifeq ($(FORT),gfortran-4.5.0)
          CFLAGS += -fwhole-file
-         #CFLAGS += -fwhole-program
+         # CFLAGS += -fwhole-program
       endif
    endif
 
@@ -116,7 +118,7 @@ ifeq ($(FORT),gfortran)
       CFLAGS += -ffree-line-length-none
    endif
 
-   #To debug code:
+   # To debug code:
    ifeq ($(DEBUG),yes)
       OPT = -O0
       CFLAGS += -g
@@ -126,14 +128,14 @@ ifeq ($(FORT),gfortran)
 endif
 
 
-#nagfor:
+# nagfor:
 ifeq ($(FORT),nagfor)
    ifeq ($(CHECK),yes)
       CFLAGS = -O0
       CFLAGS += -C=all
    endif
    ifneq ($(WARN),yes)
-      CFLAGS += -w=all  #Warnings are on by default
+      CFLAGS += -w=all  # Warnings are on by default
    endif
    CFLAGS += -colour -f2003 -u -gline
    STDOBJ += $(OBJDIR)/nagfor.o
@@ -142,7 +144,7 @@ ifeq ($(FORT),nagfor)
 endif
 
 
-LFLAGS = 
+# LFLAGS = 
 PLOT_LFLAGS = -lpgplot
 
 
@@ -151,7 +153,7 @@ PLOT_LFLAGS = -lpgplot
 
 all: tools_all plot_all
 
-plot_all: plotmdl plotmdln plotmod plotplt plotpltn plotpltp
+plot_all: plotmdl plotmdln plotmod plotplt
 tools_all: dat2plt findplt getgrid grid listmdl listmod listplt makerun mergeplt plt2ce plt2dat plt2obs selplt
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.f90
@@ -168,65 +170,60 @@ plotmdl: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 plotmdln: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
+
 plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
 plotplt: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
-plotpltn: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotpltn $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltn.o
-
-plotpltp: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotpltp $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotpltp.o
-
 
 
 # Tools:
 
 dat2plt: $(STDOBJ) $(OBJDIR)/dat2plt.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/dat2plt $(STDOBJ) $(OBJDIR)/dat2plt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/dat2plt $(STDOBJ) $(OBJDIR)/dat2plt.o
 
 convert_initdat: $(STDOBJ) $(OBJDIR)/convert_initdat.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/convert_initdat $(STDOBJ) $(OBJDIR)/convert_initdat.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/convert_initdat $(STDOBJ) $(OBJDIR)/convert_initdat.o
 
 findplt: $(STDOBJ) $(OBJDIR)/findplt.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/findplt $(STDOBJ) $(OBJDIR)/findplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/findplt $(STDOBJ) $(OBJDIR)/findplt.o
 
 getgrid: $(STDOBJ) $(OBJDIR)/getgrid.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/getgrid $(STDOBJ) $(OBJDIR)/getgrid.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/getgrid $(STDOBJ) $(OBJDIR)/getgrid.o
 
 grid: $(STDOBJ) $(OBJDIR)/grid.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/grid $(STDOBJ) $(OBJDIR)/grid.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/grid $(STDOBJ) $(OBJDIR)/grid.o
 
 listmdl: $(STDOBJ) $(MDLOBJ) $(OBJDIR)/listmdl.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/listmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/listmdl.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/listmdl $(STDOBJ) $(MDLOBJ) $(OBJDIR)/listmdl.o
 
 listmod: $(STDOBJ) $(OBJDIR)/listmod.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/listmod $(STDOBJ) $(OBJDIR)/listmod.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/listmod $(STDOBJ) $(OBJDIR)/listmod.o
 
 listplt: $(STDOBJ) $(OBJDIR)/listplt.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/listplt $(STDOBJ) $(OBJDIR)/listplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/listplt $(STDOBJ) $(OBJDIR)/listplt.o
 
 makerun: $(STDOBJ) $(OBJDIR)/makerun.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/makerun $(STDOBJ) $(OBJDIR)/makerun.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/makerun $(STDOBJ) $(OBJDIR)/makerun.o
 
 mergeplt: $(STDOBJ) $(OBJDIR)/mergeplt.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/mergeplt $(STDOBJ) $(OBJDIR)/mergeplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/mergeplt $(STDOBJ) $(OBJDIR)/mergeplt.o
 
 
 
 plt2ce: $(STDOBJ) $(OBJDIR)/plt2ce.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2ce $(STDOBJ) $(OBJDIR)/plt2ce.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plt2ce $(STDOBJ) $(OBJDIR)/plt2ce.o
 
 plt2dat: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plt2dat.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2dat $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plt2dat.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plt2dat $(STDOBJ) $(PLTOBJ) $(OBJDIR)/plt2dat.o
 
 plt2obs: $(STDOBJ) $(OBJDIR)/plt2obs.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/plt2obs $(STDOBJ) $(OBJDIR)/plt2obs.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/plt2obs $(STDOBJ) $(OBJDIR)/plt2obs.o
 
 selplt: $(STDOBJ) $(PLTOBJ) $(OBJDIR)/selplt.o
-	$(FORT) $(LFLAGS) -o ~/usr/bin/selplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/selplt.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/selplt $(STDOBJ) $(PLTOBJ) $(OBJDIR)/selplt.o
 
 
 
