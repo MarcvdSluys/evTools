@@ -23,11 +23,12 @@
 
 program makerun
   use SUFR_kinds, only: double
+  use SUFR_constants, only: solday, msun,rsun
   use init_run
   
   implicit none
   real(double) :: ct1(7),ct2(7),ct3(7)
-  real(double) :: m2
+  real(double) :: m2, aorb, a2rl, Rrl1,Rrl2
   integer :: io,narg,command_argument_count
   character :: infile*(99),outfile*(99),arg*(10),bla*(500)
   
@@ -147,7 +148,13 @@ program makerun
   
   
   
-  write(*,'(5(A,ES10.3))') '  M1 = ',sm,',   M2 = ',m2, '  q1 = ',sm/m2,',   Porb = ',per,',   Prot1 = ',p
+  write(*,'(5(A,ES10.3),A)') '  M1 = ',sm,' Mo,   M2 = ',m2, ' Mo,   q1 = ',sm/m2,',   Porb = ',per,' d,   Prot1 = ',p, ' d.'
+  call p2a((sm+m2)*msun, per*solday, aorb)
+  aorb = aorb/rsun
+  Rrl1 = a2rl(sm,m2, aorb)
+  Rrl2 = a2rl(m2,sm, aorb)
+  write(*,'(3(A,F0.3),A)') '  aorb = ',aorb, ' Ro,   Rrl1 = ',Rrl1,' Ro,   Rrl2 = ',Rrl2,' Ro.'
+  write(*,*)
   write(*,'(A)') '  New init.run was written as '//trim(outfile)
   write(*,'(A,/)') '  Program done'
   stop
