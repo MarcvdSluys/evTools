@@ -1,6 +1,6 @@
 !> \file makerun.f90  Reads, optinally changes and (over!)writes an init.run (fort.23) input file
 !!
-!! January 21, 2004
+!! 2004-01-21, MvdS: initial version.
 
 
 ! Copyright 2002-2024 Marc van der Sluys - marc.vandersluys.nl
@@ -21,71 +21,85 @@
 !***********************************************************************************************************************************
 !> \brief  Reads, optinally changes and (over!)writes an init.run (fort.23) input file
 
-program makerun  
+program makerun
   use SUFR_kinds, only: double
+  use init_run
   
   implicit none
   real(double) :: ct1(7),ct2(7),ct3(7)
-  real(double) :: ml1,dml,ql1,dql,xl1,dxl
-  real(double) :: rot,ex
-  real(double) :: sm,dty,age,per,bms,ecc,p1,enc
+  ! real(double) :: ml1,dml,ql1,dql,xl1,dxl
+  ! real(double) :: rot,ex
+  ! real(double) :: sm,dty,age,per,bms,ecc,p1,enc
   real(double) :: m2
-  integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
-  integer :: kml,kql,kxl,kr,jmx
+  ! integer :: isb,ktw,ip1,im1,ip2,im2,kpt,kp
+  ! integer :: kml,kql,kxl,kr,jmx
   integer :: io,narg,command_argument_count
-  character :: filei*(99),fileo*(99),arg*(10),bla*(500)
+  character :: infile*(99),outfile*(99),arg*(10),bla*(500)
   
-  write(6,*)''
-  filei = 'init.run'
-  fileo = 'init.run.temp'
+  write(*,*) ''
+  infile = 'init.run'
+  outfile = 'init.run.new'
   
+  ! Read input:
+  call read_init_run(trim(infile))
   
-  open(unit=10,form='formatted',status='old',file=trim(filei),iostat=io)
-  if(io.ne.0) goto 90
-  rewind 10
-  read(10,*,err=91) isb,ktw,ip1,im1,ip2,im2,kpt,kp
-  read(10,*,err=92) ml1,dml,kml
-  read(10,*,err=93) ql1,dql,kql
-  read(10,*,err=94) xl1,dxl,kxl
-  read(10,*,err=95) rot,kr,ex
-  read(10,*,err=96) sm,dty,age,per,bms,ecc,p1,enc,jmx
-  read(10,*,err=97) ct1
-  read(10,*,err=98) ct2
-  read(10,*,err=99) ct3
-  !close(10)
+  if(.false.) then
+     if(io.ne.0) goto 90
+     rewind 10
+     read(10,*,err=91) isb,ktw,ip1,im1,ip2,im2,kpt,kp
+     read(10,*,err=92) ml1,dml,kml
+     read(10,*,err=93) ql1,dql,kql
+     read(10,*,err=94) xl1,dxl,kxl
+     read(10,*,err=95) rot,kr,ex
+     read(10,*,err=96) sm,dty,age,per,bms,ecc,p,enc,jmx
+     read(10,*,err=97) ct1
+     read(10,*,err=98) ct2
+     read(10,*,err=99) ct3
+     ! close(10)
+  end if
   
-  
-  kml = 1  !Only one iteration in mass
+  kml = 1  ! Only one iteration in mass
   m2 = 0.5d0*sm
   if(bms.gt.0) m2 = bms-sm
   
   narg = command_argument_count()
-  if(narg.eq.1) then
+  if(narg.eq.1) then  ! Mass 1 only
      call get_command_argument(1,arg)
-     read(arg,*)sm
-  else if(narg.eq.2) then
+     read(arg,*) sm
+     if(bms.gt.0.d0) m2 = bms - sm
+     
+  else if(narg.eq.2) then  ! Mass 1 + Porb (silly w/o M2? - not if you want to change Porb only)
      call get_command_argument(1,arg)
-     read(arg,*)sm
+     read(arg,*) sm
+     if(bms.gt.0.d0) m2 = bms - sm
+     
      call get_command_argument(2,arg)
-     read(arg,*)per
-  else if(narg.eq.3) then
+     read(arg,*) per
+     
+     write(*,'(A)')'  Orbital period provided, but no rotational period - synchronising binary...'
+     p = per
+     
+  else if(narg.eq.3) then  ! Mass 1+2 + Porb
      call get_command_argument(1,arg)
-     read(arg,*)sm
+     read(arg,*) sm
      call get_command_argument(2,arg)
-     read(arg,*)m2
+     read(arg,*) m2
      call get_command_argument(3,arg)
-     read(arg,*)per
-     write(6,'(A)')'  Synchronising binary...'
-     p1 = per
-  else if(narg.eq.4) then
+     read(arg,*) per
+     
+     write(*,'(A)')'  Orbital period provided, but no rotational period - synchronising binary...'
+     p = per
+     
+  else if(narg.eq.4) then  ! Mass 1+2 + Porb + Prot
      call get_command_argument(1,arg)
-     read(arg,*)sm
+     read(arg,*) sm
      call get_command_argument(2,arg)
-     read(arg,*)m2
+     read(arg,*) m2
      call get_command_argument(3,arg)
-     read(arg,*)per
+     read(arg,*) per
      call get_command_argument(4,arg)
-     read(arg,*)p1
+     read(arg,*) p
+     
   else
      write(6,'(A)')'  Syntax: '
      write(6,'(A)')'    makerun <M1>'
@@ -95,62 +109,71 @@ program makerun
      stop
   end if
   
-  if(bms.gt.0.d0.or.narg.eq.3) bms = sm + m2
-  !dty = 1.d5
-  !p1 = per  !Syncronise the initial binary
-  !print*,sm,m2,bms
+  if(bms.gt.0.d0 .or. narg.ge.3) bms = sm + m2
+  ! dty = 1.d5
+  ! p = per  ! Syncronise the initial binary
+  ! print*,sm,m2,bms
   
   ml1 = log10(sm)
-  if(narg.eq.3) ql1 = log10(sm/m2)
+  ! if(narg.eq.3)
+  ql1 = log10(sm/m2)
   if(per.gt.0.d0) xl1 = log10(per)
   
-  open(unit=20,form='formatted',file=trim(fileo))
-  write(20,50) isb,ktw,ip1,im1,ip2,im2,kpt,kp,  &
-       ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
-       rot,kr,ex,  &
-       sm,dty,age,per,bms,ecc,p1,enc,jmx,  &
-       ct1,ct2,ct3
-  read(10,*)bla
-  write(20,'(/,A)')'last five lines:'
+  ! Write output:
+  call write_init_run(trim(outfile))
   
-  io = 0
-  do while(io.eq.0)
-     read(10,'(A500)',iostat=io)bla
-     if(io.ne.0.or.len_trim(bla).eq.0.or.len_trim(bla).eq.500) exit
-     write(20,'(A)')trim(bla)
-  end do
   
-  close(10)
-  close(20)
-  
-  call system('mv -f '//trim(fileo)//' '//trim(filei))
+  if(.false.) then
+     open(unit=20,form='formatted',file=trim(outfile))
+     write(20,50) isb,ktw,ip1,im1,ip2,im2,kpt,kp,  &
+          ml1,dml,kml,ql1,dql,kql,xl1,dxl,kxl,  &
+          rot,kr,ex,  &
+          sm,dty,age,per,bms,ecc,p,enc,jmx,  &
+          ct1,ct2,ct3
+     read(10,*) bla
+     write(20,'(/,A)')'last five lines:'
+     
+     io = 0
+     do while(io.eq.0)
+        read(10,'(A500)',iostat=io) bla
+        if(io.ne.0.or.len_trim(bla).eq.0.or.len_trim(bla).eq.500) exit
+        write(20,'(A)') trim(bla)
+     end do
+     
+     close(10)
+     close(20)
+     
+     call system('mv -f '//trim(outfile)//' '//trim(infile))
+  end if
   
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
   
-  write(6,'(4(A,ES10.3))')'  M1:',sm,',  M2:',m2,',  Porb:',per,',  Prot,1:',p1
-  write(6,'(A,/)')'  Program done'
+  write(*,'(5(A,ES10.3))') '  M1 = ',sm,',   M2 = ',m2, '  q1 = ',sm/m2,',   Porb = ',per,',   Prot1 = ',p
+  write(*,'(A)') '  New init.run was written as '//trim(outfile)
+  write(*,'(A,/)') '  Program done'
   stop
   
-90 write(6,'(A,/)')'  Error opening file: '//trim(filei)
+  
+90 write(6,'(A,/)')'  Error opening file: '//trim(infile)
   stop
-91 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 1'
+91 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 1'
   stop
-92 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 2'
+92 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 2'
   stop
-93 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 3'
+93 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 3'
   stop
-94 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 4'
+94 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 4'
   stop
-95 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 5'
+95 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 5'
   stop
-96 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 6'
+96 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 6'
   stop
-97 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 7'
+97 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 7'
   stop
-98 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 8'
+98 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 8'
   stop
-99 write(6,'(A,/)')'  Error reading file: '//trim(filei)//', line 9'
+99 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 9'
   stop
   
 end program makerun
