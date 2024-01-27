@@ -205,8 +205,8 @@ listmod: $(STDOBJ) $(OBJDIR)/listmod.o
 listplt: $(STDOBJ) $(OBJDIR)/listplt.o
 	$(FORT) $(LFLAGS) -o $(BINDIR)/listplt $(STDOBJ) $(OBJDIR)/listplt.o
 
-makerun: $(STDOBJ) $(OBJDIR)/makerun.o
-	$(FORT) $(LFLAGS) -o $(BINDIR)/makerun $(STDOBJ) $(OBJDIR)/makerun.o
+makerun: $(STDOBJ) $(OBJDIR)/init_functions.o $(OBJDIR)/makerun.o
+	$(FORT) $(LFLAGS) -o $(BINDIR)/makerun $(STDOBJ) $(OBJDIR)/init_functions.o $(OBJDIR)/makerun.o
 
 mergeplt: $(STDOBJ) $(OBJDIR)/mergeplt.o
 	$(FORT) $(LFLAGS) -o $(BINDIR)/mergeplt $(STDOBJ) $(OBJDIR)/mergeplt.o
