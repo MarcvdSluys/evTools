@@ -46,7 +46,7 @@ program plotplt
   logical :: logt,lgx,lgy
   
   real :: yy1(nmax),minx,dist,mindist
-  real :: x,y,xmin,xmax,ymin,ymax,dx,dy
+  real :: x,y, dx,dy, xmin,xmax, ymin,ymax
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
@@ -54,24 +54,31 @@ program plotplt
   integer :: wait,lums,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: col,lng
-  real :: sch
+  real :: sch, sch0
   
   character :: fname*(99),fnames(nfmax)*(99),psname*(99)
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
   character :: xwin*(19),boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
   character :: pstitle*(99),asclx*(99),ascly*(99), complbl*(3), mdlnr*(9)
-  logical :: ex,prleg, hlp,hlbl
+  logical :: ex,prleg, hlp,hlbl, use_plplot
   
   ! Set constants:
   call setconstants()
-  write(6,*)
-  call print_code_version(6)  !To screen
+  write(*,*)
+  call print_code_version(6)  ! To screen
   
   call evTools_settings()
   
+  ! Use PGPLOT or PLPlot?
+  use_plplot = .false.  ! Use PGPLOT
+  use_plplot = .true.   ! Use PLPlot
   
-  sch = 1.0
+  sch0 = 1.0  ! For PGPLOT
+  if(use_plplot) sch0 = 2.0  ! For PLPlot
+  
+  sch = 1.0 * sch0
+  
   
   !os = getos() !1-Linux, 2-MacOS
   os = 1        ! Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
@@ -751,7 +758,7 @@ program plotplt
      !call pgpap(30.,0.33)  !Talk, plot
      
      call pgslw(5)
-     sch = 1.5
+     sch = 1.5 * sch0
      
   else !plot.ne.9
      
@@ -770,7 +777,7 @@ program plotplt
      if(os.eq.2) call pgbegin(1,'/aqt',1,1)          !Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
      call pgslw(1)
-     sch = 1.0
+     sch = 1.0 * sch0
      if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
         call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
         call pgscr(1,0.,0.,0.)
@@ -786,19 +793,27 @@ program plotplt
   end if !plot.ne.9
   
   call pgscf(1)
-  !if(os.eq.2.or.plot.eq.9) call pgscf(2)
+  ! if(os.eq.2.or.plot.eq.9) call pgscf(2)
   call pgsch(sch)
   if(plot.eq.9) then
-     if(prleg) then
-        call pgsvp(0.10,0.90,0.12,0.95)
+     if(prleg) then  ! Make room for legend
+        call pgsvp(0.10,0.90, 0.12,0.95)
      else
-        call pgsvp(0.10,0.95,0.12,0.95)
+        call pgsvp(0.10,0.95, 0.12,0.95)
      end if
-  else
-     if(prleg) then
-        call pgsvp(0.06,0.90,0.07,0.96)
+  else  ! Sceen
+     if(prleg) then  ! Make room for legend
+        if(use_plplot) then
+           call pgsvp(0.07,0.90, 0.10,0.96)
+        else
+           call pgsvp(0.06,0.90, 0.07,0.96)
+        end if
      else
-        call pgsvp(0.06,0.95,0.07,0.96)
+        if(use_plplot) then
+           call pgsvp(0.07,0.95, 0.10,0.96)  ! xmax: need room for x10^...
+        else
+           call pgsvp(0.06,0.95, 0.07,0.96)
+        end if
      end if
   end if
   call pgswin(xmin,xmax,ymin,ymax)
@@ -819,8 +834,14 @@ program plotplt
         call pgmtxt('T',0.7,0.5,0.5,'~/'//trim(title(13:99))//'/*.plt*')
      end if
   end if
-  call pgmtxt('B',2.4,0.5,0.5,trim(pglx))
-  call pgmtxt('L',2.0,0.5,0.5,trim(pgly))
+  if(use_plplot) then
+     call pgmtxt('B',4., 0.5,0.5, trim(pglx))
+     call pgmtxt('L',5., 0.5,0.5, trim(pgly))
+  else
+     call pgmtxt('B',2.4,0.5,0.5, trim(pglx))
+     call pgmtxt('L',2.0,0.5,0.5, trim(pgly))
+  end if
+  
   
   
   ! Draw curves/points:
