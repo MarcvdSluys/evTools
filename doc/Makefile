@@ -38,6 +38,10 @@ PLOTOBJ = $(OBJDIR)/plotfunctions.o
 MODOBJ = 
 
 
+# PGPLOT flags:
+PGPLOT_LFLAGS = -lpgplot
+
+
 
 # ifort:
 ifeq ($(FORT),ifort)
@@ -92,6 +96,11 @@ ifeq ($(FORT),gfortran)
 
    CFLAGS += -fwhole-file
 
+   # Overrule PGPLOT with PG2PLplot:
+   CFLAGS += -I ~/usr/include/plplot_MvdS/${FORT} -I/usr/lib64/fortran/modules/plplot/
+   PLPLOT_LFLAGS = -lplplotfortran -lpg2plplot_gfortran  # -lpg2plplot  #  -lplplot_MvdS_gfortran
+
+   # Run-time checks:
    ifeq ($(CHECK),yes)
       OPT = -O0
       # CFLAGS += -fbounds-check
@@ -100,7 +109,7 @@ ifeq ($(FORT),gfortran)
       CFLAGS += -fbacktrace
    endif
 
-
+   # Warnings:
    ifeq ($(WARN),yes)
       CFLAGS += -Wall -Wextra
       CFLAGS += -Werror
@@ -112,13 +121,14 @@ ifeq ($(FORT),gfortran)
       endif
    endif
 
+   # F2003:
    ifeq ($(F2003),yes)
       CFLAGS += -std=f2008 -fall-intrinsics -pedantic
    else
       CFLAGS += -ffree-line-length-none
    endif
 
-   # To debug code:
+   # Debug code:
    ifeq ($(DEBUG),yes)
       OPT = -O0
       CFLAGS += -g
@@ -144,10 +154,6 @@ ifeq ($(FORT),nagfor)
 endif
 
 
-# LFLAGS = 
-PLOT_LFLAGS = -lpgplot
-
-
 
 
 
@@ -162,20 +168,21 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.f90
 exit:
 
 
-# Plotting:
+# Plotting with PGPLOT or PLplot:
 
 plotmdl: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
+	$(FORT) $(LFLAGS) $(PGPLOT_LFLAGS) -o $(BINDIR)/plotmdl $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdl.o
 
 plotmdln: $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
+	$(FORT) $(LFLAGS) $(PGPLOT_LFLAGS) -o $(BINDIR)/plotmdln $(STDOBJ) $(PLOTOBJ) $(MDLOBJ) $(OBJDIR)/plotmdln.o
 
 
 plotmod: $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
+	$(FORT) $(LFLAGS) $(PGPLOT_LFLAGS) -o $(BINDIR)/plotmod $(STDOBJ) $(MODOBJ) $(OBJDIR)/plotmod.o
 
 plotplt: $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
-	$(FORT) $(LFLAGS) $(PLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+# $(FORT) $(LFLAGS) $(PGPLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
+	$(FORT) $(LFLAGS) $(PLPLOT_LFLAGS) -o $(BINDIR)/plotplt $(STDOBJ) $(PLOTOBJ) $(PLTOBJ) $(OBJDIR)/plotplt.o
 
 
 
