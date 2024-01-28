@@ -1053,7 +1053,8 @@ program plotplt
 941  call pgsci(1)
      xsel = 0.
      ysel = 0.
-     write(6,'(A)')' Select 2-4 corner points with your left mouse button and press "x" to finish'
+     write(*,'(A)')' Select 2-4 corner points with your left mouse button and press the'// &
+          ' right mouse button or "x" key to finish'
      nsel=0
      call pgolin(4,nsel,xsel,ysel,2)
      if(nsel.lt.2) then
@@ -1089,9 +1090,9 @@ program plotplt
   if(plot.eq.10) then  !Identify closest model
      xsel = 0.
      ysel = 0.
-     write(6,'(A)')' Select a point in the graph and press "x" to finish'
-     nsel=0
+     write(6,'(A)') ' Select a point in the graph and press the right mouse button or "x" key to finish'
      call pgsci(1)
+     nsel=0
      call pgolin(1,nsel,xsel,ysel,2)
      
      
