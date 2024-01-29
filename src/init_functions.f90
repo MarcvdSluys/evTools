@@ -97,10 +97,17 @@ contains
     
     ! If that fails use old-fashioned I/O:
     if(iostat.ne.0) then
+       write(*,'(A)') 'Reading namelist format failed, trying old format'
        rewind(ip)
-       read(ip, *) isb, ktw, ip1, im1, ip2, im2, kpt, kp, ml1, dml, kml,   &
+       read(ip, *, iostat=iostat) isb, ktw, ip1, im1, ip2, im2, kpt, kp, ml1, dml, kml,   &
             ql1, dql, kql, xl1, dxl, kxl, rot, kr, ex, &
             sm, dty, age, per, bms, ecc, p, enc, jmx, uc
+       
+       if(iostat.ne.0) then
+          write(*,'(A,/)') 'Reading old format failed, aborting...'
+          stop
+       end if
+       
     end if
     
     close(ip)
