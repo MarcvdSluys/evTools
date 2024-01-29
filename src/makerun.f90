@@ -23,12 +23,10 @@
 
 program makerun
   use SUFR_kinds, only: double
-  use SUFR_constants, only: solday, msun,rsun
   use init_run
   
   implicit none
-  real(double) :: ct1(7),ct2(7),ct3(7)
-  real(double) :: m2, aorb, a2rl, Rrl1,Rrl2
+  real(double) :: ct1(7),ct2(7),ct3(7), m2
   integer :: io,narg,command_argument_count
   character :: infile*(99),outfile*(99),arg*(10),bla*(500)
   
@@ -99,11 +97,16 @@ program makerun
      read(arg,*) p
      
   else
-     write(6,'(A)')'  Syntax: '
-     write(6,'(A)')'    makerun <M1>'
-     write(6,'(A)')'    makerun <M1> <Porb>'
-     write(6,'(A)')'    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
-     write(6,'(A,/)')'    makerun <M1> <M2> <Porb> <Prot>'
+     write(*,'(/,A)')'  No arguments given - not changing anything.'
+     write(*,'(/,A)')'  Syntax: '
+     write(*,'(A)')'    makerun <M1>'
+     write(*,'(A)')'    makerun <M1> <Porb>'
+     write(*,'(A)')'    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
+     write(*,'(A,/)')'    makerun <M1> <M2> <Porb> <Prot>'
+     
+     write(*,'(A)')'  Contents of the current init.run:'
+     call print_main_settings(sm,m2,per,p)
+     
      stop
   end if
   
@@ -147,14 +150,8 @@ program makerun
 50 format (6I6,1x,2I7,/,  3(2ES11.3,I5,/),  ES11.3,I3,ES10.2,/,   ES11.3,ES12.4,6ES10.2,I6,/,      3(7ES10.2,/))
   
   
+  call print_main_settings(sm,m2,per,p)
   
-  write(*,'(5(A,ES10.3),A)') '  M1 = ',sm,' Mo,   M2 = ',m2, ' Mo,   q1 = ',sm/m2,',   Porb = ',per,' d,   Prot1 = ',p, ' d.'
-  call p2a((sm+m2)*msun, per*solday, aorb)
-  aorb = aorb/rsun
-  Rrl1 = a2rl(sm,m2, aorb)
-  Rrl2 = a2rl(m2,sm, aorb)
-  write(*,'(3(A,F0.3),A)') '  aorb = ',aorb, ' Ro,   Rrl1 = ',Rrl1,' Ro,   Rrl2 = ',Rrl2,' Ro.'
-  write(*,*)
   write(*,'(A)') '  New init.run was written as '//trim(outfile)
   write(*,'(A,/)') '  Program done'
   stop
@@ -184,3 +181,27 @@ program makerun
 end program makerun
 !***********************************************************************************************************************************
 
+
+!***********************************************************************************************************************************
+subroutine print_main_settings(sm,m2,per,p1)
+  use SUFR_kinds, only: double
+  use SUFR_constants, only: solday, msun,rsun
+  
+  implicit none
+  real(double), intent(in) :: sm,m2,per,p1
+  real(double) :: aorb, a2rl, Rrl1,Rrl2
+  
+  write(*,'(5(A,ES10.3),A)') '  M1 = ',sm,' Mo,   M2 = ',m2, ' Mo,   q1 = ',sm/m2,',   Porb = ',per, &
+       ' d,   Prot1 = ',p1, ' d.'
+  
+  call p2a((sm+m2)*msun, per*solday, aorb)
+  
+  aorb = aorb/rsun
+  Rrl1 = a2rl(sm,m2, aorb)
+  Rrl2 = a2rl(m2,sm, aorb)
+  
+  write(*,'(3(A,F0.3),A)') '  aorb = ',aorb, ' Ro,   Rrl1 = ',Rrl1,' Ro,   Rrl2 = ',Rrl2,' Ro.'
+  write(*,*)
+  
+end subroutine print_main_settings
+!***********************************************************************************************************************************
