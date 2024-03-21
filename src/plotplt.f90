@@ -50,13 +50,13 @@ program plotplt
   real :: xsel(4),ysel(4),xc,yc,xm,ym
   
   integer :: f,nf,nfi,i,i0,j,pl0,vx,vy,plot,npl,pl,plotstyle,version,verbose
-  integer :: hrd,djdt,conv,tscls,dpdt,io
+  integer :: hrd,djdt,conv,tscls,dpdt,io, status
   integer :: wait,lums,nsel,os
   integer :: ansi,xwini,pgopen,defvar(0:nvar)
   integer :: col,lng
   real :: sch, sch0
   
-  character :: fname*(99),fnames(nfmax)*(99),psname*(99)
+  character :: fname*(99),fnames(nfmax)*(99), psname*(99),pdfname*(99)
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
   character :: xwin*(19),boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
@@ -105,13 +105,13 @@ program plotplt
   end if
   
   
-  !Read current path and use it as plot title
-  call system('pwd > '//trim(homedir)//'/tmppwd.txt')
+  ! Read current path and use it as plot title
+  status = system('pwd > '//trim(homedir)//'/tmppwd.txt')
   open(unit=10,form='formatted',status='old',file=trim(homedir)//'/tmppwd.txt')
   rewind 10
   read(10,'(a99)')title
   close(10)
-  call system('rm '//trim(homedir)//'/tmppwd.txt')
+  status = system('rm '//trim(homedir)//'/tmppwd.txt')
   
   
   plot = 0
@@ -753,16 +753,16 @@ program plotplt
         stop
      end if
      
-     call pgpap(10.5,0.68) !Make it fit on letter paper
-     !call pgpap(10.,1.)  !Talk, plot
-     !call pgpap(30.,0.33)  !Talk, plot
+     call pgpap(10.5,0.68)  ! Make it fit on letter paper
+     ! call pgpap(10.,1.)  !Talk, plot
+     ! call pgpap(30.,0.33)  !Talk, plot
      
      call pgslw(5)
      sch = 1.5 * sch0
      
-  else !plot.ne.9
+  else  ! plot.ne.9
      
-     if(plot.eq.7) call pgend  ! Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
+     if(plot.eq.7) call pgend()  ! Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
         io = 0
         do while(io.le.0)
@@ -774,7 +774,7 @@ program plotplt
            end if
         end do
      end if
-     if(os.eq.2) call pgbegin(1,'/aqt',1,1)          !Use Aquaterm on MacOSX
+     if(os.eq.2) call pgbegin(1,'/aqt',1,1)   ! Use Aquaterm on MacOSX
      call pgpap(scrsz,scrrat)
      call pgslw(1)
      sch = 1.0 * sch0
@@ -790,7 +790,7 @@ program plotplt
         call pgscr(3,0.0,0.8,0.0)  ! Dark green
         call pgscr(5,0.0,0.8,0.8)  ! Dark cyan
      end if
-  end if !plot.ne.9
+  end if  ! plot.ne.9
   
   call pgscf(1)
   ! if(os.eq.2.or.plot.eq.9) call pgscf(2)
@@ -992,26 +992,39 @@ program plotplt
   call pgsci(1)
   
   if(plot.eq.9) then
-     call pgend
+     call pgend()
      ex = .true.
      pstitle = 'PlotPlt output: '//trim(asclx)//' vs. '//trim(ascly)//'.'
      if(vx.eq.201) pstitle = 'PlotPlt output: HRD.'
      i = 1
      do while(ex)
-        write(psname,'(A,I3.3,A)')'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
-        if(vx.eq.201) write(psname,'(A,I3.3,A)')'plot_plt__HRD_',i,'.eps'
-        inquire(file=trim(psname), exist=ex)                                                 !Check whether the file already exists
+        write(psname, '(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
+        write(pdfname,'(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.pdf'
+        if(vx.eq.201) then
+           write(psname, '(A,I3.3,A)') 'plot_plt__HRD_',i,'.eps'
+           write(pdfname,'(A,I3.3,A)') 'plot_plt__HRD_',i,'.pdf'
+        end if
+        
+        inquire(file=trim(pdfname), exist=ex)   ! Check whether the file already exists
         if(.not.ex) then
-           call system('mv -f plot_plt_000.eps '//trim(psname))
+           status = system('mv -f plot_plt_000.eps '//trim(psname))
            call set_PGPS_title(trim(psname),trim(pstitle))
+           
+           status = system('eps2pdf '//trim(psname))
+           if(status.ne.0) then
+              write(*,'(A)') ' An error occurred when trying to convert the plot to pdf.  Saving as postscript instead: '// &
+                   trim(psname)
+           else
+              status = system('rm -f '//trim(psname))
+              write(*,'(A)') ' Plot saved to '//trim(pdfname)
+           end if
         end if
         i = i+1
      end do
-     write(6,'(A)')' Plot saved to '//trim(psname)
      plot = 0
-     goto 501 !Redo the plot on the screen, in case you select '4' next
+     goto 501  ! Redo the plot on the screen, in case you select '4' next
   end if
-  !End of the plotting
+  ! End of the plotting
   
   
   
@@ -1045,10 +1058,10 @@ program plotplt
      write(6,'(A)')'  6) reread file and make same plot'
      write(6,'(A)')'  7) auto-update this plot'
      write(6,'(A)')'  8) change input file'
-     write(6,'(A)')'  9) save plot as postscript'
+     write(6,'(A)')'  9) save plot as pdf'
      write(6,'(A)')' 10) identify a point in the graph'
      write(6,'(A)')' 11) toggle drawing line/points'
-  end if !if(plot.ne.9) then
+  end if  ! if(plot.ne.9) then
   
   io = -1
   write(*,*)
@@ -1058,7 +1071,7 @@ program plotplt
   end do
   if(plot.lt.0.or.plot.gt.11) goto 900
   
-  if(plot.ne.4.and.plot.ne.10) call pgend
+  if(plot.ne.4.and.plot.ne.10) call pgend()
   
   if(plot.eq.1) goto 30
   if(plot.eq.2) goto 37
@@ -1070,7 +1083,7 @@ program plotplt
   end if
   if(plot.eq.9) goto 501
   
-  if(plot.eq.4) then  !Select region
+  if(plot.eq.4) then  ! Select region
 941  call pgsci(1)
      xsel = 0.
      ysel = 0.
@@ -1082,20 +1095,20 @@ program plotplt
         write(6,'(A)')' I need at least 2 corner points...'
         goto 941
      end if
-     xmin = minval(xsel(1:nsel))  !The new window is drawn for the extreme values of these points
+     xmin = minval(xsel(1:nsel))  ! The new window is drawn for the extreme values of these points
      xmax = maxval(xsel(1:nsel))
      ymin = minval(ysel(1:nsel))
      ymax = maxval(ysel(1:nsel))
-     call pgend
+     call pgend()
      goto 501
   end if
   
-  if(plot.eq.5) then  !Zoom out
+  if(plot.eq.5) then  ! Zoom out
      xc = (xmin+xmax)/2.
      yc = (ymin+ymax)/2.
      xm = xmin
      ym = ymin
-     xmin = xc - 2*abs(xc-xm) !Central value - 2x the 'radius', 'radius' = central value - minimum
+     xmin = xc - 2*abs(xc-xm)  ! Central value - 2x the 'radius', 'radius' = central value - minimum
      xmax = xc + 2*abs(xc-xm)
      ymin = yc - 2*abs(yc-ym)
      ymax = yc + 2*abs(yc-ym)
