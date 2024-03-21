@@ -429,7 +429,7 @@ program plotmdl
   !***   PLOT TO SCREEN OR FILE
   
 501 continue
-  if(plot.eq.8) then  ! PS file
+  if(plot.eq.9) then  ! PS -> PDF file
      ex = .true.
      i = 0
      do while(ex)
@@ -533,7 +533,7 @@ program plotmdl
      call pgline(2,x2,y2)
   end if
   
-  if(plot.eq.8) then
+  if(plot.eq.9) then
      call pgend()
      status = system('eps2pdf '//trim(psname))
      if(status.ne.0) then
@@ -558,7 +558,7 @@ program plotmdl
   
   !***   FINISH
   
-900 if(plot.ne.8) then
+900 if(plot.ne.9) then
      write(6,*)''
      write(6,'(A)')' You can:'
      write(6,'(A)')'  0) quit'
@@ -569,23 +569,24 @@ program plotmdl
      write(6,'(A)')'  5) zoom out'
      write(6,'(A)')'  6) change structure model'
      write(6,'(A)')'  7) change input file'
-     write(6,'(A)')'  8) save plot as pdf'
+     write(6,'(A)')'  '
+     write(6,'(A)')'  9) save plot as pdf'
      write(6,'(A)')'  '
      write(6,'(A)')' 10) identify a point in the graph'
      write(6,'(A)')' 11) toggle drawing lines/points'
-  end if !if(plot.ne.9) then
+  end if  ! if(plot.ne.9) then
   write(6,*)''
   write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot
-  if(plot.lt.0 .or. plot.eq.9 .or. plot.gt.11) goto 900
+  if(plot.lt.0 .or. plot.eq.8 .or. plot.gt.11) goto 900
   
-  if(plot.ne.4.and.plot.ne.10) call pgend
+  if(plot.ne.4.and.plot.ne.10) call pgend()
   if(plot.eq.1) goto 32
   if(plot.eq.2) goto 37
   if(plot.eq.3) goto 70
   if(plot.eq.6) goto 4
   if(plot.eq.7) goto 3
-  if(plot.eq.8) goto 501
+  if(plot.eq.9) goto 501
   
   if(plot.eq.4) then  !Select region
 941  continue
