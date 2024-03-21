@@ -575,6 +575,7 @@ program plotmdl
      write(6,'(A)')' 10) identify a point in the graph'
      write(6,'(A)')' 11) toggle drawing lines/points'
   end if  ! if(plot.ne.9) then
+  
   write(6,*)''
   write(6,'(A27)',advance='no')' What do you want to do ?  '
   read*,plot

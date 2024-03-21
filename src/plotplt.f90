@@ -56,7 +56,7 @@ program plotplt
   integer :: col,lng
   real :: sch, sch0
   
-  character :: fname*(99),fnames(nfmax)*(99), psname*(99),pdfname*(99)
+  character :: fname*(99),fnames(nfmax)*(99), epsname*(99),pdfname*(99)
   character :: ans,rng,log,hlp1,hlbls*(5),leglbl(29)*(99)
   character :: xwin*(19),boxx*(19),boxy*(19)
   character :: pglabels(nvar)*(99),asclabels(nvar)*(99),pglx*(99),pgly*(99),title*(99),title1*(99)
@@ -749,7 +749,7 @@ program plotplt
   if(plot.eq.9) then
      io = pgopen('plot_plt_000.eps/cps')
      if(io.le.0) then
-        write(0,'(A,/)')'  Error opening postscript file, aborting'
+        write(0,'(A,/)') '  Error opening postscript file, aborting'
         stop
      end if
      
@@ -778,17 +778,17 @@ program plotplt
      call pgpap(scrsz,scrrat)
      call pgslw(1)
      sch = 1.0 * sch0
-     if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
-        call pgscr(1,0.,0.,0.)
+     if(white_bg) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+        call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
+        call pgscr(1, 0.,0.,0.)
         call pgsci(0)
-        call pgsvp(0.,1.,0.,1.)
-        call pgswin(-1.,1.,-1.,1.)
-        call pgrect(-2.,2.,-2.,2.)
+        call pgsvp(0.,1., 0.,1.)
+        call pgswin(-1.,1., -1.,1.)
+        call pgrect(-2.,2., -2.,2.)
         call pgsci(1)
         
-        call pgscr(3,0.0,0.8,0.0)  ! Dark green
-        call pgscr(5,0.0,0.8,0.8)  ! Dark cyan
+        call pgscr(3, 0.0,0.8,0.0)  ! Dark green
+        call pgscr(5, 0.0,0.8,0.8)  ! Dark cyan
      end if
   end if  ! plot.ne.9
   
@@ -998,24 +998,24 @@ program plotplt
      if(vx.eq.201) pstitle = 'PlotPlt output: HRD.'
      i = 1
      do while(ex)
-        write(psname, '(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
-        write(pdfname,'(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.pdf'
+        write(epsname, '(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.eps'
+        write(pdfname, '(A,I3.3,A)') 'plot_plt__'//trim(asclx)//'--'//trim(ascly)//'_',i,'.pdf'
         if(vx.eq.201) then
-           write(psname, '(A,I3.3,A)') 'plot_plt__HRD_',i,'.eps'
-           write(pdfname,'(A,I3.3,A)') 'plot_plt__HRD_',i,'.pdf'
+           write(epsname, '(A,I3.3,A)') 'plot_plt__HRD_',i,'.eps'
+           write(pdfname, '(A,I3.3,A)') 'plot_plt__HRD_',i,'.pdf'
         end if
         
         inquire(file=trim(pdfname), exist=ex)   ! Check whether the file already exists
         if(.not.ex) then
-           status = system('mv -f plot_plt_000.eps '//trim(psname))
-           call set_PGPS_title(trim(psname),trim(pstitle))
+           status = system('mv -f plot_plt_000.eps '//trim(epsname))
+           call set_PGPS_title(trim(epsname),trim(pstitle))
            
-           status = system('eps2pdf '//trim(psname))
+           status = system('eps2pdf '//trim(epsname))
            if(status.ne.0) then
               write(*,'(A)') ' An error occurred when trying to convert the plot to pdf.  Saving as postscript instead: '// &
-                   trim(psname)
+                   trim(epsname)
            else
-              status = system('rm -f '//trim(psname))
+              status = system('rm -f '//trim(epsname))
               write(*,'(A)') ' Plot saved to '//trim(pdfname)
            end if
         end if
