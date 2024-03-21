@@ -658,7 +658,7 @@ program plotplt
         end if
         
         
-        !Enter points manually
+        ! Enter points manually
         if(nf.eq.1 .and. hlp1.eq.'m') then
            pl = 1
            write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(pl,1,n)), &
@@ -671,7 +671,7 @@ program plotplt
               nhp(pl) = nhp(pl)+1
            end do
            
-           !Convert model number to line number
+           ! Convert model number to line number
 131        nhp(pl) = nhp(pl)-1
            write(6,'(I5,A)')nhp(pl),' points selected:'
            write(6,'(A)')'      Nr   Model    Line'
@@ -948,8 +948,8 @@ program plotplt
      call pgsci(1)
      pl = 1
      
-     !Convection plot - replots axes at the end:
-     !call plt_convection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
+     ! Convection plot - replots axes at the end:
+     ! call plt_convection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
      call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)), vx, lgx,lgy, ymin,ymax, nhp(pl),hp(pl,:),hlp,hlbl)
      call pgsci(2)
   end if

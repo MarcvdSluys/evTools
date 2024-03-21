@@ -137,12 +137,13 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   character :: hlbls*(5), boxx*(19),boxy*(19)
   
   
-  plconv = 1  !Plot convection
-  plsmcv = 1  !Plot semiconvection
-  plnuc  = 1  !Plot nuclear burning regions
-  plcb   = 1  !Plot core boundaries
+  plconv = 1  ! Plot convection
+  plsmcv = 1  ! Plot semiconvection
+  plnuc  = 1  ! Plot nuclear burning regions
+  plcb   = 1  ! Plot core boundaries
   
   ! Save original styles and colours:
+  ci0 = -99;  lw0 = -99;  ch0 = -99.
   call pgqci(ci0)
   call pgqlw(lw0)
   call pgqch(ch0)
@@ -157,14 +158,14 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   y(1:n) = dat(4,1:n)
   call pgline(n,xx(1:n),y(1:n))
   
-  ch = 1 ! Plot hatches
+  ch = 1  ! Plot hatches
   if(ch.eq.1) then
      call pgsls(4)
      call pgslw(1)
      call pgsfs(1)
      
      
-     !*** Convection ***
+     ! *** Convection ***
      if(plconv.eq.1) then
         call pgslw(3)
         call pgsci(14)
@@ -212,7 +213,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            end if
            
            do j=1,nz
-              !Zeroes or change in the number of zones can mean trouble:
+              ! Zeroes or change in the number of zones can mean trouble:
               if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
@@ -251,7 +252,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
      
      
      
-     !*** Semiconvection ***  NOTE that dat(69:74) was 'cleaned' after reading the file
+     ! *** Semiconvection ***  NOTE that dat(69:74) was 'cleaned' after reading the file
      if(plsmcv.eq.1) then
         call pgsfs(1)
         call pgsls(1)
@@ -339,7 +340,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
      end if !If plsmcnv.eq.1
      
      
-     !*** Nuclear burning ***
+     ! *** Nuclear burning ***
      if(plnuc.eq.1) then
         call pgsfs(4)
         call pgslw(3)
@@ -412,15 +413,15 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            do j=1,nz
               zoney1(1:4) = zoney(j,1:4)
               call pgpoly(4,zonex,zoney1(1:4))
-              !if(mod(dib,2).eq.0.or.i.eq.2) then !Even dib
-              !call pgline(2,zonex(2:3),zoney(j,(/1,4/))) !Outline the region.  Dangerous?
-              !call pgline(2,zonex(2:3),zoney(j,2:3))
-              !call pgline(2,zonex(2:3),zoney1((/1,4/))) !Outline the region.  Dangerous?
-              !call pgline(2,zonex(2:3),(/zoney1(1),zoney1(4)/)) !Outline the region.  Dangerous?
+              ! if(mod(dib,2).eq.0.or.i.eq.2) then  ! Even dib
+              ! call pgline(2,zonex(2:3),zoney(j,(/1,4/))) !Outline the region.  Dangerous?
+              ! call pgline(2,zonex(2:3),zoney(j,2:3))
+              ! call pgline(2,zonex(2:3),zoney1((/1,4/))) !Outline the region.  Dangerous?
+              ! call pgline(2,zonex(2:3),(/zoney1(1),zoney1(4)/)) !Outline the region.  Dangerous?
               zoney2 = zoney1((/1,4/))
               call pgline(2,zonex(2:3),zoney2(1:2)) !Outline the region.  Dangerous?
               call pgline(2,zonex(2:3),zoney1(2:3))
-              !end if
+              ! end if
            end do
            ibold = ib
         end do   !do i=2,n
@@ -480,9 +481,9 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
   
   
   ! Set original styles and colours:
-  call pgsci(ci0)
-  call pgslw(lw0)
-  call pgsch(ch0)
+  call pgsci(max(ci0,1))
+  call pgslw(max(lw0,1))
+  call pgsch(max(ch0,1.))
   
   ! Replot axes:
   boxx = 'BCNTS'
