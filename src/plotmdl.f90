@@ -35,9 +35,9 @@ program plotmdl
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x,xtmp,ytmp
   real :: xx(10,nn),yy(10,nn),xx1(nn),yy1(nn),xsel(4),ysel(4),x2(2),y2(2)
   
-  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
+  integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col, status
   character findfile*(99),fname*(99),rng,log,xwin*(19)
-  character :: lx*(99),ly*(99), lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)
+  character :: lx*(99),ly*(99), lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99),pdfname*(99), fmt*(99)
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
@@ -431,13 +431,14 @@ program plotmdl
 501 continue
   if(plot.eq.8) then  ! PS file
      ex = .true.
-     i = 1
+     i = 0
      do while(ex)
-        write(psname,'(A,I3.3,A4)') 'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'
-        inquire(file=trim(psname), exist=ex)  ! Check whether the file already exists; ex is True or False
         i = i+1
+        write(pdfname,'(A,I3.3,A4)') 'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.pdf'
+        inquire(file=trim(pdfname), exist=ex)  ! Check whether the file already exists; ex is True or False
      end do
-     call pgbegin(1,trim(psname)//'/cps',1,1)
+     write(psname,'(A,I3.3,A4)') 'plot_mdl_'//trim(fx)//'-'//trim(fy)//'_',i,'.eps'  ! PGPlot can only produce eps
+     call pgbegin(1, trim(psname)//'/cps', 1,1)
      call pgpap(10.5,0.68)                    ! Make it fit on letter paper
      !call pgpap(10.5,0.25)                    ! Tailored ratio
      call pgslw(2)
@@ -534,7 +535,13 @@ program plotmdl
   
   if(plot.eq.8) then
      call pgend()
-     write(6,'(A)') ' Plot saved to '//trim(psname)
+     status = system('eps2pdf '//trim(psname))
+     if(status.ne.0) then
+        write(*,'(A)') ' An error occurred when trying to convert the plot to pdf.  Saving as postscript instead: '//trim(psname)
+     else
+        status = system('rm -f '//trim(psname))
+        write(*,'(A)') ' Plot saved to '//trim(pdfname)
+     end if
   end if
   
   
@@ -562,7 +569,7 @@ program plotmdl
      write(6,'(A)')'  5) zoom out'
      write(6,'(A)')'  6) change structure model'
      write(6,'(A)')'  7) change input file'
-     write(6,'(A)')'  8) save plot as postscript'
+     write(6,'(A)')'  8) save plot as pdf'
      write(6,'(A)')'  '
      write(6,'(A)')' 10) identify a point in the graph'
      write(6,'(A)')' 11) toggle drawing lines/points'
