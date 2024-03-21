@@ -26,11 +26,10 @@ program plotmdl
   use SUFR_numerics, only: seq0
   
   use constants, only: colours,ncolours, scrrat,scrsz, white_bg
-  use mdl_data, only: pxin,pxnr,pxns,pxfns, nq,nn,nm,nmsh,nc, nv_der,nv_sp, labels, abds,nabs, CEs
+  use mdl_data, only: pxin,pxnr,pxns,pxfns, nq,nn,nm,nmsh,ncol, nv_der,nv_sp, labels, abds,nabs, CEs
   
   implicit none
   integer :: nr,mdl,nx,ny,nsel,io,xwini,pgopen
-  !real(double) :: dat1(nq)
   
   real(double) :: dat(nq,nn),age
   real :: xmin,xmax,ymin,ymax,xmin0,xmax0,ymin0,ymax0,x,xtmp,ytmp
@@ -38,7 +37,7 @@ program plotmdl
   
   integer i,ii,j,blk,nblk,vx,vy,hmp,plot,plotstyle,ansi,col
   character findfile*(99),fname*(99),rng,log,xwin*(19)
-  character :: lx*(99),ly*(99), lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)  ! lxs(10)*(99),
+  character :: lx*(99),ly*(99), lys(10)*(99), fx*(99),fy*(99), title*(99),psname*(99), fmt*(99)
   logical :: ex, ab,nab,PCEy,ECEx,JCEx,ECEy,JCEy
   
   
@@ -53,11 +52,8 @@ program plotmdl
   plotstyle = 1  ! 1: lines, 2: dots, 3: both
   xwini = 1  ! Number of X window to try first
   log = 'n'
-  pxnr = 0
-  pxin = 0   ! CHECK: Why do I need this?
-  do i=1,nq  ! 200,nq
-     pxin(i) = i
-  end do
+  pxnr = 0   ! Will be !=0 if the variable with this ID exists
+  pxin = 0   ! Reverse variable IDs
   
   
   ! Define variable labels:
@@ -131,14 +127,14 @@ program plotmdl
   
   
   nr = 4 ! Number of variable columns
-  ii = ceiling(real(nc)/real(nr)) !Number of rows
+  ii = ceiling(real(ncol)/real(nr))  ! Number of rows
   write(6,'(A)')' Variables:                         0: Quit                   ' 
   do i=1,ii
      do j=0,nr-1
-        if(pxnr(i+j*ii).eq.0) then
-           write(6,'(A19)',advance='no')''
+        if(pxnr(i+j*ii).eq.0) then  ! Variable does not exist
+           write(6,'(A19)',advance='no') ''
         else
-           write(6,'(I9,A10,5x)',advance='no')i+j*ii,': '//pxns(pxnr(i+j*ii))
+           write(6,'(I9,A10,5x)',advance='no') i+j*ii,': '//pxns(pxnr(i+j*ii))
         end if
      end do
      write(6,*)
@@ -153,10 +149,10 @@ program plotmdl
   ii = ceiling(real(nv_der)/real(nr)) !Number of rows
   do i=1,ii
      do j=0,nr-1
-        if(pxnr(200+i+j*ii).eq.0) then
-           write(6,'(A19)',advance='no')''
+        if(pxnr(200+i+j*ii).eq.0) then  ! Variable does not exist
+           write(6,'(A19)',advance='no') ''
         else
-           write(6,'(I9,A10,5x)',advance='no')200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
+           write(6,'(I9,A10,5x)',advance='no') 200+i+j*ii,': '//pxns(pxnr(200+i+j*ii))
         end if
      end do
      write(6,*)
@@ -171,10 +167,10 @@ program plotmdl
   ii = ceiling(real(nv_sp)/real(nr)) !Number of rows
   do i=1,ii
      do j=0,nr-1
-        if(pxnr(300+i+j*ii).eq.0) then
-           write(6,'(A39)',advance='no')''
+        if(pxnr(300+i+j*ii).eq.0) then  ! Variable does not exist
+           write(6,'(A39)',advance='no') ''
         else
-           write(6,'(I9,A30,5x)',advance='no')300+i+j*ii,': '//pxns(pxnr(300+i+j*ii))
+           write(6,'(I9,A30,5x)',advance='no') 300+i+j*ii,': '//pxns(pxnr(300+i+j*ii))
         end if
      end do
      write(6,*)
@@ -197,22 +193,22 @@ program plotmdl
   
   vx = nq
   do while (pxnr(vx).le.0)
-     write(6,'(A)',advance='no')' Choose the X-axis variable: '
+     write(6,'(A)',advance='no') ' Choose the X-axis variable: '
      read*,vx
      vx = min(max(vx,0),nq)
      if(vx.eq.0) then
-        write(6,'(A,/)')' Program finished'
+        write(6,'(A,/)') ' Program finished'
         stop
      end if
   end do
   
   vy = nq
   do while (pxnr(vy).le.0)
-     write(6,'(A)',advance='no')' Choose the Y-axis variable: '
+     write(6,'(A)',advance='no') ' Choose the Y-axis variable: '
      read*,vy
      vy = min(max(vy,0),nq)
      if(vy.eq.0) then
-        write(6,'(A,/)')' Program finished'
+        write(6,'(A,/)') ' Program finished'
         stop
      end if
   end do
@@ -221,7 +217,6 @@ program plotmdl
 37 continue 
   lx = labels(pxnr(vx))
   ly = labels(pxnr(vy))
-  !lxs(1) = lx
   lys(1) = ly
   
   fx = pxfns(pxnr(vx))
@@ -243,8 +238,8 @@ program plotmdl
   if(vy.eq.301.or.ab) then
      ab = .true.
      vy = pxin(10)
-     yy(1:7,1:nm) = real(dat(pxin(10):pxin(16),1:nm))
-     lys(1:7) = labels(pxnr(pxin(10):pxin(16)))
+     yy(1:7,1:nm) = real(dat(pxin(10):pxin(16), 1:nm))
+     lys(1:7) =  labels(pxnr(pxin(10):pxin(16)))
      ny = 7
   end if
   
@@ -254,8 +249,8 @@ program plotmdl
      vy = pxin(6)
      yy(1,1:nm) = real(dat(pxin(6),1:nm))    ! Nabla_ad
      yy(2,1:nm) = real(dat(pxin(232),1:nm))  ! Nabla_rad
-     yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
-     ny = 3
+     ! yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
+     ny = 2
   end if
   
   ! CE Porb plot:

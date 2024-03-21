@@ -28,7 +28,7 @@ module mdl_data
   ! Constants:
   integer, parameter :: nn=501, nq=400  ! nn: max number of lines, nq: max number of columns
   
-  integer :: nc, nmsh, nv, nm
+  integer :: ncol, nmsh, nv, nm
   integer :: pxnr(nq), pxin(nq)
   real :: mdlver
   
@@ -49,7 +49,7 @@ end module mdl_data
 subroutine compute_mdl_variables(dat)
   use SUFR_kinds, only: double
   use SUFR_constants, only: rsun,msun,pc_g,pc_amu,pc_mh,c3rd,pc_arad,pc_kb,solday
-  use mdl_data, only: pxin,pxnr,nq,nm,nc
+  use mdl_data, only: pxin,pxnr,nq,nm,ncol
   
   implicit none
   real(double), intent(inout) :: dat(nq,nm)
@@ -60,7 +60,8 @@ subroutine compute_mdl_variables(dat)
   
   
   ! Create inverse pxnr index, pxin:  if pxin(i) = 0, then the variable px(i) is not in the file
-  do i=1,nc
+  !   - do this again for the new variables at the end of this subroutine!
+  do i=1,ncol
      if(pxnr(i).gt.0) pxin(pxnr(i)) = i
   end do
   
@@ -68,35 +69,38 @@ subroutine compute_mdl_variables(dat)
      dat(201,i) = dble(i)     ! Mesh point (1 = centre)
      dat(202,i) = dble(nm-i)  ! Reversed mesh point (1 = surface)
   end do
-  !Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
+  
+  ! Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
   dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
+  
   dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     ! M/M*
   dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   ! R/R*
   dat(205,1:nm) = dat(pxin(12),1:nm)/dat(pxin(14),1:nm)                                 ! C/O
   dat(206,1:nm) = dat(pxin(13),1:nm)/dat(pxin(14),1:nm)                                 ! Ne/O
   dat(207,1:nm) = -pc_g*dat(pxin(9),1:nm)*msun/(dat(pxin(17),1:nm)*rsun) + dat(pxin(27),1:nm)  ! Ugr + Uint  
   dat(208,1:nm) = 1.d0/(dat(pxin(3),1:nm)*dat(pxin(5),1:nm))                            ! Mean free path = 1/(rho * kappa)
+  pxnr(201:208) = [201,202,203,204,205,206,207,208]
   if(pxin(31).ne.0) then
-     dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*pc_amu)                !n = rho / (mu * pc_amu)
+     dat(209,1:nm) = dat(pxin(2),1:nm)/(dat(pxin(31),1:nm)*pc_amu)                      ! n = rho / (mu * pc_amu)
      pxnr(209) = 209
   end if
   dat(210,1:nm) = real(pc_g*dble(dat(pxin(9),1:nm))*msun/(dble(dat(pxin(17),1:nm))**2*rsun**2))  ! n = rho / (mu * pc_amu)
-  pxnr(201:210) = (/201,202,203,204,205,206,207,208,209,210/)
+  pxnr(210) = 210
   
-  !Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
+  ! Mean molecular weight mu = 2/(1 + 3X + 0.5Y), Astrophysical Formulae I, p.214, below Eq. 3.62):
   dat(211,1:nm) = 2.d0 / (1.d0 + 3*dat(9,1:nm) + 0.5d0*dat(10,1:nm))
   dat(212,1:nm) = dat(4,1:nm)/(dat(211,1:nm)*pc_mh)                                     ! Particle density       n = rho/(mu*m_H)
   dat(213,1:nm) = pc_arad*dat(5,1:nm)**4*c3rd                                           ! P_rad = aT^4/3
   dat(214,1:nm) = dat(212,1:nm)*pc_kb*dat(5,1:nm)                                       ! P_gas = nkT
   dat(215,1:nm) = dat(213,1:nm)/(dat(214,1:nm)+1.d-30)                                  ! beta = Prad/Pgas
   
-  !216-217: binding energy:
+  ! 216-217: binding energy:
   dat(216,1:nm) = 0.0d0
   dat(217,1:nm) = 0.0d0
   dat(218,1:nm) = 0.0d0
   do i=2,nm
      dat(216,i) = dat(pxin(9),i) - dat(pxin(9),i-1)                                     ! Mass of the current shell (Mo)
-     !dE = dat(207,i)*dat(216,i) * msun*1.d-40                                          ! BE of the shell (10^40 erg)
+     ! dE = dat(207,i)*dat(216,i) * msun*1.d-40                                          ! BE of the shell (10^40 erg)
      dE = dat(207,i)*dat(216,i) * msun / (PC_G*msun**2/rsun)                            ! BE of the shell       (G Mo^2 / Ro)
      dat(217,i) = dat(217,i-1) + dE                                                     ! BE of the whole star  (same units)
      if(dat(pxin(10),i).gt.0.1d0) dat(218,i) = dat(218,i-1) + dE                        ! BE of envelope        (same units)
@@ -144,7 +148,7 @@ subroutine compute_mdl_variables(dat)
      dat(222,i) = Eorb
      dat(223,i) = Jorb
   end do
-  pxnr(211:220) = (/211,212,213,214,215,216,217,218,219,220/)
+  pxnr(211:220) = [211,212,213,214,215,216,217,218,219,220]
   
   
   ! alpha-CE:
@@ -198,18 +202,25 @@ subroutine compute_mdl_variables(dat)
      end do
   end do
   
-  pxnr(221:230) = (/221,222,223,224,225,226,227,228,229,230/)
+  pxnr(221:230) = [221,222,223,224,225,226,227,228,229,230]
   
   dat(232,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 ! Nabla_rad
   
-  pxnr(231:232) = (/231,232/)
+  pxnr(231:232) = [231,232]
   
   
   if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
      dat(pxin(60),1:nm) = abs(dat(pxin(60),1:nm))
   end if
   
-  pxnr(301:305) = (/301,302,303,304,305/)  ! Abundances, Nablas, CEs
+  pxnr(301:305) = [301,302,303,304,305]  ! Abundances, Nablas, CEs
+  
+  
+  ! Create inverse pxnr index, pxin for the new variables:  if pxin(i) = 0, then the variable px(i) is not in the file
+  !   - this was done for the original variables at the top of this subroutine!
+  do i=200,nq
+     if(pxnr(i).gt.0) pxin(pxnr(i)) = i
+  end do
   
 end subroutine compute_mdl_variables
 !***********************************************************************************************************************************
@@ -226,7 +237,7 @@ subroutine list_mdl_models(infile,nblk)
   use SUFR_constants, only: pc_g
   use SUFR_numerics, only: seq0
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
-  use mdl_data, only: pxnr,nc, nmsh,nv,mdlver
+  use mdl_data, only: pxnr,ncol, nmsh,nv,mdlver
   
   implicit none
   character, intent(in) :: infile*(*)
@@ -246,18 +257,18 @@ subroutine list_mdl_models(infile,nblk)
   write(6,'(A)')'  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
-  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
      write(0,'(A,/)')'1  Error reading first line (header) of the file, aborting...'
      close(10)
      stop
   end if
   
-  if(mdlver.gt.1.) then
+  if(mdlver.gt.1.) then  ! Overshooting parameter < 1
      read(10,*) dumstr
   else
-     nc = 21
-     pxnr(1:nc)=(/9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27/)!,50,51,52,53,54,55,31,7,24,25,26,60
+     ncol = 21
+     pxnr(1:ncol) = [9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27]  ! ,50,51,52,53,54,55,31,7,24,25,26,60
   end if
   
   if(nmsh.eq.0) then ! Then post-2005 version output
@@ -268,7 +279,7 @@ subroutine list_mdl_models(infile,nblk)
   write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
   
-  mp = 1  !Silence compiler warnings
+  mp = 1  ! Silence compiler warnings
   bl = 1
   block: do 
      if(mod(bl,25).eq.0) then
@@ -446,7 +457,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      
      ! Open output file and write header and mesh point 1
      open(unit=20,form='formatted',status='replace',file=trim(outfile))
-     write(20,'(2x,I4,4x,I2,F7.3)') nmsh,nv,mdlver
+     write(20,'(2x,I4,4x,I2,F7.3)') nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
      write(20,'(I6,1x,ES16.9)') nmdl,age
      write(20,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
@@ -553,46 +564,46 @@ end subroutine print_mdl_details
 
 !***********************************************************************************************************************************
 !> \brief  Open a .mdl[12] file and read the first blk models without storing the data
-!!
+!! 
 !! \param infile   Name of the input file
 !! \param blk      Number of the stellar-structure blocks to read (and ignore)
 
 subroutine read_first_mdls(infile,blk)
   use SUFR_dummy, only: dumint, dumreal, dumstr
-  use mdl_data, only: pxnr, nmsh,nv,mdlver, nc
+  use mdl_data, only: pxnr, nmsh,nv,mdlver, ncol
   
   implicit none
   character, intent(in) :: infile*(*)
   integer, intent(in) :: blk
   
-  integer :: io,bl,mp !,ii,nmdl
-  !real :: age !,x
-  !character :: tmpstr*(3)
+  integer :: io,bl,mp  ! ,ii,nmdl
+  ! real :: age  ! ,x
+  ! character :: tmpstr*(3)
   
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
   rewind(10)
-  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
      write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
      close(10)
      stop
   end if
   
-  if(mdlver.gt.1.) then
-     read(10,'(60I4)')pxnr(1:nc)
+  if(mdlver.gt.1.) then  ! Overshooting parameter < 1
+     read(10,'(60I4)') pxnr(1:ncol)  ! Read the IDs of the variables present in the file
   else
-     nc = 21
+     ncol = 21
   end if
   
-  if(nmsh.eq.0) then ! Then post-2005 version output
+  if(nmsh.eq.0) then  ! Then post-2005 version output
      rewind(10)
   end if
   
   ! Read file, upto chosen model:
   if(blk.gt.0) then
      do bl=1,blk
-        read(10,'(I6,1x,ES16.9)',iostat=io) dumint, dumreal  !nmdl,age
+        read(10,'(I6,1x,ES16.9)',iostat=io) dumint, dumreal  ! nmdl,age
         if(io.ne.0) then
            write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
            close(10)
@@ -601,7 +612,7 @@ subroutine read_first_mdls(infile,blk)
         
         if(nmsh.eq.0) nmsh = 199
         do mp=1,nmsh
-           !read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
+           ! read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
            read(10,*,iostat=io) dumstr
            
            if(io.ne.0) then  !Error/EOF
@@ -633,7 +644,7 @@ end subroutine read_first_mdls
 
 subroutine read_chosen_mdl(blk, mdl,age,dat)
   use SUFR_kinds, only: double
-  use mdl_data, only: nq,nn, nmsh,nc,nm
+  use mdl_data, only: nq,nn, nmsh,ncol,nm
   
   implicit none
   integer, intent(in) :: blk
@@ -653,8 +664,8 @@ subroutine read_chosen_mdl(blk, mdl,age,dat)
   if(nmsh.eq.0) nmsh = 199
   do mp=1,nm
      
-     read(10,*,iostat=io) (dat1(i),i=1,nc)  ! gfortran reports a read error when the number is smaller or larger than the accuracy
-     dat(1:nc,mp) = dat1(1:nc)
+     read(10,*,iostat=io) (dat1(i),i=1,ncol)  ! gfortran reports a read error when the number is smaller or larger than the accuracy
+     dat(1:ncol,mp) = dat1(1:ncol)
      
      if(io.ne.0) then  !Error/EOF
         close(10)
@@ -662,7 +673,7 @@ subroutine read_chosen_mdl(blk, mdl,age,dat)
            write(6,'(A,/)')'  Program finished'  !EOF
         else
            write(0,'(A,2(I5,A),/)')'  Error reading model',blk-1,'line',mp-1,', aborting...'  ! Read error
-           print*,real(dat1(1:nc))
+           print*,real(dat1(1:ncol))
         end if
         stop
      end if
