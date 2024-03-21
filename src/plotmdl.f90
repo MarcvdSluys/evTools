@@ -50,12 +50,12 @@ program plotmdl
   call evTools_settings()
   
   plot = 0
-  plotstyle = 1
-  xwini = 1  !Number of X window to try first
+  plotstyle = 1  ! 1: lines, 2: dots, 3: both
+  xwini = 1  ! Number of X window to try first
   log = 'n'
   pxnr = 0
-  pxin = 0
-  do i=200,nq
+  pxin = 0   ! CHECK: Why do I need this?
+  do i=1,nq  ! 200,nq
      pxin(i) = i
   end do
   
@@ -491,10 +491,11 @@ program plotmdl
   do i=1,ny
      col = colours(mod(i-1,ncolours)+1)
      call pgsci(col)
-     xx1(1:nm) = xx(i,1:nm)  !CHECK: only for nx=1 or nx=ny
+     xx1(1:nm) = xx(i,1:nm)  ! CHECK: only for nx=1 or nx=ny
      yy1(1:nm) = yy(i,1:nm)
      
-     select case(plotstyle)
+     if(nab .and. i.eq.ny) call pgsls(2)  ! Dashed line
+     select case(plotstyle)  ! 1: lines, 2: dots, 3: both
      case(1)
         call pgline(nm,xx1(1:nm),yy1(1:nm))
      case(2)
@@ -505,6 +506,7 @@ program plotmdl
         call pgpoint(nm,xx1(1:nm),yy1(1:nm),20)
         call pgsci(col)
      end select
+     if(nab .and. i.eq.ny) call pgsls(1)  ! Back to solid lines
      
      if(ab)  call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(abds(i)))
      if(nab) call pgmtext('RV',0.5,real(ny+1-i)/20.,0.,trim(nabs(i)))
@@ -515,7 +517,7 @@ program plotmdl
   ! Plot and print values for highlighted mesh points:
   call pgsch(1.5)
   call pgsci(8)
-  if(hmp.ne.0) then
+  if(hmp.gt.0) then
      write(fmt,'(A,I3.3,A)')'(4x,A',maxval(len_trim(lys(1:ny))),',A,F15.5,ES15.4)'
      do i=1,ny
         call pgpoint(1,xx(1,hmp),yy(i,hmp),2)
@@ -637,7 +639,7 @@ program plotmdl
         write(6,'(A)', advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
-     if(ansi.gt.0) plotstyle = ansi !1-3
+     if(ansi.gt.0) plotstyle = ansi  ! 1: lines, 2: dots, 3: both
      goto 501
   end if
   
