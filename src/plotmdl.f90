@@ -44,7 +44,7 @@ program plotmdl
   ! Set constants:
   call setconstants()
   write(6,*)
-  call print_code_version(6)  !To screen
+  call print_code_version(6)  ! To screen
   
   call evTools_settings()
   
@@ -124,7 +124,6 @@ program plotmdl
   !***   CHOOSE PLOT VARIABLES
 32 continue   
   write(6,*)''
-  
   
   nr = 4 ! Number of variable columns
   ii = ceiling(real(ncol)/real(nr))  ! Number of rows
@@ -249,8 +248,8 @@ program plotmdl
      vy = pxin(6)
      yy(1,1:nm) = real(dat(pxin(6),1:nm))    ! Nabla_ad
      yy(2,1:nm) = real(dat(pxin(232),1:nm))  ! Nabla_rad
-     ! yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
-     ny = 2
+     yy(3,1:nm) = real(dat(pxin(7),1:nm))    ! True Nabla
+     ny = 3
   end if
   
   ! CE Porb plot:

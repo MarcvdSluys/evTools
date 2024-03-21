@@ -28,7 +28,7 @@ module mdl_data
   ! Constants:
   integer, parameter :: nn=501, nq=400  ! nn: max number of lines, nq: max number of columns
   
-  integer :: ncol, nmsh, nv, nm
+  integer :: ncol, nmsh, nm
   integer :: pxnr(nq), pxin(nq)
   real :: mdlver
   
@@ -69,9 +69,6 @@ subroutine compute_mdl_variables(dat)
      dat(201,i) = dble(i)     ! Mesh point (1 = centre)
      dat(202,i) = dble(nm-i)  ! Reversed mesh point (1 = surface)
   end do
-  
-  ! Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection, calculate after Nabla_rad:
-  dat(8,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
   
   dat(203,1:nm) = dat(pxin(9),1:nm)/dat(pxin(9),nm)                                     ! M/M*
   dat(204,1:nm) = dat(pxin(17),1:nm)/dat(pxin(17),nm)                                   ! R/R*
@@ -206,7 +203,11 @@ subroutine compute_mdl_variables(dat)
   
   dat(232,1:nm) = dat(pxin(6),1:nm) + dat(pxin(8),1:nm)                                 ! Nabla_rad
   
-  pxnr(231:232) = [231,232]
+  ! Difference between Nabla_rad and Nabla_ad, +1 or -1, +1: convection:
+  dat(233,1:nm)   = dat(pxin(8),1:nm)/abs(dat(pxin(8),1:nm))
+  
+  
+  pxnr(231:233) = [231,232,233]
   
   
   if(pxin(60).ne.0) then                                                                ! Brint-Vailasakatralala frequency
@@ -237,7 +238,7 @@ subroutine list_mdl_models(infile,nblk)
   use SUFR_constants, only: pc_g
   use SUFR_numerics, only: seq0
   use SUFR_dummy, only: dmrl=>dumreal, dumstr
-  use mdl_data, only: pxnr,ncol, nmsh,nv,mdlver
+  use mdl_data, only: pxnr,ncol, nmsh,mdlver
   
   implicit none
   character, intent(in) :: infile*(*)
@@ -257,7 +258,7 @@ subroutine list_mdl_models(infile,nblk)
   write(6,'(A)')'  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
-  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
      write(0,'(A,/)')'1  Error reading first line (header) of the file, aborting...'
      close(10)
@@ -267,8 +268,20 @@ subroutine list_mdl_models(infile,nblk)
   if(mdlver.gt.1.) then  ! Overshooting parameter < 1
      read(10,*) dumstr
   else
-     ncol = 21
-     pxnr(1:ncol) = [9,17,2,3,4,5,6,8,10,11,12,13,14,15,16,18,19,20,21,28,27]  ! ,50,51,52,53,54,55,31,7,24,25,26,60
+     if(ncol.eq.21) then
+        pxnr(1:ncol) = &
+             [9,17,2,3,4, 5,6,8,10,11,  12,13,14,15,16, 18,19,20,21,28,  &
+             27]
+     else if(ncol.eq.33) then
+        pxnr(1:ncol) = &
+             [9,17, 2, 3, 4,  5, 6, 8,10,11,  12,13,14,15,16, 18,19,20,21,28,  &
+             27,50,51,52,53, 54,55,31, 7,24,  25,26,60]
+     else if(ncol.eq.42) then
+        pxnr(1:ncol) = &
+             [9,17, 2, 3, 4,  5, 6 ,8,10,11,  12,13,14,15,16, 18,19,20,21,28, &
+             27,50,51,52,53, 54,55,56,31,23,  30, 7,59,69,70, 71,72,73,74,75, &
+             76,77]
+     end if
   end if
   
   if(nmsh.eq.0) then ! Then post-2005 version output
@@ -276,24 +289,24 @@ subroutine list_mdl_models(infile,nblk)
   end if
   
   write(6,*)''
-  write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
+  write(6,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
   
   mp = 1  ! Silence compiler warnings
   bl = 1
   block: do 
      if(mod(bl,25).eq.0) then
-        write(6,*)''
-        write(6,'(A)')'  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
+        write(6,*) ''
+        write(6,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
              '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
      end if
      read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
      if(io.lt.0) then
-        write(0,'(A,I5,A)')'  Model',bl,' seems incomplete, skipping...'
+        write(0,'(A,I5,A)') '  Model',bl,' seems incomplete, skipping...'
         exit block !EOF
      end if
      if(io.gt.0) then  !Error
-        write(0,'(A,I5,A,/)')'2  Error reading first line (header) of model block',bl,', aborting...'
+        write(0,'(A,I5,A,/)') '2  Error reading first line (header) of model block',bl,', aborting...'
         close(10)
         stop
      end if
@@ -309,15 +322,15 @@ subroutine list_mdl_models(infile,nblk)
      if(nmsh.eq.0) nmsh = 199
      mesh: do mp=1,nmsh
         read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
-             !mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+             ! mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
              mm,rr,dmrl,rrh,tt,dmrl,dmrl,dmrl,hh,hhe,ccc,dmrl,oo,dmrl,dmrl,ll,dmrl,dmrl,dmrl,dmrl,dmrl
-        !print*,bl,mp,io
+        ! print*,bl,mp,io
         if(io.lt.0) then
-           write(0,'(A,I5,A)')'  Model',bl,' seems incomplete, skipping...'
-           exit block !EOF
+           write(0,'(A,I5,A)') '  Model',bl,' seems incomplete, skipping...'
+           exit block  ! EOF
         end if
-        if(io.gt.0) then  !Error
-           write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'
+        if(io.gt.0) then  ! Error
+           write(0,'(A,2(I5,A),/)') '  Error reading model',bl-1,'line',mp-1,', aborting...'
            close(10)
            stop
         end if
@@ -328,7 +341,7 @@ subroutine list_mdl_models(infile,nblk)
            hec = hhe
            cc = ccc
            oc = oo
-           !zc  = 1. - hh - hhe
+           ! zc  = 1. - hh - hhe
            rhoc = rrh
         end if
         if(mp.eq.nmsh) then
@@ -397,7 +410,7 @@ end subroutine list_mdl_models
 
 subroutine print_mdl_details(infile,blk,svblk)
   use SUFR_numerics, only: seq0
-  use mdl_data, only: nmsh,nv,mdlver
+  use mdl_data, only: nmsh,ncol,mdlver
   
   implicit none
   character, intent(in) :: infile*(99)
@@ -457,7 +470,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      
      ! Open output file and write header and mesh point 1
      open(unit=20,form='formatted',status='replace',file=trim(outfile))
-     write(20,'(2x,I4,4x,I2,F7.3)') nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
+     write(20,'(2x,I4,4x,I2,F7.3)') nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
      write(20,'(I6,1x,ES16.9)') nmdl,age
      write(20,'(ES13.6,4ES11.4,16ES11.3)') &
           mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
@@ -570,7 +583,7 @@ end subroutine print_mdl_details
 
 subroutine read_first_mdls(infile,blk)
   use SUFR_dummy, only: dumint, dumreal, dumstr
-  use mdl_data, only: pxnr, nmsh,nv,mdlver, ncol
+  use mdl_data, only: pxnr, nmsh,mdlver, ncol
   
   implicit none
   character, intent(in) :: infile*(*)
@@ -583,7 +596,7 @@ subroutine read_first_mdls(infile,blk)
   
   open(unit=10,form='formatted',status='old',file=trim(infile))
   rewind(10)
-  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,nv,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
+  read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
      write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
      close(10)
@@ -592,8 +605,8 @@ subroutine read_first_mdls(infile,blk)
   
   if(mdlver.gt.1.) then  ! Overshooting parameter < 1
      read(10,'(60I4)') pxnr(1:ncol)  ! Read the IDs of the variables present in the file
-  else
-     ncol = 21
+  ! else
+  !    ncol = 21
   end if
   
   if(nmsh.eq.0) then  ! Then post-2005 version output
@@ -615,18 +628,18 @@ subroutine read_first_mdls(infile,blk)
            ! read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) (x, ii=1,21) 
            read(10,*,iostat=io) dumstr
            
-           if(io.ne.0) then  !Error/EOF
+           if(io.ne.0) then  ! Error/EOF
               close(10)
               if(io.lt.0) then
-                 write(6,'(A,/)')'  Program finished'  !EOF
+                 write(6,'(A,/)')'  Program finished'  ! EOF
               else
                  write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
               end if
               stop
            end if
            
-        end do !mp
-     end do !bl
+        end do  ! mp
+     end do  ! bl
   end if
   
 end subroutine read_first_mdls
@@ -697,46 +710,56 @@ subroutine set_mdl_labels
   nabs = [character(len=99) :: 'ad ','rad','true']                    ! Line labels in nablas plot
   CEs  = [character(len=99) :: 'r=R\drl\u','\ga-CE','\gg-CE']         ! Line labels in CEs plot
   
-  ! Names of the variables in px:
+  ! Names of the variables in px for screen use:
   pxns(0) = ''
   pxns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
   pxns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
-  pxns(21:30) = [character(len=99) :: 'Enu','dM','...','Thom','Uhom','Vhom','Uint','S','L/Ledd','wxl']
-  pxns(31:40) = [character(len=99) :: 'mu','wt?','Nel','NeO','w?','MI','phi','Fm','DGOS','...']
-  pxns(41:50) = [character(len=99) :: '...','LDRK','Enth','V^2','FAC','','','','','Rpp']
-  pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','','','','','N^2']
+  pxns(21:30) = [character(len=99) :: 'Enu','dM','Diff.coef','Thom','Uhom','Vhom','Uint','S','L/Ledd','wxl']
+  pxns(31:40) = [character(len=99) :: 'mu','wt?','Nel','NeO','w?','MI','phi','Fm','DGOS','DLRK']
+  pxns(41:50) = [character(len=99) :: 'dEnth','LDRK','Enth','V^2','FAC','-','-','-','-','Rpp']
+  pxns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','CpdS/dlogP','dL/dk','LQ','w_rot','N^2']
+  pxns(61:70) = [character(len=99) :: 'Ddsi','Dssi','v_ES','v_mu','diff_conv','var66','var67','var68','var69','var70']  ! CHECK
+  pxns(71:77) = [character(len=99) :: 'var71','var72','var73','var74','var75','var76','var77']  ! CHECK
+  ! 71-77 are also defined?
   
   pxns(201:210) = [character(len=99) :: 'Mesh pt','Rev mesh pt','m/M*','r/R*','C/O','Ne/O','Ugr-Uint','M.f.p.','n.dens','g']
   pxns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','Pr/Pg','dM','Ub,*','Ub,env','P/rho','a_rlof']
   pxns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
-  pxns(231:232) = [character(len=99) :: 'Jgce','Nrad']
+  pxns(231:233) = [character(len=99) :: 'Jgce','Nrad','Conv']
+  
   pxns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','CEEs','CEJs']
+  
   
   ! Names of the variables in px, to be used in output file name (no /.?*):
   pxfns(0) = ''
   pxfns(1:10)  = [character(len=99) :: 'Psi','P','Rho','T','k','Nad','Ntrue','Nrad-Nad','M','H']
   pxfns(11:20) = [character(len=99) :: 'He','C','N','O','Ne','Mg','R','L','Eth','Enuc']
-  pxfns(21:30) = [character(len=99) :: 'Enu','dM','-','Thom','Uhom','Vhom','Uint','S','LLedd','wxl']
-  pxfns(31:40) = [character(len=99) :: 'mu','wt','Nel','NeO','w','MI','phi','Fm','DGOS','-']
-  pxfns(41:50) = [character(len=99) :: '-','LDRK','Enth','V2','FAC','-','-','-','-','Rpp']
-  pxfns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','-','-','-','-','N2']
+  pxfns(21:30) = [character(len=99) :: 'Enu','dM','DiffCoef','Thom','Uhom','Vhom','Uint','S','LLedd','wxl']
+  pxfns(31:40) = [character(len=99) :: 'mu','wt','Nel','NeO','w','MI','phi','Fm','DGOS','DLRK']
+  pxfns(41:50) = [character(len=99) :: 'dEnth','LDRK','Enth','V2','FAC','-','-','-','-','Rpp']
+  pxfns(51:60) = [character(len=99) :: 'Rpc','Rpng','Rpn','Rpo','Ran','CpdS-dlogP','dL-dk','LQ','w_rot','N2']
+  pxfns(61:70) = [character(len=99) :: 'Ddsi','Dssi','v_ES','v_mu','diff_conv',  'var66','var67','var68','var69','var70']  ! CHECK
+  pxfns(71:77) = [character(len=99) :: 'var71','var72','var73','var74','var75','var76','var77']  ! CHECK
+  ! 71-77 are also defined?
   
   pxfns(201:210) = [character(len=99) :: 'Mesh pt','Rev mesh pt','mM','rR','CO','NeO','Ugr-Uint','Mfp','Ndens','g']
   pxfns(211:220) = [character(len=99) :: 'mu','n','Prad','Pgas','PrPg','dM','Ubst','Ubenv','Prho','arlof']
   pxfns(221:230) = [character(len=99) :: 'Prlof','Erlof','Jrlof','a_ace','Pace','Eace','Jace','a_gce','Pgce','Egce']
-  pxfns(231:232) = [character(len=99) :: 'Jgce','Nrad']
+  pxfns(231:233) = [character(len=99) :: 'Jgce','Nrad','Conv']
+  
   pxfns(301:305) = [character(len=99) :: 'Abundances','Nablas','CEPs','EEPs','JEPs']
   
-  !Axis labels, px numbers
+  
+  ! PGPlot axis labels, px numbers
   labels = ''
-  labels(1)  = '\gq' !Psi
+  labels(1)  = '\gq'  ! Psi
   labels(2)  = 'P (dyn cm\u-2\d)'
   labels(3)  = '\gr (g cm\u-3\d)'
   labels(4)  = 'T (K)'
   labels(5)  = '\gk (cm\u2\d g\u-1\d)'
   labels(6)  = '\(2266)\dad\u'
   labels(7)  = '\(2266)\dtrue\u'
-  labels(8)  = '\(2266)\drad\u - \(2266)\dad\u:  1 = convection'
+  labels(8)  = '\(2266)\drad\u - \(2266)\dad\u'
   labels(9)  = 'm (M\d\(2281)\u)'
   labels(10) = 'H abundance'
   labels(11) = 'He abundance'
@@ -751,6 +774,7 @@ subroutine set_mdl_labels
   labels(20) = '\ge\dnucl\u'
   labels(21) = '\ge\d\gn\u'
   labels(22) = 'dM (M\d\(2281)\u)'
+  labels(23) = 'Diffusion coefficient (?)'  ! CHECK
   labels(24) = 'T\dhom\u'
   labels(25) = 'U\dhom\u'
   labels(26) = 'V\dhom\u'
@@ -764,23 +788,47 @@ subroutine set_mdl_labels
   labels(34) = 'NelO'
   labels(35) = 'v\dconv\u?'
   labels(36) = 'M.I.'
-  labels(37) = '\gf' !Phi
+  labels(37) = '\gf'  ! Phi
   labels(38) = 'F\dm\u'
   labels(39) = 'DGOS'
-  labels(40) = 'DLRK'   !Variables from here on were different or non-existent in the 2003 version of the code
+  labels(40) = 'DLRK'   ! Variables from here on were different or non-existent in the 2003 version of the code
   labels(41) = '\gD(enth)'
   labels(42) = 'XIK'
   labels(43) = 'V\u2\d'
   labels(44) = 'FAC2'
   labels(45) = 'FAC1'
+  
   labels(50) = 'R\dpp\u'
   labels(51) = 'R\dpC\u'
   labels(52) = 'R\dpNG\u'
   labels(53) = 'R\dpN\u'
   labels(54) = 'R\dpO\u'
   labels(55) = 'R\dAN\u'
-  labels(60) = 'N\u2\d'
   
+  labels(56) = 'C\dp\u dS/dlogp (?)'  ! CHECK
+  labels(57) = 'dL/dk (?)'            ! CHECK
+  labels(58) = 'LQ (?)'               ! CHECK
+  labels(59) = '\gw\drot\u (Hz?)'     ! CHECK
+  
+  labels(60) = 'N\u2\d?'                      ! CHECK
+  labels(61) = 'D\ddsi\u (?)'                 ! CHECK
+  labels(62) = 'D\dssi\u (?)'                 ! CHECK
+  labels(63) = 'v\dES\u (?)'                  ! CHECK
+  labels(64) = 'v\d\gm\u (?)'                 ! CHECK
+  labels(65) = "(4\gpr\u2\d\gr)\u2\d/m' (?)"  ! CHECK
+  labels(66) = 'Variable 66 (?)'              ! CHECK
+  labels(67) = 'Variable 67 (?)'              ! CHECK
+  labels(68) = 'Variable 68 (?)'              ! CHECK
+  labels(69) = 'Variable 69 (?)'              ! CHECK
+  labels(70) = 'Variable 70 (?)'              ! CHECK
+  labels(71) = 'Variable 71 (?)'              ! CHECK
+  labels(72) = 'Variable 72 (?)'              ! CHECK
+  labels(73) = 'Variable 73 (?)'              ! CHECK
+  labels(74) = 'Variable 74 (?)'              ! CHECK
+  labels(75) = 'Variable 75 (?)'              ! CHECK
+  labels(76) = 'Variable 76 (?)'              ! CHECK
+  labels(77) = 'Variable 77 (?)'              ! CHECK
+  ! 61-77 are also defined?
   
   labels(201) = '\u\(2263) centre\d    Mesh point    \usurface \(2261)'
   labels(202) = '\u\(2263) surface\d    Mesh point    \ucentre \(2261)'
@@ -798,8 +846,8 @@ subroutine set_mdl_labels
   labels(214) = 'P\dgas\u (dyn cm\u-2\d)'
   labels(215) = '\(2128) = P\drad\u/P\dgas\u'  ! \beta - Prad/Pgas
   labels(216) = 'dM (M\d\(2281)\u)'            ! Mass of each shell
-  !labels(217) = 'E\db,*\u (10\u40\d erg)'      ! Binding energy of the star
-  !labels(218) = 'E\db,env\u (10\u40\d erg)'    ! Binding energy of the envelope
+  ! labels(217) = 'E\db,*\u (10\u40\d erg)'      ! Binding energy of the star
+  ! labels(218) = 'E\db,env\u (10\u40\d erg)'    ! Binding energy of the envelope
   labels(217) = 'E\db,*\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'      ! Binding energy of the star
   labels(218) = 'E\db,env\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'    ! Binding energy of the envelope
   labels(219) = 'P/\(2143) (cgs)'              ! P/rho
@@ -818,9 +866,11 @@ subroutine set_mdl_labels
   labels(229) = 'P\dpost-\gg-CE\u (day)'                                                   ! Porb after \gamma CE
   labels(230) = 'E\dpost-\gg-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'                       ! Eorb after \gamma CE
   labels(231) = 'J\dpost-\gg-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'        ! Jorb after \gamma CE
-  labels(232) = '\(2266)\drad\u'
   
-  nv_der = 232 - 200  ! Number of derived variables
+  labels(232) = '\(2266)\drad\u'                                                           ! Radiative temperature gradient
+  labels(233) = '\(2263)  -1 = radiative     \(0276)     convective = +1  \(2261)'         ! Radiative (-1) or convective (+1)
+  
+  nv_der = 233 - 200  ! Number of derived variables
   
   
   
@@ -831,7 +881,7 @@ subroutine set_mdl_labels
   labels(304) = 'E\dorb,post-CE\u (GM\d\(2281)\u\u2\d/R\d\(2281)\u)'
   labels(305) = 'J\dorb,post-CE\u (G\u1/2\dM\d\(2281)\u\u3/2\dR\d\(2281)\u\u1/2\d)'
   
-  nv_sp = 305 - 300  !Number of special plots
+  nv_sp = 305 - 300  ! Number of special plots
   
 end subroutine set_mdl_labels
 !***********************************************************************************************************************************
