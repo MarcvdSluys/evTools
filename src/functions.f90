@@ -53,7 +53,7 @@ module constants
   private :: double
   
   integer :: screen_dpi,screen_size_h,screen_size_v, colours(29),ncolours
-  real :: scrsz,scrrat
+  real :: paper_size,paper_ratio, scrsz,scrrat
   character :: libdir*(99)
   logical :: student_mode, white_bg
   
@@ -68,7 +68,7 @@ subroutine setconstants()
   use SUFR_constants, only: set_SUFR_constants
   
   use SUFR_constants, only: homedir
-  use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg, colours,ncolours, libdir
+  use constants, only: screen_dpi,screen_size_h,screen_size_v,white_bg, paper_size,paper_ratio, colours,ncolours, libdir
   
   implicit none
   
@@ -77,6 +77,9 @@ subroutine setconstants()
   ! Default:
   screen_size_h = 1000   ! Horizontal screen size (pixels)
   screen_size_v = 700    ! Vertical screen size (pixels)
+  
+  paper_size  = 10       ! Paper size (inches?)
+  paper_ratio = 0.7      ! Paper ratio
   
   screen_dpi = 96        ! Screen resolution:  96 is common on PCs, 72 on Macs (still?)
   white_bg = .true.      ! F: black background on screen, T: white
@@ -1008,7 +1011,7 @@ end subroutine set_PGPS_title
 
 subroutine evTools_settings()
   use SUFR_constants, only: homedir
-  use constants, only: libdir,screen_dpi,screen_size_h,screen_size_v,scrrat,scrsz,white_bg
+  use constants, only: libdir,screen_dpi,screen_size_h,screen_size_v, paper_size,paper_ratio, scrsz,scrrat, white_bg
   
   implicit none
   integer :: io,u
@@ -1016,7 +1019,7 @@ subroutine evTools_settings()
   character :: filename*(99)
   
   ! Define namelist, file name:
-  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg
+  namelist /screen_settings/ screen_size_h,screen_size_v,screen_dpi,white_bg, paper_size,paper_ratio
   namelist /local_settings/ libdir
   filename = trim(homedir)//'/.evTools'
   inquire(file=trim(filename), exist=ex)

@@ -32,7 +32,7 @@ program plotplt
   use SUFR_numerics, only: seq0,sne0
   use SUFR_dummy, only: dumstr
   
-  use constants, only: libdir, colours,ncolours, scrrat,scrsz, white_bg
+  use constants, only: libdir, colours,ncolours, scrrat,scrsz, paper_size,paper_ratio, white_bg
   use ubvdata, only: ubv
   
   implicit none
@@ -406,8 +406,8 @@ program plotplt
   if(log.eq.'y'.or.log.eq.'b') lgy = .true.
   
   
-  pglx = pglabels(vx)
-  pgly = pglabels(vy)
+  pglx  = pglabels(vx)
+  pgly  = pglabels(vy)
   asclx = asclabels(vx)
   ascly = asclabels(vy)
   
@@ -753,9 +753,10 @@ program plotplt
         stop
      end if
      
-     call pgpap(10.5,0.68)  ! Make it fit on letter paper
-     ! call pgpap(10.,1.)  !Talk, plot
-     ! call pgpap(30.,0.33)  !Talk, plot
+     ! call pgpap(10.5,0.68)  ! Make it fit on letter paper
+     ! call pgpap(10.,1.)   ! Talk, plot
+     ! call pgpap(30.,0.33) ! Talk, plot
+     call pgpap(paper_size, paper_ratio)
      
      call pgslw(5)
      sch = 1.5 * sch0
@@ -795,22 +796,30 @@ program plotplt
   call pgscf(1)
   ! if(os.eq.2.or.plot.eq.9) call pgscf(2)
   call pgsch(sch)
-  if(plot.eq.9) then
-     if(prleg) then  ! Make room for legend
-        call pgsvp(0.10,0.90, 0.12,0.95)
-     else
-        call pgsvp(0.10,0.95, 0.12,0.95)
-     end if
-  else  ! Sceen
+  if(plot.eq.9) then  ! file: eps/pdf
      if(prleg) then  ! Make room for legend
         if(use_plplot) then
-           call pgsvp(0.07,0.90, 0.10,0.96)
+           call pgsvp(0.10,0.90, 0.12,0.95)  ! xmax/ymax: need room for "(x10^99)"
+        else
+           call pgsvp(0.10,0.90, 0.12,0.95)
+        end if
+     else  ! no legend
+        if(use_plplot) then
+           call pgsvp(0.075,0.96, 0.115,0.91)  ! xmax/ymax: need room for "(x10^99)"
+        else
+           call pgsvp(0.10,0.95, 0.12,0.95)
+        end if
+     end if
+  else  ! Screen
+     if(prleg) then  ! Make room for legend
+        if(use_plplot) then
+           call pgsvp(0.07,0.90, 0.10,0.96)  ! xmax/ymax: need room for "(x10^99)"
         else
            call pgsvp(0.06,0.90, 0.07,0.96)
         end if
      else
         if(use_plplot) then
-           call pgsvp(0.07,0.95, 0.10,0.96)  ! xmax: need room for x10^...
+           call pgsvp(0.07,0.95, 0.10,0.96)  ! xmax/ymax: need room for "(x10^99)"
         else
            call pgsvp(0.06,0.95, 0.07,0.96)
         end if
@@ -835,8 +844,8 @@ program plotplt
      end if
   end if
   if(use_plplot) then
-     call pgmtxt('B',4., 0.5,0.5, trim(pglx))
-     call pgmtxt('L',5., 0.5,0.5, trim(pgly))
+     call pgmtxt('B',3.1, 0.5,0.5, trim(pglx))
+     call pgmtxt('L',3., 0.5,0.5, trim(pgly))
   else
      call pgmtxt('B',2.4,0.5,0.5, trim(pglx))
      call pgmtxt('L',2.0,0.5,0.5, trim(pgly))
@@ -1081,7 +1090,7 @@ program plotplt
      deallocate(dat, n,strmdls, xx,yy,miny,excly, hp,nhp)
      goto 5
   end if
-  if(plot.eq.9) goto 501
+  if(plot.eq.9) goto 501  ! pdf file
   
   if(plot.eq.4) then  ! Select region
 941  call pgsci(1)
