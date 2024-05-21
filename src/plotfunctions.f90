@@ -115,18 +115,20 @@ end subroutine plotzams
 !! \param  hlp   Highlight points?
 !! \param  hlbl  Label highlight points?
 !!
+!! \param  use_plplot  Use PLplot iso PGPlot?
+!!
 !! \todo  
 !!  - don't pass all nvar variables, but only those needed?
 !!  - do I need all nmax rows, or should n do?
 
-subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl)
+subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,hlbl, use_plplot)
   use SUFR_kinds, only: double
   use SUFR_numerics, only: seq0,sne0
   
   implicit none
   integer,intent(in) :: nmax,nvar,n, nhp,hp(1000),vx
   real(double), intent(in) :: dat0(nvar,nmax)  ! Can be modified at nuclear burning
-  logical, intent(in) :: lgx,lgy
+  logical, intent(in) :: lgx,lgy, use_plplot
   real, intent(in) :: ymin,ymax
   
   logical, intent(in) :: hlp,hlbl
@@ -228,17 +230,17 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
               end if
            end do
            
-           !Keep this for testing
-           !if(xx(i).gt.1245.and.xx(i).lt.1265) then
-           !write(6,*)''
-           !!if(dib.ne.0) then
-           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
-           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
-           !write(6,'(5I10)')nint(zonex),nz
-           !do j=1,nz
-           !write(6,'(4F10.6)')zoney(j,:)
-           !end do
-           !end if
+           ! Keep this for testing
+           ! if(xx(i).gt.1245.and.xx(i).lt.1265) then
+           ! write(6,*)''
+           ! !if(dib.ne.0) then
+           ! write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
+           ! write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
+           ! write(6,'(5I10)')nint(zonex),nz
+           ! do j=1,nz
+           ! write(6,'(4F10.6)')zoney(j,:)
+           ! end do
+           ! end if
            
            
            do j=1,nz
@@ -246,8 +248,8 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
               if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
            ibold = ib
-        end do !do i=2,n
-     end if !If plconv.eq.1
+        end do  ! do i=2,n
+     end if  ! If plconv.eq.1
      
      
      
@@ -303,7 +305,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            
            
            do j=1,nz
-              !Zeroes or change in the number of zones can mean trouble:
+              ! Zeroes or change in the number of zones can mean trouble:
               if(zoney(j,1)*zoney(j,2)*zoney(j,3)*zoney(j,4).lt.1.e-8.or.dib.ne.0) then
                  if((zoney(j,1)+zoney(j,2))/dat(4,i).lt.1.e-5.and.zoney(j,3)*zoney(j,4).gt.1.e-8) then
                     zoney(j,1) = (zoney(j,3)+zoney(j,4))/2.  !Zone begins, make it end nicely in a point at the left
@@ -318,17 +320,17 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
               end if
            end do
            
-           !Keep this for testing
-           !if(xx(i).gt.1280.and.xx(i).lt.1330) then
-           !!if(dib.ne.0) then
-           !write(6,*)''
-           !write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
-           !write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
-           !write(6,'(5I10)')nint(zonex),nz
-           !do j=1,nz
-           !write(6,'(4F10.6)')zoney(j,:)
-           !end do
-           !end if
+           ! Keep this for testing
+           ! if(xx(i).gt.1280.and.xx(i).lt.1330) then
+           ! !if(dib.ne.0) then
+           ! write(6,*)''
+           ! write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
+           ! write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
+           ! write(6,'(5I10)')nint(zonex),nz
+           ! do j=1,nz
+           ! write(6,'(4F10.6)')zoney(j,:)
+           ! end do
+           ! end if
            
            
            do j=1,nz
@@ -336,8 +338,8 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
               if(zoney(j,1)+zoney(j,2)+zoney(j,3)+zoney(j,4).gt.1.e-8) call pgpoly(4,zonex,zoney1(1:4))
            end do
            ibold = ib
-        end do   !do i=2,n
-     end if !If plsmcnv.eq.1
+        end do  ! do i=2,n
+     end if  ! If plsmcnv.eq.1
      
      
      ! *** Nuclear burning ***
@@ -345,7 +347,8 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
         call pgsfs(4)
         call pgslw(3)
         call pgsls(1)
-        call pgsci(2)
+        call pgsci(2)  ! Red
+        
         ibold = 0
         do i=2,n
            do j=80,76,-1
@@ -438,45 +441,50 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            end do
         end if
         
-     end if !If plnuc.eq.1
+     end if  ! if plnuc.eq.1
      
-  end if !if(ch.eq.1)
+  end if  ! if(ch.eq.1)
   
   
   ! Plot outlines:
-  !call pgsci(14)
-  !do j=63,68
-  !   do i=1,n
-  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !semiconvection bounds
-  !   end do
-  !end do !j
-  !call pgsci(15)
-  !do j=69,74
-  !   do i=1,n
-  !      if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !convection bounds
-  !   end do
-  !end do !j
+  ! call pgsci(14)
+  ! do j=63,68
+  !    do i=1,n
+  !       if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !semiconvection bounds
+  !    end do
+  ! end do  ! j
+  ! call pgsci(15)
+  ! do j=69,74
+  !    do i=1,n
+  !       if(dat(j,i).ne.0.d0) call pgpoint(1,xx(i),abs(dat(j,i)),1) !convection bounds
+  !    end do
+  ! end do  ! j
   
-  call pgsci(2)
+  call pgsci(2)  ! red
   if(plnuc.eq.1) then
      do j=75,80
         do i=1,n
-           if(sne0(dat(j,i))) call pgpoint(1,xx(i),abs(dat(j,i)),1) !nuclear burning bounds
+           if(sne0(dat(j,i))) call pgpoint(1,xx(i),abs(dat(j,i)),1)  ! nuclear burning bounds
         end do
-     end do !j
+     end do  ! j
   end if
   
   ! Plot core boundaries:
   if(plcb.eq.1) then
-     call pgslw(3)
+     if(use_plplot) then
+        call pgslw(5)
+     else
+        call pgslw(3)
+     end if
+     
      call pgsls(1)
-     do j=5,7 !core masses
+     do j=5,7  ! core masses
         call pgsci(j-1)
         do i=1,n-1
            dat1(1:2) = dat(j,i:i+1)
-           if(maxval(dat1(1:2)).gt.1.e-10) call pgline(2,xx(i:i+1),dat1(1:2))  !Only plot when one of them != 0
+           if(maxval(dat1(1:2)).gt.1.e-10) call pgline(2,xx(i:i+1),dat1(1:2))  ! Only plot when one of them != 0
         end do
-     end do !j
+     end do  ! j
   end if
   
   

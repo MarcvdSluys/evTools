@@ -80,9 +80,9 @@ program plotplt
   sch = 1.0 * sch0
   
   
-  !os = getos() !1-Linux, 2-MacOS
-  os = 1        ! Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
-  plotstyle = 1 ! 1: draw lines, 2: draw dots, 3: draw both
+  ! os = getos() !1-Linux, 2-MacOS
+  os = 1         ! Don't use Mac OS's silly AquaTerm (watta mistaka to maka)
+  plotstyle = 1  ! 1: draw lines, 2: draw dots, 3: draw both
   
   ! Remove 'uninitialised' compiler warnings:
   hrd   = 0
@@ -779,19 +779,24 @@ program plotplt
      call pgpap(scrsz,scrrat)
      call pgslw(1)
      sch = 1.0 * sch0
-     if(white_bg) then     ! Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
-        call pgscr(1, 0.,0.,0.)
-        call pgsci(0)
-        call pgsvp(0.,1., 0.,1.)
-        call pgswin(-1.,1., -1.,1.)
-        call pgrect(-2.,2., -2.,2.)
-        call pgsci(1)
-        
+  end if  ! plot.ne.9
+  
+  if(white_bg) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+     call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
+     call pgscr(1, 0.,0.,0.)
+     call pgsci(0)
+     call pgsvp(0.,1., 0.,1.)
+     call pgswin(-1.,1., -1.,1.)
+     call pgrect(-2.,2., -2.,2.)
+     call pgsci(1)
+     
+     if(use_plplot) then
+     else
         call pgscr(3, 0.0,0.8,0.0)  ! Dark green
         call pgscr(5, 0.0,0.8,0.8)  ! Dark cyan
      end if
-  end if  ! plot.ne.9
+     
+  end if
   
   call pgscf(1)
   ! if(os.eq.2.or.plot.eq.9) call pgscf(2)
@@ -959,7 +964,7 @@ program plotplt
      
      ! Convection plot - replots axes at the end:
      ! call plt_convection(nmax,nvar,n(pl),dat(pl,:,:),vx,ymin,ymax,nhp(pl),hp(pl,:),hlp,hlbl)
-     call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)), vx, lgx,lgy, ymin,ymax, nhp(pl),hp(pl,:),hlp,hlbl)
+     call plt_convection(n(pl),nvar,n(pl),dat(pl,1:nvar,1:n(pl)), vx, lgx,lgy, ymin,ymax, nhp(pl),hp(pl,:),hlp,hlbl, use_plplot)
      call pgsci(2)
   end if
   
