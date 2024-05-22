@@ -837,23 +837,46 @@ subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   integer, intent(out) :: n,version
   real(double), intent(out) :: dat(nvar,nn)
   integer :: ncols,i,j
+  ! real(double) :: dat1(nn)
+  ! character :: fmt*(999)
   
   dumint = nc ! Get rid of 'unused' message
   
   if(verbose.eq.1) write(6,'(A)', advance='no')' Reading ev file '//trim(fname)//':'
   
-  !*** Unformatted:
+  ! *** Unformatted: issue: no spaces between convection/burning-zone columns for 10Mo+ (10.00000-10.00000)!
   dat = 0.d0
   open(unit=u,form='formatted',status='old',file=trim(fname))
   rewind u
   read(u,*) ncols
   if(verbose.eq.1) write(6,'(A,I4,A)', advance='no')'  Found',ncols,' columns.'
   version = 2005   ! Can no longer distinguish with unformatted read
-  if(ncols.eq.83.or.ncols.eq.92) version = 2011  ! Latest version 
-  do j=1,nn
-     read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
-     if(verbose.eq.1.and.j.eq.1) write(6,'(A,F6.2,A)', advance='no')'  Mi =',dat(4,j),'Mo.'
-  end do
+  if(ncols.eq.83.or.ncols.eq.92) version = 2011  ! Latest version
+  
+  ! if(ncols.eq.81) then
+  !    fmt = '(I6,E17.9,E14.6, 11F9.5, 7E12.4, 3F9.5, 16E12.4, F8.4, 21E13.5, 18F9.4, E14.6)'  ! Body format 81 columns (2003)
+  ! elseif(ncols.eq.87) then
+  !    fmt = '(I6,E17.9,E14.6, 12E13.5, 7E12.4, 3E13.5, 16E12.4, 39E13.5, E14.6,E13.5, I2, 4ES13.5)'  ! Body format 87 columns (2005?)
+  ! elseif(ncols.eq.92) then
+  !    fmt = '(I6,E17.9,E14.6, 12E13.5, 7E12.4, 3E13.5, 16E12.4, 39E13.5, E14.6,E13.5,E14.6, 8E13.5,F5.1)' ! Body format 92 columns (MvdS git, 2023)
+  ! else
+  !    write(*,'(A,I0,A)') 'Unsupported number of columns: ', ncols, '.  I will try an unformatted read.'
+  !    fmt = 'None'
+  ! end if
+  
+  ! if(trim(fmt).eq.'None') then
+     do j=1,nn
+        read(u,*,err=12,end=11) (dat(i,j),i=1,ncols)
+        if(verbose.eq.1.and.j.eq.1) write(*,'(A,F6.2,A)', advance='no') '  Mi =',dat(4,j),'Mo.'
+     end do
+  ! else
+  !    do j=1,nn
+  !       read(u,'(I6,E17.9,E14.6, 11F9.5, 7E12.4, 3F9.5, 16E12.4, F8.4, 21E13.5, 18F9.5, E14.6)',err=12,end=11) dat1(1:ncols)
+  !       print*,dat1
+  !       if(verbose.eq.1.and.j.eq.1) write(*,'(A,F6.2,A)', advance='no') '  Mi =',dat(4,j),'Mo.'
+  !    end do
+  ! end if
+  
   write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
   close(u)
   n = j-1   ! Number of models in the file
