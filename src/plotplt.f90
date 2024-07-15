@@ -27,7 +27,7 @@
 !! \todo allocate nf iso npl in dat()? -> allocate(dat(npl,nvar,nmax), datf(nvar,nmax))
 
 program plotplt
-  use SUFR_kinds, only: double,dbl
+  use SUFR_kinds, only: double
   use SUFR_constants, only: homedir
   use SUFR_numerics, only: seq0,sne0
   use SUFR_dummy, only: dumstr
@@ -208,7 +208,7 @@ program plotplt
      maxt = maxval( dat(pl,10,1:n(pl)) )
      dt = 2*(maxt-mint)/(maxt+mint)  ! Relative dt
      logt = .true.
-     if(dt.lt.1.0_dbl) logt = .false.  ! No logarithmic axis for small T intervals
+     if(dt.lt.0.5d0) logt = .false.  ! No logarithmic axis for small T intervals
      
      do pl=1,npl
         if(logt) then
@@ -396,13 +396,13 @@ program plotplt
   !***   LIN/LOG AXES
   !************************************************************************      
   if(plot.ne.6.and.plot.ne.7) then      
-     write(6,'(A)', advance='no')' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(6,'(A)', advance='no') ' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,log
      if(log.eq.'X') log='x'
      if(log.eq.'Y') log='y'
      if(log.eq.'B') log='b'
      if(log.eq.'N') log='n'
-  end if  !if(plot.ne.6.and.plot.ne.7) then   
+  end if  ! if(plot.ne.6.and.plot.ne.7) then   
   
   lgx = .false.
   lgy = .false.
