@@ -175,7 +175,7 @@ program plotplt
   !************************************************************************      
   
 30 if(plot.ne.6.and.plot.ne.7) then      
-     call printpltvarlist(nf)  !Print the list of variables in a *.plt? file to screen, for input menu
+     call printpltvarlist(nf)  ! Print the list of variables in a *.plt? file to screen, for input menu
      
      io = -1
      do while(io.ne.0)
@@ -194,11 +194,11 @@ program plotplt
      conv  = 0
      tscls = 0
      lums  = 0
-  end if   !if(plot.ne.6.and.plot.ne.7) then   
+  end if   ! if(plot.ne.6.and.plot.ne.7) then   
   
   
-  npl = nf  !npl is the number of curves that will be plotted. This can be >1 because nf>1, or because nf=1, but we plot >1 variable
-  prleg = .false.  !Don't print legenda by default
+  npl = nf  ! npl is the number of curves that will be plotted. This can be >1 because nf>1, or because nf=1, but we plot >1 variable
+  prleg = .false.  ! Don't print legend by default
   if(nf.gt.1) prleg = .true.
   
   if(vx.eq.201.or.hrd.eq.1) then  ! HRD
@@ -206,7 +206,7 @@ program plotplt
      pl = 1
      mint = minval( dat(pl,10,1:n(pl)) )
      maxt = maxval( dat(pl,10,1:n(pl)) )
-     dt = 2*(maxt-mint)/(maxt+mint)  !Relative dt
+     dt = 2*(maxt-mint)/(maxt+mint)  ! Relative dt
      logt = .true.
      if(dt.lt.1.0_dbl) logt = .false.  ! No logarithmic axis for small T intervals
      
@@ -230,7 +230,6 @@ program plotplt
   end if
   
   if(plot.lt.2) then      
-     
      io = -1
      do while(io.ne.0)
         write(6,'(A)', advance='no') '  Choose the Y-axis variable: '
@@ -242,41 +241,40 @@ program plotplt
         if(vy.lt.0.or.vy.eq.201) io = -1  ! Can't take HRD as y-variable
         if(defvar(vy).eq.0)  io = -1
      end do
-  end if   !if(plot.lt.2) then   
+  end if   ! if(plot.lt.2) then   
   
   
 37 continue
   
-  if(nf.eq.1) then  !Then you can do multi-variable plots
+  if(nf.eq.1) then  ! Only one input file - you can do multi-variable plots
      f = 1
      
-     
-     if(vy.eq.25) then !Tet + analytic Tet
+     if(vy.eq.25) then  ! Tet + analytic Tet
         npl = 2
         yy(2,1:nmax) = real(dat(f,123,1:nmax))
      end if
-     if(vy.eq.127) then !Rrl
+     if(vy.eq.127) then  ! Rrl
         npl = 2
         yy(2,1:nmax) = real(dat(f,8,1:nmax))
      end if
-     if(vy.eq.202.or.conv.eq.1) then  !Convection plot
+     if(vy.eq.202.or.conv.eq.1) then  ! Convection plot
         conv = 1
         vy = 4
      end if
-     if(vy.eq.221) then  !dJ/dt
+     if(vy.eq.221) then  ! dJ/dt
         djdt = 1
         npl = 5
         yy(1:5,1:nmax) = real(dat(f,35:39,1:nmax))
         leglbl(1:npl) = (/'dJ\dtot\u','dJ\dGW\u ','dJ\dSMB\u','dJ\dRMB\u','dJ\dML\u '/)
         prleg = .true.
      end if
-     if(vy.eq.222) then !Mdots
+     if(vy.eq.222) then  ! Mdots
         npl = 3
         yy(1:3,1:nmax) = real(dat(f,31:33,1:nmax))
         leglbl(1:npl) = (/'dM\dtot\u ','dM\dwind\u','dM\dMT\u  '/)
         prleg = .true.
      end if
-     if(vy.eq.223) then ! Winds
+     if(vy.eq.223) then  ! Winds
         npl = 3
         yy(1,1:nmax) = real(dat(f,32,1:nmax))
         yy(2,1:nmax) = real(dat(f,136,1:nmax))
@@ -349,14 +347,14 @@ program plotplt
      if(vy.eq.214) then  ! Tmax abundances
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,49:55,1:nmax))
-        !Line labels for Abundances plots:
+        ! Line labels for Abundances plots:
         leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
-     if(vy.eq.215) then !Core abundances
+     if(vy.eq.215) then  ! Core abundances
         npl = 7
         yy(1:npl,1:nmax) = real(dat(f,56:62,1:nmax))
-        !Line labels for Abundances plots:
+        ! Line labels for Abundances plots:
         leglbl(1:npl) = (/'H ','He','C ','N ','O ','Ne','Mg'/)
         prleg = .true.
      end if
@@ -367,21 +365,26 @@ program plotplt
         if(vy.lt.200) yy(pl,1:nmax) = real(dat(pl,vy,1:nmax))  
      end do
      
-  else !if(nf.ne.1)
+  else  ! if(nf.ne.1) - multiple input files
      
-     do pl=1,npl
-        xx(pl,1:nmax) = real(dat(pl,vx,1:nmax))
-        yy(pl,1:nmax) = real(dat(pl,vy,1:nmax))
-     end do
+     if(vx.eq.201.or.hrd.eq.1) then
+        xx(1:npl,1:nmax) = real(dat(1:npl,10,1:nmax))  ! Teff
+        yy(1:npl,1:nmax) = real(dat(1:npl, 9,1:nmax))  ! L
+     else     
+        do pl=1,npl
+           xx(pl,1:nmax) = real(dat(pl,vx,1:nmax))
+           yy(pl,1:nmax) = real(dat(pl,vy,1:nmax))
+        end do
+     end if
      
-  end if  !if(nf.eq.1) / else
+  end if  ! if(nf.eq.1) / else
   
   
-  !do pl=1,npl
-  !   xx(pl,1:nmax) = real(dat(pl,vx,1:nmax))         
-  !   !if(vy.lt.200) yy(1,1:n) = real(dat(pl,vy,1:nmax))  
-  !   if(vy.lt.200) yy(pl,1:nmax) = real(dat(pl,vy,1:nmax))  
-  !end do
+  ! do pl=1,npl
+  !    xx(pl,1:nmax) = real(dat(pl,vx,1:nmax))         
+  !    !if(vy.lt.200) yy(1,1:n) = real(dat(pl,vy,1:nmax))  
+  !    if(vy.lt.200) yy(pl,1:nmax) = real(dat(pl,vy,1:nmax))  
+  ! end do
   
   
   
@@ -406,11 +409,17 @@ program plotplt
   if(log.eq.'x'.or.log.eq.'b') lgx = .true.
   if(log.eq.'y'.or.log.eq.'b') lgy = .true.
   
-  
-  pglx  = pglabels(vx)
-  pgly  = pglabels(vy)
-  asclx = asclabels(vx)
-  ascly = asclabels(vy)
+  if(vx.eq.201.or.hrd.eq.1) then
+     pglx  = pglabels(10)
+     pgly  = pglabels(9)
+     asclx = asclabels(10)
+     ascly = asclabels(9)
+  else
+     pglx  = pglabels(vx)
+     pgly  = pglabels(vy)
+     asclx = asclabels(vx)
+     ascly = asclabels(vy)
+  end if
   
   if(lgx) then
      do pl=1,npl
@@ -435,18 +444,18 @@ program plotplt
            if(abs(yy(pl,j)).lt.miny(pl).and.sne0(abs(yy(pl,j)))) miny(pl) = abs(yy(pl,j))
         end do
         yy(pl,1:n(pl)) = log10(abs(yy(pl,1:n(pl)))+miny(pl)*1.e-3)
-        if(abs(miny(pl)-huge(miny(pl))).lt.1e32) excly(pl) = 1  !Exclude it in determining ranges
-     end do !pl
+        if(abs(miny(pl)-huge(miny(pl))).lt.1e32) excly(pl) = 1  ! Exclude it when determining ranges
+     end do  ! pl
   end if
   
   
   
-50 continue !HRD jumps here
+50 continue  ! HRD jumps here
   
   xmin = huge(xmin)
   xmax = -huge(xmax)
   do pl=1,npl
-     !if(exclx(pl).eq.1) cycle
+     ! if(exclx(pl).eq.1) cycle
      xmin = min(minval(xx(pl,1:n(pl))),xmin)
      xmax = max(maxval(xx(pl,1:n(pl))),xmax)
   end do
@@ -464,9 +473,9 @@ program plotplt
      end if
   end do
   
-  if(vx.eq.119) then !R/(dR/dt)
-     !if(xmin.lt.1.e4.and..not.lgx) xmin = 1.e4
-     !if(xmin.lt.4..and.lgx) xmin = 4.
+  if(vx.eq.119) then  ! R/(dR/dt)
+     ! if(xmin.lt.1.e4.and..not.lgx) xmin = 1.e4
+     ! if(xmin.lt.4..and.lgx) xmin = 4.
      if(xmax.gt.1.e12.and..not.lgx) xmax = 1.e12
      if(xmax.gt.12..and..not.lgx) xmax = 12.
   end if
@@ -728,7 +737,7 @@ program plotplt
   
 501 continue
   
-  if(hrd.eq.1.or.vx.eq.133.or.vx.eq.101) then
+  if(hrd.eq.1.or.vx.eq.133.or.vx.eq.101) then  ! Swap horizontal axis
      x = min(xmin,xmax)
      xmin = max(xmin,xmax)
      xmax = x
@@ -740,10 +749,10 @@ program plotplt
   end if
   
   if(plot.ne.0.and.plot.ne.7.and.plot.ne.9) then
-     write(6,*)''     
-     write(6,*)' X-range:',xmin,'-',xmax
-     write(6,*)' Y-range:',ymin,'-',ymax
-     write(6,*)''     
+     write(6,*) ''     
+     write(6,*) ' X-range:',xmin,'-',xmax
+     write(6,*) ' Y-range:',ymin,'-',ymax
+     write(6,*) ''     
   end if
   
   
