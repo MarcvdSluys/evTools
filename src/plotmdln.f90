@@ -25,7 +25,7 @@
 program plotmdln
   use SUFR_numerics, only: seq0
   use SUFR_dummy, only: dumint, dumreal
-  use constants, only: scrrat,scrsz, white_bg
+  use constants, only: scrrat,scrsz, white_bg_screen,white_bg_file
   
   
   implicit none
@@ -412,25 +412,27 @@ program plotmdln
   !************************************************************************      
   
 501 continue
-  do plt=1,2    !Plot to PS, then screen
+  do plt=1,2  ! Plot to PS, then screen
      
      if(plt.eq.1) call pgbegin(1,'plot_mdln.eps/cps',1,1)
      if(plt.eq.2) then
         call pgbegin(1,'3/xserve',1,1)
-        call pgpap(scrsz,scrrat) !MacBook, Gentoo
-        if(white_bg) then     !Create a white background; swap black (ci=0) and white (ci=1)
-           call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
-           call pgscr(1,0.,0.,0.)
-           call pgsci(1)
-           call pgsci(0)
-           call pgsvp(0.,1.,0.,1.)
-           call pgswin(-1.,1.,-1.,1.)
-           call pgrect(-2.,2.,-2.,2.)
-           call pgsci(1)
-        end if
+        call pgpap(scrsz,scrrat)  ! Set screen size and ratio
      end if
+     
+     if((plt.eq.1.and.white_bg_file) .or. (plt.eq.2.and.white_bg_screen)) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+        call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
+        call pgscr(1, 0.,0.,0.)
+        call pgsci(1)
+        call pgsci(0)
+        call pgsvp(0.,1., 0.,1.)
+        call pgswin(-1.,1., -1.,1.)
+        call pgrect(-2.,2., -2.,2.)
+        call pgsci(1)
+     end if
+     
      call pgscf(1)
-     call pgscr(7,0.7,0.7,0.7)  !Replace yellow by light grey
+     call pgscr(7,0.7,0.7,0.7)  ! Replace yellow by light grey
      
      call pgsvp(0.06,0.95,0.07,0.96)
      call pgswin(xmin,xmax,ymin,ymax)

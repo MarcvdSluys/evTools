@@ -29,7 +29,7 @@ program plotmod
   use SUFR_constants, only: rsun,lsun,msun,julyear,pi
   use SUFR_numerics, only: deq0,seq0
   use SUFR_dummy, only: dmin=>dumint, dmrl=>dumreal
-  use constants, only: scrrat,scrsz, white_bg
+  use constants, only: scrrat,scrsz, white_bg_screen,white_bg_file
   
   implicit none
   integer, parameter :: nc=25,nm=1000
@@ -329,36 +329,39 @@ program plotmod
   write(title,'(A,I6)')trim(title),blk
   
 201 continue
-  if(plotagain.eq.5) then
+  if(plotagain.eq.5) then  ! Save plot to file
      call pgbegin(1,'plot_mod.eps/cps',1,1)
      call pgscf(2)
-  else
+  else                     ! Plot to screen
      call pgbegin(1,'/xserve',1,1)
      call pgpap(scrsz,scrrat)
      call pgscf(1)
-     if(white_bg) then           !Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0,1.,1.,1.)  !For some reason, this needs to be repeated for AquaTerm, see below
-        call pgscr(1,0.,0.,0.)
-        call pgsci(1)
-        call pgsci(0)
-        call pgsvp(0.,1.,0.,1.)
-        call pgswin(-1.,1.,-1.,1.)
-        call pgrect(-2.,2.,-2.,2.)
-        call pgsci(1)
-     end if
   end if
+  
+  if((plotagain.eq.5.and.white_bg_file) .or. (plotagain.ne.5.and.white_bg_screen)) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+     call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
+     call pgscr(1, 0.,0.,0.)
+     call pgsci(1)
+     call pgsci(0)
+     call pgsvp(0.,1., 0.,1.)
+     call pgswin(-1.,1., -1.,1.)
+     call pgrect(-2.,2., -2.,2.)
+     call pgsci(1)
+  end if
+  
   call pgslw(1)
-  call pgenv(xmin,xmax,ymin,ymax,0,0)
+  call pgenv(xmin,xmax, ymin,ymax, 0,0)
   call pglabel(lx,ly,trim(title(13:100)))
   if(plotagain.eq.5) call pgslw(2)
   
-  !Plot line:
+  
+  ! Plot line:
   call pgsci(2)
-  !if(vx.eq.1.or.vy.eq.1) then
-  !   call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)
-  !else
-  !   call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
-  !end if
+  ! if(vx.eq.1.or.vy.eq.1) then
+  !    call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)
+  ! else
+  !    call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
+  ! end if
   call pgline(kh,dat(vx,1:kh),dat(vy,1:kh))
   call pgsci(1)
   call pgpoint(kh,dat(vx,1:kh),dat(vy,1:kh),1)

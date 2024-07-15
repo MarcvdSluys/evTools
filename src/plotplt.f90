@@ -32,7 +32,8 @@ program plotplt
   use SUFR_numerics, only: seq0,sne0
   use SUFR_dummy, only: dumstr
   
-  use constants, only: libdir, colours,ncolours, scrrat,scrsz, paper_size,paper_ratio, white_bg
+  use constants, only: libdir, colours,ncolours, scrrat,scrsz, paper_size,paper_ratio
+  use constants, only: white_bg_screen, white_bg_file
   use ubvdata, only: ubv
   
   implicit none
@@ -732,7 +733,7 @@ program plotplt
      xmin = max(xmin,xmax)
      xmax = x
   end if
-  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) then
+  if((vy.eq.133.or.vy.eq.101) .and. plot.ne.9) then  ! Not to file
      y = min(ymin,ymax)
      ymin = max(ymin,ymax)
      ymax = y
@@ -746,7 +747,7 @@ program plotplt
   end if
   
   
-  if(plot.eq.9) then
+  if(plot.eq.9) then  ! Save plot to file
      io = pgopen('plot_plt_000.eps/cps')
      if(io.le.0) then
         write(0,'(A,/)') '  Error opening postscript file, aborting'
@@ -761,7 +762,7 @@ program plotplt
      call pgslw(5)
      sch = 1.5 * sch0
      
-  else  ! plot.ne.9
+  else  ! plot.ne.9 - plot to screen
      
      if(plot.eq.7) call pgend()  ! Unlike pgbegin, pgopen can't seem to open an open window - why is this no problem for plot.eq.6?
      if(os.eq.1) then
@@ -781,7 +782,7 @@ program plotplt
      sch = 1.0 * sch0
   end if  ! plot.ne.9
   
-  if(white_bg) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+  if((plot.ne.9.and.white_bg_screen) .or. (plot.eq.9.and.white_bg_file)) then     ! Create a white background; swap black (ci=0) and white (ci=1)
      call pgscr(0, 1.,1.,1.)  ! For some reason, this needs to be repeated for AquaTerm, see below
      call pgscr(1, 0.,0.,0.)
      call pgsci(0)
@@ -795,14 +796,13 @@ program plotplt
         call pgscr(3, 0.0,0.8,0.0)  ! Dark green
         call pgscr(5, 0.0,0.8,0.8)  ! Dark cyan
      end if
-     
   end if
   
   call pgscf(1)
   ! if(os.eq.2.or.plot.eq.9) call pgscf(2)
   call pgsch(sch)
-  if(plot.eq.9) then  ! file: eps/pdf
-     if(prleg) then  ! Make room for legend
+  if(plot.eq.9) then  ! Save plot to file: eps/pdf
+     if(prleg) then   ! Make room for legend
         if(use_plplot) then
            call pgsvp(0.10,0.90, 0.12,0.95)  ! xmax/ymax: need room for "(x10^99)"
         else
@@ -815,7 +815,7 @@ program plotplt
            call pgsvp(0.10,0.95, 0.12,0.95)
         end if
      end if
-  else  ! Screen
+  else  ! Plot to screen
      if(prleg) then  ! Make room for legend
         if(use_plplot) then
            call pgsvp(0.07,0.90, 0.10,0.96)  ! xmax/ymax: need room for "(x10^99)"
@@ -1005,7 +1005,7 @@ program plotplt
   
   call pgsci(1)
   
-  if(plot.eq.9) then
+  if(plot.eq.9) then  ! Save plot to file
      call pgend()
      ex = .true.
      pstitle = 'PlotPlt output: '//trim(asclx)//' vs. '//trim(ascly)//'.'
@@ -1095,7 +1095,7 @@ program plotplt
      deallocate(dat, n,strmdls, xx,yy,miny,excly, hp,nhp)
      goto 5
   end if
-  if(plot.eq.9) goto 501  ! pdf file
+  if(plot.eq.9) goto 501  ! Save plot to pdf file
   
   if(plot.eq.4) then  ! Select region
 941  call pgsci(1)

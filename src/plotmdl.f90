@@ -25,7 +25,7 @@ program plotmdl
   use SUFR_constants, only: workdir
   use SUFR_numerics, only: seq0
   
-  use constants, only: colours,ncolours, scrrat,scrsz, white_bg
+  use constants, only: colours,ncolours, scrrat,scrsz, white_bg_screen,white_bg_file
   use mdl_data, only: pxin,pxnr,pxns,pxfns, nq,nn,nm,nmsh,ncol, nv_der,nv_sp, labels, abds,nabs, CEs
   
   implicit none
@@ -429,7 +429,7 @@ program plotmdl
   !***   PLOT TO SCREEN OR FILE
   
 501 continue
-  if(plot.eq.9) then  ! PS -> PDF file
+  if(plot.eq.9) then  ! Save plot to PS -> PDF file
      ex = .true.
      i = 0
      do while(ex)
@@ -442,7 +442,7 @@ program plotmdl
      call pgpap(10.5,0.68)                    ! Make it fit on letter paper
      !call pgpap(10.5,0.25)                    ! Tailored ratio
      call pgslw(2)
-  else ! Screen
+  else ! plot.ne.9: Plot to screen
      io = 0
      do while(io.le.0)
         write(xwin,'(I3.3,A7)')xwini,'/xserve'
@@ -455,15 +455,16 @@ program plotmdl
      
      call pgpap(scrsz,scrrat)
      call pgscf(1)
-     if(white_bg) then                         ! Create a white background; swap black (ci=0) and white (ci=1)
-        call pgscr(0,1.,1.,1.)                 ! For some reason, this needs to be repeated for AquaTerm
-        call pgscr(1,0.,0.,0.)
-        call pgsci(0)
-        call pgsvp(0.,1.,0.,1.)
-        call pgswin(-1.,1.,-1.,1.)
-        call pgrect(-2.,2.,-2.,2.)
-        call pgsci(1)
-     end if
+  end if
+  
+  if((plot.ne.9.and.white_bg_screen) .or. (plot.eq.9.and.white_bg_file)) then     ! Create a white background; swap black (ci=0) and white (ci=1)
+     call pgscr(0, 1.,1.,1.)                 ! For some reason, this needs to be repeated for AquaTerm
+     call pgscr(1, 0.,0.,0.)
+     call pgsci(0)
+     call pgsvp(0.,1., 0.,1.)
+     call pgswin(-1.,1., -1.,1.)
+     call pgrect(-2.,2., -2.,2.)
+     call pgsci(1)
   end if
   
   if(nx*ny.eq.1) then
@@ -533,7 +534,7 @@ program plotmdl
      call pgline(2,x2,y2)
   end if
   
-  if(plot.eq.9) then
+  if(plot.eq.9) then  ! Save plot to file
      call pgend()
      status = system('eps2pdf '//trim(psname))
      if(status.ne.0) then
