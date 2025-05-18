@@ -31,10 +31,10 @@ program listmdl
   if(command_argument_count().eq.1) then
      call get_command_argument(1,infile)
   else
-     infile = findfile('*.mdl*') !Search for input file in current dir
+     infile = findfile('*.mdl*')  ! Search for input file in current dir
      if(len_trim(infile).le.0) call quit_program('No file found in this directory.')
   end if
-     
+  
   
   
 4 continue
@@ -53,10 +53,10 @@ program listmdl
      
      blk = 0
      do while(blk.lt.1.or.blk.gt.nblk)
-        write(6,'(A50,I3,A3)', advance='no')' For which model do you want to print details (1-',nblk,'): '
+        write(6,'(A50,I3,A3)', advance='no') ' For which model do you want to print details (1-',nblk,'): '
         read*,blk
         if(blk.eq.0) then
-           write(6,'(A,/)')'  Program finished'
+           write(6,'(A,/)') '  Program finished'
            stop
         end if
      end do
@@ -79,18 +79,18 @@ program listmdl
   ans = -1
   do while(ans.lt.0.or.ans.gt.3)
      if(nblk.eq.1) then
-        write(6,'(A,/)')'  Program finished'
+        write(6,'(A,/)') '  Program finished'
         stop
      end if
      
      write(6,*)''
-     write(6,'(A)')' You can:'
-     write(6,'(A)')'   0) Quit'
-     write(6,'(A)')'   1) See another structure model'
-     write(6,'(A)')'   2) List all models again'
-     write(6,'(A)')'   3) Save this model'
-     write(6,*)''
-     write(6,'(A27)', advance='no')' What do you want to do ?  '
+     write(6,'(A)') ' You can:'
+     write(6,'(A)') '   0) Quit'
+     write(6,'(A)') '   1) See another structure model'
+     write(6,'(A)') '   2) List all models again'
+     write(6,'(A)') '   3) Save this model'
+     write(6,*) ''
+     write(6,'(A27)', advance='no') ' What do you want to do ?  '
      
      read*,ans
   end do
@@ -108,7 +108,7 @@ program listmdl
   
   
   close(10)
-  write(6,'(A,/)')'  Program finished'
+  write(6,'(A,/)') '  Program finished'
   
 end program listmdl
 !***********************************************************************************************************************************

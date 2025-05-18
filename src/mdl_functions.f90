@@ -247,7 +247,7 @@ subroutine list_mdl_models(infile,nblk)
   integer :: nmdl
   integer :: bl,mp,io
   real :: age,vk,mm1,be,be1
-  real :: mm,rr,rrh,tt,hh,hhe,ccc,oo  ! ,kk,mmg,nnrad,nnn,nne,nnad,pp
+  real :: mm,rr,rrh,tt,hh,hhe,ccc,oo  ! ,kk,mmg,dnabla,nnn,nne,nnad,pp
   real :: ll  ! ,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,rhoc
   real :: hc,hec,cc,oc, hs,hes,zs  ! ,cs,os,zc
@@ -255,15 +255,17 @@ subroutine list_mdl_models(infile,nblk)
   
   
   write(6,*)''
-  write(6,'(A)')'  Reading file '//trim(infile)
+  write(6,'(A)') '  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
-     write(0,'(A,/)')'1  Error reading first line (header) of the file, aborting...'
+     write(0,'(A,/)') '1  Error reading first line (header) of the file, aborting...'
      close(10)
      stop
   end if
+  
+  write(*,'(2x,I0,A)') ncol, ' columns found'
   
   if(mdlver.gt.1.) then  ! Overshooting parameter < 1
      read(10,*) dumstr
@@ -323,7 +325,7 @@ subroutine list_mdl_models(infile,nblk)
      if(nmsh.eq.0) nmsh = 199
      mesh: do mp=1,nmsh
         read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
-             ! mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+             ! mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
              mm,rr,dmrl,rrh,tt,dmrl,dmrl,dmrl,hh,hhe,ccc,dmrl,oo,dmrl,dmrl,ll,dmrl,dmrl,dmrl,dmrl,dmrl
         ! print*,bl,mp,io
         if(io.lt.0) then
@@ -410,6 +412,8 @@ end subroutine list_mdl_models
 !! \param svblk   Save block or not (in/out)
 
 subroutine print_mdl_details(infile,blk,svblk)
+  use SUFR_kinds, only: double
+  use SUFR_constants, only: pi, pc_g,pc_kb,pc_mh,pc_sigma, msun,rsun,lsun
   use SUFR_numerics, only: seq0
   use mdl_data, only: nmsh,ncol,mdlver
   
@@ -420,17 +424,21 @@ subroutine print_mdl_details(infile,blk,svblk)
   
   real :: age
   integer :: nmdl
-  real :: mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg
+  real :: mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg
   real :: ll,eeth,eenc,eenu,ss,uuint
   real :: m1,r1,l1,ts,tc,mhe,mco,mhenv
   real :: hc,hec,cc,nic,oc,nec,mgc,zc
   real :: hs,hes,cs,nis,os,nes,mgs,zs
-  real :: rhoc,pc  !,ethc,enuc,encc
+  real :: pc,rhoc,kkc, nnadc,dnablac, ethc,enuc,encc, muc
+  real :: RRP,RPC,RPNG,RPN,RPO,RAN, Cp_dSdP, mu, th_mix_coef, conv_mix_coef, dlogTdlogP, omega
+  real :: dmu, domega, conv_art_mix, THmix,SHmix,DHmix,SSmix,ESmix,GSFmix
+  real(double) :: val, rho_mean, kappa_mean,mm_old
   
   integer :: mp,in,io
   character :: outfile*(99)
   
   mp = 1  ! Silence compiler warnings
+  kappa_mean = 0.d0
   
   
   ! Open the input file and read the first blk-1 models:
@@ -444,14 +452,23 @@ subroutine print_mdl_details(infile,blk,svblk)
   ! Read header:
   read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
   if(io.ne.0) then
-     write(0,'(A,I5,A,/)')'5  Error reading first line (header) of model',blk,', aborting...'
+     write(0,'(A,I5,A,/)') '5  Error reading first line (header) of model',blk,', aborting...'
      close(10)
      stop
   end if
   
   ! Read mesh point 1:
-  read(10,'(ES13.6,4ES11.4,16ES11.3)',iostat=io) &
-       mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+  if(ncol.eq.42) then
+     read(10,'(ES13.6, 4ES11.4, 16ES11.3, 21ES11.3)',iostat=io) &
+          mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint, &
+          RRP,RPC,RPNG,RPN,RPO,RAN, Cp_dSdP, mu, th_mix_coef, conv_mix_coef, dlogTdlogP, omega, &
+          dmu, domega, conv_art_mix, THmix,SHmix,DHmix,SSmix,ESmix,GSFmix
+  else  ! (Old) default: 21
+     read(10,'(ES13.6, 4ES11.4, 16ES11.3)',iostat=io) &
+          mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+  end if
+  
+  kappa_mean = kappa_mean + kk*mm  ! Integrate for mean opacity
   
   if(io.ne.0) then  ! Error/EOF
      close(10)
@@ -468,16 +485,22 @@ subroutine print_mdl_details(infile,blk,svblk)
      ! Create output filename:
      in = index(trim(infile),'.mdl',.true.)
      write(outfile,'(A,I5.5,A)')infile(1:in-1)//'_',nmdl,trim(infile(in:))
-     
+
      ! Open output file and write header and mesh point 1
      open(unit=20,form='formatted',status='replace',file=trim(outfile))
      write(20,'(2x,I4,4x,I2,F7.3)') nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
      write(20,'(I6,1x,ES16.9)') nmdl,age
      write(20,'(ES13.6,4ES11.4,16ES11.3)') &
-          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+          mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
   end if
   
+  pc   = pp
+  rhoc = rrh
   tc   = tt
+  kkc  = kk
+  nnadc  = nnad
+  dnablac = dnabla
+  
   hc   = hh
   hec  = hhe
   cc   = ccc
@@ -486,18 +509,21 @@ subroutine print_mdl_details(infile,blk,svblk)
   nec  = nne
   mgc  = mmg
   zc   = 1. - hh - hhe
-  rhoc = rrh
-  pc   = pp
-  ! encc = eenc
-  ! ethc = eeth
-  ! enuc = eenu
+  
+  encc = eenc
+  ethc = eeth
+  enuc = eenu
+  
+  muc  = mu
   
   mhe = 0.
   mco = 0.
   
   do mp=2,nmsh ! Number of mesh points
+     mm_old = mm  ! Old mass
+     
      read(10,'(ES13.6,4ES11.4,16ES11.3)') &
-          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+          mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
      
      if(io.ne.0) then  ! EOF/read error
         close(10)
@@ -505,9 +531,11 @@ subroutine print_mdl_details(infile,blk,svblk)
         stop
      end if
      
-
+     kappa_mean = kappa_mean + kk*(mm-mm_old)  ! Integrate for mean opacity
+     
      if(svblk) write(20,'(ES13.6,4ES11.4,16ES11.3)') &
-          mm,rr,pp,rrh,tt,kk,nnad,nnrad,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+          mm,rr,pp,rrh,tt,kk,nnad,dnabla,hh,hhe,ccc,nnn,oo,nne,mmg,ll,eeth,eenc,eenu,ss,uuint
+     
      if(seq0(mhe).and.hh.ge.0.1) mhe = mm
      if(seq0(mco).and.hhe.ge.0.1) mco = mm
   end do
@@ -518,6 +546,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   r1  = rr
   l1  = ll
   ts  = tt
+  
   hs  = hh
   hes = hhe
   cs  = ccc
@@ -529,8 +558,25 @@ subroutine print_mdl_details(infile,blk,svblk)
   
   mhenv = m1 - mhe
   
+  kappa_mean = kappa_mean/m1  ! Divide integral for mean opacity
   
+  ! write(*,'(//,2x,A)') 'Compare approximations to model:'
   
+  val = 3*pc_g*(m1*msun)**2/(4*pi*(r1*rsun)**4)
+  ! write(*,'(4x, 3(A,ES10.4))') 'Pc: ', pc, '  3GM^2/4piR^4: ', val, '  Ratio: ', Pc / val
+  
+  rho_mean = (m1*msun) / (4*pi/3.d0 * (r1*rsun)**3)
+  ! write(*,'(4x, 3(A,ES10.4))') 'rhoc: ', rhoc, '  rho_mean: ', rho_mean, '  Ratio: ', rhoc/rho_mean
+  
+  val = muc * pc_mh/pc_kb * pc_G* m1*msun / (r1*rsun) * rho_mean/rhoc
+  ! write(*,'(4x, 3(A,ES10.4))') 'Tc: ', tc, '  mu m_H/k * GM/R * rho_mean/rhoc: ', val , '  Ratio: ', Tc / val
+  
+  val = 64*pi**2/9.d0 * pc_sigma / kappa_mean * (muc * pc_mh * pc_G / pc_kb)**4 * (rho_mean/rhoc)**4 * (m1*msun)**3 / lsun
+  ! write(*,'(99ES10.3)') 64*pi**2/9.d0, pc_sigma, kappa_mean, muc, pc_mh, pc_G, pc_kb, rho_mean/rhoc, m1, msun, lsun
+  ! write(*,'(4x, 3(A,ES10.4))') 'L: ', l1, &
+  !      '  64 pi^2/9 * sigma/kappa * (mu m_H G/k)^4 * (rho_mean/rhoc)**4 * M**3 / Lo: ', val , '  Ratio: ', l1 / val
+  
+  ! write(*,*)
   
   
   
@@ -543,18 +589,21 @@ subroutine print_mdl_details(infile,blk,svblk)
      write(6,81) nmdl,nmsh,m1,age,zs
      write(6,*) ''
      write(6,83) m1,r1,l1,ts
-     write(6,84) tc,pc,rhoc
+     write(6,84) tc,pc,rhoc, kkc,muc
      write(6,*) ''
      write(6,85) mhe,mco,mhenv
      write(6,*) ''
      write(6,90) hs,hes,cs,nis,os,nes,mgs,zs
      write(6,91) hc,hec,cc,nic,oc,nec,mgc,zc
-     write(6,*) ''
+     write(*,*)
+     write(*,'(2x,A,ES10.4)') 'Mean opacity: ', kappa_mean
+     write(*,*)
   end if
   
 81 format('  Model:        Model nr:',i5,',    Mesh pts: ',i4,',    Mass:',f7.2,' Mo,    Age: ',es12.6,' yr,    Z =',f7.4)
 83 format('  Surface:      M   = ',f9.5,' Mo,  R   =',f11.5,' Ro,   L    =  ',es10.4,' Lo,   Teff =',f8.0,' K')
-84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3')
+84 format('  Centre:       Tc  = ',es10.4,' K,  Pc =  ',es10.4,' dyn,  RHOc = ',es10.4,' g/cm3,  opac_c = ',es10.4, &
+        ' cm2/g,  mu_c = ',f9.5)
 85 format('  Cores:        Mhe = ',f9.5,' Mo,  Mco =',f9.5,' Mo,     Menv =',f9.5,' Mo')
   
 90 format('  Composition:  Surface:  H: ',es10.4,',  He: ',es10.4,',  C: ',es10.4,',  N: ',es10.4,',  O: ',es10.4, &
