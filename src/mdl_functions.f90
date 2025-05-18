@@ -561,6 +561,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   kappa_mean = kappa_mean/m1  ! Divide integral for mean opacity
   
   ! write(*,'(//,2x,A)') 'Compare approximations to model:'
+  ! Used ~/work/CEs/models/New/grid01/01.00Mo/Sun/sun.mdl1, model 52
   
   val = 3*pc_g*(m1*msun)**2/(4*pi*(r1*rsun)**4)
   ! write(*,'(4x, 3(A,ES10.4))') 'Pc: ', pc, '  3GM^2/4piR^4: ', val, '  Ratio: ', Pc / val
@@ -572,10 +573,16 @@ subroutine print_mdl_details(infile,blk,svblk)
   ! write(*,'(4x, 3(A,ES10.4))') 'Tc: ', tc, '  mu m_H/k * GM/R * rho_mean/rhoc: ', val , '  Ratio: ', Tc / val
   
   val = 64*pi**2/9.d0 * pc_sigma / kappa_mean * (muc * pc_mh * pc_G / pc_kb)**4 * (rho_mean/rhoc)**4 * (m1*msun)**3 / lsun
-  ! write(*,'(99ES10.3)') 64*pi**2/9.d0, pc_sigma, kappa_mean, muc, pc_mh, pc_G, pc_kb, rho_mean/rhoc, m1, msun, lsun
+  ! ! write(*,'(99ES10.3)') 64*pi**2/9.d0, pc_sigma, kappa_mean, muc, pc_mh, pc_G, pc_kb, rho_mean/rhoc, m1, msun, lsun
   ! write(*,'(4x, 3(A,ES10.4))') 'L: ', l1, &
   !      '  64 pi^2/9 * sigma/kappa * (mu m_H G/k)^4 * (rho_mean/rhoc)**4 * M**3 / Lo: ', val , '  Ratio: ', l1 / val
   
+  ! write(*,*)
+  
+  ! Used ~/work/CEs/models/New/grid01/01.00Mo/Sun/sun.mdl1, model 52
+  ! write(*,'(2x,ES10.4,A)') pc/10.d0 / m1**2 * r1**4, ' N/m2  (SI!)'  ! 2.4168E+16 N/m^2  (SI!!!)
+  ! write(*,'(2x,ES10.4,A)') tc/muc / m1 * r1 / (rho_mean/rhoc),' K'   ! 2.0623E+09 K
+  ! write(*,'(2x,ES10.4,A)') l1 * (kappa_mean/10.d0) / muc**4 * (rho_mean/rhoc)**(-4) / m1**(-3), ' Lo  (for kappa in SI)'  ! 2.3821E+08 Lo
   ! write(*,*)
   
   
@@ -596,7 +603,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      write(6,90) hs,hes,cs,nis,os,nes,mgs,zs
      write(6,91) hc,hec,cc,nic,oc,nec,mgc,zc
      write(*,*)
-     write(*,'(2x,A,ES10.4)') 'Mean opacity: ', kappa_mean
+     write(*,'(2x,A,ES10.4,A)') 'Mean opacity: ', kappa_mean, ' cm^2/g'
      write(*,*)
   end if
   
