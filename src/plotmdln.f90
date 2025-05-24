@@ -90,7 +90,7 @@ program plotmdln
   call system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
-  read(10,'(a100)')title
+  read(10,'(a100)') title
   close(10)
   call system('rm tmppwd.txt')
   
@@ -148,7 +148,7 @@ program plotmdln
      
      if(mod(b,25).eq.0) then
         write(*,*)''
-        write(*,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
+        write(*,'(A)') ' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'//  &
              '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
      end if
      write(*,9)b,mdl(b),nm,age(b),m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs!,bms,p,p1
@@ -171,11 +171,11 @@ program plotmdln
   goto 9999
 15 close(10)
   
-  write(*,'(A)')' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
+  write(*,'(A)') ' Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'//  &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs'
   write(*,*)''
   nblk = b-1
-  write(*,'(A,I4,A)')'  EOF reached,',nblk,' blocks read.'
+  write(*,'(A,I4,A)') '  EOF reached,',nblk,' blocks read.'
   write(*,*)''
   
   if(nblk.eq.0) goto 9999
@@ -186,8 +186,8 @@ program plotmdln
   !***   CHOOSE STRUCTURE MODELS
   !************************************************************************      
   
-  write(*,'(A)')'Which structure models do you want to plot:' 
-  write(*,'(A78,I2,A3)')'  (press ENTER after each number, 0 for all models and -1 to end the list) (1-',nblk,'): '
+  write(*,'(A)') 'Which structure models do you want to plot:' 
+  write(*,'(A78,I2,A3)') '  (press ENTER after each number, 0 for all models and -1 to end the list) (1-',nblk,'): '
   
   
   b = 1
@@ -219,8 +219,8 @@ program plotmdln
   goto 30
   
   write(*,*)''
-  write(*,'(I5,A)')nb,' blocks selected:'
-  write(*,'(A)')'  Nr  Model       Age    Mass  Radius   Luminos      Teff        H     He    C+O'
+  write(*,'(I5,A)') nb,' blocks selected:'
+  write(*,'(A)') '  Nr  Model       Age    Mass  Radius   Luminos      Teff        H     He    C+O'
   do b=1,nb
      write(*,8)blk(b),mdl(blk(b)),age(blk(b)),dat(blk(b),2,nm),    dat(blk(b),3,nm),dat(blk(b),17,nm),dat(blk(b),6,nm),  &
           dat(blk(b),10,1),dat(blk(b),11,1),    dat(blk(b),12,1)+dat(blk(b),14,1)
@@ -262,17 +262,17 @@ program plotmdln
   
 32 continue   
   write(*,*)''
-  write(*,'(A)')'Variables:                       0: Quit'
+  write(*,'(A)') 'Variables:                       0: Quit'
   write(*,*)''
-  write(*,'(A)')' 1: Mesh pt'
-  write(*,'(A)')' 2: M                                                    '
-  write(*,'(A)')' 3: R       10: H       17: L           24: M/M*       '
-  write(*,'(A)')' 4: P       11: He      18: Eth         25: R/R*       '
-  write(*,'(A)')' 5: Rho     12: C       19: Enuc        26: C/O       '
-  write(*,'(A)')' 6: T       13: N       20: Enu         27: Ne/O              '
-  write(*,'(A)')' 7: k       14: O       21: S           28: Ne/O change  '
-  write(*,'(A)')' 8: Nad     15: Ne      22: Uint                         '
-  write(*,'(A)')' 9: Nrad    16: Mg      23: Nrad-Nad                     '
+  write(*,'(A)') ' 1: Mesh pt'
+  write(*,'(A)') ' 2: M                                                    '
+  write(*,'(A)') ' 3: R       10: H       17: L           24: M/M*       '
+  write(*,'(A)') ' 4: P       11: He      18: Eth         25: R/R*       '
+  write(*,'(A)') ' 5: Rho     12: C       19: Enuc        26: C/O       '
+  write(*,'(A)') ' 6: T       13: N       20: Enu         27: Ne/O              '
+  write(*,'(A)') ' 7: k       14: O       21: S           28: Ne/O change  '
+  write(*,'(A)') ' 8: Nad     15: Ne      22: Uint                         '
+  write(*,'(A)') ' 9: Nrad    16: Mg      23: Nrad-Nad                     '
   write(*,*)''
   
 35 write(*,'(A36)',advance='no')' Choose the X-axis variable (1-28): '
@@ -343,8 +343,8 @@ program plotmdln
   ymax0 = ymax
   
 70 write(*,*)''
-  write(*,'(A,ES12.3,A1,ES12.3)')'  X-range:',xmin,'-',xmax
-  write(*,'(A,ES12.3,A1,ES12.3)')'  Y-range:',ymin,'-',ymax
+  write(*,'(A,ES12.3,A1,ES12.3)') '  X-range:',xmin,'-',xmax
+  write(*,'(A,ES12.3,A1,ES12.3)') '  Y-range:',ymin,'-',ymax
   write(*,'(A)',advance='no')'  Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth:  '
   read*,rng
   if(rng.eq.'N') rng='n'
@@ -356,34 +356,34 @@ program plotmdln
   
   
   if(rng.eq.'x'.or.rng.eq.'b') then
-     write(*,'(A)')'Give the new range for the X-axis (Xmin, Xmax):'
+     write(*,'(A)') 'Give the new range for the X-axis (Xmin, Xmax):'
      read*,xmin,xmax
      if(xmin.gt.xmax) then
         x = xmin
         xmin = xmax
         xmax = x
-        write(*,'(A)')'  Swapped Xmin and Xmax'
+        write(*,'(A)') '  Swapped Xmin and Xmax'
      end if !if(xmin.gt.xmax)
      if(xmin.lt.xmin0) xmin = xmin0
      if(xmax.gt.xmax0) xmax = xmax0
   end if
   
   if(rng.eq.'y'.or.rng.eq.'b') then
-     write(*,'(A)')'Give the new range for the Y-axis (Ymin, Ymax):'
+     write(*,'(A)') 'Give the new range for the Y-axis (Ymin, Ymax):'
      read*,ymin,ymax
      if(ymin.gt.ymax) then
         x = ymin
         ymin = ymax
         ymax = x
-        write(*,'(A)')'  Swapped Ymin and Ymax'
+        write(*,'(A)') '  Swapped Ymin and Ymax'
      end if !if(ymin.gt.ymax)
      if(ymin.lt.ymin0) ymin = ymin0
      if(ymax.gt.ymax0) ymax = ymax0
   end if
   
   write(*,*)''
-  write(*,'(A,ES12.3,A1,ES12.3)')'X-range:',xmin,'-',xmax
-  write(*,'(A,ES12.3,A1,ES12.3)')'Y-range:',ymin,'-',ymax
+  write(*,'(A,ES12.3,A1,ES12.3)') 'X-range:',xmin,'-',xmax
+  write(*,'(A,ES12.3,A1,ES12.3)') 'Y-range:',ymin,'-',ymax
   
   
 100 continue
@@ -489,15 +489,15 @@ program plotmdln
   !************************************************************************      
   
 900 write(*,*)''
-  write(*,'(A)')' You can:'
-  write(*,'(A)')'  0) quit'
-  write(*,'(A)')'  1) change variables'
-  write(*,'(A)')'  2) change lin/log axes'
-  write(*,'(A)')'  3) change axis ranges'
-  write(*,'(A)')'  4) select zoom region'
-  write(*,'(A)')'  5) zoom out'
-  write(*,'(A)')'  6) change structure model'
-  write(*,'(A)')'  7) change input file'
+  write(*,'(A)') ' You can:'
+  write(*,'(A)') '  0) quit'
+  write(*,'(A)') '  1) change variables'
+  write(*,'(A)') '  2) change lin/log axes'
+  write(*,'(A)') '  3) change axis ranges'
+  write(*,'(A)') '  4) select zoom region'
+  write(*,'(A)') '  5) zoom out'
+  write(*,'(A)') '  6) change structure model'
+  write(*,'(A)') '  7) change input file'
   write(*,*)''
   write(*,'(A27)',advance='no')' What do you want to do ?  '
   read*,plotagain
@@ -514,11 +514,11 @@ program plotmdln
 941  call pgsci(1)
      xsel = 0.
      ysel = 0.
-     write(*,'(A)')'Select 2-4 corner points with your left mouse button and press "x" to finish'
+     write(*,'(A)') 'Select 2-4 corner points with your left mouse button and press "x" to finish'
      nsel=0
      call pgolin(4,nsel,xsel,ysel,2)
      if(nsel.lt.2) then
-        write(*,'(A)')' I need at least 2 corner points...'
+        write(*,'(A)') ' I need at least 2 corner points...'
         goto 941
      end if
      xmin = minval(xsel(1:nsel))  !The new window is drawn for the extreme values of these points
@@ -526,8 +526,8 @@ program plotmdln
      ymin = minval(ysel(1:nsel))
      ymax = maxval(ysel(1:nsel))
      write(*,*)''
-     write(*,'(A,ES12.3,A1,ES12.3)')'X-range:',xmin,'-',xmax
-     write(*,'(A,ES12.3,A1,ES12.3)')'Y-range:',ymin,'-',ymax
+     write(*,'(A,ES12.3,A1,ES12.3)') 'X-range:',xmin,'-',xmax
+     write(*,'(A,ES12.3,A1,ES12.3)') 'Y-range:',ymin,'-',ymax
      write(*,*)''
      call pgend
      goto 501
@@ -539,13 +539,13 @@ program plotmdln
      ymin = (ymin+ymax)/2. - 2*abs((ymin+ymax)/2.-ymin)
      ymax = (ymin+ymax)/2. + 2*abs((ymin+ymax)/2.-ymin)
      write(*,*)''
-     write(*,'(A,ES12.3,A1,ES12.3)')'X-range:',xmin,'-',xmax
-     write(*,'(A,ES12.3,A1,ES12.3)')'Y-range:',ymin,'-',ymax
+     write(*,'(A,ES12.3,A1,ES12.3)') 'X-range:',xmin,'-',xmax
+     write(*,'(A,ES12.3,A1,ES12.3)') 'Y-range:',ymin,'-',ymax
      write(*,*)''
      goto 501
   end if
   
-9999 write(*,'(A)')'Program finished'
+9999 write(*,'(A)') 'Program finished'
   write(*,*)''
 end program plotmdln
 

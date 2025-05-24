@@ -44,7 +44,7 @@ program listplt
      read(10,*) ubv
      close(10)
   else
-     write(*,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(*,'(A)') " Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   labels = ''
@@ -151,10 +151,10 @@ program listplt
   if(narg.eq.1) then
      call get_command_argument(1,fname)
   else
-     write(*,'(A)')'listplt: lists the contents of a plt-file to screen'
-     write(*,'(A)')'    syntax:  listplt <filename>'
+     write(*,'(A)') 'listplt: lists the contents of a plt-file to screen'
+     write(*,'(A)') '    syntax:  listplt <filename>'
      write(*,*)''
-     write(*,'(A)')"I'll look in the current directory for a *.plt file..."
+     write(*,'(A)') "I'll look in the current directory for a *.plt file..."
      fname=findfile('*.plt*')
   end if
   
@@ -163,27 +163,27 @@ program listplt
   
   
   write(*,*)''
-  write(*,'(A)')'Reading file '//trim(fname)
+  write(*,'(A)') 'Reading file '//trim(fname)
   
   dat = 0.d0
   open(unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
   read(10,*)ncols
-  write(*,'(A,I4,A)')'  Reading',ncols,' columns of data'
-  if(ncols.ne.nc) write(*,'(A,I4)')'WARNING: Number of colums in this file does not match that of the program:',nc
+  write(*,'(A,I4,A)') '  Reading',ncols,' columns of data'
+  if(ncols.ne.nc) write(*,'(A,I4)') 'WARNING: Number of colums in this file does not match that of the program:',nc
   do j=1,nn
      !read(10,'(F6.0,E17.9,E14.6,11F9.5,7E12.4,3F9.5,16E12.4,F8.4,21E13.5,12F9.5,6F9.5,E14.6)',err=12,end=11) (dat(i,j),i=1,nc)
      read(10,*,err=12,end=11) (dat(i,j),i=1,nc)
   end do
-  write(*,'(A)')'  End of file reached, arrays too small!'
+  write(*,'(A)') '  End of file reached, arrays too small!'
   close(10)
   goto 15
   
-11 write(*,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
+11 write(*,'(A,I6,A)') '  End of the file reached,',j-1,' lines read.'
   close(10)
   goto 15
   
-12 write(*,'(A,I6)')'  Error reading file, line ',j
+12 write(*,'(A,I6)') '  Error reading file, line ',j
   close(10)
   if(j.lt.3) goto 19
   print*,"  I'll skip the rest of the file and use the first part."
@@ -195,29 +195,29 @@ program listplt
   
   
   goto 29
-19 write(*,'(A)')'Trying for the new output format...'
+19 write(*,'(A)') 'Trying for the new output format...'
   dat = 0.d0
   open(unit=20,form='formatted',status='old',file=trim(fname))
   rewind 20
   read(20,*)ncols
-  write(*,'(A,I6,A)')'  Reading',ncols,' columns of data'
-  if(ncols.ne.nc) write(*,'(A,I4)')'WARNING: Number of colums in this file does not match that of the program:',nc
+  write(*,'(A,I6,A)') '  Reading',ncols,' columns of data'
+  if(ncols.ne.nc) write(*,'(A,I4)') 'WARNING: Number of colums in this file does not match that of the program:',nc
   do j=1,nn
      !read(20,'(F6.0,E17.9,E14.6,12E13.5,7E12.4,3E13.5,17E12.4,39E13.5,E14.6)',err=22,end=21) (dat(i,j),i=1,nc)
      read(20,*,err=22,end=21) (dat(i,j),i=1,nc)
   end do
-  write(*,'(A)')'  End of file reached, arrays too small!'
+  write(*,'(A)') '  End of file reached, arrays too small!'
   close(20)
   goto 25
   
-21 write(*,'(A,I6,A)')'  End of the file reached,',j-1,' lines read.'
+21 write(*,'(A,I6,A)') '  End of the file reached,',j-1,' lines read.'
   close(20)
   goto 25
   
-22 write(*,'(A,I6)')'  Error reading file, aborting at line ',j
+22 write(*,'(A,I6)') '  Error reading file, aborting at line ',j
   print*,dat(1,1:10)
   if(j.lt.3) goto 9999
-  write(*,'(A)')"  I'll skip the rest of the file and use the first part."
+  write(*,'(A)') "  I'll skip the rest of the file and use the first part."
   close(20)
 25 continue
   write(*,*)''
@@ -351,10 +351,10 @@ program listplt
      d(1:nnn) = dat(1:nnn,i)
      if(mod(i,25).eq.1) then
         write(*,*)''
-        write(*,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V'// &
+        write(*,'(A)') ' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)       V    B-V'// &
              '     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
      end if
-     write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i,nint(d(1)),d(2),d(4),d(5),d(6),d(63), &
+     write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)') i,nint(d(1)),d(2),d(4),d(5),d(6),d(63), &
           d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
   end do
   
@@ -378,7 +378,7 @@ program listplt
   end do
   
   do i=1,16
-     write(*,'(2x,4(I3,1x,A9,1x,ES15.7,9x))')i,trim(labels(i)),a(i),i+16,trim(labels(i+16)),a(i+16),i+32,trim(labels(i+32)), &
+     write(*,'(2x,4(I3,1x,A9,1x,ES15.7,9x))') i,trim(labels(i)),a(i),i+16,trim(labels(i+16)),a(i+16),i+32,trim(labels(i+32)), &
           a(i+32),i+48,trim(labels(i+48)),a(i+48)
   end do
   
@@ -387,7 +387,7 @@ program listplt
   end do
   
   do i=1,10
-     write(*,'(4(I5,1x,A13,2x,ES15.7,10x))')80+i,trim(labels(80+i)),a(80+i), 90+i,trim(labels(90+i)),a(90+i), 100+i, &
+     write(*,'(4(I5,1x,A13,2x,ES15.7,10x))') 80+i,trim(labels(80+i)),a(80+i), 90+i,trim(labels(90+i)),a(90+i), 100+i, &
           trim(labels(100+i)),a(100+i)
   end do
   
@@ -414,35 +414,35 @@ program listplt
   
   
   write(*,*)''
-  write(*,'(A)')'Variables:                                    0: Quit    '
+  write(*,'(A)') 'Variables:                                    0: Quit    '
   write(*,*)''
-  write(*,'(A)')'  1: model      16: Lh         28: Porb      34: Horb    '
-  write(*,'(A)')'  2: t          17: Lhe        29: FLR       35: dHorb/dt'
-  write(*,'(A)')'  3: dt         18: Lc         30: F1        36: dHgw/dt '
-  write(*,'(A)')'  4: M          19: Lnu        31: dM        37: dHwml/dt'
-  write(*,'(A)')'  5: Mhe        20: Lth        32: dMwind    38: dHmb/dt '
-  write(*,'(A)')'  6: Mco        21: Prot       33: dMmt      39: dHmtr/dt'
-  write(*,'(A)')'  7: Mone       22: VK2                      40: Mcomp   '
-  write(*,'(A)')'  8: R          23: Rcz                      41: e       '
-  write(*,'(A)')'  9: L          24: dRcz                                 '
-  write(*,'(A)')' 10: Teff       25: Tet                                  '
-  write(*,'(A)')' 11: Tc         26: Ralv                                 '
-  write(*,'(A)')' 12: Tmax       27: Bp          H  He   C   N   O  Ne  Mg'
-  write(*,'(A)')' 13: Rhoc                Surf  42  43  44  45  46  47  48'
-  write(*,'(A)')' 14: RhoTm               Tmax  49  50  51  52  53  54  55'
-  write(*,'(A)')' 15: Ebind               Core  56  57  58  59  60  61  62'
-  write(*,'(A)')'                                                         ' 
-  write(*,'(A)')'                                                         '
-  write(*,'(A)')' 81: Qconv          86: Rossby nr                        '  
-  write(*,'(A)')' 82: Pgw,max        87: Pcr (MB)                         '  
-  write(*,'(A)')' 83: Menv           88: Sills MB                         '
-  write(*,'(A)')' 84: Xf             89: Tet: int/anal                    '
-  write(*,'(A)')' 85: R/(dR/dt)                                           '
-  write(*,'(A)')'                                                         '
+  write(*,'(A)') '  1: model      16: Lh         28: Porb      34: Horb    '
+  write(*,'(A)') '  2: t          17: Lhe        29: FLR       35: dHorb/dt'
+  write(*,'(A)') '  3: dt         18: Lc         30: F1        36: dHgw/dt '
+  write(*,'(A)') '  4: M          19: Lnu        31: dM        37: dHwml/dt'
+  write(*,'(A)') '  5: Mhe        20: Lth        32: dMwind    38: dHmb/dt '
+  write(*,'(A)') '  6: Mco        21: Prot       33: dMmt      39: dHmtr/dt'
+  write(*,'(A)') '  7: Mone       22: VK2                      40: Mcomp   '
+  write(*,'(A)') '  8: R          23: Rcz                      41: e       '
+  write(*,'(A)') '  9: L          24: dRcz                                 '
+  write(*,'(A)') ' 10: Teff       25: Tet                                  '
+  write(*,'(A)') ' 11: Tc         26: Ralv                                 '
+  write(*,'(A)') ' 12: Tmax       27: Bp          H  He   C   N   O  Ne  Mg'
+  write(*,'(A)') ' 13: Rhoc                Surf  42  43  44  45  46  47  48'
+  write(*,'(A)') ' 14: RhoTm               Tmax  49  50  51  52  53  54  55'
+  write(*,'(A)') ' 15: Ebind               Core  56  57  58  59  60  61  62'
+  write(*,'(A)') '                                                         ' 
+  write(*,'(A)') '                                                         '
+  write(*,'(A)') ' 81: Qconv          86: Rossby nr                        '  
+  write(*,'(A)') ' 82: Pgw,max        87: Pcr (MB)                         '  
+  write(*,'(A)') ' 83: Menv           88: Sills MB                         '
+  write(*,'(A)') ' 84: Xf             89: Tet: int/anal                    '
+  write(*,'(A)') ' 85: R/(dR/dt)                                           '
+  write(*,'(A)') '                                                         '
   
   
 9999 write(*,*)''
-  write(*,'(A)')'Program finished'
+  write(*,'(A)') 'Program finished'
   write(*,*)''
   write(*,*)''
 end program listplt

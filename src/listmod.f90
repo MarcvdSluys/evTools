@@ -518,7 +518,7 @@ subroutine copy_mod(ip, infile, blk, save_dh)
   
   close(ip)
   close(op)
-  write(*,'(A)')'  Model written to '//trim(outfile)//'.'
+  write(*,'(A)') '  Model written to '//trim(outfile)//'.'
   
 end subroutine copy_mod
 !***********************************************************************************************************************************

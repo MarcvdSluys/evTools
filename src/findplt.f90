@@ -46,7 +46,7 @@ program findplt
      read(10,*) ubv
      close(10)
   else
-     write(*,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(*,'(A)') " Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   !Read the filename from the command line if any, search the current directory otherwise
@@ -63,33 +63,33 @@ program findplt
         read(arg,*) iout
      end if
   else
-     write(*,'(A)')'                                                                           ' 
-     write(*,'(A)')'  Syntax:  FINDPLT  <file.plt> <variable> <value> [<output>]'
-     write(*,'(A)')'           findplt finds every instant where <variable> becomes <value>, using interpolation'
-     write(*,'(A)')'           <output>: -1: all variables, 0: (default) selection of variables, >0: variable number <output>'
-     write(*,'(A)')'  '
-     write(*,'(A)')'  <variable>:                                                              '
-     write(*,'(A)')'    1: model        16: Lh           28: Porb        34: Horb              '
-     write(*,'(A)')'    2: t            17: Lhe          29: FLR         35: dHorb/dt          '
-     write(*,'(A)')'    3: dt           18: Lc           30: F1          36: dHgw/dt           '
-     write(*,'(A)')'    4: M            19: Lnu          31: dM          37: dHwml/dt          '
-     write(*,'(A)')'    5: Mhe          20: Lth          32: dMwind      38: dHmb/dt           '
-     write(*,'(A)')'    6: Mco          21: Prot         33: dMmt        39: dHmtr/dt          '
-     write(*,'(A)')'    7: Mone         22: VK2                          40: Mcomp             '
-     write(*,'(A)')'    8: log R        23: Rcz                          41: e                 '
-     write(*,'(A)')'    9: log L        24: dRcz                                               '
-     write(*,'(A)')'   10: log Teff     25: Tet                                                '
-     write(*,'(A)')'   11: log Tc       26: Ralv                                               '
-     write(*,'(A)')'   12: log Tmax     27: Bp                 H  He   C   N   O  Ne  Mg       '
-     write(*,'(A)')'   13: log Rhoc                    Surf:  42  43  44  45  46  47  48       '
-     write(*,'(A)')'   14: log RhoTm                   Tmax:  49  50  51  52  53  54  55       '
-     write(*,'(A)')'   15: Ub,env                      Core:  56  57  58  59  60  61  62       '
-     write(*,'(A)')'                                                                           ' 
-     write(*,'(A)')'   91: V   92: U-B   93: B-V   94: V-I   95: I-R   96: U-V   97: V-R       '
-     write(*,'(A)')'   99: Zsurf                                                               '
-     write(*,'(A)')'                                                                           '
-     write(*,'(A)')'  <value>: value to find for <variable>                                    '
-     write(*,'(A)')'                                                                           ' 
+     write(*,'(A)') '                                                                           ' 
+     write(*,'(A)') '  Syntax:  FINDPLT  <file.plt> <variable> <value> [<output>]'
+     write(*,'(A)') '           findplt finds every instant where <variable> becomes <value>, using interpolation'
+     write(*,'(A)') '           <output>: -1: all variables, 0: (default) selection of variables, >0: variable number <output>'
+     write(*,'(A)') '  '
+     write(*,'(A)') '  <variable>:                                                              '
+     write(*,'(A)') '    1: model        16: Lh           28: Porb        34: Horb              '
+     write(*,'(A)') '    2: t            17: Lhe          29: FLR         35: dHorb/dt          '
+     write(*,'(A)') '    3: dt           18: Lc           30: F1          36: dHgw/dt           '
+     write(*,'(A)') '    4: M            19: Lnu          31: dM          37: dHwml/dt          '
+     write(*,'(A)') '    5: Mhe          20: Lth          32: dMwind      38: dHmb/dt           '
+     write(*,'(A)') '    6: Mco          21: Prot         33: dMmt        39: dHmtr/dt          '
+     write(*,'(A)') '    7: Mone         22: VK2                          40: Mcomp             '
+     write(*,'(A)') '    8: log R        23: Rcz                          41: e                 '
+     write(*,'(A)') '    9: log L        24: dRcz                                               '
+     write(*,'(A)') '   10: log Teff     25: Tet                                                '
+     write(*,'(A)') '   11: log Tc       26: Ralv                                               '
+     write(*,'(A)') '   12: log Tmax     27: Bp                 H  He   C   N   O  Ne  Mg       '
+     write(*,'(A)') '   13: log Rhoc                    Surf:  42  43  44  45  46  47  48       '
+     write(*,'(A)') '   14: log RhoTm                   Tmax:  49  50  51  52  53  54  55       '
+     write(*,'(A)') '   15: Ub,env                      Core:  56  57  58  59  60  61  62       '
+     write(*,'(A)') '                                                                           ' 
+     write(*,'(A)') '   91: V   92: U-B   93: B-V   94: V-I   95: I-R   96: U-V   97: V-R       '
+     write(*,'(A)') '   99: Zsurf                                                               '
+     write(*,'(A)') '                                                                           '
+     write(*,'(A)') '  <value>: value to find for <variable>                                    '
+     write(*,'(A)') '                                                                           ' 
      
      stop
   end if
@@ -143,21 +143,21 @@ program findplt
   
 11 write(*,*)''
   print*,'  Error reading file after line ',j-1,', model ',prmdl,'!'
-  write(*,'(A)')'  Only the first part of the file will be processed.'
+  write(*,'(A)') '  Only the first part of the file will be processed.'
   write(*,*)''
 15 close(10)
   
   if(succ.eq.0) then
-     !write(*,'(A)')' Value not found, aborting... '
+     !write(*,'(A)') ' Value not found, aborting... '
      !stop
      write(*,*)''
-     write(*,'(A)')' *** Value not found, printing last model ***'
+     write(*,'(A)') ' *** Value not found, printing last model ***'
      call printmodel(nnn,x,iin,iout)
      stop
   end if
   
   
-  if(1.eq.2) write(*,'(ES12.5)')x(2)
+  if(1.eq.2) write(*,'(ES12.5)') x(2)
   
   
 end program findplt

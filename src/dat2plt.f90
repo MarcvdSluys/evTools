@@ -90,8 +90,8 @@ program dat2plt
   if(command_argument_count().eq.1) then
      call get_command_argument(1,infile)
   else
-     write(*,'(/,A)')'  dat2plt:   convert the stellar-evolution output of a different code to the plt format of ev'
-     write(*,'(A,/)')'  syntax:    dat2plt <filename>'
+     write(*,'(/,A)') '  dat2plt:   convert the stellar-evolution output of a different code to the plt format of ev'
+     write(*,'(A,/)') '  syntax:    dat2plt <filename>'
      stop
   end if
   
@@ -103,13 +103,13 @@ program dat2plt
   
   
   write(*,*)
-  write(*,'(A)')'  Input file:  '//trim(infile)
-  write(*,'(A)')'  Output file: '//trim(outfile)
+  write(*,'(A)') '  Input file:  '//trim(infile)
+  write(*,'(A)') '  Output file: '//trim(outfile)
   
   ioi = 0
   open(unit=10,form='formatted',status='old',action='read',file=trim(infile),iostat=ioi)
   if(ioi.ne.0) then
-     write(0,'(//,A,//)')'  Error opening input file '//trim(infile)//', aborting...'
+     write(0,'(//,A,//)') '  Error opening input file '//trim(infile)//', aborting...'
      stop
   end if
   rewind 10
@@ -118,7 +118,7 @@ program dat2plt
   open(unit=20,form='formatted',status='replace',action='write',file=trim(outfile),iostat=ioo)
   !open(unit=20,form='formatted',status='new',action='write',file=trim(outfile),iostat=ioo)
   if(ioo.ne.0) then
-     write(0,'(//,A,//)')'  Error creating output file '//trim(outfile)//', aborting...'
+     write(0,'(//,A,//)') '  Error creating output file '//trim(outfile)//', aborting...'
      stop
   end if
   
@@ -131,7 +131,7 @@ program dat2plt
   end if
   
   ! Write number of columns in first line of output file:
-  write(20,'(I4)')nco
+  write(20,'(I4)') nco
   
   i=0
   do while(ioi.eq.0) 
@@ -141,12 +141,12 @@ program dat2plt
      read(10,*,iostat=ioi) dati(1:nci)
      if(ioi.lt.0) exit
      if(ioi.gt.0) then
-        write(0,'(//,A,I6)')'  Error reading input file '//trim(infile)//', line',i
+        write(0,'(//,A,I6)') '  Error reading input file '//trim(infile)//', line',i
         if(i.lt.10) then
-           write(0,'(//,A)')'  Aborting...'
+           write(0,'(//,A)') '  Aborting...'
            stop
         else
-           write(0,'(//,A)')'  I could proces only part of the input file'
+           write(0,'(//,A)') '  I could proces only part of the input file'
            exit
         end if
      end if
@@ -161,14 +161,14 @@ program dat2plt
         end if
      end do
      
-     write(20,'(I6,ES17.9,ES14.6,12ES13.5,6ES12.4,3ES13.5,17ES12.4,39ES13.5,ES14.6,ES13.5,F5.1,6ES13.5)')nint(dato(1)),dato(2:nco)
+     write(20,'(I6,ES17.9,ES14.6,12ES13.5,6ES12.4,3ES13.5,17ES12.4,39ES13.5,ES14.6,ES13.5,F5.1,6ES13.5)') nint(dato(1)),dato(2:nco)
   end do
   
   close(10)
   close(20)
   
   
-  write(*,'(A,I5,A,I5,A,/)')'  Read',i-1+skipinlines,' input lines, wrote',i,' output lines'
+  write(*,'(A,I5,A,I5,A,/)') '  Read',i-1+skipinlines,' input lines, wrote',i,' output lines'
   
 end program dat2plt
 !***********************************************************************************************************************************

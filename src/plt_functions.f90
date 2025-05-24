@@ -717,62 +717,62 @@ subroutine printpltvarlist(nf)
   integer, intent(in) :: nf
   
   write(*,*)''
-  write(*,'(A)')'  Primary variables:                                  0: Quit                           '
-  write(*,'(A)')'                                                                                        '
-  write(*,'(A)')'    1: model        16: Lh           28: Porb        34: Jorb                           '
-  write(*,'(A)')'    2: t            17: Lhe          29: FLR         35: dJorb/dt                       '
-  write(*,'(A)')'    3: dt           18: Lc           30: F1          36: dJgw/dt                        '
-  write(*,'(A)')'    4: M            19: Lnu          31: dM          37: dJwml/dt                       '
-  write(*,'(A)')'    5: Mhe          20: Lth          32: dMwind      38: dJmb/dt                        '
-  write(*,'(A)')'    6: Mco          21: Prot         33: dMmt        39: dJmtr/dt                       '
-  write(*,'(A)')'    7: Mone         22: VK2                          40: Mcomp                          '
-  write(*,'(A)')'    8: R            23: Rcz                          41: e                              '
-  write(*,'(A)')'    9: L            24: dRcz                                                            '
-  write(*,'(A)')'   10: Teff         25: Tet                                                             '
-  write(*,'(A)')'   11: Tc           26: Ralv       Abundances:                                          '
-  write(*,'(A)')'   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
-  write(*,'(A)')'   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
-  write(*,'(A)')'   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
-  write(*,'(A)')'   15: Ebind,env                   Core:  56  57  58  59  60  61  62   215              '
-  write(*,'(A)')'                                                                                        ' 
-  write(*,'(A)')'   81: Qconv        86: Eb,recom     91: Rco                                            '
-  write(*,'(A)')'   82: Pc           87: Eb,H2ass     92: STRMDL                                         ' 
-  write(*,'(A)')'   83: Prot,c       88: Sc                                                              '
-  write(*,'(A)')'   84: Eb,grav      89: S1e5K                                                           '
-  write(*,'(A)')'   85: Eb,int       90: Rhe                                                             '
-  write(*,'(A)')'                                                                                        ' 
-  write(*,'(A)')'  Derived variables:                                                                                             '
-  write(*,'(A)')'   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '
-  write(*,'(A)')'   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
-  write(*,'(A)')'   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
-  write(*,'(A)')'   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
-  write(*,'(A)')'   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
-  write(*,'(A)')'   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
-  write(*,'(A)')'   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr     '
-  write(*,'(A)')'               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in  '
-  write(*,'(A)')'               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)  '
-  write(*,'(A)')'               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min) '
-  write(*,'(A)')'                                                                                                                 '
-  write(*,'(A)')'   161: zeta_*                  171: q1                                                                          '
-  write(*,'(A)')'   162: zeta_RL                 172: q2                                                                          '
-  write(*,'(A)')'   163: zeta_ad                                                                                                  '
-  write(*,'(A)')'   164: zeta_RL,an, beta=0.0                                                                                     '
-  write(*,'(A)')'   165: zeta_RL,an, beta=0.5                                                                                     '
-  write(*,'(A)')'   166: zeta_RL,an, beta=1.0                                                                                     '
-  write(*,'(A)')'                                                                                                                 '
-  write(*,'(A)')'                                                                                                                 '
-  write(*,'(A)')'  Special plots:                                                                                                 '
+  write(*,'(A)') '  Primary variables:                                  0: Quit                           '
+  write(*,'(A)') '                                                                                        '
+  write(*,'(A)') '    1: model        16: Lh           28: Porb        34: Jorb                           '
+  write(*,'(A)') '    2: t            17: Lhe          29: FLR         35: dJorb/dt                       '
+  write(*,'(A)') '    3: dt           18: Lc           30: F1          36: dJgw/dt                        '
+  write(*,'(A)') '    4: M            19: Lnu          31: dM          37: dJwml/dt                       '
+  write(*,'(A)') '    5: Mhe          20: Lth          32: dMwind      38: dJmb/dt                        '
+  write(*,'(A)') '    6: Mco          21: Prot         33: dMmt        39: dJmtr/dt                       '
+  write(*,'(A)') '    7: Mone         22: VK2                          40: Mcomp                          '
+  write(*,'(A)') '    8: R            23: Rcz                          41: e                              '
+  write(*,'(A)') '    9: L            24: dRcz                                                            '
+  write(*,'(A)') '   10: Teff         25: Tet                                                             '
+  write(*,'(A)') '   11: Tc           26: Ralv       Abundances:                                          '
+  write(*,'(A)') '   12: Tmax         27: Bp                 H  He   C   N   O  Ne  Mg   All              '
+  write(*,'(A)') '   13: Rhoc                        Surf:  42  43  44  45  46  47  48   213              '
+  write(*,'(A)') '   14: RhoTm                       Tmax:  49  50  51  52  53  54  55   214              '
+  write(*,'(A)') '   15: Ebind,env                   Core:  56  57  58  59  60  61  62   215              '
+  write(*,'(A)') '                                                                                        ' 
+  write(*,'(A)') '   81: Qconv        86: Eb,recom     91: Rco                                            '
+  write(*,'(A)') '   82: Pc           87: Eb,H2ass     92: STRMDL                                         ' 
+  write(*,'(A)') '   83: Prot,c       88: Sc                                                              '
+  write(*,'(A)') '   84: Eb,grav      89: S1e5K                                                           '
+  write(*,'(A)') '   85: Eb,int       90: Rhe                                                             '
+  write(*,'(A)') '                                                                                        ' 
+  write(*,'(A)') '  Derived variables:                                                                                             '
+  write(*,'(A)') '   101: V      111: lambda_env    121: Pcr (MB)         131: Rho_avg             141: GMMenv/R   151: E_tot      '
+  write(*,'(A)') '   102: U-B    112: q_crit        122: Sills MB         132: Zsurf               142: M_bin      152: Ebenv_gr+in'
+  write(*,'(A)') '   103: B-V    113: M2,crit       123: Tet: int/anal    133: t_f-t               143: a_orb      153: Ebenv_re+H2'
+  write(*,'(A)') '   104: V-R    114: Vrot          124: t-to             134: P_rot/crit          144: J_orb      154: Ebenv_gr/in'
+  write(*,'(A)') '   105: R-I    115: R/Rzams       125: Ne/O change      135: g_surf              145: J_spin     155: Ebenv_re/H2'
+  write(*,'(A)') '   106: U-V    116: Mhe-Mco       126: Pgw,max          136: Reimers Mdot        146: J_tot      156: Ebenv_gi/rH'
+  write(*,'(A)') '   107: V-I    117: Menv          127: Rrl              137: Reimers-like        147: E_orb      157: lam_gr     '
+  write(*,'(A)') '               118: Mconv         128: Xf               138: Rmrslike/Rmrs       148: E_spin     158: lam_gr+in  '
+  write(*,'(A)') '               119: R/(dR/dt)     129: M.I.             139: Mzams-M             149: E_so       159: Porb (hr)  '
+  write(*,'(A)') '               120: Rossby nr     130: w_spin           140: (Mzams-M)/Mzams     150: E_bind     160: Porb (min) '
+  write(*,'(A)') '                                                                                                                 '
+  write(*,'(A)') '   161: zeta_*                  171: q1                                                                          '
+  write(*,'(A)') '   162: zeta_RL                 172: q2                                                                          '
+  write(*,'(A)') '   163: zeta_ad                                                                                                  '
+  write(*,'(A)') '   164: zeta_RL,an, beta=0.0                                                                                     '
+  write(*,'(A)') '   165: zeta_RL,an, beta=0.5                                                                                     '
+  write(*,'(A)') '   166: zeta_RL,an, beta=1.0                                                                                     '
+  write(*,'(A)') '                                                                                                                 '
+  write(*,'(A)') '                                                                                                                 '
+  write(*,'(A)') '  Special plots:                                                                                                 '
   if(nf.eq.1) then
-     write(*,'(A)')"   201: HR Diagram         211: Timescales            221: dJ/dt's                                            "
-     write(*,'(A)')'   202: Convection plot    212: Luminosities          222: Mdots                                              '
-     write(*,'(A)')'                           213: Surface abundances    223: Winds                                              '
-     write(*,'(A)')'                           214: Tmax abundances       224: Zetas: mdl                                         '
-     write(*,'(A)')'                           215: Core abundances       225: Zetas: anl                                         '
-     write(*,'(A)')'                                                      226: Zetas: all                                         '
+     write(*,'(A)') "   201: HR Diagram         211: Timescales            221: dJ/dt's                                            "
+     write(*,'(A)') '   202: Convection plot    212: Luminosities          222: Mdots                                              '
+     write(*,'(A)') '                           213: Surface abundances    223: Winds                                              '
+     write(*,'(A)') '                           214: Tmax abundances       224: Zetas: mdl                                         '
+     write(*,'(A)') '                           215: Core abundances       225: Zetas: anl                                         '
+     write(*,'(A)') '                                                      226: Zetas: all                                         '
   else
-     write(*,'(A)')'   201: HR Diagram                                                                                            '
+     write(*,'(A)') '   201: HR Diagram                                                                                            '
   end if
-  write(*,'(A)')'                                                                                                                 '
+  write(*,'(A)') '                                                                                                                 '
   
 end subroutine printpltvarlist
 !***********************************************************************************************************************************
@@ -877,20 +877,20 @@ subroutine read_plt(u,fname,nn,nvar,nc,verbose,dat,n,version)
   !    end do
   ! end if
   
-  write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
+  write(0,'(A)') '  ***  ERROR:  End of file reached, arrays too small!  ***'
   close(u)
   n = j-1   ! Number of models in the file
   return
   
-11 if(verbose.eq.1) write(*,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
+11 if(verbose.eq.1) write(*,'(A,I6,A)') '  File read OK,',j-1,' lines read.'
   close(u)
   n = j-1   ! Number of models in the file
   return
   
-12 if(verbose.eq.1.or.j.ge.3) write(*,'(A,I6)')'  Error reading ev file, line',j
+12 if(verbose.eq.1.or.j.ge.3) write(*,'(A,I6)') '  Error reading ev file, line',j
   close(u)
   if(j.lt.3) call quit_program('Error reading input file')
-  if(verbose.eq.1) write(*,'(A)')"  I'll skip the rest of the file and use the first part."
+  if(verbose.eq.1) write(*,'(A)') "  I'll skip the rest of the file and use the first part."
   
   n = j-1   ! Number of models in the file
   
@@ -965,23 +965,23 @@ subroutine read_bse(u,fname,nn,nvar,verbose,dat,n,version)
   end do
   
   
-  write(0,'(A)')'  ***  ERROR:  End of file reached, arrays too small!  ***'
+  write(0,'(A)') '  ***  ERROR:  End of file reached, arrays too small!  ***'
   close(u)
   n = j-1   ! Number of models in the file
   return
   
 11 continue
-  if(verbose.eq.1) write(*,'(A,I6,A)')'  File read OK,',j-1,' lines read.'
+  if(verbose.eq.1) write(*,'(A,I6,A)') '  File read OK,',j-1,' lines read.'
   close(u)
   n = j-1   ! Number of models in the file
   return
   
 12 continue
-  if(verbose.eq.1.or.j.ge.3) write(*,'(A,I6)')'  Error reading BSE file, line',j
+  if(verbose.eq.1.or.j.ge.3) write(*,'(A,I6)') '  Error reading BSE file, line',j
   print*,real(tmpdat)
   close(u)
   if(j.lt.3) call quit_program('Error reading input file')
-  if(verbose.eq.1) write(*,'(A)')"  I'll skip the rest of the file and use the first part."
+  if(verbose.eq.1) write(*,'(A)') "  I'll skip the rest of the file and use the first part."
   
   n = j-1   ! Number of models in the file
   
@@ -1096,8 +1096,8 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
   dat(111,1:n) = max(dat(111,1:n),0.d0)
   do i=1,n
      if(abs(dat(5,i)).lt.1.d-29) dat(111,i) = 0.d0  !If there's no He core mass, there's no lambda
-     !write(*,'(I6,9ES20.5)')i,dat(4:5,i),Menv(i),dat(15,i),dat(8,i),dat(111,i)
-     !write(99,'(9ES12.4)')dat((/5,8,111/),i)
+     !write(*,'(I6,9ES20.5)') i,dat(4:5,i),Menv(i),dat(15,i),dat(8,i),dat(111,i)
+     !write(99,'(9ES12.4)') dat((/5,8,111/),i)
   end do
   
   
@@ -1113,7 +1113,7 @@ subroutine changepltvars(nn,nvar,n,dat,labels,dpdt)
         dat(112,i) = 0.
         dat(113,i) = 0.
      end if
-     !write(*,'(I6,9ES12.3)')i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
+     !write(*,'(I6,9ES12.3)') i,dat(4,i),dat(5,i),dat(112,i),dat(113,i)
   end do
   
   ! 114: Vrot = 2piR/P -> km/s:

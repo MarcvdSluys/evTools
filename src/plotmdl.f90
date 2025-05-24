@@ -127,7 +127,7 @@ program plotmdl
   
   nr = 4 ! Number of variable columns
   ii = ceiling(real(ncol)/real(nr))  ! Number of rows
-  write(*,'(A)')' Variables:                         0: Quit                   ' 
+  write(*,'(A)') ' Variables:                         0: Quit                   ' 
   do i=1,ii
      do j=0,nr-1
         if(pxnr(i+j*ii).eq.0) then  ! Variable does not exist
@@ -141,8 +141,8 @@ program plotmdl
   
   
   ! Print derived variables, from number 201 on:
-  write(*,'(A)')'                                                              '
-  write(*,'(A)')'  Derived variables:                                          '
+  write(*,'(A)') '                                                              '
+  write(*,'(A)') '  Derived variables:                                          '
   
   nr = 4 !Number of variable columns
   ii = ceiling(real(nv_der)/real(nr)) !Number of rows
@@ -159,8 +159,8 @@ program plotmdl
   
   
   ! Print special variables, from number 301 on:
-  write(*,'(A)')'                                                              '
-  write(*,'(A)')'  Special plots:                                          '
+  write(*,'(A)') '                                                              '
+  write(*,'(A)') '  Special plots:                                          '
   
   nr = 2 !Number of variable columns
   ii = ceiling(real(nv_sp)/real(nr)) !Number of rows
@@ -300,7 +300,7 @@ program plotmdl
   end if
   
   
-  if(nx.ne.1.and.nx.ne.ny) write(0,'(/,A,/)')' The number of X variables is different from the number of Y variables (nx!=ny).'// &
+  if(nx.ne.1.and.nx.ne.ny) write(0,'(/,A,/)') ' The number of X variables is different from the number of Y variables (nx!=ny).'// &
        "  I'll proceed, but the results may be inconsistent."
   
   
@@ -366,26 +366,26 @@ program plotmdl
   
   
   if(rng.eq.'x'.or.rng.eq.'b') then
-     write(*,'(A)')' Give the new range for the X-axis (Xmin, Xmax):'
+     write(*,'(A)') ' Give the new range for the X-axis (Xmin, Xmax):'
      read*,xmin,xmax
      if(xmin.gt.xmax) then
         x = xmin
         xmin = xmax
         xmax = x
-        write(*,'(A)')'  Swapped Xmin and Xmax'
+        write(*,'(A)') '  Swapped Xmin and Xmax'
      end if !if(xmin.gt.xmax)
      if(xmin.lt.xmin0) xmin = xmin0
      if(xmax.gt.xmax0) xmax = xmax0
   end if
   
   if(rng.eq.'y'.or.rng.eq.'b') then
-     write(*,'(A)')' Give the new range for the Y-axis (Ymin, Ymax):'
+     write(*,'(A)') ' Give the new range for the Y-axis (Ymin, Ymax):'
      read*,ymin,ymax
      if(ymin.gt.ymax) then
         x = ymin
         ymin = ymax
         ymax = x
-        write(*,'(A)')'  Swapped Ymin and Ymax'
+        write(*,'(A)') '  Swapped Ymin and Ymax'
      end if !if(ymin.gt.ymax)
      if(ymin.lt.ymin0) ymin = ymin0
      if(ymax.gt.ymax0) ymax = ymax0
@@ -445,10 +445,10 @@ program plotmdl
   else ! plot.ne.9: Plot to screen
      io = 0
      do while(io.le.0)
-        write(xwin,'(I3.3,A7)')xwini,'/xserve'
+        write(xwin,'(I3.3,A7)') xwini,'/xserve'
         io = pgopen(trim(xwin))
         if(io.le.0) then
-           write(*,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
+           write(*,'(A,I3,A,I3)') ' X window',xwini," is unavailable, I'll try",xwini+1
            xwini = xwini + 1
         end if
      end do
@@ -514,14 +514,14 @@ program plotmdl
   call pgsch(1.5)
   call pgsci(8)
   if(hmp.gt.0) then
-     write(fmt,'(A,I3.3,A)')'(4x,A',maxval(len_trim(lys(1:ny))),',A,F15.5,ES15.4)'
+     write(fmt,'(A,I3.3,A)') '(4x,A',maxval(len_trim(lys(1:ny))),',A,F15.5,ES15.4)'
      do i=1,ny
         call pgpoint(1,xx(1,hmp),yy(i,hmp),2)
         xtmp = xx(1,hmp)
         ytmp = yy(i,hmp)
         if(log.eq.'x'.or.log.eq.'b') xtmp = 10.0**xtmp
         if(log.eq.'y'.or.log.eq.'b') ytmp = 10.0**ytmp
-        if(i.eq.1) write(*,'(/,A,I4,A)')'  Variable value(s) for highlighted mesh point',nint(xtmp),':'
+        if(i.eq.1) write(*,'(/,A,I4,A)') '  Variable value(s) for highlighted mesh point',nint(xtmp),':'
         write(*,trim(fmt))trim(lys(i)),':',ytmp,ytmp
      end do
   end if
@@ -561,20 +561,20 @@ program plotmdl
   
 900 if(plot.ne.9) then
      write(*,*)''
-     write(*,'(A)')' You can:'
-     write(*,'(A)')'  0) quit'
-     write(*,'(A)')'  1) change variables'
-     write(*,'(A)')'  2) change lin/log axes'
-     write(*,'(A)')'  3) change axis ranges'
-     write(*,'(A)')'  4) select zoom region'
-     write(*,'(A)')'  5) zoom out'
-     write(*,'(A)')'  6) change structure model'
-     write(*,'(A)')'  7) change input file'
-     write(*,'(A)')'  '
-     write(*,'(A)')'  9) save plot as pdf'
-     write(*,'(A)')'  '
-     write(*,'(A)')' 10) identify a point in the graph'
-     write(*,'(A)')' 11) toggle drawing lines/points'
+     write(*,'(A)') ' You can:'
+     write(*,'(A)') '  0) quit'
+     write(*,'(A)') '  1) change variables'
+     write(*,'(A)') '  2) change lin/log axes'
+     write(*,'(A)') '  3) change axis ranges'
+     write(*,'(A)') '  4) select zoom region'
+     write(*,'(A)') '  5) zoom out'
+     write(*,'(A)') '  6) change structure model'
+     write(*,'(A)') '  7) change input file'
+     write(*,'(A)') '  '
+     write(*,'(A)') '  9) save plot as pdf'
+     write(*,'(A)') '  '
+     write(*,'(A)') ' 10) identify a point in the graph'
+     write(*,'(A)') ' 11) toggle drawing lines/points'
   end if  ! if(plot.ne.9) then
   
   write(*,*)''
@@ -595,11 +595,11 @@ program plotmdl
      call pgsci(1)
      xsel = 0.
      ysel = 0.
-     write(*,'(A)')' Select 2-4 corner points with your left mouse button and press "x" to finish'
+     write(*,'(A)') ' Select 2-4 corner points with your left mouse button and press "x" to finish'
      nsel=0
      call pgolin(4,nsel,xsel,ysel,2)
      if(nsel.lt.2) then
-        write(*,'(A)')' I need at least 2 corner points...'
+        write(*,'(A)') ' I need at least 2 corner points...'
         goto 941
      end if
      xmin = minval(xsel(1:nsel))  !The new window is drawn for the extreme values of these points
@@ -635,11 +635,11 @@ program plotmdl
   if(plot.eq.11) then !Toggle between drawing points, lines or both
      ansi=-1
      do while(ansi.lt.0.or.ansi.gt.3)
-        write(*,'(A)')'  You can plot:'
-        write(*,'(A)')'  0: keep the current choice'
-        write(*,'(A)')'  1: lines'
-        write(*,'(A)')'  2: dots'
-        write(*,'(A)')'  3: both'
+        write(*,'(A)') '  You can plot:'
+        write(*,'(A)') '  0: keep the current choice'
+        write(*,'(A)') '  1: lines'
+        write(*,'(A)') '  2: dots'
+        write(*,'(A)') '  3: both'
         write(*,'(A)', advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
@@ -649,7 +649,7 @@ program plotmdl
   
   
 9999 continue
-  write(*,'(A,/)')' Program finished'
+  write(*,'(A,/)') ' Program finished'
 end program plotmdl
 !***********************************************************************************************************************************
 

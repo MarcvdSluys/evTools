@@ -57,7 +57,7 @@ program plotmod
   call system('pwd > tmppwd.txt')
   open (unit=10,form='formatted',status='old',file='tmppwd.txt')
   rewind 10
-  read(10,'(a100)')title
+  read(10,'(a100)') title
   close(10)
   call system('rm tmppwd.txt')
 
@@ -68,9 +68,9 @@ program plotmod
   else if(narg.eq.1) then
      call get_command_argument(1,fname)
   else
-     write(*,'(A)')' Plotmod: plots the contents of a structure model file'
-     write(*,'(A)')'          syntax:  plotmod <filename>'
-     write(*,'(A)')'              or:  plotmod   to look for a .mod file in the current directory'
+     write(*,'(A)') ' Plotmod: plots the contents of a structure model file'
+     write(*,'(A)') '          syntax:  plotmod <filename>'
+     write(*,'(A)') '              or:  plotmod   to look for a .mod file in the current directory'
      goto 9999
   end if
 
@@ -79,11 +79,11 @@ program plotmod
   ! READ FILE AND LIST MODELS IN FILE
 
 2 write(*,*)''
-  write(*,'(A)')' Reading file '//trim(fname)
+  write(*,'(A)') ' Reading file '//trim(fname)
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
 
-  write(*,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+  write(*,'(A)') ' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
        '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
      !read(10,*,err=5,end=10) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
@@ -113,16 +113,16 @@ program plotmod
      write(*,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
           i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,ts,tc,hc,hec,zc,bms,p,ecc,p1
   end do !i
-  write(*,'(A)')'  EOF not reached, array too small!'
+  write(*,'(A)') '  EOF not reached, array too small!'
   n=999
   goto 12
-5 write(*,'(A35,I3)')'  Error reading first line of block',i
+5 write(*,'(A35,I3)') '  Error reading first line of block',i
   goto 10
-6 write(*,'(A36,I3)')'  Error reading second line of block',i
+6 write(*,'(A36,I3)') '  Error reading second line of block',i
 10 n=i-1
-  write(*,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+  write(*,'(A)') ' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
        '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
-  write(*,'(I3,A)')n,' blocks read.'
+  write(*,'(I3,A)') n,' blocks read.'
 12 if(n.eq.0) goto 999
   write(*,*)''
   blk = 1
@@ -207,18 +207,18 @@ program plotmod
 
 32 continue   
   write(*,*)''
-  write(*,'(A)')' Variables:                               0: Quit '
+  write(*,'(A)') ' Variables:                               0: Quit '
   write(*,*)''
-  write(*,'(A)')'   1: Mesh point                       Abundances:'
-  write(*,'(A)')'   2: Mass                               11: H    '
-  write(*,'(A)')'   3: Radius                             12: He   '
-  write(*,'(A)')'   4: Temperature                        13: C    '
-  write(*,'(A)')'   5: Density                            14: O    '
-  write(*,'(A)')'   6: Luminosity                         15: Ne   '
-  write(*,'(A)')'   7: Fdegeneracy                                 '
-  write(*,'(A)')'   8: Potential (grav+centr)                      '
-  write(*,'(A)')'   9: Mass flux                                   '
-  write(*,'(A)')'  10: Moment of inertia                           '
+  write(*,'(A)') '   1: Mesh point                       Abundances:'
+  write(*,'(A)') '   2: Mass                               11: H    '
+  write(*,'(A)') '   3: Radius                             12: He   '
+  write(*,'(A)') '   4: Temperature                        13: C    '
+  write(*,'(A)') '   5: Density                            14: O    '
+  write(*,'(A)') '   6: Luminosity                         15: Ne   '
+  write(*,'(A)') '   7: Fdegeneracy                                 '
+  write(*,'(A)') '   8: Potential (grav+centr)                      '
+  write(*,'(A)') '   9: Mass flux                                   '
+  write(*,'(A)') '  10: Moment of inertia                           '
   write(*,*)''
 
 
@@ -275,7 +275,7 @@ program plotmod
      if(xmax.gt.xmax0) xmax = xmax0
      ymin=1.e33
      ymax=-1.e33
-     write(*,'(I5)')kh
+     write(*,'(I5)') kh
      do i=1,kh
         if(dat(vx,i).ge.xmin.and.dat(vx,i).le.xmax) then
            if(dat(vy,i).lt.ymin) ymin = dat(vy,i)
@@ -326,7 +326,7 @@ program plotmod
   end do
   
   !Add block number to plot title:
-  write(title,'(A,I6)')trim(title),blk
+  write(title,'(A,I6)') trim(title),blk
   
 201 continue
   if(plotagain.eq.5) then  ! Save plot to file
@@ -377,13 +377,13 @@ program plotmod
 
 
 200 write(*,*)''
-  write(*,'(A)')' You can:'
-  write(*,'(A)')'   0) quit'
-  write(*,'(A)')'   1) change variables'
-  write(*,'(A)')'   2) change lin/log axes'
-  write(*,'(A)')'   3) change axis ranges'
-  write(*,'(A)')'   4) change structure model'
-  write(*,'(A)')'   5) save plot as postscript'
+  write(*,'(A)') ' You can:'
+  write(*,'(A)') '   0) quit'
+  write(*,'(A)') '   1) change variables'
+  write(*,'(A)') '   2) change lin/log axes'
+  write(*,'(A)') '   3) change axis ranges'
+  write(*,'(A)') '   4) change structure model'
+  write(*,'(A)') '   5) save plot as postscript'
   write(*,'(A)',advance='no')' What would you like to do:  '
   read*,plotagain
   write(*,*)''
@@ -402,9 +402,9 @@ program plotmod
   
   
   goto 999
-991 write(*,'(A)')' Error reading first line'
+991 write(*,'(A)') ' Error reading first line'
   goto 999
-993 write(*,'(A)')' Error reading second line'
+993 write(*,'(A)') ' Error reading second line'
   
 999 close(10)
 9999 write(*,*)''

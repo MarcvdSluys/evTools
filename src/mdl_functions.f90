@@ -117,7 +117,7 @@ subroutine compute_mdl_variables(dat)
   m2i = m1i                                                                              ! (Initial) total mass of star 2
   if(1.eq.2) then
      m2i = 0.25                                                                          ! CHECK: using custom M2
-     write(0,'(/,A,/)')'  *** Warning: using custom value for M2 ***'
+     write(0,'(/,A,/)') '  *** Warning: using custom value for M2 ***'
   end if
   Mbini = m1i+m2i                                                                        ! (Initial) binary mass
   r1i = dat(pxin(17),nm)                                                                 ! (Initial) surface radius of star 1
@@ -389,7 +389,7 @@ subroutine list_mdl_models(infile,nblk)
   write(*,*)''
   
   if(nblk.eq.0) then
-     write(*,'(A,/)')'  Program finished'
+     write(*,'(A,/)') '  Program finished'
      stop
   end if
   
@@ -473,9 +473,9 @@ subroutine print_mdl_details(infile,blk,svblk)
   if(io.ne.0) then  ! Error/EOF
      close(10)
      if(io.lt.0) then
-        write(*,'(A,/)')'  Program finished'  !EOF
+        write(*,'(A,/)') '  Program finished'  !EOF
      else
-        write(0,'(A,2(I5,A),/)')'  Error reading model',blk,'line',mp-1,', aborting...'  ! Read error
+        write(0,'(A,2(I5,A),/)') '  Error reading model',blk,'line',mp-1,', aborting...'  ! Read error
      end if
      stop
   end if
@@ -484,7 +484,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   if(svblk) then
      ! Create output filename:
      in = index(trim(infile),'.mdl',.true.)
-     write(outfile,'(A,I5.5,A)')infile(1:in-1)//'_',nmdl,trim(infile(in:))
+     write(outfile,'(A,I5.5,A)') infile(1:in-1)//'_',nmdl,trim(infile(in:))
 
      ! Open output file and write header and mesh point 1
      open(unit=20,form='formatted',status='replace',file=trim(outfile))
@@ -527,7 +527,7 @@ subroutine print_mdl_details(infile,blk,svblk)
      
      if(io.ne.0) then  ! EOF/read error
         close(10)
-        write(0,'(A,2(I5,A),/)')'  Error reading model',blk,'line',mp-1,', aborting...'
+        write(0,'(A,2(I5,A),/)') '  Error reading model',blk,'line',mp-1,', aborting...'
         stop
      end if
      
@@ -621,7 +621,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   
   if(svblk) then
      close(20)
-     write(*,'(A)')' Output model saved in '//trim(outfile)//'.'
+     write(*,'(A)') ' Output model saved in '//trim(outfile)//'.'
      svblk = .false.  ! Stop saving the model block
   end if
   
@@ -655,7 +655,7 @@ subroutine read_first_mdls(infile,blk)
   rewind(10)
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
   if(io.ne.0) then
-     write(0,'(A,/)')'3  Error reading first line (header) of the file, aborting...'
+     write(0,'(A,/)') '3  Error reading first line (header) of the file, aborting...'
      close(10)
      stop
   end if
@@ -675,7 +675,7 @@ subroutine read_first_mdls(infile,blk)
      do bl=1,blk
         read(10,'(I6,1x,ES16.9)',iostat=io) dumint, dumreal  ! nmdl,age
         if(io.ne.0) then
-           write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',bl,', aborting...'
+           write(0,'(A,I5,A,/)') '4  Error reading first line (header) of model',bl,', aborting...'
            close(10)
            stop
         end if
@@ -688,9 +688,9 @@ subroutine read_first_mdls(infile,blk)
            if(io.ne.0) then  ! Error/EOF
               close(10)
               if(io.lt.0) then
-                 write(*,'(A,/)')'  Program finished'  ! EOF
+                 write(*,'(A,/)') '  Program finished'  ! EOF
               else
-                 write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
+                 write(0,'(A,2(I5,A),/)') '  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
               end if
               stop
            end if
@@ -726,7 +726,7 @@ subroutine read_chosen_mdl(blk, mdl,age,dat)
   
   read(10,'(I6,1x,E16.9)',iostat=io) mdl,age
   if(io.ne.0) then
-     write(0,'(A,I5,A,/)')'4  Error reading first line (header) of model',blk,', aborting...'
+     write(0,'(A,I5,A,/)') '4  Error reading first line (header) of model',blk,', aborting...'
      close(10)
      stop
   end if
@@ -740,9 +740,9 @@ subroutine read_chosen_mdl(blk, mdl,age,dat)
      if(io.ne.0) then  !Error/EOF
         close(10)
         if(io.lt.0) then
-           write(*,'(A,/)')'  Program finished'  !EOF
+           write(*,'(A,/)') '  Program finished'  !EOF
         else
-           write(0,'(A,2(I5,A),/)')'  Error reading model',blk-1,'line',mp-1,', aborting...'  ! Read error
+           write(0,'(A,2(I5,A),/)') '  Error reading model',blk-1,'line',mp-1,', aborting...'  ! Read error
            print*,real(dat1(1:ncol))
         end if
         stop

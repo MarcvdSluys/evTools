@@ -42,8 +42,8 @@ program plt2ce
      
      open(unit=10,form='formatted',status='old',file=fname)
      rewind(10)
-     read(10,'(I4)')nc1
-     if(nc1.ne.nc) write(*,'(A,I3,A,I3,A)')'Data file has',nc1,' columns, the programme is designed for',nc,' columns !'
+     read(10,'(I4)') nc1
+     if(nc1.ne.nc) write(*,'(A,I3,A,I3,A)') 'Data file has',nc1,' columns, the programme is designed for',nc,' columns !'
      open(unit=20,form='formatted',status='replace',file=fname(1:fl)//'.ce')
      
      do i=1,n
@@ -62,9 +62,9 @@ program plt2ce
              dat(88),dat(89)
 20      format(ES17.9,16ES13.5)
      end do! i=1,n
-     write(*,'(A)')'End of file not reached, arrays too small!'
+     write(*,'(A)') 'End of file not reached, arrays too small!'
      goto 15
-12   write(*,'(A,I6,A)')'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
+12   write(*,'(A,I6,A)') 'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
 15   continue
      close(10)
      close(20)

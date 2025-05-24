@@ -46,12 +46,12 @@ subroutine plotlinesofconstantradius(ltmin,ltmax,llmin,llmax)
      if(logr.lt.r1.or.logr.gt.r2) cycle
      if(logr.lt.0.0001) then
         if(logr.lt.-2.0) then
-           write(str,'(F6.3,A)')10**logr,'R\d\(2281)\u'
+           write(str,'(F6.3,A)') 10**logr,'R\d\(2281)\u'
         else
-           write(str,'(F5.2,A)')10**logr,'R\d\(2281)\u'
+           write(str,'(F5.2,A)') 10**logr,'R\d\(2281)\u'
         end if
      else
-        write(str,'(I5,A)')nint(10**logr),'R\d\(2281)\u'
+        write(str,'(I5,A)') nint(10**logr),'R\d\(2281)\u'
      end if
      x2 = (/2.,6./)
      y2 = cst+2*logr+4*(/2.,6./)
@@ -234,11 +234,11 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            ! if(xx(i).gt.1245.and.xx(i).lt.1265) then
            ! write(*,*)''
            ! !if(dib.ne.0) then
-           ! write(*,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
-           ! write(*,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
-           ! write(*,'(5I10)')nint(zonex),nz
+           ! write(*,'(4I5,6F8.4)') i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
+           ! write(*,'(4I5,6F8.4)') i,nint(xx(i)),ib,dib,dat(63:68,i)
+           ! write(*,'(5I10)') nint(zonex),nz
            ! do j=1,nz
-           ! write(*,'(4F10.6)')zoney(j,:)
+           ! write(*,'(4F10.6)') zoney(j,:)
            ! end do
            ! end if
            
@@ -324,11 +324,11 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            ! if(xx(i).gt.1280.and.xx(i).lt.1330) then
            ! !if(dib.ne.0) then
            ! write(*,*)''
-           ! write(*,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
-           ! write(*,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
-           ! write(*,'(5I10)')nint(zonex),nz
+           ! write(*,'(4I5,6F8.4)') i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
+           ! write(*,'(4I5,6F8.4)') i,nint(xx(i)),ib,dib,dat(69:74,i)
+           ! write(*,'(5I10)') nint(zonex),nz
            ! do j=1,nz
-           ! write(*,'(4F10.6)')zoney(j,:)
+           ! write(*,'(4F10.6)') zoney(j,:)
            ! end do
            ! end if
            
@@ -436,7 +436,7 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
               xx2 = (/xx(hp(i)),xx(hp(i))/)
               yy2 = (/ymin,ymax/)
               call pgline(2,xx2,yy2)
-              write(hlbls,'(I5)')nint(dat(1,hp(i)))
+              write(hlbls,'(I5)') nint(dat(1,hp(i)))
               if(hlbl) call pgtext(xx(hp(i)),y(hp(i)),hlbls)
            end do
         end if
@@ -582,14 +582,14 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   !   dy = yy(iy0,i0+1)-yy(iy0,i0)
   !end if
   !
-  !write(*,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+  !write(*,'(3(A,ES12.4))') ' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
   !
   !write(*,*)''
   !!From listiyt
-  !write(*,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
+  !write(*,'(A)') ' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
   !     '       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
   !d = dat(:,i0)
-  !write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
+  !write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)') i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
   !     d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
   !write(*,*)''
   
@@ -598,7 +598,7 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   call pgsci(col)
   
   call pgpoint(1,xx(ix0,i0),yy(iy0,i0),2)
-  write(hlbls,'(I5)')i0
+  write(hlbls,'(I5)') i0
   call pgptxt(xx(ix0,i0),yy(iy0,i0),0.,0.,hlbls)
   
   call pgsci(1)

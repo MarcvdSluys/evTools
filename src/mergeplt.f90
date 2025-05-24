@@ -47,40 +47,40 @@ program mergeplt
      call get_command_argument(1,fin1)
      call get_command_argument(2,fin2)
      fout = 'merged.plt1'
-     write(*,'(A)')'  No output file name specified, using merged.plt1'
+     write(*,'(A)') '  No output file name specified, using merged.plt1'
   else
-     write(*,'(A)')'  mergeplt: merges the contents of two plot files to a third file'
-     write(*,'(A)')'            syntax:  mergeplt <infile1> <infile2> <outfile>'
+     write(*,'(A)') '  mergeplt: merges the contents of two plot files to a third file'
+     write(*,'(A)') '            syntax:  mergeplt <infile1> <infile2> <outfile>'
      goto 9999
   end if
   
   write(*,*)''
-  write(*,'(A)')'  Reading file '//trim(fin1)
+  write(*,'(A)') '  Reading file '//trim(fin1)
   open (unit=10,form='formatted',status='old',file=trim(fin1))
   rewind 10
   read(10,*)ncols1
   if(ncols1.gt.nnn+1) then
-     write(*,'(A)')'  The array DAT is too small for the number of columns'
-     write(*,'(A)')'  Aborting...'
+     write(*,'(A)') '  The array DAT is too small for the number of columns'
+     write(*,'(A)') '  Aborting...'
      goto 9999
   end if
   do j=1,nn
      read(10,*,err=12,end=11) (dat1(i,j),i=1,ncols1)
   end do
-  write(*,'(A)')'  End of file reached, arrays too small!'
+  write(*,'(A)') '  End of file reached, arrays too small!'
   close(10)
   goto 15
   
-11 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
-  write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat1(1,1),' - ',dat1(1,j-1)
+11 write(*,'(A,I6,A,I6,A,I6)') '  End of the file reached,',j-1,' lines read: model',nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
+  write(*,'(A8,ES14.7,A3,ES14.7)') '  time: ', dat1(1,1),' - ',dat1(1,j-1)
   close(10)
   goto 15
   
 12 write(*,*)'  File unreadable after line ',j-1
-  write(*,'(A)')'  Make sure files overlap !!!'
+  write(*,'(A)') '  Make sure files overlap !!!'
   write(*,*)''
-  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
-  write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat1(1,1),' - ',dat1(1,j-1)
+  write(*,'(A,I6,A,I6,A,I6)') '  ',j-1,' lines read: model', nint(dat1(1,1)),' - ',nint(dat1(1,j-1))
+  write(*,'(A8,ES14.7,A3,ES14.7)') '  time: ', dat1(1,1),' - ',dat1(1,j-1)
   close(10)
   
   
@@ -90,33 +90,33 @@ program mergeplt
   write(*,*)''
   
   
-  write(*,'(A)')'  Reading file '//trim(fin2)
+  write(*,'(A)') '  Reading file '//trim(fin2)
   open (unit=20,form='formatted',status='old',file=trim(fin2))
   rewind 20
   read(20,*)ncols2
   ncols = ncols1
   if(ncols2.ne.ncols1) then
-     write(*,'(A,I4,A,I4)')'  The two files have different numbers of columns:',ncols1,' vs.',ncols2    
+     write(*,'(A,I4,A,I4)') '  The two files have different numbers of columns:',ncols1,' vs.',ncols2    
      ncols = min(ncols1,ncols2)
-     write(*,'(A,I4)')'  Continuing with the minimum of the two:',ncols  !This can happen because I write 81 cols max.
+     write(*,'(A,I4)') '  Continuing with the minimum of the two:',ncols  !This can happen because I write 81 cols max.
   end if
   do j=1,nn
      read(20,*,err=22,end=21) (dat2(i,j),i=1,ncols2)
   end do
-  write(*,'(A)')'  End of file reached, arrays too small!'
+  write(*,'(A)') '  End of file reached, arrays too small!'
   close(20)
   goto 25
   
-21 write(*,'(A,I6,A,I6,A,I6)')'  End of the file reached,',j-1,' lines read: model',nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
-  write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat2(1,1),' - ',dat2(1,j-1)
+21 write(*,'(A,I6,A,I6,A,I6)') '  End of the file reached,',j-1,' lines read: model',nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
+  write(*,'(A8,ES14.7,A3,ES14.7)') '  time: ', dat2(1,1),' - ',dat2(1,j-1)
   close(10)
   goto 25
   
 22 write(*,*)'  File unreadable after line ',j-1
-  write(*,'(A)')'  Continuing process, check the result !!!'
+  write(*,'(A)') '  Continuing process, check the result !!!'
   write(*,*)''
-  write(*,'(A,I6,A,I6,A,I6)')'  ',j-1,' lines read: model', nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
-  write(*,'(A8,ES14.7,A3,ES14.7)')'  time: ', dat2(1,1),' - ',dat2(1,j-1)
+  write(*,'(A,I6,A,I6,A,I6)') '  ',j-1,' lines read: model', nint(dat2(1,1)),' - ',nint(dat2(1,j-1))
+  write(*,'(A8,ES14.7,A3,ES14.7)') '  time: ', dat2(1,1),' - ',dat2(1,j-1)
   close(20)
   
 25 n2=j-1
@@ -124,18 +124,18 @@ program mergeplt
   write(*,*)''
   
   if(ncols.gt.ncolsmax) then
-     write(*,'(A,I4,A,I4,A)')'  The number of columns is larger than', ncolsmax,', I can only save the first', ncolsmax,' !!!'
+     write(*,'(A,I4,A,I4,A)') '  The number of columns is larger than', ncolsmax,', I can only save the first', ncolsmax,' !!!'
      ncols = ncolsmax
   end if
   
   open(unit=30,form='formatted',status='new',file=trim(fout),iostat=i)
   if(i.ne.0) then
-     write(*,'(A)')'  File already exists: '//trim(fout)
-     write(*,'(A)')'  Aborting...'
+     write(*,'(A)') '  File already exists: '//trim(fout)
+     write(*,'(A)') '  Aborting...'
      goto 9999
   end if
-  write(*,'(A)')'  Creating output file: '//trim(fout)
-  write(30,'(I4)')ncols
+  write(*,'(A)') '  Creating output file: '//trim(fout)
+  write(30,'(I4)') ncols
   do j=1,n1
      if(dat1(1,j).ge.dat2(1,1)) goto 28 !Use time rather than model number
      if(ncols.le.81) write(30,2003) nint(dat1(1,j)), (dat1(i,j),i=2,ncols)  !v.2003
@@ -155,7 +155,7 @@ program mergeplt
   
   
   
-  write(*,'(A)')'  Program finished'
+  write(*,'(A)') '  Program finished'
 9999 write(*,*)''
   
 end program mergeplt

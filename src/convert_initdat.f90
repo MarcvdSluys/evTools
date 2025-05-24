@@ -152,12 +152,12 @@ program convert_initdat
      call get_command_argument(1,infilename)
      call get_command_argument(2,outfilename)
   else
-     write(0,'(/,A,/)')'  Syntax:  convert_initdat <old file> [<new file>]'
+     write(0,'(/,A,/)') '  Syntax:  convert_initdat <old file> [<new file>]'
      stop
   end if
   
-  write(*,'(/,A)')'  Input file:   '//trim(infilename)
-  write(*,'(A,/)')'  Output file:  '//trim(outfilename)
+  write(*,'(/,A)') '  Input file:   '//trim(infilename)
+  write(*,'(A,/)') '  Output file:  '//trim(outfilename)
   
   call set_defaults()
   call read_old_initdat(trim(infilename))
@@ -512,7 +512,7 @@ subroutine read_old_initdat(infilename)
   
   open(unit=10,form='formatted',status='old',action='read',position='rewind',file=trim(infilename),iostat=io)
   if(io.ne.0) then
-     write(0,'(A,/)')'  Error opening '//trim(infilename)//', aborting...'
+     write(0,'(A,/)') '  Error opening '//trim(infilename)//', aborting...'
      stop
   end if
   
@@ -536,8 +536,8 @@ subroutine read_old_initdat(infilename)
   close(10)
   
   if(io.ne.0) then
-     if(io.lt.0) write(0,'(A)')'  End of file reached before finishing read, aborting...'
-     if(io.gt.0) write(0,'(A)')'  Error reading '//trim(infilename)//', aborting...'
+     if(io.lt.0) write(0,'(A)') '  End of file reached before finishing read, aborting...'
+     if(io.gt.0) write(0,'(A)') '  Error reading '//trim(infilename)//', aborting...'
      stop
   end if
   
@@ -608,13 +608,13 @@ subroutine write_new_initdat(outfilename)
   
   open(unit=10,form='formatted',status='replace',action='write',position='rewind',file=trim(outfilename),iostat=io)
   if(io.ne.0) then
-     write(0,'(A,/)')'  Error opening '//trim(outfilename)//', aborting...'
+     write(0,'(A,/)') '  Error opening '//trim(outfilename)//', aborting...'
      stop
   end if
   
   write(10, nml=init_dat, iostat=io)
   if(io.ne.0) then
-     write(0,'(A,/)')'  Error writing init_dat namelist to '//trim(outfilename)//', aborting...'
+     write(0,'(A,/)') '  Error writing init_dat namelist to '//trim(outfilename)//', aborting...'
      stop
   end if
   
@@ -626,7 +626,7 @@ subroutine write_new_initdat(outfilename)
   ! This is a bit ugly, but do we want to use another fort.nnn file for this?
   !write(10, nml=accret, iostat=io)
   !if(io.ne.0) then
-  !   write(0,'(A,/)')'  Error writing accret namelist to '//trim(outfilename)//', aborting...'
+  !   write(0,'(A,/)') '  Error writing accret namelist to '//trim(outfilename)//', aborting...'
   !   stop
   !end if
   
@@ -634,7 +634,7 @@ subroutine write_new_initdat(outfilename)
   ! Finally, write the nucleosynthesis abundances:
   !write(10, nml=abund, iostat=io)
   !if(io.ne.0) then
-  !   write(0,'(A,/)')'  Error writing abund namelist to '//trim(outfilename)//', aborting...'
+  !   write(0,'(A,/)') '  Error writing abund namelist to '//trim(outfilename)//', aborting...'
   !   stop
   !end if
   

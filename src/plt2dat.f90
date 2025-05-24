@@ -99,7 +99,7 @@ program plt2dat
               stop
            end if
         end do
-        write(20,'(A)')''
+        write(20,'(A)') ''
      end do! i=1,n
      
      if(i.ge.n) write(0,'(A)') '  End of file not reached, arrays too small!'

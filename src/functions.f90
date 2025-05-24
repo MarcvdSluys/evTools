@@ -355,7 +355,7 @@ function getos()
   
   call system('uname > '//trim(homedir)//'/uname.tmp')  ! This gives Linux or Darwin
   open(16,file=trim(homedir)//'/uname.tmp', status='old', form='formatted')
-  read(16,'(A)')ostype
+  read(16,'(A)') ostype
   close(16, status = 'delete')
   getos = 1 !Linux
   if(ostype(1:5).eq.'Darwi') getos = 2 !MacOSX
@@ -382,7 +382,7 @@ function findfile(match)
   allocate(names(maxfile))
   
   if(len_trim(homedir).le.0.or.len_trim(homedir).ge.99) then
-     write(0,'(/,A,/)')'  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
+     write(0,'(/,A,/)') '  Findfile:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
      stop
   end if
   
@@ -405,14 +405,14 @@ function findfile(match)
   
   fnum = 1
   if(k.gt.1) then
-     write(*,'(A)')'  Files found:'
+     write(*,'(A)') '  Files found:'
      do i=1,k
-        write(*,'(I5,A)')i,':  '//trim(names(i))
+        write(*,'(I5,A)') i,':  '//trim(names(i))
      end do
      write(*,'(/,A)',advance='no')'  Enter the number of the file you want to view: '
      read*,fnum
      if(fnum.le.0.or.fnum.gt.k) then
-        write(*,'(/,A,/)')'  No file selected, quitting...'
+        write(*,'(/,A,/)') '  No file selected, quitting...'
         stop
      end if
      fname = names(fnum)
@@ -420,7 +420,7 @@ function findfile(match)
   
   if(k.eq.0.or.fnum.eq.0) then
      fname = ''
-     !if(k.eq.0) write(*,'(A)')'  No file found in this directory'
+     !if(k.eq.0) write(*,'(A)') '  No file found in this directory'
   end if
   
   findfile = fname
@@ -450,7 +450,7 @@ subroutine findfiles(match,nff,all, fnames,nf)
   character :: names(nff)*(99),tempfile*(99)
   
   if(len_trim(homedir).eq.99) then
-     write(0,'(/,A,/)')'  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
+     write(0,'(/,A,/)') '  Findfiles:  ERROR:  variable homedir not defined (forgot to call setconstants?), quitting.'
      stop
   end if
   
@@ -477,15 +477,15 @@ subroutine findfiles(match,nff,all, fnames,nf)
   
   if(k.gt.1) then
      if(all.eq.0) then !Select files manually
-        write(*,'(A)')'  Files found:'
+        write(*,'(A)') '  Files found:'
         do i=1,k
-           write(*,'(I5,A3,A)')i,':  ',trim(names(i))
+           write(*,'(I5,A3,A)') i,':  ',trim(names(i))
         end do
         write(*,*)''
-        write(*,'(A,I3)')'  Enter the number of the file you want to select: 1 -',k
-        write(*,'(A,I3,A1)')'    (max',nff,')'
-        write(*,'(A)')'      or:   0 - to select all files in the list'
-        write(*,'(A)')'           -1 - when done'
+        write(*,'(A,I3)') '  Enter the number of the file you want to select: 1 -',k
+        write(*,'(A,I3,A1)') '    (max',nff,')'
+        write(*,'(A)') '      or:   0 - to select all files in the list'
+        write(*,'(A)') '           -1 - when done'
         do j=1,nff
            read*,fnum
            if(fnum.lt.0) then
@@ -509,7 +509,7 @@ subroutine findfiles(match,nff,all, fnames,nf)
   
   if(k.eq.0) then
      fnames(1)='                                                                                                   '
-     !write(*,'(A)')'  No file found in this directory'
+     !write(*,'(A)') '  No file found in this directory'
      nf = 0
   end if
   
@@ -894,8 +894,8 @@ subroutine quit_program(message)
   integer :: len
   
   len = len_trim(message)
-  if(len.ge.1) write(0,'(/,A)')'  '//trim(message)
-  write(0,'(A,/)')'  Aborting...'
+  if(len.ge.1) write(0,'(/,A)') '  '//trim(message)
+  write(0,'(A,/)') '  Aborting...'
   stop
   
 end subroutine quit_program
@@ -1034,7 +1034,7 @@ subroutine evTools_settings()
      ! Read the settings file:
      open(unit=u,form='formatted',status='old',action='read',position='rewind',file=trim(filename),iostat=io)
      if(io.ne.0) then
-        write(0,'(A,/)')'  Error opening settings file '//trim(filename)//' for reading.'
+        write(0,'(A,/)') '  Error opening settings file '//trim(filename)//' for reading.'
         return
      end if
      read(u, nml=screen_settings, iostat=io)
@@ -1044,23 +1044,23 @@ subroutine evTools_settings()
         call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
      else
         write(*,*)
-        write(0,'(A)')'  An error occured when reading the settings file '//trim(filename)// &
+        write(0,'(A)') '  An error occured when reading the settings file '//trim(filename)// &
              ', using default settings.'
-        write(*,'(A)')'  The format of your settings file may be outdated.'
-        write(*,'(A)')'  Consider renaming the existing file and rerunning this program to generate a new settings file.'
+        write(*,'(A)') '  The format of your settings file may be outdated.'
+        write(*,'(A)') '  Consider renaming the existing file and rerunning this program to generate a new settings file.'
         write(*,*)
      end if
      
   else
      
      write(*,*)
-     write(*,'(A)')'############################################################'
-     write(*,'(A)')'#                                                          #'
-     write(*,'(A)')'#   No evTools settings file found.                        #'
-     write(*,'(A)')'#   Creating '//trim(filename)//' with default settings,   #'
-     write(*,'(A)')'#   please edit it to set your preferences.                #'
-     write(*,'(A)')'#                                                          #'
-     write(*,'(A)')'############################################################'
+     write(*,'(A)') '############################################################'
+     write(*,'(A)') '#                                                          #'
+     write(*,'(A)') '#   No evTools settings file found.                        #'
+     write(*,'(A)') '#   Creating '//trim(filename)//' with default settings,   #'
+     write(*,'(A)') '#   please edit it to set your preferences.                #'
+     write(*,'(A)') '#                                                          #'
+     write(*,'(A)') '############################################################'
      write(*,*)
      
   end if

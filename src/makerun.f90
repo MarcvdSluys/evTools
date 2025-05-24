@@ -72,7 +72,7 @@ program makerun
      call get_command_argument(2,arg)
      read(arg,*) per
      
-     write(*,'(A)')'  Orbital period provided, but no rotational period - synchronising binary...'
+     write(*,'(A)') '  Orbital period provided, but no rotational period - synchronising binary...'
      p = per
      
   else if(narg.eq.3) then  ! Mass 1+2 + Porb
@@ -83,7 +83,7 @@ program makerun
      call get_command_argument(3,arg)
      read(arg,*) per
      
-     write(*,'(A)')'  Orbital period provided, but no rotational period - synchronising binary...'
+     write(*,'(A)') '  Orbital period provided, but no rotational period - synchronising binary...'
      p = per
      
   else if(narg.eq.4) then  ! Mass 1+2 + Porb + Prot
@@ -97,14 +97,14 @@ program makerun
      read(arg,*) p
      
   else
-     write(*,'(/,A)')'  No arguments given - not changing anything.'
-     write(*,'(/,A)')'  Syntax: '
-     write(*,'(A)')'    makerun <M1>'
-     write(*,'(A)')'    makerun <M1> <Porb>'
-     write(*,'(A)')'    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
-     write(*,'(A,/)')'    makerun <M1> <M2> <Porb> <Prot>'
+     write(*,'(/,A)') '  No arguments given - not changing anything.'
+     write(*,'(/,A)') '  Syntax: '
+     write(*,'(A)') '    makerun <M1>'
+     write(*,'(A)') '    makerun <M1> <Porb>'
+     write(*,'(A)') '    makerun <M1> <M2> <Porb> (synchonise: Prot=Porb)'
+     write(*,'(A,/)') '    makerun <M1> <M2> <Porb> <Prot>'
      
-     write(*,'(A)')'  Contents of the current init.run:'
+     write(*,'(A)') '  Contents of the current init.run:'
      call print_main_settings(sm,m2,per,p)
      
      stop
@@ -132,7 +132,7 @@ program makerun
           sm,dty,age,per,bms,ecc,p,enc,jmx,  &
           ct1,ct2,ct3
      read(10,*) bla
-     write(20,'(/,A)')'last five lines:'
+     write(20,'(/,A)') 'last five lines:'
      
      io = 0
      do while(io.eq.0)
@@ -157,25 +157,25 @@ program makerun
   stop
   
   
-90 write(*,'(A,/)')'  Error opening file: '//trim(infile)
+90 write(*,'(A,/)') '  Error opening file: '//trim(infile)
   stop
-91 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 1'
+91 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 1'
   stop
-92 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 2'
+92 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 2'
   stop
-93 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 3'
+93 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 3'
   stop
-94 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 4'
+94 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 4'
   stop
-95 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 5'
+95 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 5'
   stop
-96 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 6'
+96 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 6'
   stop
-97 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 7'
+97 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 7'
   stop
-98 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 8'
+98 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 8'
   stop
-99 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 9'
+99 write(*,'(A,/)') '  Error reading file: '//trim(infile)//', line 9'
   stop
   
 end program makerun

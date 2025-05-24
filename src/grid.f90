@@ -29,9 +29,9 @@ program grid
   character :: bla*(99)
   
   if(command_argument_count().ne.3) then
-     write(*,'(/,A)')'  This program shows what values are used in a grid of models for ev'// &
+     write(*,'(/,A)') '  This program shows what values are used in a grid of models for ev'// &
           ' with specified grid settings'
-     write(*,'(A,/)')'  syntax:  grid <Xi, dX, n> '
+     write(*,'(A,/)') '  syntax:  grid <Xi, dX, n> '
      stop
   end if
   
@@ -42,14 +42,14 @@ program grid
   call get_command_argument(3,bla)
   read(bla,*)n
   
-  write(*,'(/,A,2ES11.3,I5)')'  Start at first value:  ',xi,dx,n
-  write(*,'(A,2ES11.3,I5,/)')'  Start at second value: ',xi+dx,dx,n-1
+  write(*,'(/,A,2ES11.3,I5)') '  Start at first value:  ',xi,dx,n
+  write(*,'(A,2ES11.3,I5,/)') '  Start at second value: ',xi+dx,dx,n-1
   
   write(*,*)
   call printgrid(xi,dx,n)
   write(*,*)
 
-  write(*,'(/,A,2ES11.3,I5)')'  Intermediate grid:     ',xi+dx/2.,dx,n-1
+  write(*,'(/,A,2ES11.3,I5)') '  Intermediate grid:     ',xi+dx/2.,dx,n-1
   write(*,*)
   call printgrid(xi+dx/2.,dx,n-1)
   write(*,*)
@@ -78,9 +78,9 @@ subroutine printgrid(xi1,dx,n)
   integer :: i
   
   xi = xi1
-  write(*,'(A5,2A10)')'i','x','log x'
+  write(*,'(A5,2A10)') 'i','x','log x'
   do i=1,n
-     write(*,'(I5,F10.5,ES12.3)')i,10.d0**xi,xi
+     write(*,'(I5,F10.5,ES12.3)') i,10.d0**xi,xi
      xi = xi + dx
   end do
   

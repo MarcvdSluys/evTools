@@ -28,9 +28,9 @@ program getgrid
   character :: bla*(99)
   
   if(command_argument_count().ne.3) then
-     write(*,'(/,A)')'  This program returns the parameters you need for a certain grid of N models with values between'// &
+     write(*,'(/,A)') '  This program returns the parameters you need for a certain grid of N models with values between'// &
           ' X1 and X2 in ev'
-     write(*,'(A,/)')'  Syntax:  getgrid <X1> <X2> <N>'
+     write(*,'(A,/)') '  Syntax:  getgrid <X1> <X2> <N>'
      stop
   end if
   
@@ -43,14 +43,14 @@ program getgrid
   
   dlgx = log10(x2/x1)/real(n-1)
   
-  write(*,'(/,A,2ES11.3,I5)')'  Start at first value:  ',log10(x1),dlgx,n
-  write(*,'(A,2ES11.3,I5,/)')'  Start at second value: ',log10(x1)+dlgx,dlgx,n-1
+  write(*,'(/,A,2ES11.3,I5)') '  Start at first value:  ',log10(x1),dlgx,n
+  write(*,'(A,2ES11.3,I5,/)') '  Start at second value: ',log10(x1)+dlgx,dlgx,n-1
   
   write(*,*)
   call printgrid(log10(x1),dlgx,n)
   write(*,*)
   
-  write(*,'(/,A,2ES11.3,I5)')'  Intermediate grid:     ',log10(x1)+dlgx/2.,dlgx,n-1
+  write(*,'(/,A,2ES11.3,I5)') '  Intermediate grid:     ',log10(x1)+dlgx/2.,dlgx,n-1
   write(*,*)
   call printgrid(log10(x1)+dlgx/2.,dlgx,n-1)
   write(*,*)
@@ -79,9 +79,9 @@ subroutine printgrid(xi1,dx,n)
   integer :: i
   
   xi = xi1
-  write(*,'(A5,2A10)')'i','x','log x'
+  write(*,'(A5,2A10)') 'i','x','log x'
   do i=1,n
-     write(*,'(I5,F10.5,ES12.3)')i,10.d0**xi,xi
+     write(*,'(I5,F10.5,ES12.3)') i,10.d0**xi,xi
      xi = xi + dx
   end do
   
