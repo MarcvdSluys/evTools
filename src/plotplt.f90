@@ -102,7 +102,7 @@ program plotplt
      read(10,*) ubv
      close(10)
   else
-     write(6,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
+     write(*,'(A)')" Warning:  I can't find the file "//trim(libdir)//"/UBVRI.Kur, so I can't calculate colours and magnitudes..."
   end if
   
   
@@ -157,7 +157,7 @@ program plotplt
   
   verbose = 1
   if(plot.eq.7) verbose = 0
-  if(verbose.eq.1) write(6,*)
+  if(verbose.eq.1) write(*,*)
   allocate(datf(nvar,nmax))
   do f=1,nf
      call read_plt_bse(10,trim(fnames(f)),nmax,nvar,nc,verbose,datf,nfi,version)  ! Use unit 10
@@ -179,7 +179,7 @@ program plotplt
      
      io = -1
      do while(io.ne.0)
-        write(6,'(A)', advance='no') '  Choose the X-axis variable: '
+        write(*,'(A)', advance='no') '  Choose the X-axis variable: '
         read(*,*, iostat=io) vx
         if(io.ne.0) cycle
         
@@ -232,7 +232,7 @@ program plotplt
   if(plot.lt.2) then      
      io = -1
      do while(io.ne.0)
-        write(6,'(A)', advance='no') '  Choose the Y-axis variable: '
+        write(*,'(A)', advance='no') '  Choose the Y-axis variable: '
         read(*,*, iostat=io) vy
         if(io.ne.0) cycle
         
@@ -396,7 +396,7 @@ program plotplt
   !***   LIN/LOG AXES
   !************************************************************************      
   if(plot.ne.6.and.plot.ne.7) then      
-     write(6,'(A)', advance='no') ' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(*,'(A)', advance='no') ' Do you want a logarithmic scale:  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,log
      if(log.eq.'X') log='x'
      if(log.eq.'Y') log='y'
@@ -523,10 +523,10 @@ program plotplt
   !************************************************************************      
   
 70 if(plot.ne.6.and.plot.ne.7) then      
-     write(6,*)''
-     write(6,*)' X-range:',xmin,'-',xmax
-     write(6,*)' Y-range:',ymin,'-',ymax
-     write(6,'(A)', advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
+     write(*,*)''
+     write(*,*)' X-range:',xmin,'-',xmax
+     write(*,*)' Y-range:',ymin,'-',ymax
+     write(*,'(A)', advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis, (B)oth: '
      read*,rng
      
      if(rng.eq.'N') rng='n'
@@ -537,31 +537,31 @@ program plotplt
      if(rng.eq.'n'.or.rng.eq.' ') goto 100
      
      if(rng.eq.'x'.or.rng.eq.'b') then
-        write(6,'(A51)', advance='no')'  Give the new range for the X-axis (Xmin, Xmax): '
+        write(*,'(A51)', advance='no')'  Give the new range for the X-axis (Xmin, Xmax): '
         read*,xmin,xmax
         if(xmin.gt.xmax) then
            x = xmin
            xmin = xmax
            xmax = x
-           write(6,'(A)')'  I swapped Xmin and Xmax'
+           write(*,'(A)')'  I swapped Xmin and Xmax'
         end if !if(xmin.gt.xmax)
      end if !if(rng.eq.'x'.or.rng.eq.'b')
      
      
      if(rng.eq.'y'.or.rng.eq.'b') then
-        write(6,'(A51)', advance='no')'  Give the new range for the Y-axis (Ymin, Ymax): '
+        write(*,'(A51)', advance='no')'  Give the new range for the Y-axis (Ymin, Ymax): '
         read*,ymin,ymax
         if(ymin.gt.ymax) then
            x = ymin
            ymin = ymax
            ymax = x
-           write(6,'(A)')'  I swapped Ymin and Ymax'
+           write(*,'(A)')'  I swapped Ymin and Ymax'
         end if !if(ymin.gt.ymax)
      end if !if(rng.eq.'y'.or.rng.eq.'b')
   end if  !if(plot.ne.6.and.plot.ne.7) then   
   
   
-  if(plot.ne.7) write(6,*)''  
+  if(plot.ne.7) write(*,*)''  
   !Limit ranges for logged axes like Mdot
   if(lgx) then
      if(vx.ge.31.and.vx.le.33.and.xmin.lt.-12.) xmin = -12.
@@ -591,23 +591,23 @@ program plotplt
   
 100 continue
   if(djdt.eq.1) then
-     write(6,*)''
-     write(6,'(A)')'  dJ_tot  : total angular-momentum loss'
-     write(6,'(A)')'  dJ_GW   : gravitational-wave AM loss'
-     write(6,'(A)')'  dJ_SMB  : Sills MB AM loss (was: wind AM loss)'
-     write(6,'(A)')'  dJ_RMB  : Rappaport MB AML (was: SO coupling AML)'
-     write(6,'(A)')'  dJ_ML   : non-conservative MT AM loss'
-     write(6,*)''
+     write(*,*)''
+     write(*,'(A)')'  dJ_tot  : total angular-momentum loss'
+     write(*,'(A)')'  dJ_GW   : gravitational-wave AM loss'
+     write(*,'(A)')'  dJ_SMB  : Sills MB AM loss (was: wind AM loss)'
+     write(*,'(A)')'  dJ_RMB  : Rappaport MB AML (was: SO coupling AML)'
+     write(*,'(A)')'  dJ_ML   : non-conservative MT AM loss'
+     write(*,*)''
   end if
   
   if(tscls.eq.1) then
-     write(6,*)
-     write(6,'(A)')'  tau_nuc  : nuclear evolution timescale'
-     write(6,'(A)')'  tau_th   : Kelvin-Helmholz timescale'
-     write(6,'(A)')'  tau_ML   : mass loss timescale'
-     write(6,'(A)')'  tau_Gw   : gravitational-wave timescale'
-     write(6,'(A)')'  tau_dyn  : dynamical timescale'
-     write(6,*)
+     write(*,*)
+     write(*,'(A)')'  tau_nuc  : nuclear evolution timescale'
+     write(*,'(A)')'  tau_th   : Kelvin-Helmholz timescale'
+     write(*,'(A)')'  tau_ML   : mass loss timescale'
+     write(*,'(A)')'  tau_Gw   : gravitational-wave timescale'
+     write(*,'(A)')'  tau_dyn  : dynamical timescale'
+     write(*,*)
   end if
   
   
@@ -632,19 +632,19 @@ program plotplt
   !************************************************************************      
   
   if(plot.lt.2.or.plot.eq.8) then 
-     write(6,*)''
+     write(*,*)''
      nhp = 0
      hp = 0
      hlp = .false.
      hlbl = .false.
-     write(6,'(A47)', advance='no')' Do you want to highlight model points (y/n) ? '
+     write(*,'(A47)', advance='no')' Do you want to highlight model points (y/n) ? '
      read*,ans
      if(ans.eq.'Y' .or. ans.eq.'y') hlp = .true.
      
      if(hlp) then
         hlp1 = 's'
         if(nf.eq.1) then
-           write(6,'(A)', advance='no')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
+           write(*,'(A)', advance='no')' Do you want show (S)tructure models or type model numbers (M)anually?  (S/M) ? '
            read*,hlp1
            if(hlp1.eq.'S') hlp1='s'
            if(hlp1.eq.'M') hlp1='m'
@@ -653,17 +653,17 @@ program plotplt
         ! Use saved structure models, store them in hp()
         if(hlp1.eq.'s') then
            do pl=1,npl
-              write(6,'(/,A)')'      Nr    Line   Model'
+              write(*,'(/,A)')'      Nr    Line   Model'
               i = 0
               do j=1,n(pl)
                  if(strmdls(pl,j).eq.1) then
                     i = i+1
                     hp(pl,i) = j
-                    write(6,'(3I8)')i,hp(pl,i),nint(dat(pl,1,j))
+                    write(*,'(3I8)')i,hp(pl,i),nint(dat(pl,1,j))
                  end if
               end do
               nhp(pl) = i
-              write(6,'(I5,A)')nhp(pl),' points selected.'
+              write(*,'(I5,A)')nhp(pl),' points selected.'
            end do !pl
         end if
         
@@ -671,7 +671,7 @@ program plotplt
         ! Enter points manually
         if(nf.eq.1 .and. hlp1.eq.'m') then
            pl = 1
-           write(6,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(pl,1,n)), &
+           write(*,'(A67,I7,A17)')' Enter the number(s) of the model(s) that you want to highlight: (1-',nint(dat(pl,1,n)), &
                 '), -1: end list: '
            nhp(pl) = 1
            do j=1,1000
@@ -683,19 +683,19 @@ program plotplt
            
            ! Convert model number to line number
 131        nhp(pl) = nhp(pl)-1
-           write(6,'(I5,A)')nhp(pl),' points selected:'
-           write(6,'(A)')'      Nr   Model    Line'
+           write(*,'(I5,A)')nhp(pl),' points selected:'
+           write(*,'(A)')'      Nr   Model    Line'
            do i=1,nhp(pl)
               call locate(dat(pl,1,1:n(pl)),n,dble(hp(pl,i)),j)
               if(abs(dat(pl,1,j+1)-dble(hp(pl,i))).lt.abs(dat(pl,1,j)-dble(hp(pl,i)))) j = j+1
               if(j.gt.n(pl)) j = n(pl)
-              write(6,'(3I8)')i,hp(pl,i),j
+              write(*,'(3I8)')i,hp(pl,i),j
               hp(pl,i) = j
            end do
         end if
         
-        write(6,*)''     
-        write(6,'(A43)', advance='no')' Do you want to label these points (y/n) ? '
+        write(*,*)''     
+        write(*,'(A43)', advance='no')' Do you want to label these points (y/n) ? '
         read*,ans
         if(ans.eq.'Y' .or. ans.eq.'y') hlbl=.true.
         
@@ -706,18 +706,18 @@ program plotplt
   ! Redetermine which structure models were saved after rereading file:
   if(plot.eq.6.or.plot.eq.7.and.hlp.and.hlp1.eq.'s') then
      !Use saved structure models, store them in hp()
-     !write(6,'(/,A)')'      Nr    Line   Model'
+     !write(*,'(/,A)')'      Nr    Line   Model'
      i = 0
      do pl=1,npl
         do j=1,n(pl)
            if(strmdls(pl,j).eq.1) then
               i = i+1
               hp(pl,i) = j
-              !write(6,'(3I8)')i,hp(pl,i),nint(dat(pl,1,j))
+              !write(*,'(3I8)')i,hp(pl,i),nint(dat(pl,1,j))
            end if
         end do
         nhp(pl) = i
-        !write(6,'(I5,A)')nhp(pl),' points selected.'
+        !write(*,'(I5,A)')nhp(pl),' points selected.'
      end do !pl
   end if
         
@@ -749,10 +749,10 @@ program plotplt
   end if
   
   if(plot.ne.0.and.plot.ne.7.and.plot.ne.9) then
-     write(6,*) ''     
-     write(6,*) ' X-range:',xmin,'-',xmax
-     write(6,*) ' Y-range:',ymin,'-',ymax
-     write(6,*) ''     
+     write(*,*) ''     
+     write(*,*) ' X-range:',xmin,'-',xmax
+     write(*,*) ' Y-range:',ymin,'-',ymax
+     write(*,*) ''     
   end if
   
   
@@ -780,7 +780,7 @@ program plotplt
            write(xwin,'(I3.3,A7)')xwini,'/xserve'
            io = pgopen(trim(xwin))
            if(io.le.0) then
-              write(6,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
+              write(*,'(A,I3,A,I3)')' X window',xwini," is unavailable, I'll try",xwini+1
               xwini = xwini + 1
            end if
         end do
@@ -1070,26 +1070,26 @@ program plotplt
   
 900 continue
   if(plot.ne.0.and.plot.ne.9) then
-     write(6,*)''
-     write(6,'(A)')' You can:'
-     write(6,'(A)')'  0) quit'
-     write(6,'(A)')'  1) change variables'
-     write(6,'(A)')'  2) change lin/log axes'
-     write(6,'(A)')'  3) change axis ranges'
-     write(6,'(A)')'  4) select zoom region'
-     write(6,'(A)')'  5) zoom out'
-     write(6,'(A)')'  6) reread file and make same plot'
-     write(6,'(A)')'  7) auto-update this plot'
-     write(6,'(A)')'  8) change input file'
-     write(6,'(A)')'  9) save plot as pdf'
-     write(6,'(A)')' 10) identify a point in the graph'
-     write(6,'(A)')' 11) toggle drawing line/points'
+     write(*,*)''
+     write(*,'(A)')' You can:'
+     write(*,'(A)')'  0) quit'
+     write(*,'(A)')'  1) change variables'
+     write(*,'(A)')'  2) change lin/log axes'
+     write(*,'(A)')'  3) change axis ranges'
+     write(*,'(A)')'  4) select zoom region'
+     write(*,'(A)')'  5) zoom out'
+     write(*,'(A)')'  6) reread file and make same plot'
+     write(*,'(A)')'  7) auto-update this plot'
+     write(*,'(A)')'  8) change input file'
+     write(*,'(A)')'  9) save plot as pdf'
+     write(*,'(A)')' 10) identify a point in the graph'
+     write(*,'(A)')' 11) toggle drawing line/points'
   end if  ! if(plot.ne.9) then
   
   io = -1
   write(*,*)
   do while(io.ne.0)
-     write(6,'(A)', advance='no') ' What do you want to do ?  '
+     write(*,'(A)', advance='no') ' What do you want to do ?  '
      read(*,*, iostat=io) plot
   end do
   if(plot.lt.0.or.plot.gt.11) goto 900
@@ -1115,7 +1115,7 @@ program plotplt
      nsel=0
      call pgolin(4,nsel,xsel,ysel,2)
      if(nsel.lt.2) then
-        write(6,'(A)')' I need at least 2 corner points...'
+        write(*,'(A)')' I need at least 2 corner points...'
         goto 941
      end if
      xmin = minval(xsel(1:nsel))  ! The new window is drawn for the extreme values of these points
@@ -1147,7 +1147,7 @@ program plotplt
   if(plot.eq.10) then  !Identify closest model
      xsel = 0.
      ysel = 0.
-     write(6,'(A)') ' Select a point in the graph and press the right mouse button or "x" key to finish'
+     write(*,'(A)') ' Select a point in the graph and press the right mouse button or "x" key to finish'
      call pgsci(1)
      nsel=0
      call pgolin(1,nsel,xsel,ysel,2)
@@ -1166,9 +1166,9 @@ program plotplt
            end if
         end do
      end do
-     write(6,*)''
-     write(6,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-     write(6,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(pl0,i0),',  y =',yy(pl0,i0),  &
+     write(*,*)''
+     write(*,'(A,ES12.4,A,ES12.4)')          ' Selected point:    x =',xsel(1),',  y =',ysel(1)
+     write(*,'(A,ES12.4,A,ES12.4,A,I5,A,I6)')' Closest model:     x =',xx(pl0,i0),',  y =',yy(pl0,i0),  &
           '    line =',i0+1,',  model =',nint(dat(pl0,1,i0))
      
      dx = 0
@@ -1184,16 +1184,16 @@ program plotplt
         dy = yy(pl0,i0+1)-yy(pl0,i0)
      end if
      
-     write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+     write(*,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
      
-     write(6,*)''
+     write(*,*)''
      !From listplt
-     write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
+     write(*,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
           '       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
      d = dat(pl0,:,i0)
-     write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
+     write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
           d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
-     write(6,*)''
+     write(*,*)''
      
      !col = 2
      col = colours(mod(pl0-1,ncolours)+1)
@@ -1210,12 +1210,12 @@ program plotplt
   if(plot.eq.11) then  ! Toggle between drawing lines, dots, or both
      ansi=-1
      do while(ansi.lt.0.or.ansi.gt.3)
-        write(6,'(A)')'  You can plot:'
-        write(6,'(A)')'  0: keep the current choice'
-        write(6,'(A)')'  1: lines'
-        write(6,'(A)')'  2: dots'
-        write(6,'(A)')'  3: both'
-        write(6,'(A)', advance='no')'  What would you like to plot?  '
+        write(*,'(A)')'  You can plot:'
+        write(*,'(A)')'  0: keep the current choice'
+        write(*,'(A)')'  1: lines'
+        write(*,'(A)')'  2: dots'
+        write(*,'(A)')'  3: both'
+        write(*,'(A)', advance='no')'  What would you like to plot?  '
         read*,ansi
      end do
      if(ansi.gt.0) plotstyle = ansi !1-3
@@ -1224,7 +1224,7 @@ program plotplt
   
   
 9999 continue
-  write(6,'(/,A,/)')' Program finished.'
+  write(*,'(/,A,/)')' Program finished.'
   
 end program plotplt
 !***********************************************************************************************************************************

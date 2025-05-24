@@ -49,7 +49,7 @@ program plotmod
   character :: labels(nc)*(60),lx*(60),ly*(60),title*(100)
   
   call setconstants()
-  write(6,*)
+  write(*,*)
   call print_code_version(6)  !To screen
   call evTools_settings()
   
@@ -68,9 +68,9 @@ program plotmod
   else if(narg.eq.1) then
      call get_command_argument(1,fname)
   else
-     write(6,'(A)')' Plotmod: plots the contents of a structure model file'
-     write(6,'(A)')'          syntax:  plotmod <filename>'
-     write(6,'(A)')'              or:  plotmod   to look for a .mod file in the current directory'
+     write(*,'(A)')' Plotmod: plots the contents of a structure model file'
+     write(*,'(A)')'          syntax:  plotmod <filename>'
+     write(*,'(A)')'              or:  plotmod   to look for a .mod file in the current directory'
      goto 9999
   end if
 
@@ -78,12 +78,12 @@ program plotmod
 
   ! READ FILE AND LIST MODELS IN FILE
 
-2 write(6,*)''
-  write(6,'(A)')' Reading file '//trim(fname)
+2 write(*,*)''
+  write(*,'(A)')' Reading file '//trim(fname)
   open (unit=10,form='formatted',status='old',file=trim(fname))
   rewind 10
 
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+  write(*,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
        '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
   do i=1,999
      !read(10,*,err=5,end=10) m1,dt,t,p,bms,ecc,p1,enc,kh,kp,jmod,jb,jin
@@ -110,24 +110,24 @@ program plotmod
         if(deq0(mhe).and.x1.lt.0.1) mhe = lnm*1.d33/msun
         if(deq0(mco).and.x4.lt.0.1) mco = lnm*1.d33/msun
      end do !j
-     write(6,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
+     write(*,'(I3,2I7,ES12.4,ES10.2,3F8.3,1x,4ES9.2,1x,3F7.4,2(F8.3,ES10.2))') &
           i,jmod,kh,t,dt,m1,mhe,mco,r1,l1,ts,tc,hc,hec,zc,bms,p,ecc,p1
   end do !i
-  write(6,'(A)')'  EOF not reached, array too small!'
+  write(*,'(A)')'  EOF not reached, array too small!'
   n=999
   goto 12
-5 write(6,'(A35,I3)')'  Error reading first line of block',i
+5 write(*,'(A35,I3)')'  Error reading first line of block',i
   goto 10
-6 write(6,'(A36,I3)')'  Error reading second line of block',i
+6 write(*,'(A36,I3)')'  Error reading second line of block',i
 10 n=i-1
-  write(6,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
+  write(*,'(A)')' Nr  Model  Nmesh         Age        dT      M1     Mhe     Mco         R        L     Teff       Tc'//  &
        '      Xc     Yc     Zc    Mtot      Porb       e      Prot'
-  write(6,'(I3,A)')n,' blocks read.'
+  write(*,'(I3,A)')n,' blocks read.'
 12 if(n.eq.0) goto 999
-  write(6,*)''
+  write(*,*)''
   blk = 1
   if(n.eq.1) goto 21
-20 write(6,'(A37,I2,A15)',advance='no')' Which block do you want to plot (1 -', n,'), 0 to quit: '
+20 write(*,'(A37,I2,A15)',advance='no')' Which block do you want to plot (1 -', n,'), 0 to quit: '
   read*,blk
   if(blk.eq.0) goto 9999
   if(blk.lt.1.or.blk.gt.n) goto 20
@@ -206,33 +206,33 @@ program plotmod
 
 
 32 continue   
-  write(6,*)''
-  write(6,'(A)')' Variables:                               0: Quit '
-  write(6,*)''
-  write(6,'(A)')'   1: Mesh point                       Abundances:'
-  write(6,'(A)')'   2: Mass                               11: H    '
-  write(6,'(A)')'   3: Radius                             12: He   '
-  write(6,'(A)')'   4: Temperature                        13: C    '
-  write(6,'(A)')'   5: Density                            14: O    '
-  write(6,'(A)')'   6: Luminosity                         15: Ne   '
-  write(6,'(A)')'   7: Fdegeneracy                                 '
-  write(6,'(A)')'   8: Potential (grav+centr)                      '
-  write(6,'(A)')'   9: Mass flux                                   '
-  write(6,'(A)')'  10: Moment of inertia                           '
-  write(6,*)''
+  write(*,*)''
+  write(*,'(A)')' Variables:                               0: Quit '
+  write(*,*)''
+  write(*,'(A)')'   1: Mesh point                       Abundances:'
+  write(*,'(A)')'   2: Mass                               11: H    '
+  write(*,'(A)')'   3: Radius                             12: He   '
+  write(*,'(A)')'   4: Temperature                        13: C    '
+  write(*,'(A)')'   5: Density                            14: O    '
+  write(*,'(A)')'   6: Luminosity                         15: Ne   '
+  write(*,'(A)')'   7: Fdegeneracy                                 '
+  write(*,'(A)')'   8: Potential (grav+centr)                      '
+  write(*,'(A)')'   9: Mass flux                                   '
+  write(*,'(A)')'  10: Moment of inertia                           '
+  write(*,*)''
 
 
 
-35 write(6,'(A36)',advance='no')' Choose the X-axis variable (1-15): '
+35 write(*,'(A36)',advance='no')' Choose the X-axis variable (1-15): '
   read*,vx
   if(vx.eq.0) goto 9999
   if(vx.lt.1.or.vx.gt.15) goto 35
-36 write(6,'(A36)',advance='no')' Choose the Y-axis variable (1-15): '
+36 write(*,'(A36)',advance='no')' Choose the Y-axis variable (1-15): '
   read*,vy
   if(vy.eq.0) goto 9999
   if(vy.lt.1.or.vy.gt.15) goto 36
 
-37 write(6,'(A68)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
+37 write(*,'(A68)',advance='no')' Do you want a logarithmic scale: (N)o, (X)-axis, (Y)-axis, (B)oth: '
   read*,log
 
   lx = labels(vx)
@@ -259,23 +259,23 @@ program plotmod
   ymin0 = ymin
   ymax0 = ymax
 
-70 write(6,*)''
-  write(6,*)' X-range:',xmin,'-',xmax
-  write(6,*)' Y-range:',ymin,'-',ymax
-  write(6,'(A66)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis:  '
+70 write(*,*)''
+  write(*,*)' X-range:',xmin,'-',xmax
+  write(*,*)' Y-range:',ymin,'-',ymax
+  write(*,'(A66)',advance='no')' Do you want to change a plot range ?  (N)o, (X)-axis, (Y)-axis:  '
   read*,ans
 
   if(ans.eq.'N'.or.ans.eq.'n'.or.ans.eq.' ') goto 100
 
 
   if(ans.eq.'X'.or.ans.eq.'x') then
-     write(6,'(A49)',advance='no')' Give the new range for the X-axis (Xmin, Xmax): '
+     write(*,'(A49)',advance='no')' Give the new range for the X-axis (Xmin, Xmax): '
      read*,xmin,xmax
      if(xmin.lt.xmin0) xmin = xmin0
      if(xmax.gt.xmax0) xmax = xmax0
      ymin=1.e33
      ymax=-1.e33
-     write(6,'(I5)')kh
+     write(*,'(I5)')kh
      do i=1,kh
         if(dat(vx,i).ge.xmin.and.dat(vx,i).le.xmax) then
            if(dat(vy,i).lt.ymin) ymin = dat(vy,i)
@@ -285,7 +285,7 @@ program plotmod
   end if
 
   if(ans.eq.'Y'.or.ans.eq.'y') then
-     write(6,'(A49)',advance='no')' Give the new range for the Y-axis (Ymin, Ymax): '
+     write(*,'(A49)',advance='no')' Give the new range for the Y-axis (Ymin, Ymax): '
      read*,ymin,ymax
      if(ymin.lt.ymin0) ymin = ymin0
      if(ymax.gt.ymax0) ymax = ymax0
@@ -300,9 +300,9 @@ program plotmod
   end if
 
 
-  write(6,*)''
-  write(6,*)' X-range:',xmin,'-',xmax
-  write(6,*)' Y-range:',ymin,'-',ymax
+  write(*,*)''
+  write(*,*)' X-range:',xmin,'-',xmax
+  write(*,*)' Y-range:',ymin,'-',ymax
 
 
 100 continue
@@ -318,7 +318,7 @@ program plotmod
   hmp = 999
   !      if(vx.eq.1) then
   do while(hmp.gt.kh)
-     write(6,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',kh,'): '
+     write(*,'(A28,I4,A3)',advance='no')' Highlight a mesh point (1 -',kh,'): '
      read*,hmp
      !if(hmp.gt.kh) goto 111
      if(hmp.lt.1) hmp=0
@@ -376,17 +376,17 @@ program plotmod
 
 
 
-200 write(6,*)''
-  write(6,'(A)')' You can:'
-  write(6,'(A)')'   0) quit'
-  write(6,'(A)')'   1) change variables'
-  write(6,'(A)')'   2) change lin/log axes'
-  write(6,'(A)')'   3) change axis ranges'
-  write(6,'(A)')'   4) change structure model'
-  write(6,'(A)')'   5) save plot as postscript'
-  write(6,'(A)',advance='no')' What would you like to do:  '
+200 write(*,*)''
+  write(*,'(A)')' You can:'
+  write(*,'(A)')'   0) quit'
+  write(*,'(A)')'   1) change variables'
+  write(*,'(A)')'   2) change lin/log axes'
+  write(*,'(A)')'   3) change axis ranges'
+  write(*,'(A)')'   4) change structure model'
+  write(*,'(A)')'   5) save plot as postscript'
+  write(*,'(A)',advance='no')' What would you like to do:  '
   read*,plotagain
-  write(6,*)''
+  write(*,*)''
 
   if(plotagain.eq.0) goto 999
   if(plotagain.eq.1) goto 32
@@ -402,12 +402,12 @@ program plotmod
   
   
   goto 999
-991 write(6,'(A)')' Error reading first line'
+991 write(*,'(A)')' Error reading first line'
   goto 999
-993 write(6,'(A)')' Error reading second line'
+993 write(*,'(A)')' Error reading second line'
   
 999 close(10)
-9999 write(6,*)''
+9999 write(*,*)''
 end program plotmod
 
 

@@ -232,13 +232,13 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            
            ! Keep this for testing
            ! if(xx(i).gt.1245.and.xx(i).lt.1265) then
-           ! write(6,*)''
+           ! write(*,*)''
            ! !if(dib.ne.0) then
-           ! write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
-           ! write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
-           ! write(6,'(5I10)')nint(zonex),nz
+           ! write(*,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(63:68,i-1)
+           ! write(*,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(63:68,i)
+           ! write(*,'(5I10)')nint(zonex),nz
            ! do j=1,nz
-           ! write(6,'(4F10.6)')zoney(j,:)
+           ! write(*,'(4F10.6)')zoney(j,:)
            ! end do
            ! end if
            
@@ -323,12 +323,12 @@ subroutine plt_convection(nmax,nvar,n, dat0, vx, lgx,lgy, ymin,ymax, nhp,hp,hlp,
            ! Keep this for testing
            ! if(xx(i).gt.1280.and.xx(i).lt.1330) then
            ! !if(dib.ne.0) then
-           ! write(6,*)''
-           ! write(6,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
-           ! write(6,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
-           ! write(6,'(5I10)')nint(zonex),nz
+           ! write(*,*)''
+           ! write(*,'(4I5,6F8.4)')i-1,nint(xx(i-1)),ibold,dib,dat(69:74,i-1)
+           ! write(*,'(4I5,6F8.4)')i,nint(xx(i)),ib,dib,dat(69:74,i)
+           ! write(*,'(5I10)')nint(zonex),nz
            ! do j=1,nz
-           ! write(6,'(4F10.6)')zoney(j,:)
+           ! write(*,'(4F10.6)')zoney(j,:)
            ! end do
            ! end if
            
@@ -538,7 +538,7 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   ! Identify closest model:
   xsel = 0.
   ysel = 0.
-  write(6,'(A)') ' Select a point in the graph and press "x" to finish'
+  write(*,'(A)') ' Select a point in the graph and press "x" to finish'
   nsel=0
   call pgsci(1)
   call pgolin(1,nsel,xsel,ysel,2)
@@ -563,9 +563,9 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
         end do
      end do
   end do
-  write(6,*)''
-  write(6,'(A,ES12.4,A,ES12.4)')      ' Selected point:    x =',xsel(1),',  y =',ysel(1)
-  write(6,'(A,ES12.4,A,ES12.4,A,I5)') ' Closest model:     x =',xx(ix0,i0),',  y =',yy(iy0,i0),  &
+  write(*,*)''
+  write(*,'(A,ES12.4,A,ES12.4)')      ' Selected point:    x =',xsel(1),',  y =',ysel(1)
+  write(*,'(A,ES12.4,A,ES12.4,A,I5)') ' Closest model:     x =',xx(ix0,i0),',  y =',yy(iy0,i0),  &
        ',  model =',i0
   
   !Copied from plotplt:
@@ -582,16 +582,16 @@ subroutine identify_closest_mdl_model(nn,nx,ny,xx,yy, xmin,xmax,ymin,ymax)
   !   dy = yy(iy0,i0+1)-yy(iy0,i0)
   !end if
   !
-  !write(6,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
+  !write(*,'(3(A,ES12.4))')' Derivative:       dx =',dx,', dy =',dy,',  dy/dx =',dy/dx
   !
-  !write(6,*)''
+  !write(*,*)''
   !!From listiyt
-  !write(6,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
+  !write(*,'(A)')' Line   Mdl     t (yr)   M(Mo)   Mhe   Mco   Menv    R (Ro)   L (Lo)    Te (K)   Tc (K)'//  &
   !     '       V    B-V     Xc    Yc   Porb(d)     dM/dt  M2/Mo'
   !d = dat(:,i0)
-  !write(6,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
+  !write(*,'(I5,I6,ES11.4,F8.3,2F6.3,F7.3,2(1x,2ES9.2),1x,2F7.3,1x,2F6.3,2ES10.2,F7.3)')i0+1,nint(d(1)),d(2),d(4),d(5),d(6),  &
   !     d(63),d(8),d(9),d(10),d(11),d(101),d(103),d(56),d(57),d(28),abs(d(31)),d(40)
-  !write(6,*)''
+  !write(*,*)''
   
   col = 2
   !col = colours(mod(iy0-1,ncolours)+1)  !2,3,...,ncolours,1,2,...

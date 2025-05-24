@@ -47,7 +47,7 @@ program mergeplt
      call get_command_argument(1,fin1)
      call get_command_argument(2,fin2)
      fout = 'merged.plt1'
-     write(6,'(A)')'  No output file name specified, using merged.plt1'
+     write(*,'(A)')'  No output file name specified, using merged.plt1'
   else
      write(*,'(A)')'  mergeplt: merges the contents of two plot files to a third file'
      write(*,'(A)')'            syntax:  mergeplt <infile1> <infile2> <outfile>'

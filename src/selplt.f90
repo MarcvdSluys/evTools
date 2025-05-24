@@ -171,13 +171,13 @@ program selplt
      
      
      goto 15
-     write(6,'(A,I5,A)')'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
+     write(*,'(A,I5,A)')'Error reading line',i-1,' of '//trim(fname)//', using the first part of the file only'
 15   continue
      close(10)
   end do  !f
   close(20)
   
-  write(6,'(I6,A1,I6,A,F4.1,A/)')nsel,'/',ndata,' data points (',real(nsel)/real(ndata)*100,'%) selected.'
+  write(*,'(I6,A1,I6,A,F4.1,A/)')nsel,'/',ndata,' data points (',real(nsel)/real(ndata)*100,'%) selected.'
 end program selplt
 
 

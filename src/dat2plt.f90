@@ -90,8 +90,8 @@ program dat2plt
   if(command_argument_count().eq.1) then
      call get_command_argument(1,infile)
   else
-     write(6,'(/,A)')'  dat2plt:   convert the stellar-evolution output of a different code to the plt format of ev'
-     write(6,'(A,/)')'  syntax:    dat2plt <filename>'
+     write(*,'(/,A)')'  dat2plt:   convert the stellar-evolution output of a different code to the plt format of ev'
+     write(*,'(A,/)')'  syntax:    dat2plt <filename>'
      stop
   end if
   
@@ -102,9 +102,9 @@ program dat2plt
   outfile = infile(1:i-1)//'.plt'
   
   
-  write(6,*)
-  write(6,'(A)')'  Input file:  '//trim(infile)
-  write(6,'(A)')'  Output file: '//trim(outfile)
+  write(*,*)
+  write(*,'(A)')'  Input file:  '//trim(infile)
+  write(*,'(A)')'  Output file: '//trim(outfile)
   
   ioi = 0
   open(unit=10,form='formatted',status='old',action='read',file=trim(infile),iostat=ioi)
@@ -168,7 +168,7 @@ program dat2plt
   close(20)
   
   
-  write(6,'(A,I5,A,I5,A,/)')'  Read',i-1+skipinlines,' input lines, wrote',i,' output lines'
+  write(*,'(A,I5,A,I5,A,/)')'  Read',i-1+skipinlines,' input lines, wrote',i,' output lines'
   
 end program dat2plt
 !***********************************************************************************************************************************

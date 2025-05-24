@@ -254,8 +254,8 @@ subroutine list_mdl_models(infile,nblk)
   
   
   
-  write(6,*)''
-  write(6,'(A)') '  Reading file '//trim(infile)
+  write(*,*)''
+  write(*,'(A)') '  Reading file '//trim(infile)
   open(unit=10,form='formatted',status='old',file=trim(infile))
   
   read(10,'(2x,I4,4x,I2,F7.3)',iostat=io) nmsh,ncol,mdlver  ! Actually, mdlver used to be the overshooting parameter(?)
@@ -291,16 +291,16 @@ subroutine list_mdl_models(infile,nblk)
      rewind(10)
   end if
   
-  write(6,*)''
-  write(6,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
+  write(*,*)''
+  write(*,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc     Rhoc'// &
        '      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
   
   mp = 1  ! Silence compiler warnings
   bl = 1
   block: do 
      if(mod(bl,25).eq.0) then
-        write(6,*) ''
-        write(6,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
+        write(*,*) ''
+        write(*,'(A)') '  Nr  Model Nmsh          Age        M1   Mhe   Mco     Menv         R        L     Teff       Tc'// &
              '     Rhoc      Xc     Yc     Cc     Oc     Xs    Ys    Zs   k^2'
      end if
      read(10,'(I6,1x,ES16.9)',iostat=io) nmdl,age
@@ -374,7 +374,7 @@ subroutine list_mdl_models(infile,nblk)
      end do mesh !do mp=1,nmsh
      
      vk = vk/((m1-mhe)*r1**2)   
-     write(6,'(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)') &
+     write(*,'(I4,I7,I5,ES13.5,f10.4,2f6.3,ES9.2,1x,4ES9.2,ES9.2,1x,4f7.4,1x,4f6.3,2ES8.1)') &
           bl,nmdl,nmsh,age,m1,mhe,mco,m1-mhe,r1,l1,ts,tc,rhoc,hc,hec,cc,oc,hs,hes,zs,vk !,be,be1 !,bms,p,p1
      
      bl = bl+1
@@ -384,12 +384,12 @@ subroutine list_mdl_models(infile,nblk)
   close(10)
   
   nblk = bl-1
-  write(6,*)''
+  write(*,*)''
   write(*,*)' EOF reached,',nblk,' structure models read.'
-  write(6,*)''
+  write(*,*)''
   
   if(nblk.eq.0) then
-     write(6,'(A,/)')'  Program finished'
+     write(*,'(A,/)')'  Program finished'
      stop
   end if
   
@@ -473,7 +473,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   if(io.ne.0) then  ! Error/EOF
      close(10)
      if(io.lt.0) then
-        write(6,'(A,/)')'  Program finished'  !EOF
+        write(*,'(A,/)')'  Program finished'  !EOF
      else
         write(0,'(A,2(I5,A),/)')'  Error reading model',blk,'line',mp-1,', aborting...'  ! Read error
      end if
@@ -591,17 +591,17 @@ subroutine print_mdl_details(infile,blk,svblk)
   !***   PRINT MODEL DETAILS
   !************************************************************************      
   if(.not.svblk) then
-     write(6,'(A)') ' Properties of this model:'
-     write(6,*) ''
-     write(6,81) nmdl,nmsh,m1,age,zs
-     write(6,*) ''
-     write(6,83) m1,r1,l1,ts
-     write(6,84) tc,pc,rhoc, kkc,muc
-     write(6,*) ''
-     write(6,85) mhe,mco,mhenv
-     write(6,*) ''
-     write(6,90) hs,hes,cs,nis,os,nes,mgs,zs
-     write(6,91) hc,hec,cc,nic,oc,nec,mgc,zc
+     write(*,'(A)') ' Properties of this model:'
+     write(*,*) ''
+     write(*,81) nmdl,nmsh,m1,age,zs
+     write(*,*) ''
+     write(*,83) m1,r1,l1,ts
+     write(*,84) tc,pc,rhoc, kkc,muc
+     write(*,*) ''
+     write(*,85) mhe,mco,mhenv
+     write(*,*) ''
+     write(*,90) hs,hes,cs,nis,os,nes,mgs,zs
+     write(*,91) hc,hec,cc,nic,oc,nec,mgc,zc
      write(*,*)
      write(*,'(2x,A,ES10.4,A)') 'Mean opacity: ', kappa_mean, ' cm^2/g'
      write(*,*)
@@ -621,7 +621,7 @@ subroutine print_mdl_details(infile,blk,svblk)
   
   if(svblk) then
      close(20)
-     write(6,'(A)')' Output model saved in '//trim(outfile)//'.'
+     write(*,'(A)')' Output model saved in '//trim(outfile)//'.'
      svblk = .false.  ! Stop saving the model block
   end if
   
@@ -688,7 +688,7 @@ subroutine read_first_mdls(infile,blk)
            if(io.ne.0) then  ! Error/EOF
               close(10)
               if(io.lt.0) then
-                 write(6,'(A,/)')'  Program finished'  ! EOF
+                 write(*,'(A,/)')'  Program finished'  ! EOF
               else
                  write(0,'(A,2(I5,A),/)')'  Error reading model',bl-1,'line',mp-1,', aborting...'  ! Read error
               end if
@@ -740,7 +740,7 @@ subroutine read_chosen_mdl(blk, mdl,age,dat)
      if(io.ne.0) then  !Error/EOF
         close(10)
         if(io.lt.0) then
-           write(6,'(A,/)')'  Program finished'  !EOF
+           write(*,'(A,/)')'  Program finished'  !EOF
         else
            write(0,'(A,2(I5,A),/)')'  Error reading model',blk-1,'line',mp-1,', aborting...'  ! Read error
            print*,real(dat1(1:ncol))

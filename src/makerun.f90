@@ -157,25 +157,25 @@ program makerun
   stop
   
   
-90 write(6,'(A,/)')'  Error opening file: '//trim(infile)
+90 write(*,'(A,/)')'  Error opening file: '//trim(infile)
   stop
-91 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 1'
+91 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 1'
   stop
-92 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 2'
+92 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 2'
   stop
-93 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 3'
+93 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 3'
   stop
-94 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 4'
+94 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 4'
   stop
-95 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 5'
+95 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 5'
   stop
-96 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 6'
+96 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 6'
   stop
-97 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 7'
+97 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 7'
   stop
-98 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 8'
+98 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 8'
   stop
-99 write(6,'(A,/)')'  Error reading file: '//trim(infile)//', line 9'
+99 write(*,'(A,/)')'  Error reading file: '//trim(infile)//', line 9'
   stop
   
 end program makerun

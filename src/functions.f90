@@ -405,11 +405,11 @@ function findfile(match)
   
   fnum = 1
   if(k.gt.1) then
-     write(6,'(A)')'  Files found:'
+     write(*,'(A)')'  Files found:'
      do i=1,k
-        write(6,'(I5,A)')i,':  '//trim(names(i))
+        write(*,'(I5,A)')i,':  '//trim(names(i))
      end do
-     write(6,'(/,A)',advance='no')'  Enter the number of the file you want to view: '
+     write(*,'(/,A)',advance='no')'  Enter the number of the file you want to view: '
      read*,fnum
      if(fnum.le.0.or.fnum.gt.k) then
         write(*,'(/,A,/)')'  No file selected, quitting...'
@@ -420,7 +420,7 @@ function findfile(match)
   
   if(k.eq.0.or.fnum.eq.0) then
      fname = ''
-     !if(k.eq.0) write(6,'(A)')'  No file found in this directory'
+     !if(k.eq.0) write(*,'(A)')'  No file found in this directory'
   end if
   
   findfile = fname
@@ -477,15 +477,15 @@ subroutine findfiles(match,nff,all, fnames,nf)
   
   if(k.gt.1) then
      if(all.eq.0) then !Select files manually
-        write(6,'(A)')'  Files found:'
+        write(*,'(A)')'  Files found:'
         do i=1,k
-           write(6,'(I5,A3,A)')i,':  ',trim(names(i))
+           write(*,'(I5,A3,A)')i,':  ',trim(names(i))
         end do
-        write(6,*)''
-        write(6,'(A,I3)')'  Enter the number of the file you want to select: 1 -',k
-        write(6,'(A,I3,A1)')'    (max',nff,')'
-        write(6,'(A)')'      or:   0 - to select all files in the list'
-        write(6,'(A)')'           -1 - when done'
+        write(*,*)''
+        write(*,'(A,I3)')'  Enter the number of the file you want to select: 1 -',k
+        write(*,'(A,I3,A1)')'    (max',nff,')'
+        write(*,'(A)')'      or:   0 - to select all files in the list'
+        write(*,'(A)')'           -1 - when done'
         do j=1,nff
            read*,fnum
            if(fnum.lt.0) then
@@ -509,7 +509,7 @@ subroutine findfiles(match,nff,all, fnames,nf)
   
   if(k.eq.0) then
      fnames(1)='                                                                                                   '
-     !write(6,'(A)')'  No file found in this directory'
+     !write(*,'(A)')'  No file found in this directory'
      nf = 0
   end if
   
@@ -1043,25 +1043,25 @@ subroutine evTools_settings()
      if(io.eq.0) then
         call pgxy2szrat_screen(screen_size_h,screen_size_v, screen_dpi, scrsz,scrrat)
      else
-        write(6,*)
+        write(*,*)
         write(0,'(A)')'  An error occured when reading the settings file '//trim(filename)// &
              ', using default settings.'
-        write(6,'(A)')'  The format of your settings file may be outdated.'
-        write(6,'(A)')'  Consider renaming the existing file and rerunning this program to generate a new settings file.'
-        write(6,*)
+        write(*,'(A)')'  The format of your settings file may be outdated.'
+        write(*,'(A)')'  Consider renaming the existing file and rerunning this program to generate a new settings file.'
+        write(*,*)
      end if
      
   else
      
-     write(6,*)
-     write(6,'(A)')'############################################################'
-     write(6,'(A)')'#                                                          #'
-     write(6,'(A)')'#   No evTools settings file found.                        #'
-     write(6,'(A)')'#   Creating '//trim(filename)//' with default settings,   #'
-     write(6,'(A)')'#   please edit it to set your preferences.                #'
-     write(6,'(A)')'#                                                          #'
-     write(6,'(A)')'############################################################'
-     write(6,*)
+     write(*,*)
+     write(*,'(A)')'############################################################'
+     write(*,'(A)')'#                                                          #'
+     write(*,'(A)')'#   No evTools settings file found.                        #'
+     write(*,'(A)')'#   Creating '//trim(filename)//' with default settings,   #'
+     write(*,'(A)')'#   please edit it to set your preferences.                #'
+     write(*,'(A)')'#                                                          #'
+     write(*,'(A)')'############################################################'
+     write(*,*)
      
   end if
   

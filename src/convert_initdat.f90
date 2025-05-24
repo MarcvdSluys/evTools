@@ -156,8 +156,8 @@ program convert_initdat
      stop
   end if
   
-  write(6,'(/,A)')'  Input file:   '//trim(infilename)
-  write(6,'(A,/)')'  Output file:  '//trim(outfilename)
+  write(*,'(/,A)')'  Input file:   '//trim(infilename)
+  write(*,'(A,/)')'  Output file:  '//trim(outfilename)
   
   call set_defaults()
   call read_old_initdat(trim(infilename))
